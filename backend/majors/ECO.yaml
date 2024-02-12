@@ -22,44 +22,40 @@ req_list:
     MAT (175 or equivalent), earning a letter grade of C or better in each course.
     ORF 245 can be substituted for ECO 202. POL 345 followed by POL 346 can also be
     used to satisfy our statistics pre-requirement. (POL 345 alone is not sufficient).
-    PSY 251, SPI 200 and SOC 301 are also not sufficient. The statistics pre-requirement
+    PSY 251, SPI 200 and SOC 301 are also not accepted. The statistics pre-requirement
     cannot be satisfied with summer courses taken after the student has begun studies
     at Princeton, except in unusual circumstances approved by the departmental representative,
     Professor Smita Brunnermeier (smita@princeton.edu).
   completed_by_semester: 4
+  min_grade: 2
   req_list:
   - name: Economics
     max_counted: 1
     min_needed: 3
     explanation: To enter the department, a student must complete, by the end of sophomore
-      year, the prerequisite courses ECO 100, ECO 101, ECO 202 (or equivalent), and
-      MAT (175 or equivalent), earning a letter grade of C or better in each course.
+      year, the prerequisite courses ECO 100, ECO 101, ECO 202 (or equivalent).
       ORF 245 can be substituted for ECO 202. POL 345 followed by POL 346 can also
       be used to satisfy our statistics pre-requirement. (POL 345 alone is not sufficient).
     req_list:
     - name:
-      max_counted: 2
-      min_needed:
-      explanation:
+      max_counted: 1
+      min_needed: 2
       course_list:
       - ECO 100
       - ECO 101
     - name:
       max_counted: 1
       min_needed: 1
-      explanation:
       req_list:
       - name:
         max_counted: 1
-        min_needed:
-        explanation:
+        min_needed: 1
         course_list:
         - ECO 202
         - ORF 245
       - name:
         max_counted: 1
         min_needed: ALL
-        explanation:
         course_list:
         - POL 345
         - POL 346
@@ -67,46 +63,18 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      Incoming majors must complete MAT 175 (or equivalent) by the end of their sophomore year and earn a letter grade of C or better. MAT 201 or EGR 156 can be used as a substitute for MAT 175 for entry into the department.
-
-      Students will only be exempt from the Economics Department’s MAT 175 pre-requisite if they have already taken an acceptable college level course in multivariate calculus and earned a grade of C or better. Please note that the AP BC calculus curriculum is not sufficient since it only teaches univariate calculus, while MAT 175 focuses on multivariate calculus.
-
-      Students who wish to take math-track econometrics (ECO 312), upper level finance certificate courses (such as ECO 462, ECO 465 and ECO 466), or pursue graduate studies in economics and finance should take MAT 201 and MAT 202 instead of MAT 175. Both courses should be taken for a letter grade by this subset of students. The finance certificate program strongly advises that you take both MAT 201 and MAT 202; only the highest of the two grades is recorded for the purpose of fulfilling the entry requirements. Students who choose to fulfill this requirement by taking the one-semester MAT 175 will be responsible for mastering the linear algebra part of the curriculum on their own.
-    completed_by_semester: 4
-    req_list:
-    - name:
-      max_counted: 1
-      min_needed: 1
-      explanation:
-      course_list:
-      - MAT 175
-      - MAT 201
-      - MAT 203
-      - EGR 156
-    - name:
-      max_counted: 1
-      min_needed: ALL
-      explanation:
-      req_list:
-      - name:
-        max_counted: 1
-        min_needed:
-        explanation:
-        course_list:
-        - MAT 201
-        - MAT 203
-      - name:
-        max_counted: 1
-        min_needed:
-        explanation:
-        course_list:
-        - MAT 202
-        - MAT 204
+      Majors must complete MAT 175 (or equivalent) by the end of sophomore year and earn a letter grade of C or better in each course. MAT 201 or EGR 156 can be substituted for MAT 175.
+      
+      It is highly recommended that students who wish to take math-track econometrics (ECO 312) or upper-level finance certificate courses (such as ECO 462, ECO 465 and ECO 466), or pursue graduate studies in economics and finance take MAT 201 and MAT 202 instead of one semester of MAT 175 or EGR 156. Both MAT 201 and MAT 202 should be taken for a letter grade by this subset of students.
+    course_list:
+    - MAT 175
+    - MAT 201
+    - EGR 156
 - name: Core Courses
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    All concentrators must pass, on a graded basis, core courses in microeconomics (ECO 300 or 310), macroeconomics (ECO 301 or 311) and econometrics (ECO 302 or 312). These courses must be completed during or before the junior year. Each of the three core courses is offered in two versions to accommodate different levels of preparation in mathematics: ECO 300, ECO 301 and ECO 302 require MAT 175 or equivalent. Students who wish to take ECO 310 and/or ECO 311 can take either MAT 175 or MAT 201; the latter course will provide a more thorough preparation. Students planning to take ECO 312 should take the two semester sequence MAT 201 and MAT 202 instead of MAT 175.
+    All majors must pass, on a graded basis, core courses in microeconomics (ECO 300 or 310), macroeconomics (ECO 301 or 311) and econometrics (ECO 302 or 312). These courses must be completed during or before the junior year. Each of the three core courses is offered in two versions to accommodate different levels of preparation in mathematics: ECO 300, ECO 301 and ECO 302 require MAT 175 or equivalent. ECO 310 and ECO 311 require MAT 201. ECO 312 requires MAT 201 + MAT 202.
 
     Qualified students are encouraged to take the more mathematical versions. It is not necessary to take all three courses in the same version.
   completed_by_semester: 6
@@ -121,14 +89,12 @@ req_list:
   - name: Macroeconomics
     max_counted: 1
     min_needed: 1
-    explanation:
     course_list:
     - ECO 301
     - ECO 311
-  - name: Economometrics
+  - name: Econometrics
     max_counted: 1
     min_needed: 1
-    explanation:
     course_list:
     - ECO 302
     - ECO 312
@@ -136,58 +102,55 @@ req_list:
   max_counted: 1
   min_needed: 5
   explanation: |-
-    In addition to the three core courses, concentrators must pass, on a graded basis, five other departmental courses. Departmentals can be any 300-, 400-, or 500-level Economics courses, or an approved cognate (see Cognates).
+    In addition to the three core courses, majors must pass, on a graded basis, five other departmental courses. Departmentals can be any 300-, 400-, or 500-level Economics courses, or an approved cognate.
 
     Students planning a senior thesis with empirical emphasis are strongly encouraged to take ECO 313; students planning a theoretical senior thesis are strongly encouraged to take ECO 317 and/or ECO 418.
   req_list:
   - name: Economics
-    max_counted:
-    min_needed: 3
-    explanation:
+    max_counted: 5
+    min_needed: 1
     course_list:
     - ECO 3*
     - ECO 4*
     - ECO 5*
   - name: Cognates
     max_counted: 2
-    min_needed:
+    min_needed: 1
     explanation: Economics majors are allowed to count a maximum of two courses from
       other departments as cognates. These courses need to have substantial economics
       content. A course with an Economics cross-listing (indicated by an ECO 3XX,
       ECO 4XX, or ECO 5XX number in its first or second listing) counts as a regular
       departmental, not as a cognate. Courses that will be automatically recognized
-      by SCORE as cognates are listed below. No application is necessary for these
+      by TigerHub as cognates are listed below. No application is necessary for these
       courses.
     course_list:
     - COS 445
-    - ECE 381
+    - ECE 473 / COS 473
     - ENE 422/MAE 422
     - HIS 474
     - MAT 378
-    - ORF 307
-    - ORF 309
+    - ORF 307 / EGR 307
+    - ORF 309 / EGR 309 / MAT 380
     - ORF 311
     - ORF 350
-    - ORF 360
-    - ORF 363
+    - ORF 363 / COS 323
     - ORF 405
-    - ORF 417
+    - ORF 445 / ORF 474
     - ORF 473
-    - ORF 474
     - POL 335
-    - POL 347
     - POL 349
-    - POL 352
+    - POL 385
     - POL 385
     - POL 432
+    - POL 434
+    - POL 492
     - POL 505
-    - SPI 329/POL 350
+    - SOC 306 / SML 306
+    - SPI 329 / POL 350
+    - SPI 340 / PSY 321
+    - SPI 373 / CHV 373
+    - SPI 466 / HIS 467
     - SPI 522
-    - SPI 309
-    - SPI 340/PSY 321
-    - SPI 373/CHV 373
-    - SPI 408
-    - SPI 466/HIS 467
     - SPI 524
     - SPI 538
     - SPI 582C
@@ -218,7 +181,7 @@ req_list:
       explanation: |-
         In addition to the two Politics prerequisites, a student in the PPE must complete three Politics departmentals, i.e. Politics courses in the 300-level or higher, on a graded basis.
 
-        <i>Note:</i> Starting with the class of 2022, POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.
+        <i>Note:</i> POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.
       excluded_course_list:
       - POL 345
       - POL 446
@@ -226,19 +189,17 @@ req_list:
       - POL 3*
       - POL 4*
       - POL 5*
-- name: Independent Work
-  max_counted:
-  min_needed:
+- name: Junior Independent Work
+  max_counted: 1
+  min_needed: 1
   explanation: |-
     <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
 
-    Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Juniors complete a yearlong research project, which consists of a research prospectus submitted in December and a final paper submitted in April.
-  no_req:
+    Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Juniors complete a year-long research project, which consists of a research prospectus submitted in December and a final paper submitted in April.
 - name: Senior Thesis
-  max_counted:
-  min_needed:
+  max_counted: 1
+  min_needed: 1
   explanation: |-
     <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
 
     Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Unlike junior independent work, the senior thesis is expected to be more extensive, with a topic of greater scope and, correspondingly broader analysis and interpretation.
-  no_req:

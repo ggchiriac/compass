@@ -462,6 +462,9 @@ export function Canvas({
           setActiveId(active.id);
           setActiveContainerId(findContainer(active.id));
           setClonedItems(items);
+
+          console.log('Drag start');
+          console.log('activeId:', active.id);
         }}
         onDragOver={({ active, over }) => {
           const overId = over?.id;
@@ -471,6 +474,12 @@ export function Canvas({
 
           const overContainer = findContainer(overId);
           const activeContainer = findContainer(active.id);
+
+          console.log('Drag over');
+          console.log('overId:', overId);
+          console.log('overContainer:', overContainer);
+          console.log('activeId:', active.id);
+          console.log('activeContainer:', activeContainer);
 
           if (!overContainer || !activeContainer) {
             return;
@@ -661,11 +670,25 @@ export function Canvas({
 
   function handleRemove(value: UniqueIdentifier, containerId: UniqueIdentifier) {
     setItems((items) => {
+      const userCurrentCourses: Set<string> = new Set<string>();
+      Object.keys(items).forEach((key) => {
+        if (key !== SEARCH_RESULTS_ID) {
+          const courses = items[key];
+          courses.forEach((course) => {
+            if (course.toString() !== value.toString()) {
+              userCurrentCourses.add(course.toString());
+            }
+          });
+        }
+      });
       const updatedCourses = {
         ...items,
-        [SEARCH_RESULTS_ID]: searchResults.map(
-          (course) => `${course.department_code} ${course.catalog_number}`
-        ),
+        [SEARCH_RESULTS_ID]: searchResults
+          .filter(
+            (course) =>
+              !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`)
+          )
+          .map((course) => `${course.department_code} ${course.catalog_number}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
