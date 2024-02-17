@@ -40,15 +40,7 @@ const Dashboard: FC = () => {
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded overflow-x-auto'>
           {!isLoading && userProfile && userProfile.netId !== '' ? (
-            <Canvas
-              user={userProfile}
-              columns={2}
-              strategy={rectSortingStrategy}
-              wrapperStyle={() => ({
-                width: 150,
-                height: 150,
-              })}
-            />
+            <Canvas user={userProfile} columns={2} strategy={rectSortingStrategy} />
           ) : (
             <div>
               <SkeletonApp />

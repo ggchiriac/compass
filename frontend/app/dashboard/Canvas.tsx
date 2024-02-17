@@ -137,7 +137,8 @@ type Props = {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
-  initialItems?: Items; // Consider removing since we populate semester bins based on classyear
+  // Consider removing since we populate semester bins based on classyear
+  initialItems?: Items;
   containerStyle?: React.CSSProperties;
   coordinateGetter?: KeyboardCoordinateGetter;
 
@@ -150,8 +151,6 @@ type Props = {
     isSorting: boolean;
     isDragOverlay: boolean;
   }): React.CSSProperties;
-
-  wrapperStyle?(args: { index: number }): React.CSSProperties;
 
   itemCount?: number;
   items?: Items;
@@ -173,15 +172,12 @@ const defaultClassYear = new Date().getFullYear() + 1;
 export function Canvas({
   user,
   adjustScale = false,
-  // itemCount = 3, // remove this?
   cancelDrop,
   columns = 2,
   handle = true,
-  // initialItems, // remove
   containerStyle,
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
-  wrapperStyle = () => ({}),
   minimal = false,
   modifiers,
   renderItem,
@@ -189,6 +185,11 @@ export function Canvas({
   // vertical = false,
   scrollable,
 }: Props) {
+  // This limits the width of the course cards
+  const wrapperStyle = () => ({
+    width: '100%',
+    height: 150,
+  });
   const classYear = user.classYear ?? defaultClassYear;
 
   const generateSemesters = (classYear: number): Items => {
@@ -228,6 +229,7 @@ export function Canvas({
     ...semesters,
   }));
 
+  // The width of the semester bins is hard-coded here
   const semesterBinStyle = {
     ...containerStyle,
     width: '322px',
@@ -339,6 +341,7 @@ export function Canvas({
   const initialContainers = [SEARCH_RESULTS_ID, ...Object.keys(semesters)];
   const containers = initialContainers;
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
+  // const [shouldExpand, setShouldExpand] = useState(false);
   const [activeContainerId, setActiveContainerId] = useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
@@ -506,6 +509,9 @@ export function Canvas({
           }
         }}
         onDragEnd={async ({ active, over }) => {
+          // setShouldExpand(true);
+          // Reset after animation duration
+          // setTimeout(() => setShouldExpand(false), 200);
           // Active and over are course draggables.
           if (!activeContainerId) {
             setActiveId(null);
@@ -556,7 +562,7 @@ export function Canvas({
                   key='Search Results'
                   id='Search Results'
                   label={<Search />}
-                  columns={columns}
+                  columns={1}
                   items={items['Search Results']}
                   scrollable={scrollable}
                   style={containerStyle}
@@ -661,7 +667,7 @@ export function Canvas({
           isDragOverlay: true,
         })}
         color={getColor(id)}
-        wrapperStyle={wrapperStyle({ index: 0 })}
+        wrapperStyle={wrapperStyle()}
         renderItem={renderItem}
         dragOverlay
       />
