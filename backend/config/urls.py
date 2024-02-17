@@ -37,4 +37,6 @@ urlpatterns = [
     path('check_requirements/', views.check_requirements, name='check_requirements'),
     path('update_user/', views.update_user, name='update_user'),
     path('requirement_info/', views.requirement_info, name='requirement_info'),
+    # Calendar
+    path('calendar_search/', views.calendar_search, name='calendar_search'),
 ]

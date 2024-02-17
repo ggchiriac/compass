@@ -10,11 +10,13 @@ from django.views import View
 from django.shortcuts import redirect
 from .models import (
     models,
+    ClassMeeting,
     Course,
     Major,
     Minor,
     CustomUser,
     UserCourses,
+    Section,
 )
 from .serializers import CourseSerializer
 import json
@@ -521,7 +523,7 @@ def transform_data(data):
     transformed_data = {}
 
     # Go through each major/minor and transform accordingly
-    for key, value in data.items():
+    for _, value in data.items():
         if 'requirements' in value:
             # Extract 'code' and 'satisfied' from 'requirements'
             code = value['requirements'].pop('code')
@@ -631,3 +633,40 @@ def check_requirements(request):
 def requirement_info(request):
     info = fetch_requirement_info(request.GET.get('reqId', ''))
     return JsonResponse(info)
+
+
+# --------------------------------- CALENDAR ---------------------------------------#
+
+def calendar_search(request):
+    try:
+        class_meetings = (
+            ClassMeeting.objects.all()
+        )  # Adjust the query based on search parameters
+        course_info_list = []
+
+        print('Starting data fetch for ClassMeeting and Section tables.')
+        for meeting in class_meetings:
+            section = Section.objects.get(id=meeting.section_id, term_id=8)
+
+            course_info = {
+                'start_time': meeting.start_time,
+                'end_time': meeting.end_time,
+                'location': f'{meeting.building_name} {meeting.room}',
+                'days': meeting.days,
+                'section_details': {
+                    'id': section.id,
+                    'class_section': section.class_section,
+                    'course_id': section.course_id,
+                    'instructor_id': section.instructor_id,
+                    'enrollment': section.enrollment,
+                },
+            }
+
+            course_info_list.append(course_info)
+            print(f'Fetched and appended course info for section ID: {section.id}')
+
+        return JsonResponse({'courses': course_info_list})
+
+    except Exception as e:
+        logger.error(f'An error occurred while retrieving course information: {e}')
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)

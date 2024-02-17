@@ -22,6 +22,10 @@ def fetch_data(subject, term, req_lib):
     """
     Fetches course and seat information for a given subject and term.
     """
+    # if subject in ['EEB', 'GHP', 'SPI']:
+    #     print(f'Skipping department {subject} for now.')
+    #     return {}, {}, {}
+
     # Fetch all offered courses from a department
     courses = req_lib.getJSON(
         req_lib.configs.COURSES_COURSES, fmt='json', term=term, subject=subject
@@ -38,7 +42,7 @@ def fetch_data(subject, term, req_lib):
     print(f'Fetched {len(course_ids)} course IDs from {subject}.')
 
     # Parallel fetching of course details
-    with ThreadPoolExecutor(max_workers=8) as executor:
+    with ThreadPoolExecutor(max_workers=12) as executor:
         futures = [
             executor.submit(fetch_course_detail, course_id, term, req_lib)
             for course_id in course_ids
