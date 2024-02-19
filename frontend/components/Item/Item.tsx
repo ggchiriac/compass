@@ -99,7 +99,6 @@ export const Item = memo(
             styles.Wrapper,
             fadeIn && styles.fadeIn,
             sorting && styles.sorting,
-            dragOverlay && styles.shrink,
             dragOverlay && styles.dragOverlay
           )}
           style={
