@@ -2,13 +2,25 @@ import { useEffect, useRef } from 'react';
 
 import { Event } from '../types';
 
-// import Navbar from '../../components/Navbar';
+import Navbar from './Navbar';
 
 export default function Calendar() {
-  const container = useRef(null);
-  const containerNav = useRef(null);
-  const containerOffset = useRef(null);
-  const numberOfVerticalLines = 8;
+  const container = useRef<HTMLDivElement>(null);
+  const containerNav = useRef<HTMLDivElement>(null);
+  const containerOffset = useRef<HTMLDivElement>(null);
+
+  const calculateGridRow = (timeString) => {
+    const time = new Date(timeString);
+    const startHour = 7; // Grid starts at 7AM
+    const slotsPerHour = 4;
+    const hour = time.getHours();
+    const minute = time.getMinutes();
+
+    // Calculate the starting row based on the number of 15-minute intervals from 7AM
+    const rowStart = (hour - startHour) * slotsPerHour + Math.floor(minute / 15) + 1;
+    return rowStart;
+  };
+
   const formatHour = (hour: number): string => {
     switch (hour) {
       case 0:
@@ -24,20 +36,21 @@ export default function Calendar() {
     }
   };
 
+  // TODO: Make the dates and current (should be called current) dynamic
   const days = [
-    { name: 'Monday', date: 10 }, // Monday
-    { name: 'Tuesday', date: 11 }, // Tuesday
-    { name: 'Wednesday', date: 12, special: true }, // Wednesday
-    { name: 'Thursday', date: 13 }, // Thursday
-    { name: 'Friday', date: 14 }, // Friday
+    { name: 'Monday', date: 19 },
+    { name: 'Tuesday', date: 20 },
+    { name: 'Wednesday', date: 21, current: true },
+    { name: 'Thursday', date: 22 },
+    { name: 'Friday', date: 23 },
   ];
 
   // Simulated dataset of events
   const events: Event[] = [
     {
       id: 'event-1',
-      name: 'Breakfast',
-      description: '6:00 AM',
+      name: 'COS 423',
+      description: '11:00 AM',
       startTime: '2022-01-12T06:00', // Assuming this is Wednesday
       endTime: '',
       color: 'blue',
@@ -48,8 +61,8 @@ export default function Calendar() {
     },
     {
       id: 'event-2',
-      name: 'Flight to Paris',
-      description: '7:30 AM',
+      name: 'COS 418',
+      description: '10:00 AM',
       startTime: '2022-01-12T07:30', // Also Wednesday
       endTime: '',
       color: 'pink',
@@ -60,8 +73,8 @@ export default function Calendar() {
     },
     {
       id: 'event-3',
-      name: 'Meeting with design team at Disney',
-      description: '10:00 AM',
+      name: 'COS 333',
+      description: '3:00 PM',
       startTime: '2022-01-14T10:00', // Assuming this is Friday
       endTime: '',
       color: 'gray',
@@ -73,108 +86,83 @@ export default function Calendar() {
   ];
 
   useEffect(() => {
-    // Set the container scroll position based on the current time.
-    const currentMinute = new Date().getHours() * 60;
-    container.current.scrollTop =
-      ((container.current.scrollHeight -
-        containerNav.current.offsetHeight -
-        containerOffset.current.offsetHeight) *
-        currentMinute) /
-      1440;
+    if (container.current && containerNav.current && containerOffset.current) {
+      // Calculate scroll position based on current time
+      const currentHour = new Date().getHours();
+      const currentMinute = new Date().getMinutes();
+      const totalMinutes = currentHour * 60 + currentMinute;
+      const scrollPosition = (totalMinutes / (24 * 60)) * container.current.scrollHeight;
+
+      // Apply calculated scroll position to the container
+      container.current.scrollTop =
+        scrollPosition - containerNav.current.clientHeight - containerOffset.current.clientHeight;
+    }
   }, []);
 
+  // TODO: User should be able to choose any hex color for classes (can change default)
+  // Also, make sure that text colors are contrasted with the color they choose, so white text for black color
+  // black for white, etc. Also, make sure that time of day color (we will have a dark mode) is not interfered.
   return (
-    <div className='flex h-full flex-col'>
-      <div ref={container} className='isolate flex flex-auto flex-col overflow-auto bg-white'>
-        <div
-          style={{ width: '165%' }}
-          className='flex max-w-full flex-none flex-col sm:max-w-none md:max-w-full'
-        >
-          <div
-            ref={containerNav}
-            className='sticky top-0 z-30 flex-none bg-white shadow ring-1 ring-black ring-opacity-5 sm:pr-8'
-          >
-            {/* Map days */}
-            <div className='-mr-px hidden grid-cols-7 divide-x divide-gray-100 border-r border-gray-100 text-sm leading-6 text-gray-500 sm:grid'>
-              <div className='col-end-1 w-14' />
-              {days.map((day) => (
-                <button
-                  key={day.name}
-                  type='button'
-                  className='flex flex-col items-center pb-3 pt-2'
-                >
-                  {day.name}{' '}
-                  <span
-                    className={`mt-1 flex h-8 w-8 items-center justify-center font-semibold ${
-                      day.special ? 'rounded-full bg-indigo-600 text-white' : 'text-gray-900'
-                    }`}
-                  >
-                    {day.date}
-                  </span>
-                </button>
-              ))}
+    <>
+      <Navbar />
+      <div className='flex h-full flex-col'>
+        <div ref={container} className='isolate flex flex-auto flex-col overflow-auto bg-white'>
+          <div className='flex flex-auto flex-col'>
+            <div
+              ref={containerNav}
+              className='sticky top-0 z-30 bg-white shadow ring-1 ring-black ring-opacity-5'
+            >
+              {/* Days Header */}
+              <div className='grid grid-cols-5 border-1 border-r divide-x divide-gray-100 border-b border-gray-300 relative text-sm leading-6 text-gray-500'>
+                {/* Days Mapping */}
+                {days.map((day) => (
+                  <div key={day.name} className='flex flex-col items-center p-2'>
+                    <span
+                      className={`mt-1 flex h-8 w-8 items-center justify-center rounded-full font-semibold ${
+                        day.current ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                      }`}
+                    >
+                      {day.date}
+                    </span>
+                    <span>{day.name}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-          <div className='flex flex-auto'>
-            <div className='sticky left-0 z-10 w-14 flex-none bg-white ring-1 ring-gray-100' />
-            <div className='grid flex-auto grid-cols-1 grid-rows-1'>
-              {/* Horizontal lines */}
-              <div
-                className='col-start-1 col-end-2 row-start-1 grid divide-y divide-gray-100'
-                style={{ gridTemplateRows: 'repeat(48, minmax(3.5rem, 1fr))' }}
-              >
-                {/* Times */}
-                <div ref={containerOffset} className='row-end-1 h-7'></div>
-                {Array.from({ length: 18 }, (_, i) => i + 6).map((hour) => (
-                  <div key={hour}>
-                    <div className='sticky left-0 z-20 -ml-14 -mt-2.5 w-14 pr-2 text-right text-xs leading-5 text-gray-400'>
-                      {formatHour(hour)}
+            <div className='grid-container'>
+              <div className='time-column'>
+                {Array.from({ length: 15 }, (_, i) => i + 7).map((hour) => (
+                  <div key={hour} className='border-b border-gray-300 py-2'>
+                    {formatHour(hour)}
+                  </div>
+                ))}
+              </div>
+              {/* Events Grid */}
+              <div className='events-grid'>
+                {events.map((event) => (
+                  <div
+                    key={event.id}
+                    className={`relative border border-gray-400 m-0.5 z-10 bg-${event.color}-200 text-${event.color}-800 rounded-lg p-2 text-xs leading-5`}
+                    // Inline styles for dynamic values may still be needed here
+                    style={{
+                      gridColumnStart: event.gridColumnStart,
+                      gridRowStart: calculateGridRow(event.startTime),
+                      gridRowEnd: `span ${
+                        calculateGridRow(event.endTime) - calculateGridRow(event.startTime)
+                      }`,
+                    }}
+                  >
+                    <div className='flex flex-col'>
+                      <strong className='font-semibold'>{event.name}</strong>
+                      <time dateTime={event.startTime}>{event.description}</time>
                     </div>
                   </div>
                 ))}
-                <div />
               </div>
-
-              {/* Vertical lines */}
-              <div className='col-start-1 col-end-2 row-start-1 hidden grid-cols-7 grid-rows-1 divide-x divide-gray-100 sm:grid sm:grid-cols-7'>
-                {Array.from({ length: numberOfVerticalLines }).map((_, index) => (
-                  <div
-                    key={index}
-                    className={`col-start-${index + 1} row-span-full ${index === 7 ? 'w-8' : ''}`}
-                  />
-                ))}
-              </div>
-              {/* Events */}
-              <ol
-                className='col-start-1 col-end-2 row-start-1 grid grid-cols-1 sm:grid-cols-5 sm:pr-8'
-                style={{ gridTemplateRows: '1.75rem repeat(288, minmax(0, 1fr)) auto' }}
-              >
-                {events.map((event) => (
-                  <li
-                    key={event.id}
-                    className={`relative mt-px flex sm:col-start-${event.gridColumnStart}`}
-                    style={{ gridRow: `${event.gridRowStart} / span ${event.gridRowEnd}` }}
-                  >
-                    <a
-                      href='#'
-                      className='group absolute inset-1 flex flex-col overflow-y-auto rounded-lg p-2 text-xs leading-5'
-                      style={{
-                        backgroundColor: event.color,
-                        color: event.textColor,
-                      }}
-                    >
-                      <p className='order-1 font-semibold'>{event.name}</p>
-                      <p>
-                        <time dateTime={event.startTime}>{event.description}</time>
-                      </p>
-                    </a>
-                  </li>
-                ))}
-              </ol>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

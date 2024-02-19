@@ -12,6 +12,19 @@ const searchCache = new LRUCache<string, Course[]>({
   entryExpirationTimeInMS: 1000 * 60 * 60 * 24, // 1 day
 });
 
+// const addCourseToCalendar = (course: Event) => {
+//   // Map the course to the calendar event format
+//   const newEvent = {
+//     id: course.id, // Use the unique identifier for the course
+//     name: course.name,
+//     description: course.description,
+//     // ... other properties mapped from the course to match the Event type
+//   };
+//   // Update the calendar state with the new event
+//   // For example, if you're using a state management library or context:
+//   setCalendarEvents([...calendarEvents, newEvent]);
+// };
+
 const CalendarSearch: FC = () => {
   const [query, setQuery] = useState<string>('');
   const timerRef = useRef<number>();

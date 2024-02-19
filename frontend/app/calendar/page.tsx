@@ -1,31 +1,29 @@
 'use client';
 
-import { FC } from 'react';
-
-// import { rectSortingStrategy } from '@dnd-kit/sortable';
+import { useEffect, useState, FC } from 'react';
 
 import Calendar from '../../components/Calendar';
-import CalendarSearch from '../../components/CalendarSearch';
 import Footer from '../../components/Footer';
 // import LoadingComponent from '../../components/LoadingComponent';
 import Navbar from '../../components/Navbar';
-// import SkeletonApp from '../../components/SkeletonApp';
-// import useAuthStore from '../../store/authSlice';
-// import UserState from '../../store/userSlice';
+import Search from '../../components/Search';
+import SkeletonApp from '../../components/SkeletonApp';
+import useAuthStore from '../../store/authSlice';
+import UserState from '../../store/userSlice';
 
 const Dashboard: FC = () => {
-  // const [isLoading, setIsLoading] = useState(true);
-  // const { checkAuthentication } = useAuthStore((state) => state);
-  // const userProfile = UserState((state) => state.profile);
-  // useEffect(() => {
-  //   checkAuthentication().then(() => setIsLoading(false));
-  // }, [checkAuthentication]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { checkAuthentication } = useAuthStore((state) => state);
+  const userProfile = UserState((state) => state.profile);
+  useEffect(() => {
+    checkAuthentication().then(() => setIsLoading(false));
+  }, [checkAuthentication]);
 
   return (
     <>
       <Navbar />
-      <div className='flex flex-col min-h-screen pt-20'>
-        Background Gradient Effect
+      <div className='flex flex-col min-h-screen pt-24'>
+        {/* Background Gradient Effect */}
         <div
           className='absolute inset-x-0 -top-40 z-0 transform-gpu overflow-hidden blur-3xl sm:-top-80'
           aria-hidden='true'
@@ -38,16 +36,23 @@ const Dashboard: FC = () => {
             }}
           />
         </div>
-        <div className='flex w-full'>
-          {/* Calendar takes 4/5 of the space */}
-          <div className='flex-grow' style={{ flexBasis: '80%' }}>
-            <Calendar />
+        <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded overflow-x-auto p-4 gap-4'>
+          {/* Adjust the div wrapping CalendarSearch to include padding/margin as needed */}
+          <div className='flex-none w-full max-w-[200px] p-2'>
+            {' '}
+            {/* Adjust the max-width and padding as needed */}
+            <Search />
           </div>
-          {/* SearchBar takes 1/5 of the space */}
-          <div className='flex-grow' style={{ flexBasis: '20%', backgroundColor: 'white' }}>
-            <CalendarSearch />
+
+          {/* Ensure Calendar grows to fill the space, with padding if necessary */}
+          <div className='flex-grow p-2'>
+            {!isLoading && userProfile && userProfile.netId !== '' ? (
+              <Calendar />
+            ) : (
+              <SkeletonApp /> // Placeholder for loading state
+            )}
           </div>
-        </div>
+        </main>
       </div>
       <Footer />
     </>

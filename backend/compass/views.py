@@ -1,9 +1,10 @@
 import logging
+from datetime import datetime, timedelta
 from re import sub, search, split, compile, IGNORECASE
 from urllib.request import urlopen
 from urllib.parse import urlencode
 from urllib.error import HTTPError, URLError
-from django.db.models import Case, Q, Value, When
+from django.db.models import Q, Value, When, Case
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
 from django.views import View
@@ -637,36 +638,148 @@ def requirement_info(request):
 
 # --------------------------------- CALENDAR ---------------------------------------#
 
-def calendar_search(request):
+
+# TODO: See if this function can replace redundant parts of the code in this file.
+def get_course_details(request, course_id):
     try:
-        class_meetings = (
-            ClassMeeting.objects.all()
-        )  # Adjust the query based on search parameters
-        course_info_list = []
+        course = Course.objects.prefetch_related('sections__class_meetings').get(
+            pk=course_id
+        )
+        serializer = CourseSerializer(course)
+        return JsonResponse(serializer.data)
+    except Course.DoesNotExist:
+        return JsonResponse({'error': 'Course not found'}, status=404)
 
-        print('Starting data fetch for ClassMeeting and Section tables.')
-        for meeting in class_meetings:
-            section = Section.objects.get(id=meeting.section_id, term_id=8)
 
-            course_info = {
-                'start_time': meeting.start_time,
-                'end_time': meeting.end_time,
-                'location': f'{meeting.building_name} {meeting.room}',
-                'days': meeting.days,
-                'section_details': {
-                    'id': section.id,
-                    'class_section': section.class_section,
-                    'course_id': section.course_id,
-                    'instructor_id': section.instructor_id,
-                    'enrollment': section.enrollment,
-                },
-            }
+def get_first_meeting_day(days_string):
+    days_mapping = {
+        'Monday': 1,
+        'Tuesday': 2,
+        'Wednesday': 3,
+        'Thursday': 4,
+        'Friday': 5,
+    }
+    days_list = days_string.split(',')
+    for day in days_list:
+        if day in days_mapping:
+            return days_mapping[day]
+    return None
 
-            course_info_list.append(course_info)
-            print(f'Fetched and appended course info for section ID: {section.id}')
 
-        return JsonResponse({'courses': course_info_list})
+def calendar_search(request):
+    query = request.GET.get('query', '').strip()
+    if not query:
+        return JsonResponse({'events': []})
 
+    match = DEPT_NUM_REGEX.match(query)
+    if match:
+        dept, num = match.groups()
+    else:
+        return JsonResponse({'events': []})
+
+    try:
+        courses = Course.objects.filter(
+            Q(department__code__iexact=dept) & Q(catalog_number__iexact=num)
+        ).prefetch_related('department', 'sections__classmeetings')
+
+        # Convert courses and related data to Event[] format for the frontend
+        events = []
+        for course in courses:
+            for section in course.sections.all():
+                for class_meeting in section.classmeetings.all():
+                    event = {
+                        'id': f'{section.class_number}-{class_meeting.meeting_number}',
+                        'name': course.title,
+                        'description': section.class_type,
+                        'startTime': f'{class_meeting.start_time}',
+                        'endTime': f'{class_meeting.end_time}',
+                        'color': 'blue',  # Static for the example; you could map this based on the class type
+                        'textColor': 'white',  # Static for the example
+                        'gridColumnStart': get_first_meeting_day(
+                            class_meeting.days
+                        ),  # Map 'days' to your calendar grid
+                        'gridRowStart': calculate_grid_position(
+                            class_meeting.start_time
+                        ),
+                        'gridRowEnd': calculate_grid_duration(
+                            class_meeting.start_time, class_meeting.end_time
+                        ),
+                    }
+                    events.append(event)
+
+        return JsonResponse({'events': events})
+
+    except Course.DoesNotExist:
+        return JsonResponse({'events': []})
     except Exception as e:
-        logger.error(f'An error occurred while retrieving course information: {e}')
+        logger.error(f'An error occurred while searching for courses: {e}')
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+
+# def calculate_grid_row(time_string):
+#     """
+#     Calculate the grid row number for a given time string.
+#     The grid is assumed to start at 7AM and each row represents 15 minutes.
+#     """
+#     time = datetime.datetime.strptime(time_string, '%H:%M').time()
+#     start_hour = 7  # Grid starts at 7AM
+#     slots_per_hour = 4  # Number of 15-minute slots in an hour
+#     hour = time.hour
+#     minute = time.minute
+
+#     # Calculate the starting row based on the number of 15-minute intervals from 7AM
+#     row_start = (hour - start_hour) * slots_per_hour + minute // 15 + 1
+#     return row_start
+
+
+# def calculate_grid_duration(start_time_string, end_time_string):
+#     """
+#     Calculate the duration in grid rows based on start and end time strings.
+#     """
+#     start_time = datetime.datetime.strptime(start_time_string, '%H:%M').time()
+#     end_time = datetime.datetime.strptime(end_time_string, '%H:%M').time()
+#     start_minutes = start_time.hour * 60 + start_time.minute
+#     end_minutes = end_time.hour * 60 + end_time.minute
+
+#     # Calculate the duration in 15-minute intervals
+#     duration = (end_minutes - start_minutes) // 15
+#     return duration
+
+# def calculate_grid_position(start_time):
+#     # Convert time object to datetime for today
+#     start_datetime = datetime.combine(datetime.today(), start_time)
+#     # Define the grid start time
+#     grid_start_time = time(7, 0)  # Grid starts at 7AM
+#     grid_start_datetime = datetime.combine(datetime.today(), grid_start_time)
+#     # Calculate the difference in minutes
+#     difference = (start_datetime - grid_start_datetime).total_seconds() / 60
+#     # Calculate grid position based on 15-minute intervals
+#     return int(difference // 15) + 1
+
+# def calculate_grid_duration(start_time, end_time):
+#     start_datetime = datetime.combine(datetime.today(), start_time)
+#     end_datetime = datetime.combine(datetime.today(), end_time)
+#     # Calculate the duration in minutes
+#     duration = (end_datetime - start_datetime).total_seconds() / 60
+#     # Calculate grid duration based on 15-minute intervals
+#     return int(duration // 15)
+
+
+def calculate_grid_position(start_time):
+    # Assume start_time is a Python time object
+    start_hour = 7  # Grid starts at 7AM
+    slots_per_hour = 4  # 4 slots in an hour (15-minute intervals)
+    row_start = (
+        (start_time.hour - start_hour) * slots_per_hour + start_time.minute // 15 + 1
+    )
+    return row_start
+
+
+def calculate_grid_duration(start_time, end_time):
+    # Assume start_time and end_time are Python time objects
+    start_datetime = datetime.combine(datetime.today(), start_time)
+    end_datetime = datetime.combine(datetime.today(), end_time)
+    duration = (end_datetime - start_datetime).total_seconds() / (
+        15 * 60
+    )  # duration in 15-minute intervals
+    return int(duration)  # Return as an integer number of slots
