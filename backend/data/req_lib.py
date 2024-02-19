@@ -1,7 +1,7 @@
 from typing import Dict, Any
 import requests
 import ujson as json
-from .configs import Configs
+from .configs import Configs # TODO: Fix this .configs issue w/ running stuff from backend root dir eventually
 
 
 class ReqLib:
