@@ -29,7 +29,6 @@ from data.check_reqs import (
     get_course_comments,
     check_user,
 )
-from datetime import datetime
 from django.conf import settings
 
 logger = logging.getLogger(__name__)

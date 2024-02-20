@@ -6,7 +6,9 @@
   },
   "settings": {
     "import/resolver": {
-      "typescript": {}
+      "typescript": {
+        "project": "frontend/tsconfig.json"
+      }
     },
     "react": {
       "version": "detect"
