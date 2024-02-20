@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   CancelDrop,
@@ -87,7 +87,7 @@ function DroppableContainer({
   disabled?: boolean;
   id: UniqueIdentifier;
   items: UniqueIdentifier[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }) {
   const { active, isDragging, over, setNodeRef, transition, transform } = useSortable({
     id,
@@ -138,9 +138,11 @@ type Props = {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
-  // Consider removing since we populate semester bins based on classyear
+  
+  // TODO: Consider removing since we populate semester bins based on classyear
   initialItems?: Items;
-  containerStyle?: React.CSSProperties;
+  containerStyle?: CSSProperties;
+
   coordinateGetter?: KeyboardCoordinateGetter;
 
   getItemStyles?(args: {
@@ -151,13 +153,14 @@ type Props = {
     containerId: UniqueIdentifier;
     isSorting: boolean;
     isDragOverlay: boolean;
-  }): React.CSSProperties;
+  }): CSSProperties;
+
 
   itemCount?: number;
   items?: Items;
   handle?: boolean;
   onRemove?(courseId: string): void;
-  renderItem?(): React.ReactElement;
+  renderItem?(): ReactElement;
 
   strategy?: SortingStrategy;
   modifiers?: Modifiers;
@@ -759,15 +762,15 @@ type SortableItemProps = {
     containerId: UniqueIdentifier;
     isSorting: boolean;
     isDragOverlay?: boolean;
-  }): React.CSSProperties;
+  }): CSSProperties;
 
   getIndex(id: UniqueIdentifier): number;
 
   onRemove?(): void;
 
-  renderItem?(): React.ReactElement;
+  renderItem?(): ReactElement;
 
-  wrapperStyle({ index }: { index: number }): React.CSSProperties;
+  wrapperStyle({ index }: { index: number }): CSSProperties;
 };
 
 function SortableItem({
