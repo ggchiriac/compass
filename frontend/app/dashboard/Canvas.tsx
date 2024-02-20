@@ -138,9 +138,11 @@ type Props = {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
+  
   // TODO: Consider removing since we populate semester bins based on classyear
   initialItems?: Items;
   containerStyle?: CSSProperties;
+
   coordinateGetter?: KeyboardCoordinateGetter;
 
   getItemStyles?(args: {
@@ -152,6 +154,7 @@ type Props = {
     isSorting: boolean;
     isDragOverlay: boolean;
   }): CSSProperties;
+
 
   itemCount?: number;
   items?: Items;
