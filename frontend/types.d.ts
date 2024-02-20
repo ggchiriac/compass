@@ -127,3 +127,17 @@ export type Planner = {
 export type Dictionary = {
   [key: string]: string | Dictionary;
 };
+
+// Calendar
+type Event = {
+  id: string; // Unique identifier for the event
+  name: string; // Name of the event, e.g., "Breakfast", "Flight to Paris"
+  description: string; // Description or additional details, e.g., "6:00 AM"
+  startTime: string; // ISO 8601 date string indicating the start time of the event
+  endTime: string; // ISO 8601 date string indicating the end time of the event (can be empty if not applicable)
+  color: string; // Color code for UI representation, e.g., "blue", "pink"
+  textColor: string; // Text color code for UI representation
+  gridColumnStart: number; // Numeric representation aligning with the day of the week (1 = Monday, ..., 5 = Friday)
+  gridRowStart: number; // The starting grid row for the event, based on its start time
+  gridRowEnd: number; // The number of rows the event spans, indicating its duration
+};

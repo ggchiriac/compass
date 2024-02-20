@@ -2,7 +2,6 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
-
 :root {
   --foreground-rgb: 30, 30, 30; /* Dark Gray for text */
   --background-start-rgb: 31, 53, 78; /* compass-blue but darker */
@@ -19,7 +18,7 @@
     --foreground-rgb: 0, 0, 0; /* Dark Gray for text */
     --background-start-rgb: 18, 18, 18; /* Near Black */
     --background-end-rgb: 30, 30, 30; /* Change to compass-blue */
-    --system-text-color:#f6efec; /* Light Gray */
+    --system-text-color: #f6efec; /* Light Gray */
   }
 }
 
@@ -84,4 +83,34 @@ body {
     opacity: 1;
     transform: scale(1);
   }
+}
+
+/* Calendar grid styling */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* Adjust if the number of days changes */
+  border-left: 1px solid #ddd; /* Adds a border to the left of the grid */
+  border-right: 1px solid #ddd; /* Adds a border to the right of the grid */
+}
+
+.grid-container::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  border-right: 1px solid #ddd; /* This adds a right border to the last column */
+  pointer-events: none; /* Ensures the border doesn't interfere with clicks */
+}
+
+.time-slot {
+  border-bottom: 100% solid #ddd; /* Adds a horizontal line after each time slot */
+  padding: 8px; /* Adjust padding for visual comfort */
+}
+
+.event-item {
+  border: 1px solid #ccc; /* Adds a border around each event */
+  margin: 2px; /* Adds a small space around each event for separation */
+  z-index: 1; /* Ensures events are above the grid lines */
 }
