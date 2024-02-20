@@ -182,7 +182,6 @@ class Course(models.Model):
     course_id = models.CharField(max_length=15, db_index=True, null=True)
     catalog_number = models.CharField(max_length=10, db_index=True, null=True)
     title = models.CharField(max_length=150, db_index=True, null=True)
-    crosslistings = models.CharField(max_length=150, db_index=True, null=True)
     description = models.TextField(db_index=True, null=True)
     drop_consent = models.CharField(max_length=1, db_index=True, blank=True, null=True)
     add_consent = models.CharField(max_length=1, db_index=True, blank=True, null=True)
