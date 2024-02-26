@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
 
 import {
   CancelDrop,
@@ -87,7 +87,7 @@ function DroppableContainer({
   disabled?: boolean;
   id: UniqueIdentifier;
   items: UniqueIdentifier[];
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 }) {
   const { active, isDragging, over, setNodeRef, transition, transform } = useSortable({
     id,
@@ -119,6 +119,7 @@ function DroppableContainer({
   );
 }
 
+// THIS IS WHERE YOU EDIT THE DND DROP ANIMATION
 const dropAnimation: DropAnimation = {
   // TODO: Lowkey, this is where we can render the course card differently -> full title to DEPT CATNUM
   sideEffects: defaultDropAnimationSideEffects({
@@ -137,8 +138,11 @@ type Props = {
   adjustScale?: boolean;
   cancelDrop?: CancelDrop;
   columns?: number;
-  initialItems?: Items; // Consider removing since we populate semester bins based on classyear
-  containerStyle?: React.CSSProperties;
+
+  // TODO: Consider removing since we populate semester bins based on classyear
+  initialItems?: Items;
+  containerStyle?: CSSProperties;
+
   coordinateGetter?: KeyboardCoordinateGetter;
 
   getItemStyles?(args: {
@@ -149,15 +153,13 @@ type Props = {
     containerId: UniqueIdentifier;
     isSorting: boolean;
     isDragOverlay: boolean;
-  }): React.CSSProperties;
-
-  wrapperStyle?(args: { index: number }): React.CSSProperties;
+  }): CSSProperties;
 
   itemCount?: number;
   items?: Items;
   handle?: boolean;
   onRemove?(courseId: string): void;
-  renderItem?(): React.ReactElement;
+  renderItem?(): ReactElement;
 
   strategy?: SortingStrategy;
   modifiers?: Modifiers;
@@ -173,22 +175,28 @@ const defaultClassYear = new Date().getFullYear() + 1;
 export function Canvas({
   user,
   adjustScale = false,
-  // itemCount = 3, // remove this?
   cancelDrop,
   columns = 2,
   handle = true,
-  // initialItems, // remove
   containerStyle,
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
-  wrapperStyle = () => ({}),
   minimal = false,
-  modifiers,
   renderItem,
   strategy = verticalListSortingStrategy,
   // vertical = false,
   scrollable,
 }: Props) {
+  // This limits the width of the course cards
+  const wrapperStyle = () => ({
+    width: 150,
+    height: 150,
+    transition: 'width 0.3s ease-in-out',
+  });
+  const searchWrapperStyle = () => ({
+    height: 150,
+    transition: 'width 0.3s ease-in-out',
+  });
   const classYear = user.classYear ?? defaultClassYear;
 
   const generateSemesters = (classYear: number): Items => {
@@ -228,6 +236,7 @@ export function Canvas({
     ...semesters,
   }));
 
+  // The width of the semester bins is hard-coded here
   const semesterBinStyle = {
     ...containerStyle,
     width: '322px',
@@ -344,6 +353,7 @@ export function Canvas({
   const recentlyMovedToNewContainer = useRef(false);
   // isSortingContainer is legacy code, since we are not using sortable containers
   const isSortingContainer = false;
+  const [overContainerId, setOverContainerId] = useState(null);
 
   /**
    * Custom collision detection strategy optimized for multiple containers
@@ -445,6 +455,7 @@ export function Canvas({
 
     setActiveId(null);
     setActiveContainerId(null);
+    setOverContainerId(null);
     setClonedItems(null);
   };
 
@@ -459,8 +470,11 @@ export function Canvas({
           },
         }}
         onDragStart={({ active }) => {
+          const activeContainer = findContainer(active.id);
+
           setActiveId(active.id);
-          setActiveContainerId(findContainer(active.id));
+          setActiveContainerId(activeContainer);
+          setOverContainerId(activeContainer);
           setClonedItems(items);
 
           console.log('Drag start');
@@ -474,6 +488,7 @@ export function Canvas({
 
           const overContainer = findContainer(overId);
           const activeContainer = findContainer(active.id);
+          setOverContainerId(overContainer);
 
           console.log('Drag over');
           console.log('overId:', overId);
@@ -540,10 +555,10 @@ export function Canvas({
 
           setActiveId(null);
           setActiveContainerId(null);
+          setOverContainerId(null);
         }}
         cancelDrop={cancelDrop}
         onDragCancel={onDragCancel}
-        modifiers={modifiers}
       >
         <SortableContext items={[...containers, PLACEHOLDER_ID]}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -556,7 +571,7 @@ export function Canvas({
                   key='Search Results'
                   id='Search Results'
                   label={<Search />}
-                  columns={columns}
+                  columns={1}
                   items={items['Search Results']}
                   scrollable={scrollable}
                   style={containerStyle}
@@ -571,7 +586,7 @@ export function Canvas({
                         index={index}
                         handle={handle}
                         style={getItemStyles}
-                        wrapperStyle={wrapperStyle}
+                        wrapperStyle={searchWrapperStyle}
                         renderItem={renderItem} // This render function should render with full name
                         containerId='Search Results'
                         getIndex={getIndex}
@@ -647,6 +662,23 @@ export function Canvas({
   );
 
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
+    // Determine the current overlay width based on overContainerId
+    const currentOverlayWidth = overContainerId === SEARCH_RESULTS_ID ? '340px' : '150px';
+    const currentOverlayLeft =
+      activeContainerId === SEARCH_RESULTS_ID && overContainerId !== SEARCH_RESULTS_ID
+        ? '190px'
+        : activeContainerId !== SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
+          ? '-190px'
+          : '0px';
+
+    // Modify the wrapperStyle function or directly adjust the style here to use the determined width
+    const dynamicWrapperStyle = {
+      ...wrapperStyle(), // Spread the original styles
+      width: currentOverlayWidth, // Override the width with the current overlay width
+      left: currentOverlayLeft,
+      transition: 'width 0.2s ease-in-out, left 0.2s ease-in-out', // Ensure smooth transition
+    };
+
     return (
       <Item
         value={id}
@@ -661,7 +693,7 @@ export function Canvas({
           isDragOverlay: true,
         })}
         color={getColor(id)}
-        wrapperStyle={wrapperStyle({ index: 0 })}
+        wrapperStyle={dynamicWrapperStyle}
         renderItem={renderItem}
         dragOverlay
       />
@@ -729,15 +761,15 @@ type SortableItemProps = {
     containerId: UniqueIdentifier;
     isSorting: boolean;
     isDragOverlay?: boolean;
-  }): React.CSSProperties;
+  }): CSSProperties;
 
   getIndex(id: UniqueIdentifier): number;
 
   onRemove?(): void;
 
-  renderItem?(): React.ReactElement;
+  renderItem?(): ReactElement;
 
-  wrapperStyle({ index }: { index: number }): React.CSSProperties;
+  wrapperStyle({ index }: { index: number }): CSSProperties;
 };
 
 function SortableItem({
