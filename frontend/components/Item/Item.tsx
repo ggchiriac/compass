@@ -130,14 +130,15 @@ export const Item = memo(
             {...props}
             tabIndex={!handle ? 0 : undefined}
           >
-            <div id='modal-root'>
-              <InfoComponent
-                dept={value.toString().split(' ')[0]}
-                coursenum={value.toString().split(' ')[1]}
-              />
+            {/* Text Container for InfoComponent */}
+            <div className={styles.TextContainer}>
+              <InfoComponent value={value.toString()} />
             </div>
+
+            {handle ? <Handle {...handleProps} {...listeners} className={styles.Handle} /> : null}
+
+            {/* Actions Container for the Remove button */}
             <span className={styles.Actions}>
-              {handle ? <Handle {...handleProps} {...listeners} /> : null}
               <Remove className={styles.Remove} onClick={onRemove} />
             </span>
           </div>
