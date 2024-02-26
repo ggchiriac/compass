@@ -310,6 +310,14 @@ if __name__ == '__main__':
         push_major(Path('../majors/CBE.yaml').resolve())
         push_major(Path('../majors/ECE.yaml').resolve())
         push_major(Path('../majors/ORF.yaml').resolve())
+        push_major(Path('../majors/COM.yaml').resolve())
+        push_major(Path('../majors/ECO.yaml').resolve())
+        push_major(Path('../majors/ENG.yaml').resolve())
+        push_major(Path('../majors/FIT.yaml').resolve())
+        push_major(Path('../majors/GEO.yaml').resolve())
+        push_major(Path('../majors/GER.yaml').resolve())
+        push_major(Path('../majors/HIS.yaml').resolve())
+        push_major(Path('../majors/MAT.yaml').resolve())
         push_minors(Path('../minors').resolve())
 
         # Push Undeclared major into database

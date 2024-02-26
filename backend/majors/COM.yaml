@@ -11,8 +11,8 @@ contacts:
   name: Thomas W. Hare
   email: thare@princeton.edu
 - type: Director of Undergraduate Studies
-  name: Wendy L. Belcher
-  email: wbelcherta@princeton.edu
+  name: Karen R. Emmerich
+  email: karene@princeton.edu
 req_list:
 - name: Prerequisites
   max_counted: 1
@@ -25,20 +25,103 @@ req_list:
     explanation: |-
       To enter the department, students must be sufficiently knowledgeable in one language other than English to take an upper-level course in it in his or her junior year.
 
-      Plan to read a second foreign language before graduation. Proficiency in only one non-English language is required for admission to the department. However, students who concentrate in comparative literature are also expected to study at least one other non-English language and to be able to read in the language by the time they graduate. Such language study may take place before or during their years as departmental concentrators. Some students demonstrate their competency by taking an upper-level course in the literature of that language. Other students gain this competency by taking three terms of language study at Princeton, or two terms and an intensive language course in the summer, or (especially in the case of languages that are no longer spoken) an intensive language course in the summer. A few take a foreign language test administered by the relevant department during the summer.
+      Plan to read a second foreign language before graduation. Proficiency in only one non-English language is required for admission to the department. However, students who major in comparative literature are also expected to study at least one other non-English language and to be able to read in the language by the time they graduate. Such language study may take place before or during their years as departmental majors. Some students demonstrate their competency by taking an upper-level course in the literature of that language. Other students gain this competency by taking three terms of language study at Princeton, or two terms and an intensive language course in the summer, or (especially in the case of languages that are no longer spoken) an intensive language course in the summer. A few take a foreign language test administered by the relevant department during the summer.
     double_counting_allowed: true
     completed_by_semester: 4
-    course_list:
-    - LANG 107
-    - LANG 108
-    - LANG 2**
-    - LANG 3**
-    - LANG 4**
-    - LANG 5**
+    req_list:
+    - name: Three Terms of Language
+      max_counted: 1
+      min_needed: 3
+      explanation: |-
+        <i>Editor's Note: Students must take all three language courses in the same language.
+      course_list:
+      - LANG 1*
+      - ARA 3*
+      - CHI 3*
+      - CHI 4*
+      - FRE 307
+      - JPN 3*
+      - JPN 4*
+      - KOR 3*
+      - KOR 4*
+      - PER 3*
+      - RUS 2*
+    - name: Upper-level Literature Course
+      max_counted: 1
+      min_needed: 1
+      explanation: |-
+        <i>Editor's Note: The course list for this requirement is not comprehensive. It contains all upper-level courses with LA designation that require reading in a foreign language. Check with your academic advisor for other options. <\i>
+      course_list:
+      - ARA 309
+      - ARA 404
+      - SLA 305
+      - SLA 545
+      - SLA 315
+      - SLA 411
+      - SLA 350
+      - SLA 511
+      - SLA 315
+      - CHI 418
+      - CHI 411
+      - CHI 412
+      - FRE 222
+      - FRE 260
+      - FRE 376
+      - FRE 401
+      - FRE 224
+      - FRE 385
+      - FRE 398
+      - FRE 420
+      - FRE 541
+      - FRE 222
+      - FRE 224
+      - FRE 526
+      - FRE 367
+      - FRE 352
+      - FRE 362
+      - FRE 532
+      - FRE 526
+      - FRE 403
+      - FRE 435
+      - GER 324
+      - GER 209
+      - CLG 214
+      - CLG 310
+      - CLG 301
+      - CLG 214
+      - CLG 310
+      - CLG 240
+      - HEB 312
+      - HEB 320
+      - HIN 305
+      - HIN 303
+      - ITA 302
+      - ITA 308
+      - LAT 205
+      - LAT 403
+      - LAT 340
+      - LAT 203
+      - LAT 204
+      - LAT 330
+      - LAT 401
+      - LAT 335
+      - LAT 332
+      - LAT 335
+      - SAN 304
+      - SAN 305
+      - SPA 213
+      - SPA 220
+      - COM 353
+      - SPA 235
+      - SPA 236
+      - SPA 307
+      - SPA 218
+      - SPA 241
+      - SPA 303
   - name: Introductory Courses
     max_counted: 1
     min_needed: 1
-    explanation: Students who wish to concentrate in comparative literature are advised
+    explanation: Students who wish to major in comparative literature are advised
       (though not required) to take COM 205-206, HUM 216-219 or TRA 200 in their sophomore
       year or earlier.
     double_counting_allowed: true
@@ -46,14 +129,13 @@ req_list:
     req_list:
     - name:
       max_counted: 1
-      min_needed: ALL
-      explanation:
+      min_needed: 2
       course_list:
       - COM 205
       - COM 206
     - name:
       max_counted: 1
-      min_needed: ALL
+      min_needed: 4
       explanation:
       course_list:
       - HUM 216
@@ -62,7 +144,7 @@ req_list:
       - HUM 219
     - name:
       max_counted: 1
-      min_needed: ALL
+      min_needed: 1
       explanation:
       course_list:
       - TRA 200
@@ -87,9 +169,9 @@ req_list:
     max_counted: 1
     min_needed: 2
     explanation: |-
-      <i>Editor's Note: Not all of the courses allowed by TigerPath will satisfy this requirement. Only the subset that are taught by core COM faculty should count, but TigerPath cannot verify this.</i>
+      <i>Editor's Note: Not all of the courses allowed by Compass will satisfy this requirement. Only the subset that are taught by core COM faculty should count, but Compass does not verify this.</i>
 
-      All majors beginning with the class of 2021, must take COM 300 (the Junior Seminar), and two other COM courses taught by core COM faculty (that is, by faculty listed on the “Core Faculty” list of the departmental website). Those other two COM courses can be 200-, 300-, 400-, or 500-level; with the professor’s permission, advanced students may enroll in 500-level COM courses. These must be Princeton COM courses; no exceptions.
+      All majors must take two COM courses taught by core COM faculty (that is, by faculty listed on the “Core Faculty” list of the departmental website). Those other two COM courses can be 200-, 300-, 400-, or 500-level; with the professor’s permission, advanced students may enroll in 500-level COM courses. These must be Princeton COM courses; no exceptions.
     excluded_course_list:
     - COM 300
     course_list:
@@ -100,20 +182,14 @@ req_list:
   - name: Junior Seminar
     max_counted: 1
     min_needed: ALL
-    explanation: All majors beginning with the class of 2021, must take COM 300 (the
-      Junior Seminar), and two other COM courses taught by core COM faculty (that
-      is, by faculty listed on the “Core Faculty” list of the departmental website).
-      Majors must take COM 300 in the fall term of their junior year, unless they
-      are studying abroad then, in which case they must take the course in their senior
-      year instead. COM has also sometimes accepted the English-department junior
-      seminar taught in London by Princeton faculty.
+    explanation: All majors must take COM 300 (the Junior Seminar).
     course_list:
     - COM 300
-  - name: Non-English-Languge Reading
+  - name: Non-English-Language Reading
     max_counted: 1
     min_needed: 4
     explanation: |-
-      <i>Editor's Note: Most of these courses fall under this requirement but TigerPath does not verify this.</i>
+      <i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i>
 
       All majors must take four 200-, 300-, 400-, or 500-level non-English-language reading-based courses. Any course at the 200-level or above taught within any language department at Princeton that is not part of a language instruction sequence may be used to fulfill the requirement, so long as it is based on the reading of texts and/or viewing of films in a non-English language. The focus of such a course must be in the language for which the student is claiming credit. A limited number of secondary readings may be in English (or some other foreign language), but the course must entail a substantial and extended engagement with materials in the original language for which the student is claiming credit. Courses that are part of a language-instruction sequence as well as grammar-review courses are normally excluded; students studying languages with fewer course offerings such as Arabic or Hindi-Urdu may petition the Director of Undergraduate Studies for permission to allow a reading-based course that is part of the language-instruction sequence. Courses do not need to be about literature; courses in film, art, history, philosophy, or the social sciences that are devoted to reading texts in the original language will also fulfill this requirement. Courses in which the primary readings are in translation cannot be counted, but those where the language of discussion and written assignments are in English are allowable. Any questions about whether a course and its readings or viewings qualify for credit should be taken up with the Director of Undergraduate Studies. In the event that a special arrangement is requested in order to claim credit for a course, students must secure such arrangements at the beginning of the semester with both the course professor and the DUS, and follow up with both the professor and DUS at the end of the semester once those conditions have been fulfilled.
 
@@ -135,9 +211,9 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |-
-        <i>Editor's Note: Most of these courses fall under this requirement but TigerPath does not verify this.</i>
+        <i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i>
 
-        Comparative work in literatures: two 300-, 400-, or 500-level courses in any literature, including English. These courses need not be taken in the same department; a pairing such as ENG 320 and SPA 354, for example, would fulfill the requirement.
+        Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed with comparative literature (one of which is COM 300); and two upper-level courses in literature in any other language (including English and courses on readings taught in translation).
       course_list:
       - LANG 3**
       - LANG 4**
@@ -148,14 +224,7 @@ req_list:
     - name: Another Textual Discipline
       max_counted: 1
       min_needed: 2
-      explanation: 'Comparative work in literature and another textual discipline:
-        two 300-, 400-, or 500-level courses in philosophy, art and archeology, classics,
-        religion, anthropology, history, psychology, sociology, politics, economics,
-        or public policy. In general, these courses represent a consistent intellectual
-        approach and have the same prefix (REL, for example); students intending to
-        pair courses with related content, but offered in different departments (HIS
-        and POL, for example) should obtain written permission from COM’s Director
-        of Undergraduate Studies.'
+      explanation: Comparative work in literature and a traditional textual discipline (that is, in the humanities [e.g., philosophy, art and archaeology, classics or religion] or social sciences [e.g., anthropology, history, psychology, sociology, politics, economics or public policy]). Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed in comparative literature (one of which is COM 300); and two upper-level courses in the relevant textual discipline.
       course_list:
       - ANT 3*
       - ANT 4*
@@ -194,9 +263,9 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |-
-        <i>Editor's Note: Not all of these courses fall under this requirement and TigerPath does not verify this.</i>
+        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i>
 
-        Comparative work in literature and another medium: two 300-, 400-, or 500-level courses in photography, film, art, art history, architecture or music. In general, these courses involve the same medium (photography, for example); students intending to pair courses involving different media with related content (photography and painting, for example) should obtain written permission from COM’s Director of Undergraduate Studies.
+        Comparative work in literature and another medium (that is, photography, film, art, art history, architecture or music). Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed in comparative literature (one of which is COM 300); and two upper-level courses in the relevant medium. Both courses must be in the same medium.
       course_list:
       - ART 3*
       - ART 4*
@@ -213,14 +282,7 @@ req_list:
     - name: Regional or Ethnic Studies
       max_counted: 1
       min_needed: 2
-      explanation: 'Comparative work in literature and regional or ethnic studies:
-        two 300-, 400-, or 500-level courses in AFS, AAS, EAP, EAS, ECS, EPS, HLS,
-        JDS, LAS, LAO, NES, or SAS. These two courses normally emerge from a single
-        program, and have the same prefix (AFS, for instance). Alternatively, students
-        on this track might take two 300-, 400-, or 500-level courses in either ENV,
-        GSS, or URB; as elsewhere, courses should emerge from a single program, and
-        have the same prefix. Those interested in these options should consult with
-        COM’s Director of Undergraduate Studies to plan a course of study.'
+      explanation: Comparative work in literature and regional or ethnic studies (that is, African [AFS], African American [AAS], American [AMS], East Asian [EAP or EAS], European [ECS or EPS], Hellenic [HLS], Judaic [JDS], Latin American [LAS], Latino [LAO], Near Eastern [NES] or South Asian [SAS]). Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed in comparative literature (one of which is COM 300); and two courses in the relevant region or ethnicity.
       course_list:
       - AFS 3*
       - AFS 4*
@@ -270,16 +332,9 @@ req_list:
     - name: Creative Arts
       max_counted: 1
       min_needed: 2
-      explanation: 'Comparative work in literary study and the creative arts: two
-        300-, 400-, or 500-level courses in creative writing, screenwriting, translation,
-        dance, theatrical or musical performance, visual arts, film, or video. These
-        two courses normally emerge from a single program, and have the same prefix
-        (DAN, for instance). Students entering COM must select the creative option
-        provisionally, as final admission depends upon the formal acceptance of the
-        creative thesis proposal by the Creative Writing program. Applications for
-        the creative thesis are due in the spring of the junior year; interested students
-        should be look over additional information on writing the creative senior
-        thesis.'
+      explanation: Comparative work in literary study and the creative arts (that is, creative writing [poetry, the novel, short stories, drama, memoir], screenwriting, translation, dance, theatrical performance, visual arts, film or video). Students choose four reading-based courses in non-English-language literature; three courses listed or cross-listed with comparative literature (one of which is COM 300); and two courses in the relevant creative art. Both courses must be in the same area of study. 
+      
+        Students entering the department select this program provisionally. Final admission depends upon the acceptance of the creative thesis proposal by the department and by an adviser from the relevant creative arts program.
       course_list:
       - CWR 3*
       - CWR 4*
@@ -303,26 +358,41 @@ req_list:
       - VIS 4*
       - VIS 5*
   - name: Historical Period
-    max_counted:
-    min_needed:
+    max_counted: 0
+    min_needed: 0
     explanation: |-
-      <i>Editor's Note: This requirement is too broad or requires course approval from the concentrator's Director of Undergraduate Studies, so TigerPath does not check it.</i>
+      <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
 
-      Students must take one course, 200-level and above, dedicated mostly to a period before 1800. It does not necessarily have to be one of their nine departmentals. Nor does it have to be a literature course, strictly speaking, but it must be a study of culture based upon the reading of primary sources. Some examples would be: any course on literature before 1800; any course on pre-modern or early modern philosophy or religion; any course on art or music history before 1800. A course on general history that is not specifically cultural in focus and not based upon the study of primary sources such as texts, music, or art will not count. Students unsure whether a particular course will meet the historical requirement should email the syllabus to COM’s Director of Undergraduate Studies for approval. If the pre-1800 course is not one of the nine departmentals, it may be taken P/D/F. If it is one of the nine departmentals, it must be taken for a grade.
-    no_req:
-- name: Independent Work
-  max_counted:
-  min_needed:
+      One course, which may or may not be one of the nine courses taken for the major, must be dedicated in its entirety to historical periods, literature or cultures before 1800 C.E.
+  - name: Theory and Methods of Comparative Literature
+    max_counted: 0
+    min_needed: 0
+    explanation: |-
+      <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
+      
+      Theoretical issues naturally arise in the study of comparative literature. They may also function as the main focus of a student's work. Theoretical issues are specifically addressed in two departmental courses: COM 303, Comparative History of Literary Theory and COM 301, Theory and Methods of Comparative Literature: Critical and Literary Theory. Upper-level courses in theory, methodology and criticism are offered by other humanities and social science departments as well.
+    course_list:
+    - COM 303
+    - COM 301
+
+- name: Junior Papers
+  max_counted: 1
+  min_needed: 0
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
-    Concentrators must write two junior papers. The first paper, some 3,000 words in length, will normally involve the close study of a work from one of the non-English-language literatures in which the student has linguistic competence. Its purpose is to develop the student's basic skills as a reader of complex texts. The second paper should be wider in scope, and might serve as the beginnings of a senior thesis. It will normally be some 8,000 words in length.
-  no_req:
+    Majors must write two junior papers. The first paper, some 3,000 words in length, will normally involve the close study of a work from one of the non-English-language literatures in which the student has linguistic competence. Its purpose is to develop the student's basic skills as a reader of complex texts. The second paper should be wider in scope, and might serve as the beginnings of a senior thesis. It will normally be some 8,000 words in length.
 - name: Senior Thesis
-  max_counted:
-  min_needed:
+  max_counted: 1
+  min_needed: 0
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
-    Concentrators must write a senior thesis, normally between 15,000 and 20,000 words, which is comparative in nature and should reflect the student's ability to relate and analyze materials in the area chosen. Creative theses must be accompanied by a substantial critical essay.
-  no_req:
+    Majors must write a senior thesis, normally between 15,000 and 20,000 words, which is comparative in nature and should reflect the student's ability to relate and analyze materials in the area chosen. Creative theses must be accompanied by a substantial critical essay.
+- name: Senior Departmental Examination
+  max_counted: 1
+  min_needed: 0
+  explanation: |-
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    
+    Majors must take the senior departmental examination, which is a written exam to test their ability to analyze texts and make connections among them. The student consults with their senior faculty adviser to select specific titles from a broad reading list, reads them and answers questions based on the student's particular language proficiency and chosen program of study. Students will also be asked to analyze a passage in their primary language.

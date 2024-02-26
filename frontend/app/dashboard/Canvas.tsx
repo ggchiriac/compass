@@ -216,13 +216,9 @@ export function Canvas({
     const startYear = classYear - 4;
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = userCourses[semester].map(
-        (course) => `${course.department_code} ${course.catalog_number}`
-      );
+      prevItems[`Fall ${year}`] = userCourses[semester].map((course) => course.crosslistings);
       semester += 1;
-      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
-        (course) => `${course.department_code} ${course.catalog_number}`
-      );
+      prevItems[`Spring ${year + 1}`] = userCourses[semester].map((course) => course.crosslistings);
       semester += 1;
     }
     return prevItems;
@@ -334,11 +330,8 @@ export function Canvas({
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`)
-          )
-          .map((course) => `${course.department_code} ${course.catalog_number}`),
+          .filter((course) => !userCurrentCourses.has(course.crosslistings))
+          .map((course) => course.crosslistings),
       };
     });
   }, [searchResults]);
@@ -714,11 +707,13 @@ export function Canvas({
       const updatedCourses = {
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`)
-          )
-          .map((course) => `${course.department_code} ${course.catalog_number}`),
+          .filter((course) => {
+            if (course.crosslistings && !userCurrentCourses.has(course.crosslistings)) {
+              return true;
+            }
+            return !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`);
+          })
+          .map((course) => course.crosslistings),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;

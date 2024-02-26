@@ -51,6 +51,7 @@ export type Course = {
   catalog_number: number;
   title: string;
   originSemesterId?: string;
+  crosslistings?: string;
 };
 
 export type SearchStoreState = {
