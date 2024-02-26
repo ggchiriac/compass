@@ -70,17 +70,17 @@ MIDDLEWARE = [
 
 AUTHENTICATION_BACKENDS = ('django.contrib.auth.backends.ModelBackend',)
 
-HOMEPAGE = os.getenv('COMPASS')
-DASHBOARD = urljoin(os.getenv('COMPASS'), 'dashboard')
+HOMEPAGE = os.getenv('PUCOMPASS')
+DASHBOARD = urljoin(os.getenv('PUCOMPASS'), 'dashboard')
 CAS_SERVER_URL = urljoin(os.getenv('CAS_URL'), 'cas/')
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    os.getenv('COMPASS'),
+    os.getenv('PUCOMPASS'),
     os.getenv('BACKEND'),
 ]
 CSRF_TRUSTED_ORIGINS = [
-    os.getenv('COMPASS'),
+    os.getenv('PUCOMPASS'),
     os.getenv('BACKEND'),
 ]
 

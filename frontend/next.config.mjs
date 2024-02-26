@@ -10,7 +10,7 @@ const nextConfig = {
     includePaths: [path.join(__dirname, 'styles')],
   },
   env: {
-    COMPASS: process.env.COMPASS,
+    PUCOMPASS: process.env.PUCOMPASS,
     BACKEND: process.env.BACKEND,
   },
   ...withPWA({
