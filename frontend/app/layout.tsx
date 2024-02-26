@@ -1,4 +1,4 @@
-import './globals.css';
+import './globals.scss';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import { GeistSans } from 'geist/font/sans';

@@ -36,14 +36,14 @@ const Dashboard: FC = () => {
             }}
           />
         </div>
-        <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded overflow-x-auto p-4 gap-4'>
+        <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded overflow-x-auto'>
+          {' '}
           {/* Adjust the div wrapping CalendarSearch to include padding/margin as needed */}
           <div className='flex-none w-full max-w-[200px] p-2'>
             {' '}
             {/* Adjust the max-width and padding as needed */}
             <Search />
           </div>
-
           {/* Ensure Calendar grows to fill the space, with padding if necessary */}
           <div className='flex-grow p-2'>
             {!isLoading && userProfile && userProfile.netId !== '' ? (

@@ -1,6 +1,6 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+@import 'node_modules/tailwindcss/base';
+@import 'node_modules/tailwindcss/components';
+@import 'node_modules/tailwindcss/utilities';
 
 :root {
   --foreground-rgb: 30, 30, 30; /* Dark Gray for text */
@@ -85,32 +85,56 @@ body {
   }
 }
 
-/* Calendar grid styling */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr); /* Adjust if the number of days changes */
-  border-left: 1px solid #ddd; /* Adds a border to the left of the grid */
-  border-right: 1px solid #ddd; /* Adds a border to the right of the grid */
+// Base styles for calendar grid
+.container {
+  width: 100%;
+  height: 500px; /* Adjust the height as you like */
+  background-color: #f0f0f0; /* A light background color */
 }
 
-.grid-container::after {
+.canvas {
+  position: relative; /* For positioning the gridlines */
+  width: 100%;
+  height: 100%;
+}
+
+.horizontal-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  grid-template-rows: repeat(auto-fill, minmax(30px, 1fr)); /* Change 30px for line height */
+  border-top: 1px solid #ddd;
+  border-left: 1px solid #ddd;
+}
+
+.horizontal-lines::before {
   content: '';
   position: absolute;
-  left: 0;
-  right: 0;
   top: 0;
-  bottom: 0;
-  border-right: 1px solid #ddd; /* This adds a right border to the last column */
-  pointer-events: none; /* Ensures the border doesn't interfere with clicks */
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-bottom: 1px solid #ddd;
 }
 
-.time-slot {
-  border-bottom: 100% solid #ddd; /* Adds a horizontal line after each time slot */
-  padding: 8px; /* Adjust padding for visual comfort */
+.vertical-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  grid-template-columns: repeat(5, 1fr);
+  border-right: 1px solid #ddd;
 }
 
-.event-item {
-  border: 1px solid #ccc; /* Adds a border around each event */
-  margin: 2px; /* Adds a small space around each event for separation */
-  z-index: 1; /* Ensures events are above the grid lines */
+.vertical-lines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%; /* Adjust for column positions */
+  width: 1px;
+  height: 100%;
+  border-right: 1px solid #ddd;
 }
