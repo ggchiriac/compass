@@ -69,25 +69,48 @@ def load_course_list(course_list):
         dept_code = course_code.replace('/', ' ').split(' ')[0]
         course_num = course_code.replace('/', ' ').split(' ')[1]
 
-        try:
-            dept_id = Department.objects.get(code=dept_code).id
-        except Department.DoesNotExist:
-            logging.info(f'Dept with code {dept_code} not found')
-            dept_id = None
+        if dept_code == 'LANG':
+            for lang_dept in constants.LANG_DEPTS:
+                try:
+                    dept_id = Department.objects.get(code=lang_dept).id
+                except Department.DoesNotExist:
+                    logging.info(f'Dept with code {lang_dept} not found')
+                    dept_id = None
 
-        if not dept_id:
-            continue
+                if not dept_id:
+                    continue
 
-        if course_num in ['*', '***']:
-            dept_list.append(dept_code)
-        elif '*' in course_num:
-            course_inst_list += Course.objects.filter(
-                department_id=dept_id, catalog_number__startswith=course_num[0]
-            )
+                if course_num in ['*', '***']:
+                    dept_list.append(lang_dept)
+                elif '*' in course_num:
+                    course_inst_list += Course.objects.filter(
+                        department_id=dept_id, catalog_number__startswith=course_num[0]
+                    )
+                else:
+                    course_inst_list += Course.objects.filter(
+                        department_id=dept_id, catalog_number=course_num
+                    )
         else:
-            course_inst_list += Course.objects.filter(
-                department_id=dept_id, catalog_number=course_num
-            )
+            try:
+                dept_id = Department.objects.get(code=dept_code).id
+            except Department.DoesNotExist:
+                logging.info(f'Dept with code {dept_code} not found')
+                dept_id = None
+
+            if not dept_id:
+                continue
+
+            if course_num in ['*', '***']:
+                dept_list.append(dept_code)
+            elif '*' in course_num:
+                course_inst_list += Course.objects.filter(
+                    department_id=dept_id,
+                    catalog_number__startswith=course_num[0]
+                )
+            else:
+                course_inst_list += Course.objects.filter(
+                    department_id=dept_id, catalog_number=course_num
+                )
     return course_inst_list, dept_list
 
 
@@ -302,23 +325,23 @@ def push_certificates(certificates_path):
 # TODO: This should create or update so we don't have duplicates in the database, also with atomicity too
 if __name__ == '__main__':
     with transaction.atomic():
-        push_degrees(Path('../degrees').resolve())
-        push_major(Path('../majors/COS-AB.yaml').resolve())
-        push_major(Path('../majors/COS-BSE.yaml').resolve())
-        push_major(Path('../majors/MAE.yaml').resolve())
-        push_major(Path('../majors/CEE.yaml').resolve())
-        push_major(Path('../majors/CBE.yaml').resolve())
-        push_major(Path('../majors/ECE.yaml').resolve())
-        push_major(Path('../majors/ORF.yaml').resolve())
-        push_major(Path('../majors/COM.yaml').resolve())
-        push_major(Path('../majors/ECO.yaml').resolve())
-        push_major(Path('../majors/ENG.yaml').resolve())
-        push_major(Path('../majors/FIT.yaml').resolve())
-        push_major(Path('../majors/GEO.yaml').resolve())
-        push_major(Path('../majors/GER.yaml').resolve())
-        push_major(Path('../majors/HIS.yaml').resolve())
-        push_major(Path('../majors/MAT.yaml').resolve())
-        push_minors(Path('../minors').resolve())
+        # push_degrees(Path('../degrees').resolve())
+        # push_major(Path('../majors/COS-AB.yaml').resolve())
+        # push_major(Path('../majors/COS-BSE.yaml').resolve())
+        # push_major(Path('../majors/MAE.yaml').resolve())
+        # push_major(Path('../majors/CEE.yaml').resolve())
+        # push_major(Path('../majors/CBE.yaml').resolve())
+        # push_major(Path('../majors/ECE.yaml').resolve())
+        # push_major(Path('../majors/ORF.yaml').resolve())
+        # push_major(Path('../majors/COM.yaml').resolve())
+        # push_major(Path('../majors/ECO.yaml').resolve())
+        # push_major(Path('../majors/ENG.yaml').resolve())
+        # push_major(Path('../majors/FIT.yaml').resolve())
+        # push_major(Path('../majors/GEO.yaml').resolve())
+        # push_major(Path('../majors/GER.yaml').resolve())
+        # push_major(Path('../majors/HIS.yaml').resolve())
+        # push_major(Path('../majors/MAT.yaml').resolve())
+        # push_minors(Path('../minors').resolve())
 
         # Push Undeclared major into database
-        # Major.objects.create(UNDECLARED)
+        Major.objects.create(UNDECLARED)

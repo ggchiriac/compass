@@ -329,6 +329,8 @@ export function Canvas({
         }
       });
 
+      console.log(searchResults);
+
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
