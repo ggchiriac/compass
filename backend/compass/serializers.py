@@ -61,4 +61,5 @@ class CourseSerializer(serializers.ModelSerializer):
             'reading_list',
             'department_code',
             'sections',
+            'crosslistings',
         )
