@@ -77,8 +77,9 @@ const animateLayoutChanges: AnimateLayoutChanges = (args) =>
 
 function DroppableContainer({
   children,
+  refSetter,
   columns = 1,
-  disabled,
+  disabled = false,
   id,
   items,
   style,
@@ -88,6 +89,7 @@ function DroppableContainer({
   id: UniqueIdentifier;
   items: UniqueIdentifier[];
   style?: CSSProperties;
+  refSetter?: (instance: HTMLDivElement | null) => void;
 }) {
   const { active, isDragging, over, setNodeRef, transition, transform } = useSortable({
     id,
@@ -101,9 +103,16 @@ function DroppableContainer({
     ? (id === over.id && active?.data.current?.type !== 'container') || items.includes(over.id)
     : false;
 
+  const combinedRefSetter = (instance: HTMLDivElement | null) => {
+    setNodeRef(instance);
+    if (refSetter) {
+      refSetter(instance); // Call the refSetter passed from the parent
+    }
+  };
+
   return (
     <Container
-      ref={disabled ? undefined : setNodeRef}
+      ref={disabled ? undefined : combinedRefSetter}
       style={{
         ...style,
         transition,
@@ -315,6 +324,42 @@ export function Canvas({
     debouncedCheckRequirements();
   }, [classYear]);
 
+  const handleScroll = (e) => {
+    const newScrollPosition = Math.max(e.target.scrollTop, 0);
+
+    const startIndex = Math.floor(newScrollPosition / itemHeight);
+    const endIndex = Math.min(items['Search Results'].length - 1, startIndex + 5); // Assuming 20 items should be rendered at a time
+    setVisibleRange([startIndex, endIndex]);
+    console.log('handleScroll: ', newScrollPosition);
+  };
+
+  const droppableContainerRef = useRef(null);
+
+  const setDroppableContainerRef = useCallback((instance) => {
+    droppableContainerRef.current = instance;
+  }, []);
+  useEffect(() => {
+    const element = droppableContainerRef.current;
+    console.log('element: ', element);
+    if (element) {
+      const ul = element.querySelector('ul');
+      if (ul) {
+        // Attach the scroll listener to the ul
+        ul.addEventListener('scroll', handleScroll);
+        console.log('scrolled');
+      }
+
+      return () => {
+        if (element) {
+          const ul = element.querySelector('ul');
+          if (ul) {
+            ul.removeEventListener('scroll', handleScroll);
+          }
+        }
+      };
+    }
+  }, []);
+
   const { searchResults } = useSearchStore();
 
   useEffect(() => {
@@ -328,8 +373,6 @@ export function Canvas({
           });
         }
       });
-
-      console.log(searchResults);
 
       return {
         ...prevItems,
@@ -349,6 +392,7 @@ export function Canvas({
   // isSortingContainer is legacy code, since we are not using sortable containers
   const isSortingContainer = false;
   const [overContainerId, setOverContainerId] = useState(null);
+  const [visibleRange, setVisibleRange] = useState([0, 20]);
 
   /**
    * Custom collision detection strategy optimized for multiple containers
@@ -453,6 +497,8 @@ export function Canvas({
     setOverContainerId(null);
     setClonedItems(null);
   };
+
+  const itemHeight = 40; // gap of 10 + height of 30
 
   return (
     <>
@@ -559,7 +605,7 @@ export function Canvas({
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Left Section for Search Results */}
             {containers.includes('Search Results') && (
-              <div style={{ width: '360px' }}>
+              <div style={{ width: '380px' }}>
                 {/* issue here with resizing + with requirements dropdowns*/}
                 {/* Try to get this to fixed height*/}
                 <DroppableContainer
@@ -571,22 +617,25 @@ export function Canvas({
                   scrollable={scrollable}
                   style={containerStyle}
                   height='703px'
+                  refSetter={setDroppableContainerRef}
                 >
                   <SortableContext items={items['Search Results']} strategy={strategy}>
-                    {items['Search Results'].map((value, index) => (
-                      <SortableItem
-                        disabled={isSortingContainer}
-                        key={index}
-                        id={value}
-                        index={index}
-                        handle={handle}
-                        style={getItemStyles}
-                        wrapperStyle={searchWrapperStyle}
-                        renderItem={renderItem} // This render function should render with full name
-                        containerId='Search Results'
-                        getIndex={getIndex}
-                      />
-                    ))}
+                    {items['Search Results']
+                      // .slice(visibleRange[0], visibleRange[1])
+                      .map((value, index) => (
+                        <SortableItem
+                          disabled={isSortingContainer}
+                          key={index}
+                          id={value}
+                          index={index}
+                          handle={handle}
+                          style={getItemStyles}
+                          wrapperStyle={searchWrapperStyle}
+                          renderItem={renderItem}
+                          containerId='Search Results'
+                          getIndex={getIndex}
+                        />
+                      ))}
                   </SortableContext>
                 </DroppableContainer>
               </div>
