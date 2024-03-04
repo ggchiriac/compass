@@ -559,7 +559,7 @@ export function Canvas({
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Left Section for Search Results */}
             {containers.includes('Search Results') && (
-              <div style={{ width: '380px' }}>
+              <div style={{ width: '360px' }}>
                 {/* issue here with resizing + with requirements dropdowns*/}
                 {/* Try to get this to fixed height*/}
                 <DroppableContainer
