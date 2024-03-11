@@ -12,9 +12,9 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
-import { createPortal } from 'react-dom';
 
 import LoadingComponent from '../LoadingComponent';
+import SettingsModal from '../Modal';
 
 import styles from '../InfoComponent/InfoComponent.module.scss';
 
@@ -87,14 +87,15 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   const [showPopup, setShowPopup] = useState(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
 
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (modalContent && (event.key === 'Escape' || event.key === 'Enter')) {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape' || event.key === 'Enter') {
+      event.preventDefault();
       event.stopPropagation();
-      handleClose(event);
+      handleClose();
     }
-  });
+  };
 
-  const handleExplanationClick = (e, reqId) => {
+  const handleExplanationClick = (event, reqId) => {
     const url = new URL(`${process.env.BACKEND}/requirement_info/`);
     url.searchParams.append('reqId', reqId);
 
@@ -109,78 +110,77 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       .then((data) => {
         setExplanation(data);
       });
-    e.stopPropagation();
+    event.stopPropagation();
     setShowPopup(true);
+    document.addEventListener('keydown', handleKeyDown);
   };
 
-  const handleClose = (e) => {
+  const handleClose = () => {
     setExplanation('');
-    e.stopPropagation();
     setShowPopup(false);
+    document.removeEventListener('keydown', handleKeyDown);
   };
 
   const modalContent = showPopup ? (
-    <div className={styles.modalBackdrop}>
-      <div className={styles.modal}>
-        <div
-          style={{
-            overflowWrap: 'break-word',
-            flexWrap: 'wrap',
-            overflowY: 'auto',
-            maxHeight: '75vh',
-          }}
-        >
-          <div className={styles.detailRow}>
-            {explanation ? (
-              Object.entries(explanation).map(([index, value]) => {
-                if (index === '0') {
-                  if (value) {
-                    return (
-                      <div key={index}>
-                        <strong className={styles.strong}>{'Explanation'}:</strong> {value}
-                      </div>
-                    );
-                  } else {
-                    return (
-                      <div key={index}>
-                        <strong className={styles.strong}>{'Explanation'}:</strong>{' '}
-                        {'No explanation available'}
-                      </div>
-                    );
-                  }
-                } else if (value[0]) {
+    <SettingsModal>
+      <div
+        style={{
+          overflowWrap: 'break-word',
+          flexWrap: 'wrap',
+          overflowY: 'auto',
+          maxHeight: '75vh',
+        }}
+      >
+        <div className={styles.detailRow}>
+          {explanation ? (
+            Object.entries(explanation).map(([index, value]) => {
+              if (index === '0') {
+                if (value) {
                   return (
                     <div key={index}>
-                      <strong className={styles.strong}>{'Satisfying Courses'}: </strong>
-                      {value
-                        .map((course) => {
-                          return `${course}, `;
-                        })
-                        .join('')
-                        .slice(0, -2)}
+                      <strong className={styles.strong}>{'Explanation'}:</strong> {value}
+                    </div>
+                  );
+                } else {
+                  return (
+                    <div key={index}>
+                      <strong className={styles.strong}>{'Explanation'}:</strong>{' '}
+                      {'No explanation available'}
                     </div>
                   );
                 }
-              })
-            ) : (
-              <LoadingComponent />
-              // <div>Loading...</div>
-            )}
-          </div>
+              } else if (value[0]) {
+                return (
+                  <div key={index}>
+                    <strong className={styles.strong}>{'Satisfying Courses'}: </strong>
+                    {value
+                      .map((course) => {
+                        return `${course}, `;
+                      })
+                      .join('')
+                      .slice(0, -2)}
+                  </div>
+                );
+              }
+            })
+          ) : (
+            <LoadingComponent />
+            // <div>Loading...</div>
+          )}
         </div>
-        <footer className='mt-auto text-right'>
-          <JoyButton
-            variant='outlined'
-            color='neutral'
-            onClick={handleClose}
-            sx={{ ml: 2 }}
-            size='sm'
-          >
-            Close
-          </JoyButton>
-        </footer>
       </div>
-    </div>
+      <footer className='mt-auto text-right'>
+        <JoyButton
+          variant='outlined'
+          color='neutral'
+          onClick={handleClose}
+          sx={{ ml: 2 }}
+          size='sm'
+        >
+          Close
+        </JoyButton>
+      </footer>
+    </SettingsModal>
   ) : null;
 
   const handleClick = (courseId, reqId) => {
@@ -293,7 +293,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
             <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
               <div
                 className={classNames(styles.Action)}
-                onClick={(e) => handleExplanationClick(e, data[key]['req_id'])}
+                onClick={(event) => handleExplanationClick(event, data[key]['req_id'])}
               >
                 <Typography style={{ fontWeight: 500 }}>{key}</Typography>
               </div>
@@ -313,7 +313,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   return (
     <>
       {renderContent(data)}
-      {modalContent && createPortal(modalContent, document.body)}
+      {modalContent}
     </>
   );
 };

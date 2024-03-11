@@ -41,7 +41,6 @@ export type ProfileProps = {
 
 export type SettingsModalProps = {
   children: React.ReactNode;
-  onClose: () => void;
 };
 
 export type Course = {

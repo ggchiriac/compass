@@ -33,19 +33,23 @@ const DropdownMenu: FC = () => {
   ]);
   const closeMenu = () => setIsMenuOpen(false);
 
-  // const handleSave = () => {
-  //   // Implement the save logic here instead of reloading the page.
-  //   // After saving, you can update the state accordingly to reflect the changes.
-  //   setBlur(false);
-  //   // If you need to fetch updated data from the server, do it here.
-  // };
+  useEffect(() => {
+    const keyboardCloseMenu = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' || event.key === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+        setIsMenuOpen(false);
+      }
+    };
 
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (isMenuOpen && (event.key === 'Escape' || event.key === 'Enter')) {
-      event.stopPropagation();
-      setIsMenuOpen(!isMenuOpen);
+    if (isMenuOpen) {
+      document.addEventListener('keydown', keyboardCloseMenu);
     }
-  });
+
+    return () => {
+      document.removeEventListener('keydown', keyboardCloseMenu);
+    };
+  }, [isMenuOpen]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -119,12 +123,11 @@ const DropdownMenu: FC = () => {
       </Menu>
 
       {blur && (
-        <SettingsModal onClose={() => setBlur(false)}>
+        <SettingsModal>
           <UserSettings
             profile={userProfile}
             onClose={() => setBlur(false)}
             onSave={() => {
-              setBlur(false);
               window.location.reload();
             }}
           />

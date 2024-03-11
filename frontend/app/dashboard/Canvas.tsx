@@ -281,17 +281,6 @@ export function Canvas({
     }
   };
 
-  const timerRef = useRef<number>();
-  const debouncedCheckRequirements = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      checkRequirements();
-    }, 10);
-  };
-
   const checkRequirements = () => {
     fetch(`${process.env.BACKEND}/check_requirements/`, {
       method: 'GET',
@@ -312,7 +301,7 @@ export function Canvas({
         }));
       }
     });
-    debouncedCheckRequirements();
+    checkRequirements();
   }, [classYear]);
 
   const { searchResults } = useSearchStore();
@@ -328,8 +317,6 @@ export function Canvas({
           });
         }
       });
-
-      console.log(searchResults);
 
       return {
         ...prevItems,
@@ -471,9 +458,6 @@ export function Canvas({
           setActiveContainerId(activeContainer);
           setOverContainerId(activeContainer);
           setClonedItems(items);
-
-          console.log('Drag start');
-          console.log('activeId:', active.id);
         }}
         onDragOver={({ active, over }) => {
           const overId = over?.id;
@@ -484,12 +468,6 @@ export function Canvas({
           const overContainer = findContainer(overId);
           const activeContainer = findContainer(active.id);
           setOverContainerId(overContainer);
-
-          console.log('Drag over');
-          console.log('overId:', overId);
-          console.log('overContainer:', overContainer);
-          console.log('activeId:', active.id);
-          console.log('activeContainer:', activeContainer);
 
           if (!overContainer || !activeContainer) {
             return;
@@ -544,7 +522,7 @@ export function Canvas({
                 },
                 body: JSON.stringify({ courseId: active.id, semesterId: overContainerId }),
               }).then((response) => response.json());
-              debouncedCheckRequirements();
+              checkRequirements();
             }
           }
 
@@ -640,7 +618,7 @@ export function Canvas({
               <TabbedMenu
                 tabsData={academicPlan}
                 csrfToken={csrfToken}
-                checkRequirements={debouncedCheckRequirements}
+                checkRequirements={checkRequirements}
               />
             </div>
           </div>
@@ -728,7 +706,7 @@ export function Canvas({
       body: JSON.stringify({ courseId: value.toString(), semesterId: 'Search Results' }),
     }).then((response) => {
       response.json();
-      debouncedCheckRequirements();
+      checkRequirements();
     });
   }
 }

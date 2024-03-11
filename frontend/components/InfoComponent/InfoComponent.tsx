@@ -5,6 +5,7 @@ import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
 import LoadingComponent from '../LoadingComponent';
+import SettingsModal from '../Modal';
 import ReviewMenu from '../ReviewMenu';
 
 import styles from './InfoComponent.module.scss';
@@ -39,24 +40,27 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
     }
   }, [showPopup, dept, coursenum]);
 
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (modalContent && (event.key === 'Escape' || event.key === 'Enter')) {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape' || event.key === 'Enter') {
       handleClose(event);
     }
-  });
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    setShowPopup(true);
   };
 
-  const handleClose = (e) => {
-    e.stopPropagation();
+  const handleClick = (event) => {
+    event.stopPropagation();
+    setShowPopup(true);
+    document.addEventListener('keydown', handleKeyDown);
+  };
+
+  const handleClose = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     setShowPopup(false);
+    document.removeEventListener('keydown', handleKeyDown);
   };
 
   const modalContent = showPopup ? (
-    <div className={styles.modalBackdrop} onClick={(e) => e.stopPropagation()}>
+    <SettingsModal>
       <div className={styles.modal} style={{ width: '85%', height: '75%', padding: '25px' }}>
         {' '}
         {/* Ensure full width */}
@@ -119,7 +123,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
           </footer>
         </div>
       </div>
-    </div>
+    </SettingsModal>
   ) : null;
 
   return (

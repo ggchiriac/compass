@@ -76,8 +76,8 @@ CAS_SERVER_URL = urljoin(os.getenv('CAS_URL'), 'cas/')
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    os.getenv('PUCOMPASS'),
     os.getenv('BACKEND'),
+    os.getenv('PUCOMPASS'), # might be useless
 ]
 CSRF_TRUSTED_ORIGINS = [
     os.getenv('PUCOMPASS'),
