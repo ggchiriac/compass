@@ -1,4 +1,5 @@
 import logging
+import time
 from datetime import datetime, timedelta
 from re import sub, search, split, compile, IGNORECASE
 from urllib.request import urlopen
@@ -301,12 +302,21 @@ class CAS(View):
 
 # ------------------------------- SEARCH COURSES --------------------------------------#
 
-DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]{1}$', IGNORECASE)
+DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$', IGNORECASE)
 DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,3}$', IGNORECASE)
-DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{3}$', IGNORECASE)
-NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{1,3}[a-zA-Z]{1}$', IGNORECASE)
+DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
+NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{1,3}[a-zA-Z]$', IGNORECASE)
 NUM_ONLY_REGEX = compile(r'^\d{1,3}$', IGNORECASE)
 
+def make_sort_key(dept):
+    def sort_key(course):
+        crosslistings = course['crosslistings']
+        if len(dept) >= 3:
+            start_index = crosslistings.lower().find(dept)
+            if start_index != -1:
+                return crosslistings[start_index:]
+        return crosslistings
+    return sort_key
 
 class SearchCourses(View):
     """
@@ -316,30 +326,29 @@ class SearchCourses(View):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('course', None)
         if query:
-            # if query == '*' or query == '.':
-            #     courses = Course.objects.select_related('department').all()
-            #     serialized_courses = CourseSerializer(courses, many=True)
-            #     return JsonResponse({'courses': serialized_courses.data})
 
             # process queries
             trimmed_query = sub(r'\s', '', query)
-            # title = ''
             if DEPT_NUM_SUFFIX_REGEX.match(trimmed_query):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
+                code = dept + " " + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
                 result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
+                code = dept + " " + num
             elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
                 trimmed_query
             ):
                 dept = ''
                 num = trimmed_query
+                code = num
             elif DEPT_ONLY_REGEX.match(trimmed_query):
                 dept = trimmed_query
                 num = ''
+                code = dept
             else:
                 return JsonResponse({'courses': []})
 
@@ -351,31 +360,31 @@ class SearchCourses(View):
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
                     return JsonResponse({'courses': serialized_course.data})
-                courses = Course.objects.select_related('department').filter(
-                    Q(department__code__icontains=dept)
-                    & Q(catalog_number__icontains=num)
-                )
-                if not courses.exists():
+                else:
+                    courses = Course.objects.select_related('department').filter(
+                        Q(crosslistings__icontains=code)
+                    )
+                    if courses:
+                        # custom_sorting_field = Case(
+                        #     When(
+                        #         Q(department__code__icontains=dept)
+                        #         & Q(catalog_number__icontains=num),
+                        #         then=Value(3),
+                        #     ),
+                        #     When(Q(department__code__icontains=dept), then=Value(2)),
+                        #     When(Q(catalog_number__icontains=num), then=Value(1)),
+                        #     default=Value(0),
+                        #     output_field=models.IntegerField(),
+                        # )
+                        # sorted_courses = courses.annotate(
+                        #     custom_sorting=custom_sorting_field
+                        # ).order_by(
+                        #     '-custom_sorting', 'department__code', 'catalog_number', 'title'
+                        # )
+                        serialized_courses = CourseSerializer(courses, many=True)
+                        sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
+                        return JsonResponse({'courses': sorted_data})
                     return JsonResponse({'courses': []})
-                custom_sorting_field = Case(
-                    When(
-                        Q(department__code__icontains=dept)
-                        & Q(catalog_number__icontains=num),
-                        then=Value(3),
-                    ),
-                    When(Q(department__code__icontains=dept), then=Value(2)),
-                    When(Q(catalog_number__icontains=num), then=Value(1)),
-                    default=Value(0),
-                    output_field=models.IntegerField(),
-                )
-                sorted_courses = courses.annotate(
-                    custom_sorting=custom_sorting_field
-                ).order_by(
-                    '-custom_sorting', 'department__code', 'catalog_number', 'title'
-                )
-                serialized_courses = CourseSerializer(sorted_courses, many=True)
-                return JsonResponse({'courses': serialized_courses.data})
-
             except Exception as e:
                 logger.error(f'An error occurred while searching for courses: {e}')
                 return JsonResponse({'error': 'Internal Server Error'}, status=500)
