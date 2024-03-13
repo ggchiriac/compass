@@ -53,6 +53,28 @@ export type Course = {
   originSemesterId?: string;
 };
 
+export type ClassMeeting = {
+  meeting_number: string;
+  start_time: string;
+  end_time: string;
+  room: string;
+  days: string[];
+  building_name: string;
+};
+
+export type Section = {
+  class_number: string;
+  class_type: string;
+  class_section: string;
+  track: string;
+  seat_reservations: number;
+  instructor_name: string;
+  capacity: number;
+  status: string;
+  enrollment: number;
+  class_meetings: ClassMeeting[];
+};
+
 export type SearchStoreState = {
   searchResults: Course[];
   setSearchResults: (results: Course[]) => void;
@@ -129,15 +151,22 @@ export type Dictionary = {
 };
 
 // Calendar
-type Event = {
-  id: string; // Unique identifier for the event
-  name: string; // Name of the event, e.g., "Breakfast", "Flight to Paris"
-  description: string; // Description or additional details, e.g., "6:00 AM"
-  startTime: string; // ISO 8601 date string indicating the start time of the event
-  endTime: string; // ISO 8601 date string indicating the end time of the event (can be empty if not applicable)
-  color: string; // Color code for UI representation, e.g., "blue", "pink"
-  textColor: string; // Text color code for UI representation
-  gridColumnStart: number; // Numeric representation aligning with the day of the week (1 = Monday, ..., 5 = Friday)
-  gridRowStart: number; // The starting grid row for the event, based on its start time
-  gridRowEnd: number; // The number of rows the event spans, indicating its duration
+type CalendarEvent = {
+  id: string; // Unique identifier for the event, could be the course or section ID
+  title: string; // Title of the course, e.g., "Advanced Programming Techniques"
+  description: string; // Description of the course, could include catalog number, e.g., "COS 333"
+  departmentCode: string; // Department code, e.g., "COS"
+  catalogNumber: string; // Catalog number of the course, e.g., "333"
+  instructorName: string; // Name of the instructor
+  startTime: string; // ISO 8601 date string indicating the start time of the first class meeting
+  endTime: string; // ISO 8601 date string indicating the end time of the last class meeting
+  meetingDays: string[]; // Days of the week when the course meets, e.g., ["Monday", "Wednesday"]
+  color: string; // Color code for UI representation, e.g., "#3498db"
+  textColor: string; // Text color code for UI representation, ideally contrasted with `color`
+  gridColumnStart: number; // Numeric representation aligning with the day of the week (1 = Monday, ..., 7 = Sunday)
+  gridRowStart: number; // Calculated starting grid row based on the start time
+  gridRowEnd: number; // Calculated grid row end based on the duration
+  // Additional fields from the ClassMeetingSerializer, if necessary
+  room?: string; // Room number or location of the class meeting
+  buildingName?: string; // Name of the building where the class meets
 };

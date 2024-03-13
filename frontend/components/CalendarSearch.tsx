@@ -7,23 +7,12 @@ import { Course } from '@/types';
 
 import useSearchStore from '@/store/searchSlice';
 
+import CalendarList from './CalendarList';
+
 const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
-  entryExpirationTimeInMS: 1000 * 60 * 60 * 24, // 1 day
+  entryExpirationTimeInMS: 1000 * 60 * 60 * 24,
 });
-
-// const addCourseToCalendar = (course: Event) => {
-//   // Map the course to the calendar event format
-//   const newEvent = {
-//     id: course.id, // Use the unique identifier for the course
-//     name: course.name,
-//     description: course.description,
-//     // ... other properties mapped from the course to match the Event type
-//   };
-//   // Update the calendar state with the new event
-//   // For example, if you're using a state management library or context:
-//   setCalendarEvents([...calendarEvents, newEvent]);
-// };
 
 const CalendarSearch: FC = () => {
   const [query, setQuery] = useState<string>('');
@@ -46,7 +35,7 @@ const CalendarSearch: FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.BACKEND}/calendar_search/?course=${encodeURIComponent(searchQuery)}`
+        `${process.env.BACKEND}/search/?course=${encodeURIComponent(searchQuery)}`
       );
       if (response.ok) {
         const data: { courses: Course[] } = await response.json();
@@ -84,6 +73,7 @@ const CalendarSearch: FC = () => {
       setQuery(event.target.value);
     }, 500);
   };
+
   return (
     <div>
       <label htmlFor='search' className='sr-only'>
@@ -117,6 +107,7 @@ const CalendarSearch: FC = () => {
           ))}
         </div>
       </div>
+      <CalendarList items={searchResults} />
     </div>
   );
 };

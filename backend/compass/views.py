@@ -374,6 +374,7 @@ class SearchCourses(View):
                     '-custom_sorting', 'department__code', 'catalog_number', 'title'
                 )
                 serialized_courses = CourseSerializer(sorted_courses, many=True)
+                print(serialized_courses.data)
                 return JsonResponse({'courses': serialized_courses.data})
 
             except Exception as e:
@@ -665,54 +666,67 @@ def get_first_meeting_day(days_string):
     return None
 
 
-def calendar_search(request):
-    query = request.GET.get('query', '').strip()
-    if not query:
-        return JsonResponse({'events': []})
+class CalendarSearch(View):
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('course', None)
+        if not query:
+            return JsonResponse({'courses': []})
 
-    match = DEPT_NUM_REGEX.match(query)
-    if match:
-        dept, num = match.groups()
-    else:
-        return JsonResponse({'events': []})
+        try:
+            courses = Course.objects.prefetch_related(
+                'sections', 'sections__classmeeting_set'
+            ).filter(
+                Q(course_id__icontains=query)
+                | Q(title__icontains=query)
+                | Q(department__code__icontains=query)
+            )
 
-    try:
-        courses = Course.objects.filter(
-            Q(department__code__iexact=dept) & Q(catalog_number__iexact=num)
-        ).prefetch_related('department', 'sections__classmeetings')
+            if not courses.exists():
+                return JsonResponse({'courses': []})
 
-        # Convert courses and related data to Event[] format for the frontend
-        events = []
-        for course in courses:
-            for section in course.sections.all():
-                for class_meeting in section.classmeetings.all():
-                    event = {
-                        'id': f'{section.class_number}-{class_meeting.meeting_number}',
-                        'name': course.title,
-                        'description': section.class_type,
-                        'startTime': f'{class_meeting.start_time}',
-                        'endTime': f'{class_meeting.end_time}',
-                        'color': 'blue',  # Static for the example; you could map this based on the class type
-                        'textColor': 'white',  # Static for the example
-                        'gridColumnStart': get_first_meeting_day(
-                            class_meeting.days
-                        ),  # Map 'days' to your calendar grid
-                        'gridRowStart': calculate_grid_position(
-                            class_meeting.start_time
-                        ),
-                        'gridRowEnd': calculate_grid_duration(
-                            class_meeting.start_time, class_meeting.end_time
-                        ),
+            # Serialize the filtered courses
+            serialized_courses = CourseSerializer(courses, many=True)
+
+            # Custom data construction to include start and end times explicitly
+            data_with_times = []
+            for course in serialized_courses.data:
+                course_data = {
+                    'guid': course['guid'],
+                    'course_id': course['course_id'],
+                    'title': course['title'],
+                    'department_code': course['department_code'],
+                    # Include any other course fields you need
+                    'sections': [],
+                }
+
+                for section in course['sections']:
+                    section_data = {
+                        'class_number': section['class_number'],
+                        'class_section': section['class_section'],
+                        'instructor_name': section['instructor_name'],
+                        # Include any other section fields you need
+                        'class_meetings': [],
                     }
-                    events.append(event)
 
-        return JsonResponse({'events': events})
+                    for class_meeting in section['class_meetings']:
+                        class_meeting_data = {
+                            'start_time': class_meeting['start_time'],
+                            'end_time': class_meeting['end_time'],
+                            'room': class_meeting['room'],
+                            'building_name': class_meeting['building_name'],
+                            # Include any other class meeting fields you need
+                        }
+                        section_data['class_meetings'].append(class_meeting_data)
 
-    except Course.DoesNotExist:
-        return JsonResponse({'events': []})
-    except Exception as e:
-        logger.error(f'An error occurred while searching for courses: {e}')
-        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+                    course_data['sections'].append(section_data)
+
+                data_with_times.append(course_data)
+
+            return JsonResponse({'courses': data_with_times})
+
+        except Exception as e:
+            logger.error(f'An error occurred while searching for courses: {e}')
+            return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 
 # def calculate_grid_row(time_string):

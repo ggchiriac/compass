@@ -1,4 +1,3 @@
-'use client';
 export default function CalendarDays({ days }) {
   return (
     <div

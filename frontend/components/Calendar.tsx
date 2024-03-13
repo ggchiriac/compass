@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-// import { Event } from '../types';
+// import { CalendarEvent } from '../types';
 
 import CourseCard from './CalendarCard';
 import CalendarDays from './CalendarDays'; // Assuming you have this component
@@ -11,6 +11,12 @@ export default function Calendar() {
   const container = useRef<HTMLDivElement>(null);
   const containerNav = useRef<HTMLDivElement>(null);
   const containerOffset = useRef<HTMLDivElement>(null);
+
+  // const { calendarEvents, setCalendarEvents, addCalendarEvent } = useKairosStore((state) => ({
+  //   calendarEvents: state.calendarEvents,
+  //   setCalendarEvents: state.setCalendarEvents,
+  //   addCalendarEvent: state.addCalendarEvent,
+  // }));
 
   const calculateGridRow = (timeString) => {
     const time = new Date(timeString);
@@ -42,11 +48,11 @@ export default function Calendar() {
   // TODO: Make the dates and current (should be called current) dynamic
   const days = [
     { name: '', date: null },
-    { name: 'Monday', date: 19 },
-    { name: 'Tuesday', date: 20 },
-    { name: 'Wednesday', date: 21, current: true },
-    { name: 'Thursday', date: 22 },
-    { name: 'Friday', date: 23 },
+    { name: 'Monday', date: 26, current: true },
+    { name: 'Tuesday', date: 27 },
+    { name: 'Wednesday', date: 28 },
+    { name: 'Thursday', date: 29 },
+    { name: 'Friday', date: 30 },
   ];
 
   const initialEvents = [
@@ -65,7 +71,7 @@ export default function Calendar() {
       name: 'COS 418',
       description: 'Distributed Systems',
       startTime: '2022-01-12T07:30', // 7:30 AM start
-      endTime: '2022-01-12T10:00', // 3:00 PM end
+      endTime: '2022-01-12T08:00', // 3:00 PM end
       color: 'pink',
       textColor: 'black',
       gridColumnStart: 3, // Wednesday
@@ -88,7 +94,7 @@ export default function Calendar() {
     return {
       ...event,
       gridRowStart: startTimeRow,
-      gridRowEnd: startTimeRow + durationRows, // Correctly calculate gridRowEnd based on duration
+      gridRowEnd: startTimeRow + durationRows,
     };
   });
 

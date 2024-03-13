@@ -99,9 +99,7 @@ const Search: FC = () => {
               key={index}
               className='bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-0.5 px-2 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300'
               onClick={() => retrieveCachedSearch(search)}
-            >
-              {search}
-            </button>
+            ></button>
           ))}
         </div>
       </div>

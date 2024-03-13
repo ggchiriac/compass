@@ -1,7 +1,7 @@
-import { Event } from '@/types';
+import { CalendarEvent } from '@/types';
 
 interface CourseCardProps {
-  event: Event;
+  event: CalendarEvent;
   calculateGridRow: (timeString: string) => number;
   style?: React.CSSProperties;
 }
@@ -32,7 +32,7 @@ function stringToColor(name, description) {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ event, calculateGridRow }) => {
-  const backgroundColor = stringToColor(event.color, event.description); // Assuming `event.color` is now a hex value
+  const backgroundColor = stringToColor(event.color, event.description);
   const textColor = getContrastYIQ(backgroundColor);
   return (
     <div
