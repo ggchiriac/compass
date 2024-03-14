@@ -25,7 +25,7 @@ export type Props = {
   style?: React.CSSProperties;
   transition?: string | null;
   wrapperStyle?: React.CSSProperties;
-  value: React.ReactNode;
+  value: React.ReactNode; // This should be the text that appears on the course card
   onRemove?(): void;
   renderItem?(args: {
     dragOverlay: boolean;
@@ -132,7 +132,7 @@ export const Item = memo(
           >
             {/* Text Container for InfoComponent */}
             <div className={styles.TextContainer}>
-              <InfoComponent value={value.toString()} />
+              <InfoComponent value={value.toString().split('|')[1]} />
             </div>
 
             {handle ? <Handle {...handleProps} {...listeners} className={styles.Handle} /> : null}

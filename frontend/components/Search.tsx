@@ -59,6 +59,8 @@ const Search: FC = () => {
   useEffect(() => {
     if (query) {
       search(query);
+    } else {
+      search('');
     }
   }, [query]);
 

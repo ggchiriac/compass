@@ -218,9 +218,13 @@ export function Canvas({
     const startYear = classYear - 4;
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = userCourses[semester].map((course) => course.crosslistings);
+      prevItems[`Fall ${year}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`
+      );
       semester += 1;
-      prevItems[`Spring ${year + 1}`] = userCourses[semester].map((course) => course.crosslistings);
+      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`
+      );
       semester += 1;
     }
     return prevItems;
@@ -304,7 +308,7 @@ export function Canvas({
     checkRequirements();
   }, [classYear]);
 
-  const { searchResults } = useSearchStore();
+  const searchResults = useSearchStore((state) => state.searchResults);
 
   useEffect(() => {
     setItems((prevItems) => {
@@ -321,8 +325,10 @@ export function Canvas({
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter((course) => !userCurrentCourses.has(course.crosslistings))
-          .map((course) => course.crosslistings),
+          .filter(
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+          )
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
       };
     });
   }, [searchResults]);
@@ -520,7 +526,10 @@ export function Canvas({
                   'Content-Type': 'application/json',
                   'X-CSRFToken': csrfToken,
                 },
-                body: JSON.stringify({ courseId: active.id, semesterId: overContainerId }),
+                body: JSON.stringify({
+                  courseId: active.id.toString().split('|')[0],
+                  semesterId: overContainerId,
+                }),
               }).then((response) => response.json());
               checkRequirements();
             }
@@ -689,8 +698,10 @@ export function Canvas({
       const updatedCourses = {
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter((course) => !userCurrentCourses.has(course.crosslistings))
-          .map((course) => course.crosslistings),
+          .filter(
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+          )
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
@@ -703,7 +714,10 @@ export function Canvas({
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ courseId: value.toString(), semesterId: 'Search Results' }),
+      body: JSON.stringify({
+        courseId: value.toString().split('|')[0],
+        semesterId: 'Search Results',
+      }),
     }).then((response) => {
       response.json();
       checkRequirements();

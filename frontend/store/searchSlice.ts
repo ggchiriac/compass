@@ -4,12 +4,10 @@ import { SearchStoreState } from '../types';
 
 const useSearchStore = create<SearchStoreState>((set) => ({
   searchResults: [],
-  activeDraggableCourse: null,
   recentSearches: [],
   error: null,
   loading: false,
   setSearchResults: (results) => set({ searchResults: results }),
-  setActiveDraggableCourse: (course) => set({ activeDraggableCourse: course }),
   addRecentSearch: (query) => {
     let trimmedQuery = query.trim();
     if (trimmedQuery.length === 0) {

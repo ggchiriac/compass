@@ -44,7 +44,7 @@ export type SettingsModalProps = {
 };
 
 export type Course = {
-  id: number;
+  course_id: number;
   guid: number;
   department_code: string;
   catalog_number: number;
@@ -58,8 +58,6 @@ export type SearchStoreState = {
   setSearchResults: (results: Course[]) => void;
   recentSearches: string[];
   addRecentSearch: (query: string) => void;
-  activeDraggableCourse: Course | null;
-  setActiveDraggableCourse: (course: Course | null) => void;
   error: string | null;
   setError: (error: string | null) => void;
   loading: boolean;

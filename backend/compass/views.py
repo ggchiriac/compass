@@ -303,16 +303,16 @@ class CAS(View):
 # ------------------------------- SEARCH COURSES --------------------------------------#
 
 DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$', IGNORECASE)
-DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,3}$', IGNORECASE)
+DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,4}$', IGNORECASE)
 DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
 NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{1,3}[a-zA-Z]$', IGNORECASE)
-NUM_ONLY_REGEX = compile(r'^\d{1,3}$', IGNORECASE)
+NUM_ONLY_REGEX = compile(r'^\d{1,4}$', IGNORECASE)
 
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
         if len(dept) >= 3:
-            start_index = crosslistings.lower().find(dept)
+            start_index = crosslistings.lower().find(dept.lower())
             if start_index != -1:
                 return crosslistings[start_index:]
         return crosslistings
@@ -326,7 +326,7 @@ class SearchCourses(View):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('course', None)
         if query:
-
+            init_time = time.time()
             # process queries
             trimmed_query = sub(r'\s', '', query)
             if DEPT_NUM_SUFFIX_REGEX.match(trimmed_query):
@@ -355,7 +355,7 @@ class SearchCourses(View):
             try:
                 exact_match_course = Course.objects.select_related('department').filter(
                     Q(department__code__iexact=dept) & Q(catalog_number__iexact=num)
-                )
+                ).order_by('course_id', '-guid').distinct('course_id')
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
@@ -363,7 +363,7 @@ class SearchCourses(View):
                 else:
                     courses = Course.objects.select_related('department').filter(
                         Q(crosslistings__icontains=code)
-                    )
+                    ).order_by('course_id', '-guid').distinct('course_id')
                     if courses:
                         # custom_sorting_field = Case(
                         #     When(
@@ -383,6 +383,7 @@ class SearchCourses(View):
                         # )
                         serialized_courses = CourseSerializer(courses, many=True)
                         sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
+                        print(f"Search time: {time.time() - init_time}")
                         return JsonResponse({'courses': sorted_data})
                     return JsonResponse({'courses': []})
             except Exception as e:
@@ -432,30 +433,20 @@ def parse_semester(semester_id, class_year):
     return semester_num
 
 
-# This needs to be changed.
-def get_first_course_inst(course_code):
-    department_code = course_code.split(' ')[0]
-    catalog_number = course_code.split(' ')[1]
-    course_inst = Course.objects.filter(
-        department__code=department_code, catalog_number=catalog_number
-    )[0]
-    return course_inst
-
-
 def update_courses(request):
     try:
         data = json.loads(request.body)
-        course_code = data.get('courseId')  # might have to adjust this, print
+        course_id = data.get('courseId')  # might have to adjust this, print
         container = data.get('semesterId')
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = get_first_course_inst(course_code)
+        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(user=user_inst, course=course_inst)
+            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
             user_course.delete()
-            message = f'User course deleted: {course_inst.course_id}, {net_id}'
+            message = f'User course deleted: {course_id}, {net_id}'
 
         else:
             semester = parse_semester(container, class_year)
@@ -465,10 +456,10 @@ def update_courses(request):
             )
             if created:
                 message = (
-                    f'User course added: {semester}, {course_inst.course_id}, {net_id}'
+                    f'User course added: {semester}, {course_id}, {net_id}'
                 )
             else:
-                message = f'User course updated: {semester}, {course_inst.course_id}, {net_id}'
+                message = f'User course updated: {semester}, {course_id}, {net_id}'
 
         return JsonResponse({'status': 'success', 'message': message})
 
