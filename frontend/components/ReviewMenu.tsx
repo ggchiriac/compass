@@ -55,7 +55,7 @@ const ReviewMenu: React.FC<ReviewMenuProps> = ({ dept, coursenum }) => {
           <td>{rating}</td>
           <td>
             {' '}
-            <Rating name='course rating' value={rating} precision={0.01} readOnly />{' '}
+            <Rating name='course rating' value={rating} precision={0.1} readOnly />{' '}
           </td>
         </tr>
       </table>

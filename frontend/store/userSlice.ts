@@ -49,5 +49,4 @@ export const useFetchUserProfile = () => {
     fetchProfile();
   }, [updateStore]);
 };
-
 export default useUserSlice;

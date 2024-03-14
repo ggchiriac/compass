@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 import {
   Autocomplete,
@@ -38,6 +38,7 @@ function generateClassYears() {
 
 // Should probably id these corresponding to the ids in the database
 const undeclared = { code: 'Undeclared', name: 'Undeclared' };
+const defaultClassYear = new Date().getFullYear() + 1;
 
 // Should probably id these corresponding to the ids in the database
 const majorOptions = [
@@ -50,20 +51,20 @@ const majorOptions = [
   { code: 'CEE', name: 'Civil and Environmental Engineering' },
   // { code: 'CHM', name: 'Chemistry' },
   // { code: 'CLA', name: 'Classics' },
-  // { code: 'COM', name: 'Comparative Literature' },
+  { code: 'COM', name: 'Comparative Literature' },
   { code: 'COS-AB', name: 'Computer Science - A.B.' },
   { code: 'COS-BSE', name: 'Computer Science - B.S.E.' },
   // { code: 'EAS', name: 'East Asian Studies' },
   { code: 'ECE', name: 'Electrical and Computer Engineering' },
-  // { code: 'ECO', name: 'Economics' },
+  { code: 'ECO', name: 'Economics' },
   // { code: 'EEB', name: 'Ecology and Evolutionary Biology' },
-  // { code: 'ENG', name: 'English' },
-  // { code: 'FIT', name: 'French and Italian' },
-  // { code: 'GEO', name: 'Geosciences' },
-  // { code: 'GER', name: 'German' },
-  // { code: 'HIS', name: 'History' },
+  { code: 'ENG', name: 'English' },
+  { code: 'FIT', name: 'French and Italian' },
+  { code: 'GEO', name: 'Geosciences' },
+  { code: 'GER', name: 'German' },
+  { code: 'HIS', name: 'History' },
   { code: 'MAE', name: 'Mechanical and Aerospace Engineering' },
-  // { code: 'MAT', name: 'Mathematics' },
+  { code: 'MAT', name: 'Mathematics' },
   // { code: 'MOL', name: 'Molecular Biology' },
   // { code: 'MUS', name: 'Music' },
   // { code: 'NES', name: 'Near Eastern Studies' },
@@ -127,7 +128,7 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   const { updateProfile } = useUserSlice((state) => state);
   const [firstName, setFirstName] = useState<string>(profile.firstName);
   const [lastName, setLastName] = useState<string>(profile.lastName);
-  const [classYear, setClassYear] = useState(profile.classYear || undefined);
+  const [classYear, setClassYear] = useState(profile.classYear || defaultClassYear);
   const [major, setMajor] = useState<MajorMinorType>(profile.major ?? undeclared);
   const [minors, setMinors] = useState<MajorMinorType[]>(profile.minors || []);
   // const [timeFormat24h, setTimeFormat24h] = useState<boolean>(profile.timeFormat24h);
@@ -149,19 +150,18 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
     setOpenSnackbar(false);
   };
 
-  const handleSave = async () => {
-    updateProfile({
+  const handleSave = useCallback(async () => {
+    const oldProfile = useUserSlice.getState().profile;
+    const profile = {
+      ...oldProfile,
       firstName: firstName,
       lastName: lastName,
       major: major ?? undeclared,
       minors: minors,
       classYear: classYear,
-      // timeFormat24h: timeFormat24h,
-      // themeDarkMode: themeDarkMode, // TODO: This isn't stateful yet --Windsor (people use light mode, trussss... :p)
-    });
-
-    profile = useUserSlice.getState().profile;
+    };
     const csrfToken = await fetchCsrfToken();
+
     fetch(`${process.env.BACKEND}/update_profile/`, {
       method: 'POST',
       credentials: 'include',
@@ -171,122 +171,135 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       },
       body: JSON.stringify(profile),
     }).then((response) => {
-      response.json();
+      if (!response.ok) {
+        throw new Error('POST request to update profile failed.');
+      }
       onSave(profile);
-      onClose();
+      updateProfile(profile);
     });
-  };
+  }, [updateProfile, firstName, lastName, major, minors, classYear, onSave]);
 
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (event.key === 'Enter') {
-      handleSave();
-    } else if (event.key === 'Escape') {
-      onClose();
-    }
-  });
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+        handleSave();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [onClose, handleSave]);
 
   return (
-    <div className='fixed inset-0 flex justify-center items-center z-50'>
-      <div className='bg-white p-8 rounded-xl max-w-2xl w-2/3 shadow-2xl border border-gray-400'>
-        <div className='grid grid-cols-2 gap-6'>
-          <div>
-            <FormLabel>First name</FormLabel>
-            <Input
-              placeholder='First name'
-              variant='soft'
-              autoComplete='off'
-              value={firstName}
-              onChange={(e) => {
-                e.stopPropagation();
-                setFirstName(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <FormLabel>Last name</FormLabel>
-            <Input
-              placeholder='Last name'
-              variant='soft'
-              autoComplete='off'
-              value={lastName}
-              onChange={(e) => {
-                e.stopPropagation();
-                setLastName(e.target.value);
-              }}
-            />
-          </div>
-          <div>
-            <FormLabel>Major</FormLabel>
-            <Autocomplete
-              multiple={false}
-              autoHighlight
-              options={majorOptions}
-              placeholder='Select your major'
-              variant='soft'
-              value={major}
-              // inputValue={major.code === undeclared.code ? '' : major.code}
-              isOptionEqualToValue={(option, value) => option.code === value.code}
-              onChange={(e, newMajor: MajorMinorType) => {
-                e.stopPropagation();
-                setMajor(newMajor ?? undeclared);
-              }}
-              getOptionLabel={(option: MajorMinorType) => option.code}
-              renderOption={(props, option) => (
-                <AutocompleteOption {...props} key={option.name}>
-                  <ListItemContent>
-                    {option.code}
-                    <Typography level='body-sm'>{option.name}</Typography>
-                  </ListItemContent>
-                </AutocompleteOption>
-              )}
-            />
-          </div>
-          <div>
-            <FormLabel>Minor(s)</FormLabel>
-            <Autocomplete
-              multiple={true}
-              autoHighlight
-              options={minorOptions}
-              placeholder={'Select your minor(s)'}
-              variant='soft'
-              value={minors}
-              isOptionEqualToValue={(option, value) =>
-                value === undefined || option.code === value.code
-              }
-              onChange={(e, newMinors: MajorMinorType[]) => {
-                e.stopPropagation();
-                handleMinorsChange(e, newMinors);
-              }}
-              getOptionLabel={(option: MajorMinorType) => option.code}
-              renderOption={(props, option) => (
-                <AutocompleteOption {...props} key={option.name}>
-                  <ListItemContent>
-                    {option.code}
-                    <Typography level='body-sm'>{option.name}</Typography>
-                  </ListItemContent>
-                </AutocompleteOption>
-              )}
-            />
-          </div>
-          <Snackbar
-            open={openSnackbar}
-            color={'primary'}
-            variant={'soft'}
-            onClose={handleCloseSnackbar}
-            autoHideDuration={6000}
-            sx={{
-              '.MuiSnackbar-root': {
-                borderRadius: '16px', // Roundedness
-              },
-              backgroundColor: '#0F1E2F', // Compass Blue
-              color: '#f6f6f6', // Compass Gray
+    <div>
+      <div className='grid grid-cols-2 gap-6'>
+        <div>
+          <FormLabel>First name</FormLabel>
+          <Input
+            placeholder='First name'
+            variant='soft'
+            autoComplete='off'
+            value={firstName}
+            onChange={(event) => {
+              event.stopPropagation();
+              setFirstName(event.target.value);
             }}
-          >
-            <div className='text-center'>
-              You can only minor in two programs and plan up to three.
-            </div>
-          </Snackbar>
-          {/* <div>
+          />
+        </div>
+        <div>
+          <FormLabel>Last name</FormLabel>
+          <Input
+            placeholder='Last name'
+            variant='soft'
+            autoComplete='off'
+            value={lastName}
+            onChange={(event) => {
+              event.stopPropagation();
+              setLastName(event.target.value);
+            }}
+          />
+        </div>
+        <div>
+          <FormLabel>Major</FormLabel>
+          <Autocomplete
+            multiple={false}
+            autoHighlight
+            options={majorOptions}
+            placeholder='Select your major'
+            variant='soft'
+            value={major}
+            // inputValue={major.code === undeclared.code ? '' : major.code}
+            isOptionEqualToValue={(option, value) => option.code === value.code}
+            onChange={(event, newMajor: MajorMinorType) => {
+              event.stopPropagation();
+              setMajor(newMajor ?? undeclared);
+            }}
+            getOptionLabel={(option: MajorMinorType) => option.code}
+            renderOption={(props, option) => (
+              <AutocompleteOption {...props} key={option.name}>
+                <ListItemContent>
+                  {option.code}
+                  <Typography level='body-sm'>{option.name}</Typography>
+                </ListItemContent>
+              </AutocompleteOption>
+            )}
+          />
+        </div>
+        <div>
+          <FormLabel>Minor(s)</FormLabel>
+          <Autocomplete
+            multiple={true}
+            autoHighlight
+            options={minorOptions}
+            placeholder={'Select your minor(s)'}
+            variant='soft'
+            value={minors}
+            isOptionEqualToValue={(option, value) =>
+              value === undefined || option.code === value.code
+            }
+            onChange={(event, newMinors: MajorMinorType[]) => {
+              event.stopPropagation();
+              handleMinorsChange(event, newMinors);
+            }}
+            getOptionLabel={(option: MajorMinorType) => option.code}
+            renderOption={(props, option) => (
+              <AutocompleteOption {...props} key={option.name}>
+                <ListItemContent>
+                  {option.code}
+                  <Typography level='body-sm'>{option.name}</Typography>
+                </ListItemContent>
+              </AutocompleteOption>
+            )}
+          />
+        </div>
+        <Snackbar
+          open={openSnackbar}
+          color={'primary'}
+          variant={'soft'}
+          onClose={handleCloseSnackbar}
+          autoHideDuration={6000}
+          sx={{
+            '.MuiSnackbar-root': {
+              borderRadius: '16px', // Roundedness
+            },
+            backgroundColor: '#0F1E2F', // Compass Blue
+            color: '#f6f6f6', // Compass Gray
+          }}
+        >
+          <div className='text-center'>
+            You can only minor in two programs and plan up to three.
+          </div>
+        </Snackbar>
+        {/* <div>
             <FormLabel>Certificate(s)</FormLabel>
             <Autocomplete
               multiple={true}
@@ -307,29 +320,29 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
               )}
             />
           </div> */}
-          <div>
-            <FormLabel>Class year</FormLabel>
-            <Autocomplete
-              multiple={false}
-              autoHighlight
-              options={generateClassYears()}
-              placeholder='Class year'
-              variant='soft'
-              value={classYear} // TODO: Does '' work here or is it redundant? --Windsor
-              isOptionEqualToValue={(option, value) => value === undefined || option === value}
-              onChange={(e, newClassYear: number | undefined) => {
-                e.stopPropagation();
-                setClassYear(newClassYear ?? undefined);
-              }}
-              getOptionLabel={(option) => option.toString()}
-              renderOption={(props, option) => (
-                <AutocompleteOption {...props} key={option}>
-                  <ListItemContent>{option}</ListItemContent>
-                </AutocompleteOption>
-              )}
-            />
-          </div>
-          {/* <Box
+        <div>
+          <FormLabel>Class year</FormLabel>
+          <Autocomplete
+            multiple={false}
+            autoHighlight
+            options={generateClassYears()}
+            placeholder='Class year'
+            variant='soft'
+            value={classYear} // TODO: Does '' work here or is it redundant? --Windsor
+            isOptionEqualToValue={(option, value) => value === undefined || option === value}
+            onChange={(event, newClassYear: number | undefined) => {
+              event.stopPropagation();
+              setClassYear(newClassYear ?? undefined);
+            }}
+            getOptionLabel={(option) => option.toString()}
+            renderOption={(props, option) => (
+              <AutocompleteOption {...props} key={option}>
+                <ListItemContent>{option}</ListItemContent>
+              </AutocompleteOption>
+            )}
+          />
+        </div>
+        {/* <Box
             sx={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -340,14 +353,14 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
             <FormLabel>Dark Mode</FormLabel>
             <Switch
               checked={themeDarkMode}
-              onChange={(e) => setThemeDarkMode(e.target.checked)}
+              onChange={(event) => setThemeDarkMode(event.target.checked)}
               color={themeDarkMode ? 'success' : 'neutral'}
               variant={themeDarkMode ? 'solid' : 'outlined'}
             />
           </Box> */}
 
-          {/* Implement this once we have ReCal functionality, perhaps in IW work */}
-          {/* <FormControl
+        {/* Implement this once we have ReCal functionality, perhaps in IW work */}
+        {/* <FormControl
             orientation='horizontal'
             sx={{ width: '100%', justifyContent: 'space-between' }}
           >
@@ -356,21 +369,20 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
             </div>
             <Switch
               checked={timeFormat24h}
-              onChange={(e) => setTimeFormat24h(e.target.checked)}
+              onChange={(event) => setTimeFormat24h(event.target.checked)}
               // TODO: Consider changing color to match our color palette
               color={timeFormat24h ? 'success' : 'neutral'}
               variant={timeFormat24h ? 'solid' : 'outlined'}
             />
           </FormControl> */}
-        </div>
-        <div className='mt-5 text-right'>
-          <Button variant='soft' color='primary' onClick={handleSave} size='md'>
-            Save
-          </Button>
-          <Button variant='soft' color='neutral' onClick={onClose} sx={{ ml: 2 }} size='md'>
-            Cancel
-          </Button>
-        </div>
+      </div>
+      <div className='mt-5 text-right'>
+        <Button variant='soft' color='primary' onClick={handleSave} size='md'>
+          Save
+        </Button>
+        <Button variant='soft' color='neutral' onClick={onClose} sx={{ ml: 2 }} size='md'>
+          Cancel
+        </Button>
       </div>
     </div>
   );

@@ -5,16 +5,18 @@ import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
 import LoadingComponent from '../LoadingComponent';
+import SettingsModal from '../Modal';
 import ReviewMenu from '../ReviewMenu';
 
 import styles from './InfoComponent.module.scss';
 
 interface InfoComponentProps {
-  dept: string;
-  coursenum: string;
+  value: string;
 }
 
-const InfoComponent: React.FC<InfoComponentProps> = ({ dept, coursenum }) => {
+const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
+  const dept = value.split(' ')[0];
+  const coursenum = value.split(' ')[1];
   const [showPopup, setShowPopup] = useState(false);
   const [courseDetails, setCourseDetails] = useState<{ [key: string]: any } | null>(null);
 
@@ -38,24 +40,27 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ dept, coursenum }) => {
     }
   }, [showPopup, dept, coursenum]);
 
-  document.addEventListener('keydown', (event: KeyboardEvent) => {
-    if (modalContent && (event.key === 'Escape' || event.key === 'Enter')) {
+  const handleKeyDown = (event) => {
+    if (event.key === 'Escape' || event.key === 'Enter') {
       handleClose(event);
     }
-  });
-
-  const handleClick = (e) => {
-    e.stopPropagation();
-    setShowPopup(true);
   };
 
-  const handleClose = (e) => {
-    e.stopPropagation();
+  const handleClick = (event) => {
+    event.stopPropagation();
+    setShowPopup(true);
+    document.addEventListener('keydown', handleKeyDown);
+  };
+
+  const handleClose = (event) => {
+    event.preventDefault();
+    event.stopPropagation();
     setShowPopup(false);
+    document.removeEventListener('keydown', handleKeyDown);
   };
 
   const modalContent = showPopup ? (
-    <div className={styles.modalBackdrop} onClick={(e) => e.stopPropagation()}>
+    <SettingsModal>
       <div className={styles.modal} style={{ width: '85%', height: '75%', padding: '25px' }}>
         {' '}
         {/* Ensure full width */}
@@ -84,7 +89,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ dept, coursenum }) => {
             >
               <div>
                 <div className={styles.detailRow}>
-                  <strong className={styles.strong}>{`${dept} ${coursenum}`}</strong>
+                  <strong className={styles.strong}>{value}</strong>
                 </div>
                 {Object.entries(courseDetails).map(([key, value]) => (
                   <div key={key} className={styles.detailRow}>
@@ -118,17 +123,25 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ dept, coursenum }) => {
           </footer>
         </div>
       </div>
-    </div>
+    </SettingsModal>
   ) : null;
 
   return (
     <>
       <div
         onClick={handleClick}
-        style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
+        style={{
+          position: 'relative',
+          display: 'block', // changed from inline-block to block
+          cursor: 'pointer',
+          maxWidth: '100%', // ensure it respects the container's max width
+          overflow: 'hidden', // ensure overflow is hidden
+          whiteSpace: 'nowrap', // no wrap
+          textOverflow: 'ellipsis', // apply ellipsis
+        }}
         className={classNames(styles.Action)}
       >
-        {`${dept} ${coursenum}`}
+        {value.length > 28 ? `${value.substring(0, 27)}...` : value}
       </div>
       {modalContent && createPortal(modalContent, document.body)}
     </>

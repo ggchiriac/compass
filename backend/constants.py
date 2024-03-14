@@ -154,3 +154,29 @@ BSE_MAJORS = {
     'MAE': 'Mechanical and Aerospace Engineering',
     'ORF': 'Operations Research and Financial Engineering',
 }
+
+LANG_DEPTS = {
+    "ARA": "Arabic",
+    "SLA": "Slavic Languages and Lit",  # TODO: confirm
+    "CHI": "Chinese",
+    "CZE": "Czech",
+    "FRE": "French",
+    "GER": "German",
+    "MOG": "Modern Greek",
+    "CLG": "Classical Greek",
+    "HEB": "Hebrew",
+    "HIN": "Hindi",
+    "ITA": "Italian",
+    "JPN": "Japanese",
+    "KOR": "Korean",
+    "LAT": "Latin",
+    "PER": "Persian",
+    "POR": "Portuguese",  # TODO: confirm
+    "RUS": "Russian",
+    "SAN": "Sanskrit",
+    "SPA": "Spanish",
+    "SWA": "Swahili",
+    "TUR": "Turkish",
+    "TWI": "Twi",
+    "URD": "Urdu",
+}  # unsure if some of these can count for AB foreign language requirement.

@@ -2,8 +2,8 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import Calendar from '../../components/Calendar';
-import CalendarSearch from '../../components/CalendarSearch';
+import Calendar from '../../components/Calendar/Calendar';
+import CalendarSearch from '../../components/Calendar/CalendarSearch';
 import Footer from '../../components/Footer';
 // import LoadingComponent from '../../components/LoadingComponent';
 import Navbar from '../../components/Navbar';

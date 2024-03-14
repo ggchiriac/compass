@@ -76,8 +76,8 @@ CAS_SERVER_URL = urljoin(os.getenv('CAS_URL'), 'cas/')
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    os.getenv('PUCOMPASS'),
     os.getenv('BACKEND'),
+    os.getenv('PUCOMPASS'), # might be useless
 ]
 CSRF_TRUSTED_ORIGINS = [
     os.getenv('PUCOMPASS'),
@@ -122,19 +122,11 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
-if os.getenv('DJANGO_TESTING').lower() == 'true':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-        }
+DATABASES = {
+    'default': {
+        **dj_database_url.config(default=os.getenv('DATABASE_URL')),
     }
-else:
-    DATABASES = {
-        'default': {
-            **dj_database_url.config(default=os.getenv('DATABASE_URL')),
-        }
-    }
+}
 
 CONN_MAX_AGE = 0
 

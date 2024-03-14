@@ -1,13 +1,11 @@
-import millionCompiler from 'million/compiler';
+import MillionCompiler from '@million/lint';
+import million from 'million/compiler';
 import withPWA from 'next-pwa';
-import path, { dirname } from 'path';
+import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Handling __dirname in ES Module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Base Next.js configuration
 const nextConfig = {
   reactStrictMode: true,
   sassOptions: {
@@ -17,23 +15,15 @@ const nextConfig = {
     PUCOMPASS: process.env.PUCOMPASS,
     BACKEND: process.env.BACKEND,
   },
-  // PWA configuration integrated directly
-  pwa: {
+  ...withPWA({
     dest: 'public',
     register: true,
     skipWaiting: true,
-  },
+  }),
 };
 
-// Million Compiler configuration
 const millionConfig = {
-  auto: {
-    threshold: 0.05,
-    skip: ['useBadHook', /badVariable/g],
-    // React Server Components configuration
-    rsc: true,
-  },
+  auto: { rsc: true },
 };
 
-// Combine Next.js config with PWA and Million Compiler enhancements
-export default millionCompiler.next(withPWA(nextConfig), millionConfig);
+export default million.next(MillionCompiler.next()(nextConfig), millionConfig);

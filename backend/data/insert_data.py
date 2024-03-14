@@ -114,14 +114,17 @@ def insert_courses(rows):
     logging.info('Starting Course insertions and updates...')
 
     departments = {dept.code: dept for dept in Department.objects.all()}
-    existing_courses = {course.guid: course for course in Course.objects.all()}
+    existing_courses = {course.crosslistings: course for course in Course.objects.all()}
     new_courses = []
     updated_courses = []
 
     for row in tqdm(rows, desc='Processing Courses'):
         guid = row.get('Course GUID')
-        if guid in existing_courses:
-            continue  # Skip if no GUID or if GUID already processed
+        crosslistings = row.get('Crosslistings')
+        if crosslistings is None:
+            crosslistings = row['Subject Code'] + ' ' + row['Catalog Number']
+        if crosslistings in existing_courses:
+            continue
 
         dept_code = row['Subject Code']
         department = departments.get(dept_code)
@@ -153,9 +156,10 @@ def insert_courses(rows):
             'reading_writing_assignment': row.get('Reading Writing Assignment'),
             'grading_basis': row.get('Grading Basis'),
             'reading_list': reading_list,
+            'crosslistings': crosslistings
         }
 
-        course = existing_courses.get(guid)
+        course = existing_courses.get(crosslistings)
         if course:
             # Update existing course
             for key, value in defaults.items():
@@ -165,7 +169,7 @@ def insert_courses(rows):
             # Create new course instance
             new_course = Course(guid=guid, **defaults)
             new_courses.append(new_course)
-            existing_courses[guid] = new_course
+            existing_courses[crosslistings] = new_course
 
     # Define the fields to update using list comprehension
     update_fields = [field.name for field in Course._meta.fields if field.name != 'id']
@@ -598,12 +602,12 @@ def insert_course_data(semester):
     try:
         with transaction.atomic():
             # insert_departments(trimmed_rows)
-            insert_academic_terms(trimmed_rows)
-            insert_courses(trimmed_rows)
-            # insert_course_equivalents(trimmed_rows)
-            insert_sections(trimmed_rows)
-            insert_class_meetings(trimmed_rows)
-            insert_class_year_enrollments(trimmed_rows)
+            # insert_academic_terms(trimmed_rows)
+            # insert_courses(trimmed_rows)
+            insert_course_equivalents(trimmed_rows)
+            # insert_sections(trimmed_rows)
+            # insert_class_meetings(trimmed_rows)
+            # insert_class_year_enrollments(trimmed_rows)
 
     except Exception as e:
         logging.error(f'Transaction failed: {e}')

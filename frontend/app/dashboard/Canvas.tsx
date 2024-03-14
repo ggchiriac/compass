@@ -218,13 +218,9 @@ export function Canvas({
     const startYear = classYear - 4;
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = userCourses[semester].map(
-        (course) => `${course.department_code} ${course.catalog_number}`
-      );
+      prevItems[`Fall ${year}`] = userCourses[semester].map((course) => course.crosslistings);
       semester += 1;
-      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
-        (course) => `${course.department_code} ${course.catalog_number}`
-      );
+      prevItems[`Spring ${year + 1}`] = userCourses[semester].map((course) => course.crosslistings);
       semester += 1;
     }
     return prevItems;
@@ -285,17 +281,6 @@ export function Canvas({
     }
   };
 
-  const timerRef = useRef<number>();
-  const debouncedCheckRequirements = () => {
-    if (timerRef.current) {
-      clearTimeout(timerRef.current);
-    }
-
-    timerRef.current = window.setTimeout(() => {
-      checkRequirements();
-    }, 10);
-  };
-
   const checkRequirements = () => {
     fetch(`${process.env.BACKEND}/check_requirements/`, {
       method: 'GET',
@@ -316,7 +301,7 @@ export function Canvas({
         }));
       }
     });
-    debouncedCheckRequirements();
+    checkRequirements();
   }, [classYear]);
 
   const { searchResults } = useSearchStore();
@@ -336,11 +321,8 @@ export function Canvas({
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`)
-          )
-          .map((course) => `${course.department_code} ${course.catalog_number}`),
+          .filter((course) => !userCurrentCourses.has(course.crosslistings))
+          .map((course) => course.crosslistings),
       };
     });
   }, [searchResults]);
@@ -476,9 +458,6 @@ export function Canvas({
           setActiveContainerId(activeContainer);
           setOverContainerId(activeContainer);
           setClonedItems(items);
-
-          console.log('Drag start');
-          console.log('activeId:', active.id);
         }}
         onDragOver={({ active, over }) => {
           const overId = over?.id;
@@ -489,12 +468,6 @@ export function Canvas({
           const overContainer = findContainer(overId);
           const activeContainer = findContainer(active.id);
           setOverContainerId(overContainer);
-
-          console.log('Drag over');
-          console.log('overId:', overId);
-          console.log('overContainer:', overContainer);
-          console.log('activeId:', active.id);
-          console.log('activeContainer:', activeContainer);
 
           if (!overContainer || !activeContainer) {
             return;
@@ -549,7 +522,7 @@ export function Canvas({
                 },
                 body: JSON.stringify({ courseId: active.id, semesterId: overContainerId }),
               }).then((response) => response.json());
-              debouncedCheckRequirements();
+              checkRequirements();
             }
           }
 
@@ -564,7 +537,7 @@ export function Canvas({
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Left Section for Search Results */}
             {containers.includes('Search Results') && (
-              <div style={{ width: '380px' }}>
+              <div style={{ width: '360px' }}>
                 {/* issue here with resizing + with requirements dropdowns*/}
                 {/* Try to get this to fixed height*/}
                 <DroppableContainer
@@ -645,7 +618,7 @@ export function Canvas({
               <TabbedMenu
                 tabsData={academicPlan}
                 csrfToken={csrfToken}
-                checkRequirements={debouncedCheckRequirements}
+                checkRequirements={checkRequirements}
               />
             </div>
           </div>
@@ -716,11 +689,8 @@ export function Canvas({
       const updatedCourses = {
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.department_code} ${course.catalog_number}`)
-          )
-          .map((course) => `${course.department_code} ${course.catalog_number}`),
+          .filter((course) => !userCurrentCourses.has(course.crosslistings))
+          .map((course) => course.crosslistings),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
@@ -736,7 +706,7 @@ export function Canvas({
       body: JSON.stringify({ courseId: value.toString(), semesterId: 'Search Results' }),
     }).then((response) => {
       response.json();
-      debouncedCheckRequirements();
+      checkRequirements();
     });
   }
 }

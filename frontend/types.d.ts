@@ -41,38 +41,22 @@ export type ProfileProps = {
 
 export type SettingsModalProps = {
   children: React.ReactNode;
-  onClose: () => void;
 };
 
 export type Course = {
-  id: number;
+  id?: number;
   guid: number;
   department_code: string;
   catalog_number: number;
   title: string;
   originSemesterId?: string;
-};
-
-export type ClassMeeting = {
-  meeting_number: string;
-  start_time: string;
-  end_time: string;
-  room: string;
-  days: string[];
-  building_name: string;
-};
-
-export type Section = {
-  class_number: string;
-  class_type: string;
-  class_section: string;
-  track: string;
-  seat_reservations: number;
-  instructor_name: string;
-  capacity: number;
-  status: string;
-  enrollment: number;
-  class_meetings: ClassMeeting[];
+  crosslistings?: string;
+  // Calendar portion (might need to rewrite to make cleaner)
+  sections?: Section[];
+  course_id?: string;
+  description?: string;
+  drop_consent?: string;
+  add_consent?: string;
 };
 
 export type SearchStoreState = {
@@ -152,21 +136,57 @@ export type Dictionary = {
 
 // Calendar
 type CalendarEvent = {
-  id: string; // Unique identifier for the event, could be the course or section ID
-  title: string; // Title of the course, e.g., "Advanced Programming Techniques"
-  description: string; // Description of the course, could include catalog number, e.g., "COS 333"
-  departmentCode: string; // Department code, e.g., "COS"
-  catalogNumber: string; // Catalog number of the course, e.g., "333"
-  instructorName: string; // Name of the instructor
-  startTime: string; // ISO 8601 date string indicating the start time of the first class meeting
-  endTime: string; // ISO 8601 date string indicating the end time of the last class meeting
-  meetingDays: string[]; // Days of the week when the course meets, e.g., ["Monday", "Wednesday"]
-  color: string; // Color code for UI representation, e.g., "#3498db"
-  textColor: string; // Text color code for UI representation, ideally contrasted with `color`
-  gridColumnStart: number; // Numeric representation aligning with the day of the week (1 = Monday, ..., 7 = Sunday)
-  gridRowStart: number; // Calculated starting grid row based on the start time
-  gridRowEnd: number; // Calculated grid row end based on the duration
-  // Additional fields from the ClassMeetingSerializer, if necessary
-  room?: string; // Room number or location of the class meeting
-  buildingName?: string; // Name of the building where the class meets
+  guid: string;
+  course_id: string;
+  catalog_number: string;
+  title: string;
+  description: string;
+  drop_consent: string;
+  add_consent: string;
+  web_address: string;
+  transcript_title: string;
+  long_title: string;
+  distribution_area_long: string;
+  distribution_area_short: string;
+  reading_writing_assignment: string;
+  grading_basis: string;
+  reading_list: string;
+  department_code: string;
+  sections: Section[];
+  crosslistings: string;
+  sections: Section[];
+  selectedSection?: Section;
+  // Additional fields for UI representation
+  color?: string;
+  textColor?: string;
+  gridColumnStart?: number;
+  gridRowStart?: number;
+  gridRowEnd?: number;
+  // Additional fields for event rendering
+  startTime?: string;
+  endTime?: string;
+  startColumnIndex?: number;
+  startRowIndex?: number;
+  endRowIndex?: number;
+};
+
+export type Section = {
+  class_number: number;
+  class_type: string;
+  class_section: string;
+  track: string;
+  seat_reservations: string;
+  capacity: number;
+  status: string;
+  enrollment: number;
+  class_meetings: ClassMeeting[];
+};
+
+export type ClassMeeting = {
+  meeting_number: number;
+  start_time: string;
+  end_time: string;
+  room: string;
+  days: string;
+  building_name: string;
 };
