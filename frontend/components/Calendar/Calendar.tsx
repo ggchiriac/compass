@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay, parse } from 'date-fns';
 
 import { CalendarEvent, Section } from '@/types';
 
@@ -29,7 +29,7 @@ const dayToStartColumnIndex: Record<string, number> = {
 
 const getStartColumnIndexForDays = (daysString: string): number[] => {
   const daysArray = daysString.split(',');
-  return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0); 
+  return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0);
 };
 
 const Calendar: React.FC = () => {
@@ -42,31 +42,49 @@ const Calendar: React.FC = () => {
   const startDate = startOfWeek(today, { weekStartsOn: 1 });
   const daysOfWeek = Array.from({ length: 5 }, (_, index) => addDays(startDate, index));
 
+  // TODO: This needs to be re-rendered
   const days = daysOfWeek.map((date) => ({
     name: format(date, 'EEEE'),
     date: Number(format(date, 'd')),
     current: isSameDay(date, today),
   }));
 
-  const events: CalendarEvent[] = selectedCourses.flatMap((course) =>
-    course.sections
-      .filter(
-        (section) =>
-          !course.selectedSection || section.class_number === course.selectedSection.class_number
-      )
-      .flatMap((section) =>
-        section.class_meetings.map((meeting) => ({
-          ...course,
-          startTime: meeting.start_time,
-          endTime: meeting.end_time,
-          startColumnIndex: getStartColumnIndexForDays(meeting.days)[0],
-          startRowIndex: calculateGridRow(meeting.start_time),
-          endRowIndex: calculateGridRow(meeting.end_time),
-          sections: course.sections,
-          selectedSection: course.selectedSection,
-        }))
-      )
-  );
+  console.log('Selected Courses:', selectedCourses);
+
+  const events: CalendarEvent[] = selectedCourses.flatMap((course) => {
+    console.log('Processing Course:', course.title);
+
+    return course[0].class_meetings.map((meeting) => {
+      const startTime = meeting.start_time;
+      const endTime = meeting.end_time;
+      const startRowIndex = calculateGridRow(startTime);
+      const endRowIndex = calculateGridRow(endTime);
+
+      // Convert start time and end time to 12-hour format
+      const startTimeFormatted = format(parse(startTime, 'HH:mm:ss', new Date()), 'h:mm a');
+      const endTimeFormatted = format(parse(endTime, 'HH:mm:ss', new Date()), 'h:mm a');
+
+      console.log('Course:', course.title);
+      console.log('Start Time:', startTimeFormatted);
+      console.log('End Time:', endTimeFormatted);
+      console.log('Start Row Index:', startRowIndex);
+      console.log('End Row Index:', endRowIndex);
+      console.log('---');
+
+      const currentTime = new Date().getTime();
+      const uniqueKey = `${course.guid}-${startTime}-${currentTime}`;
+
+      return {
+        ...course,
+        startTime,
+        endTime,
+        startColumnIndex: getStartColumnIndexForDays(meeting.days)[0],
+        startRowIndex,
+        endRowIndex,
+        key: uniqueKey,
+      };
+    });
+  });
 
   const handleSectionClick = (courseId: string, selectedSection: Section) => {
     const updatedCourses = selectedCourses.map((course) => {

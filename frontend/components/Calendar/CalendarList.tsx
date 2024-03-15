@@ -3,6 +3,8 @@
 import Paper from '@mui/material/Paper';
 import { FixedSizeList as VirtualList } from 'react-window';
 
+import { CalendarEvent } from '@/types';
+
 import useKairosStore from '@/store/kairosSlice';
 
 import CourseListItem from './CourseListItem';

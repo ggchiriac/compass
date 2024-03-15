@@ -1,7 +1,14 @@
 from rest_framework import serializers
-from .models import Course, Section, ClassMeeting
+
+from .models import (
+    ClassMeeting,
+    Course,
+    Section,
+)
+import time
 
 
+# TODO: It's possible that not all of these fields are needed for non-Calendar searching
 class ClassMeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassMeeting
@@ -17,7 +24,7 @@ class ClassMeetingSerializer(serializers.ModelSerializer):
 
 class SectionSerializer(serializers.ModelSerializer):
     # Nested ClassMeetingSerializer to include meeting details in the section data
-    class_meetings = ClassMeetingSerializer(source='classmeeting_set', many=True, read_only=True)
+    class_meetings = ClassMeetingSerializer(many=True, read_only=True)
     instructor_name = serializers.CharField(source='instructor.name', read_only=True)
 
     class Meta:
@@ -38,7 +45,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
 class CourseSerializer(serializers.ModelSerializer):
     # Nested SectionSerializer to include section details in the course data
-    sections = SectionSerializer(source='section_set', many=True, read_only=True)
+    sections = SectionSerializer(many=True, read_only=True)
     department_code = serializers.CharField(source='department.code', read_only=True)
 
     class Meta:
@@ -63,3 +70,18 @@ class CourseSerializer(serializers.ModelSerializer):
             'sections',
             'crosslistings',
         )
+
+
+# Calendar
+class NewClassMeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClassMeeting
+        fields = ('start_time', 'end_time', 'days')
+
+
+class NewSectionSerializer(serializers.ModelSerializer):
+    class_meetings = NewClassMeetingSerializer(source='classmeeting_set', many=True, read_only=True)
+
+    class Meta:
+        model = Section
+        fields = ('class_number', 'class_section', 'class_meetings')

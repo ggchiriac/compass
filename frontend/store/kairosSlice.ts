@@ -10,7 +10,6 @@ interface KairosStoreState {
   loading: boolean;
   addCourse: (course: CalendarEvent) => void;
   removeCourse: (courseId: string) => void;
-  updateCourse: (courseId: string, updatedCourse: Partial<CalendarEvent>) => void;
   setSelectedCourses: (courses: CalendarEvent[]) => void;
   setCalendarSearchResults: (results: Course[]) => void;
   addRecentSearch: (search: string) => void;
@@ -37,19 +36,37 @@ const useKairosStore = create<KairosStoreState>((set) => ({
   error: null,
   loading: false,
   setSelectedCourses: (courses: CalendarEvent[]) => set({ selectedCourses: courses }),
-  addCourse: (course) =>
-    set((state) => ({
-      selectedCourses: [...state.selectedCourses, { ...course, sections: course.sections || [] }],
-    })),
+  addCourse: async (newCourse) => {
+    // Fetch course details from the backend
+    const response = await fetch(
+      `${process.env.BACKEND}/fetch_class_meetings/${newCourse.course_id}/`
+    );
+    const courseDetails = await response.json();
+
+    if (!response.ok) {
+      console.error('Failed to fetch course details:', courseDetails.error);
+      return; // Optionally handle this case in your UI
+    }
+
+    const courseToAdd = { ...newCourse, ...courseDetails, sections: courseDetails.sections || [] };
+    set((state) => {
+      const isCourseAlreadyAdded = state.selectedCourses.some(
+        (course) => course.guid === newCourse.guid
+      );
+
+      if (isCourseAlreadyAdded) {
+        return state;
+      }
+      console.log('yoyoyo', courseToAdd);
+      return {
+        ...state,
+        selectedCourses: [...state.selectedCourses, courseToAdd],
+      };
+    });
+  },
   removeCourse: (courseId) =>
     set((state) => ({
       selectedCourses: state.selectedCourses.filter((course) => String(course.guid) !== courseId),
-    })),
-  updateCourse: (courseId, updatedCourse) =>
-    set((state) => ({
-      selectedCourses: state.selectedCourses.map((course) =>
-        String(course.guid) === courseId ? { ...course, ...updatedCourse } : course
-      ),
     })),
   setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
   addRecentSearch: (search) => {

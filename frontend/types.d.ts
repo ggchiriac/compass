@@ -159,9 +159,6 @@ type CalendarEvent = {
   // Additional fields for UI representation
   color?: string;
   textColor?: string;
-  gridColumnStart?: number;
-  gridRowStart?: number;
-  gridRowEnd?: number;
   // Additional fields for event rendering
   startTime?: string;
   endTime?: string;

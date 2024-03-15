@@ -41,38 +41,13 @@ const CalendarSearch: FC = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${process.env.BACKEND}/calendar_search/?course=${encodeURIComponent(searchQuery)}`
+        `${process.env.BACKEND}/search/?course=${encodeURIComponent(searchQuery)}`
       );
       if (response.ok) {
         const data: { courses: Course[] } = await response.json();
         setCalendarSearchResults(data.courses);
-        console.log('Response data:', data);
-        console.log('Courses:', data.courses);
-        if (data.courses.length > 0) {
-          addRecentSearch(searchQuery);
-          searchCache.set(searchQuery, data.courses);
-
-          // Access section and class meeting data
-          data.courses.forEach((course) => {
-            console.log('Course:', course);
-            console.log('Course sections:', course.sections);
-            if (course.sections && course.sections.length > 0) {
-              course.sections.forEach((section) => {
-                console.log('Section:', section);
-                console.log('Section class meetings:', section.class_meetings);
-                if (section.class_meetings && section.class_meetings.length > 0) {
-                  section.class_meetings.forEach((meeting) => {
-                    console.log('Class Meeting:', meeting);
-                  });
-                } else {
-                  console.log('No class meetings found for section');
-                }
-              });
-            } else {
-              console.log('No sections found for course');
-            }
-          });
-        }
+        addRecentSearch(searchQuery);
+        searchCache.set(searchQuery, data.courses);
       } else {
         setError(`Server returned ${response.status}: ${response.statusText}`);
       }
