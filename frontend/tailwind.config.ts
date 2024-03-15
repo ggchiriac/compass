@@ -35,6 +35,9 @@ const config: Config = {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
       },
+      backgroundColor: {
+        'dnd-gray': 'rgba(0, 0, 0, 0.05)', // Background "on hover" color dnd uses
+      },
     },
   },
   plugins: [require('@tailwindcss/forms')],

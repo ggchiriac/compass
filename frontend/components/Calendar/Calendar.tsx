@@ -1,23 +1,34 @@
 import { useEffect, useRef } from 'react';
-
 import { format, startOfWeek, addDays, isSameDay, parse } from 'date-fns';
 
 import { CalendarEvent, Section } from '@/types';
-
 import useKairosStore from '@/store/kairosSlice';
-
 import Navbar from '../Navbar';
-
 import CourseCard from './CalendarCard';
 import CalendarDays from './CalendarDays';
 
-const calculateGridRow = (timeString: string) => {
-  const [hour, minute] = timeString.split(':').map(Number);
-  const startHour = 7;
-  const slotsPerHour = 4;
-  const rowStart = (hour - startHour) * slotsPerHour + Math.floor(minute / 15) + 1;
-  return rowStart;
+const startHour = 7;
+const endHour = 21;
+const formatHour = (hour: number) => {
+  const formattedHour = hour % 12 || 12;
+  const period = hour < 12 ? 'AM' : 'PM';
+  return `${formattedHour}:00 ${period}`;
 };
+
+const calculateGridRow = (timeString: string) => {
+  const [time, period] = timeString.split(' ');
+  const [hour, minute] = time.split(':').map(Number);
+
+  let adjustedHour = hour;
+  if (period === 'PM' && hour !== 12) {
+    adjustedHour += 12;
+  } else if (period === 'AM' && hour === 12) {
+    adjustedHour = 0;
+  }
+
+  return adjustedHour - startHour;
+};
+
 
 const dayToStartColumnIndex: Record<string, number> = {
   M: 1, // Monday
@@ -42,7 +53,6 @@ const Calendar: React.FC = () => {
   const startDate = startOfWeek(today, { weekStartsOn: 1 });
   const daysOfWeek = Array.from({ length: 5 }, (_, index) => addDays(startDate, index));
 
-  // TODO: This needs to be re-rendered
   const days = daysOfWeek.map((date) => ({
     name: format(date, 'EEEE'),
     date: Number(format(date, 'd')),
@@ -53,27 +63,26 @@ const Calendar: React.FC = () => {
 
   const events: CalendarEvent[] = selectedCourses.flatMap((course) => {
     console.log('Processing Course:', course.title);
-
-    return course[0].class_meetings.map((meeting) => {
+  
+    return course[0].class_meetings.map((meeting, index) => {
       const startTime = meeting.start_time;
       const endTime = meeting.end_time;
       const startRowIndex = calculateGridRow(startTime);
       const endRowIndex = calculateGridRow(endTime);
-
+  
       // Convert start time and end time to 12-hour format
       const startTimeFormatted = format(parse(startTime, 'HH:mm:ss', new Date()), 'h:mm a');
       const endTimeFormatted = format(parse(endTime, 'HH:mm:ss', new Date()), 'h:mm a');
-
+  
       console.log('Course:', course.title);
       console.log('Start Time:', startTimeFormatted);
       console.log('End Time:', endTimeFormatted);
       console.log('Start Row Index:', startRowIndex);
       console.log('End Row Index:', endRowIndex);
       console.log('---');
-
-      const currentTime = new Date().getTime();
-      const uniqueKey = `${course.guid}-${startTime}-${currentTime}`;
-
+  
+      const uniqueKey = `${course.guid}-${startTime}-${index}`;
+  
       return {
         ...course,
         startTime,
@@ -125,14 +134,15 @@ const Calendar: React.FC = () => {
             {/* Time Slots */}
             <div
               className='bg-white border-r border-gray-200 grid'
-              style={{ gridTemplateRows: 'repeat(18, 50px)' }}
+              style={{ gridTemplateRows: `repeat(${endHour - startHour + 1}, 50px)` }}
             >
-              {Array.from({ length: 18 }, (_, rowIndex) => (
+              {Array.from({ length: endHour - startHour + 1 }, (_, rowIndex) => (
                 <div
                   key={`time-${rowIndex}`}
-                  className='border-b border-gray-200 flex items-center justify-end pr-2 text-xs text-gray-500'
+                  className='border-b border-gray-200 flex items-center justify-end pr-2 text-gray-400'
+                  style={{ fontSize: '0.6rem' }}
                 >
-                  {`${rowIndex + 7}:00`}
+                  {formatHour(rowIndex + startHour)}
                 </div>
               ))}
             </div>
@@ -141,14 +151,14 @@ const Calendar: React.FC = () => {
               className='grid'
               style={{
                 gridTemplateColumns: `repeat(${days.length}, 1fr)`,
-                gridTemplateRows: 'repeat(18, 50px)',
+                gridTemplateRows: `repeat(${endHour - startHour + 1}, 50px)`,
               }}
             >
               {/* Grid Lines */}
-              {Array.from({ length: 18 }, (_, rowIndex) => (
+              {Array.from({ length: endHour - startHour + 1 }, (_, rowIndex) => (
                 <div
                   key={`grid-row-${rowIndex}`}
-                  className={`border-b border-gray-200 ${rowIndex === 17 ? 'border-b-0' : ''}`}
+                  className={`border-b border-gray-200 ${rowIndex === endHour - startHour ? 'border-b-0' : ''}`}
                   style={{ gridRow: rowIndex + 1, gridColumn: '1 / -1' }}
                 />
               ))}
@@ -162,7 +172,7 @@ const Calendar: React.FC = () => {
               {/* Events */}
               {events.map((event) => (
                 <CourseCard
-                  key={`${event.guid}-${event.startTime}`}
+                  key={event.key}
                   event={event}
                   onSectionClick={(section) => handleSectionClick(event.guid, section)}
                   style={{

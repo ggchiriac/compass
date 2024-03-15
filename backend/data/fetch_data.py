@@ -1,6 +1,7 @@
 import argparse
 import csv
-from req_lib import ReqLib
+import os
+from .req_lib import ReqLib
 import time
 from concurrent.futures import ThreadPoolExecutor
 
@@ -13,6 +14,8 @@ def fetch_course_detail(course_id, term, req_lib):
     """
     Fetches course details for a given course_id and term.
     """
+    if course_id == '010855' or '011605':
+        return course_id, {}
     return course_id, req_lib.getJSON(
         req_lib.configs.COURSES_DETAILS, fmt='json', term=term, course_id=course_id
     )
@@ -110,8 +113,8 @@ def process_courses(courses, seat_info, course_details, writer):
         for subject in term.get('subjects', []):  # Loop through each subject
             for course in subject.get('courses', []):  # Loop through each course
                 if not course_details:
-                    print(f'No course details available for {course}.')
-                    return
+                    print(f'No course details provided Possible issue with the server.')
+                    continue
                 # Fetch the course details and process each course
                 course_id = course.get('course_id', '')
                 course_dict = course_details.get(course_id)
@@ -120,7 +123,7 @@ def process_courses(courses, seat_info, course_details, writer):
                     print(
                         f'Data for course ID {course_id} not found. Possible issue with the server.'
                     )
-                    return
+                    continue
                 course_detail = course_dict.get('course_details', {})
                 process_course(
                     term, subject, course, seat_mapping, course_detail, writer
@@ -358,7 +361,14 @@ def get_semesters_from_args():
 
 
 def generate_csv(semester, subjects, query, fieldnames, req_lib):
+    copy_n = 0
     csv_file = f'{semester}.csv'
+
+    # Check if file already exists
+    while os.path.exists(csv_file):
+        copy_n += 1
+        csv_file = f'{semester}_{copy_n}.csv'
+
     with open(csv_file, 'w', newline='', encoding='utf-8') as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()

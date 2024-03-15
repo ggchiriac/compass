@@ -114,7 +114,7 @@ def insert_courses(rows):
     logging.info('Starting Course insertions and updates...')
 
     departments = {dept.code: dept for dept in Department.objects.all()}
-    existing_courses = {course.crosslistings: course for course in Course.objects.all()}
+    existing_courses = {course.guid: course for course in Course.objects.all()}
     new_courses = []
     updated_courses = []
 
@@ -123,8 +123,11 @@ def insert_courses(rows):
         crosslistings = row.get('Crosslistings')
         if crosslistings is None:
             crosslistings = row['Subject Code'] + ' ' + row['Catalog Number']
-        if crosslistings in existing_courses:
-            continue
+
+        # Handle CHI1001, FRE1027, GER1025...
+        pattern = r"([a-zA-Z])([0-9])"
+        replacement = r"\1 \2"
+        crosslistings = re.sub(pattern, replacement, crosslistings)
 
         dept_code = row['Subject Code']
         department = departments.get(dept_code)
@@ -159,7 +162,7 @@ def insert_courses(rows):
             'crosslistings': crosslistings
         }
 
-        course = existing_courses.get(crosslistings)
+        course = existing_courses.get(guid)
         if course:
             # Update existing course
             for key, value in defaults.items():
@@ -169,7 +172,7 @@ def insert_courses(rows):
             # Create new course instance
             new_course = Course(guid=guid, **defaults)
             new_courses.append(new_course)
-            existing_courses[crosslistings] = new_course
+            existing_courses[guid] = new_course
 
     # Define the fields to update using list comprehension
     update_fields = [field.name for field in Course._meta.fields if field.name != 'id']
@@ -184,7 +187,10 @@ def insert_courses(rows):
 
 # -------------------------------------------------------------------------------------#
 
-
+# For each course in the Course table, take its crosslistings and
+# insert every crosslisting in the Course table as a separate course.
+# Also populate CourseEquivalents table with the links between
+# each pair of equivalent courses.
 def insert_course_equivalents(rows):
     logging.info('Starting CourseEquivalent insertions and updates...')
 
@@ -603,8 +609,8 @@ def insert_course_data(semester):
         with transaction.atomic():
             # insert_departments(trimmed_rows)
             # insert_academic_terms(trimmed_rows)
-            # insert_courses(trimmed_rows)
-            insert_course_equivalents(trimmed_rows)
+            insert_courses(trimmed_rows)
+            # insert_course_equivalents(trimmed_rows)
             # insert_sections(trimmed_rows)
             # insert_class_meetings(trimmed_rows)
             # insert_class_year_enrollments(trimmed_rows)

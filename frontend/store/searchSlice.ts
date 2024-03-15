@@ -4,12 +4,10 @@ import { SearchStoreState } from '@/types';
 
 const useSearchStore = create<SearchStoreState>((set) => ({
   searchResults: [],
-  activeDraggableCourse: null,
   recentSearches: [],
   error: null,
   loading: false,
   setSearchResults: (results) => set({ searchResults: results }),
-  setActiveDraggableCourse: (course) => set({ activeDraggableCourse: course }),
   addRecentSearch: (query) => {
     let trimmedQuery = query.trim();
     if (trimmedQuery.length === 0) {
@@ -26,6 +24,13 @@ const useSearchStore = create<SearchStoreState>((set) => ({
   },
   setError: (error) => set({ error }),
   setLoading: (loading) => set({ loading }),
+  searchFilter: {
+    termFilter: '',
+    distributionFilter: '',
+    levelFilter: [],
+    gradingFilter: [],
+  },
+  setSearchFilter: (filter) => set(() => ({ searchFilter: filter })),
 }));
 
 export default useSearchStore;

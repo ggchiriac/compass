@@ -20,7 +20,7 @@ from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from thefuzz import fuzz, process
+from thefuzz import fuzz, process # TODO: Consider adding fuzzy finding to search
 
 from data.check_reqs import (
     check_user,
@@ -315,17 +315,21 @@ class CAS(View):
 # ------------------------------- SEARCH COURSES --------------------------------------#
 
 DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$', IGNORECASE)
-DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,3}$', IGNORECASE)
-DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
-NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{1,3}[a-zA-Z]$', IGNORECASE)
-NUM_ONLY_REGEX = compile(r'^\d{1,3}$', IGNORECASE)
-
+DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,4}$', IGNORECASE)
+DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{3}$', IGNORECASE)
+NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{3}[a-zA-Z]$', IGNORECASE)
+NUM_ONLY_REGEX = compile(r'^\d{3,4}$', IGNORECASE)
+GRADING_OPTIONS = {
+    'A-F': ['FUL', 'GRD', 'NAU', 'NPD'],
+    'P/D/F': ['PDF', 'FUL', 'NAU'],
+    'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
+}
 
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
         if len(dept) >= 3:
-            start_index = crosslistings.lower().find(dept)
+            start_index = crosslistings.lower().find(dept.lower())
             if start_index != -1:
                 return crosslistings[start_index:]
         return crosslistings
@@ -341,8 +345,15 @@ class SearchCourses(View):
     def get(self, request, *args, **kwargs):
         start_time = time.time()
         query = request.GET.get('course', None)
+        term = request.GET.get('term', None)
+        distribution = request.GET.get('distribution', None)
+        levels = request.GET.get('level')
+        grading_options = request.GET.get('grading')
+
         if query:
             # Process queries
+            init_time = time.time()
+            # process queries
             trimmed_query = sub(r'\s', '', query)
             if DEPT_NUM_SUFFIX_REGEX.match(trimmed_query):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
@@ -368,21 +379,40 @@ class SearchCourses(View):
                 print(f'Query processing time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})
 
-            try:
-                exact_match_start_time = time.time()
-                exact_match_course = (
-                    Course.objects.select_related('department')
-                    .filter(
-                        Q(department__code__iexact=dept)
-                        & Q(catalog_number__iexact=num),
-                        section__term_id=9,
-                    )
-                    .distinct()
-                )
-                print(
-                    f'Exact match query time: {time.time() - exact_match_start_time:.5f} seconds'
-                )
+            query_conditions = Q()
 
+            if term:
+                query_conditions &= Q(guid__startswith=term)
+
+            if distribution:
+                query_conditions &= Q(
+                    distribution_area_short__iexact=distribution)
+
+            if levels:
+                levels = levels.split(',')
+                level_query = Q()
+                for level in levels:
+                    level_query |= Q(catalog_number__startswith=level)
+                query_conditions &= level_query
+
+            if grading_options:
+                grading_options = grading_options.split(',')
+                grading_filters = []
+                for grading in grading_options:
+                    grading_filters += GRADING_OPTIONS[grading]
+                print(f"Grading filters: {grading_filters}")
+                grading_query = Q()
+                for grading in grading_filters:
+                    grading_query |= Q(grading_basis__iexact=grading)
+                query_conditions &= grading_query
+
+            try:
+                filtered_query = query_conditions
+                filtered_query &= Q(department__code__iexact=dept)
+                filtered_query &= Q(catalog_number__iexact=num)
+                exact_match_course = Course.objects.select_related('department').filter(
+                    filtered_query
+                ).order_by('course_id', '-guid').distinct('course_id')
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
@@ -404,6 +434,11 @@ class SearchCourses(View):
                         f'Courses query time: {time.time() - courses_start_time:.5f} seconds'
                     )
 
+                    filtered_query = query_conditions
+                    filtered_query &= Q(crosslistings__icontains=code)
+                    courses = Course.objects.select_related('department').filter(
+                        filtered_query
+                    ).order_by('course_id', '-guid').distinct('course_id')
                     if courses:
                         sorting_start_time = time.time()
                         custom_sorting_field = Case(
@@ -504,17 +539,17 @@ def get_first_course_inst(course_code):
 def update_courses(request):
     try:
         data = json.loads(request.body)
-        course_code = data.get('courseId')  # might have to adjust this, print
+        course_id = data.get('courseId')  # might have to adjust this, print
         container = data.get('semesterId')
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = get_first_course_inst(course_code)
+        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(user=user_inst, course=course_inst)
+            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
             user_course.delete()
-            message = f'User course deleted: {course_inst.course_id}, {net_id}'
+            message = f'User course deleted: {course_id}, {net_id}'
 
         else:
             semester = parse_semester(container, class_year)
@@ -524,10 +559,10 @@ def update_courses(request):
             )
             if created:
                 message = (
-                    f'User course added: {semester}, {course_inst.course_id}, {net_id}'
+                    f'User course added: {semester}, {course_id}, {net_id}'
                 )
             else:
-                message = f'User course updated: {semester}, {course_inst.course_id}, {net_id}'
+                message = f'User course updated: {semester}, {course_id}, {net_id}'
 
         return JsonResponse({'status': 'success', 'message': message})
 

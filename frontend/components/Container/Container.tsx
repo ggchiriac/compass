@@ -74,15 +74,7 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
         onClick={onClick}
         tabIndex={onClick ? 0 : undefined}
       >
-        {label ? (
-          <div className={styles.Header}>
-            {label}
-            {/* <div className={styles.Actions}>
-              {onRemove ? <Remove onClick={onRemove} /> : undefined}
-              <Handle {...handleProps} />
-            </div> */}
-          </div>
-        ) : null}
+        {label ? <div className={styles.Header}>{label}</div> : null}
         {placeholder ? children : <ul>{children}</ul>}
       </Component>
     );

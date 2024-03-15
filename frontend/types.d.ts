@@ -44,7 +44,7 @@ export type SettingsModalProps = {
 };
 
 export type Course = {
-  id?: number;
+  course_id?: number;
   guid: number;
   department_code: string;
   catalog_number: number;
@@ -59,17 +59,31 @@ export type Course = {
   add_consent?: string;
 };
 
+export type Filter = {
+  termFilter: string;
+  distributionFilter: string;
+  levelFilter: string[];
+  gradingFilter: string[];
+};
+
+export type Filter = {
+  termFilter: string;
+  distributionFilter: string;
+  levelFilter: string[];
+  gradingFilter: string[];
+};
+
 export type SearchStoreState = {
   searchResults: Course[];
   setSearchResults: (results: Course[]) => void;
   recentSearches: string[];
   addRecentSearch: (query: string) => void;
-  activeDraggableCourse: Course | null;
-  setActiveDraggableCourse: (course: Course | null) => void;
   error: string | null;
   setError: (error: string | null) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  searchFilter: Filter;
+  setSearchFilter: (filter: Filter) => void;
 };
 
 export type CourseProps = {
@@ -136,6 +150,7 @@ export type Dictionary = {
 
 // Calendar
 type CalendarEvent = {
+  key: string;
   guid: string;
   course_id: string;
   catalog_number: string;

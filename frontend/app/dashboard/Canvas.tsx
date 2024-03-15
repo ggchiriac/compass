@@ -33,7 +33,6 @@ import {
   SortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import ColorHash from 'color-hash';
 import { createPortal } from 'react-dom';
 
 import { Course, Profile } from '@/types';
@@ -45,6 +44,50 @@ import useSearchStore from '@/store/searchSlice';
 import { Item, Container, ContainerProps } from '../../components';
 
 import { coordinateGetter as multipleContainersCoordinateGetter } from './multipleContainersKeyboardCoordinates';
+
+const PRIMARY_COLOR_LIST: string[] = [
+  '#ff7895',
+  '#e38a62',
+  '#cdaf7b',
+  '#94bb77',
+  '#e2c25e',
+  '#ead196',
+  '#e7bc7d',
+  '#d0b895',
+  '#72b4c9',
+  '#2cdbca',
+  '#a8cadc',
+  '#c5bab6',
+  '#bf91bd',
+];
+
+const SECONDARY_COLOR_LIST: string[] = [
+  '#ff91a9',
+  '#e9a88a',
+  '#d7bf95',
+  '#afcb9a',
+  '#e9d186',
+  '#f5db9d',
+  '#f0d2a8',
+  '#dcc9af',
+  '#96c7d6',
+  '#2ee8d6',
+  '#a8d3dc',
+  '#cac1be',
+  '#c398c1',
+];
+
+function simpleHash(str: string) {
+  if (str.length !== 3) {
+    return 0;
+  }
+
+  let sum = 0;
+  for (let i = 0; i < str.length; i++) {
+    sum += (i + 1) * str.charCodeAt(i);
+  }
+  return sum % 11;
+}
 
 async function fetchCsrfToken() {
   try {
@@ -218,9 +261,13 @@ export function Canvas({
     const startYear = classYear - 4;
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = userCourses[semester].map((course) => course.crosslistings);
+      prevItems[`Fall ${year}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`
+      );
       semester += 1;
-      prevItems[`Spring ${year + 1}`] = userCourses[semester].map((course) => course.crosslistings);
+      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`
+      );
       semester += 1;
     }
     return prevItems;
@@ -304,7 +351,7 @@ export function Canvas({
     checkRequirements();
   }, [classYear]);
 
-  const { searchResults } = useSearchStore();
+  const searchResults = useSearchStore((state) => state.searchResults);
 
   useEffect(() => {
     setItems((prevItems) => {
@@ -321,8 +368,10 @@ export function Canvas({
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter((course) => !userCurrentCourses.has(course.crosslistings))
-          .map((course) => course.crosslistings),
+          .filter(
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+          )
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
       };
     });
   }, [searchResults]);
@@ -520,7 +569,10 @@ export function Canvas({
                   'Content-Type': 'application/json',
                   'X-CSRFToken': csrfToken,
                 },
-                body: JSON.stringify({ courseId: active.id, semesterId: overContainerId }),
+                body: JSON.stringify({
+                  courseId: active.id.toString().split('|')[0],
+                  semesterId: overContainerId,
+                }),
               }).then((response) => response.json());
               checkRequirements();
             }
@@ -665,7 +717,8 @@ export function Canvas({
           isDragging: true,
           isDragOverlay: true,
         })}
-        color={getColor(id)}
+        color_primary={getPrimaryColor(id)}
+        color_secondary={getSecondaryColor(id)}
         wrapperStyle={dynamicWrapperStyle}
         renderItem={renderItem}
         dragOverlay
@@ -689,8 +742,10 @@ export function Canvas({
       const updatedCourses = {
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter((course) => !userCurrentCourses.has(course.crosslistings))
-          .map((course) => course.crosslistings),
+          .filter(
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+          )
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
@@ -703,7 +758,10 @@ export function Canvas({
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ courseId: value.toString(), semesterId: 'Search Results' }),
+      body: JSON.stringify({
+        courseId: value.toString().split('|')[0],
+        semesterId: 'Search Results',
+      }),
     }).then((response) => {
       response.json();
       checkRequirements();
@@ -711,9 +769,14 @@ export function Canvas({
   }
 }
 
-function getColor(id: UniqueIdentifier) {
-  const colorHash = new ColorHash();
-  return colorHash.hex(String(id).slice(0, 3));
+function getPrimaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
+  return PRIMARY_COLOR_LIST[hash];
+}
+
+function getSecondaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
+  return SECONDARY_COLOR_LIST[hash];
 }
 
 type SortableItemProps = {
@@ -788,7 +851,8 @@ function SortableItem({
         overIndex: over ? getIndex(over.id) : overIndex,
         containerId,
       })}
-      color={getColor(id)}
+      color_primary={getPrimaryColor(id)}
+      color_secondary={getSecondaryColor(id)}
       transition={transition}
       transform={transform}
       fadeIn={mountedWhileDragging}
