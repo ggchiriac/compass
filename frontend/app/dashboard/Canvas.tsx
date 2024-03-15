@@ -33,7 +33,6 @@ import {
   SortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import ColorHash from 'color-hash';
 import { createPortal } from 'react-dom';
 
 import { Course, Profile } from '@/types';
@@ -45,6 +44,50 @@ import useSearchStore from '@/store/searchSlice';
 import { Item, Container, ContainerProps } from '../../components';
 
 import { coordinateGetter as multipleContainersCoordinateGetter } from './multipleContainersKeyboardCoordinates';
+
+const PRIMARY_COLOR_LIST: string[] = [
+  '#ff7895',
+  '#e38a62',
+  '#cdaf7b',
+  '#94bb77',
+  '#e2c25e',
+  '#ead196',
+  '#e7bc7d',
+  '#d0b895',
+  '#72b4c9',
+  '#2cdbca',
+  '#a8cadc',
+  '#c5bab6',
+  '#bf91bd',
+];
+
+const SECONDARY_COLOR_LIST: string[] = [
+  '#ff91a9',
+  '#e9a88a',
+  '#d7bf95',
+  '#afcb9a',
+  '#e9d186',
+  '#f5db9d',
+  '#f0d2a8',
+  '#dcc9af',
+  '#96c7d6',
+  '#2ee8d6',
+  '#a8d3dc',
+  '#cac1be',
+  '#c398c1',
+];
+
+function simpleHash(str: string) {
+  if (str.length !== 3) {
+    return 0;
+  }
+
+  let sum = 0;
+  for (let i = 0; i < str.length; i++) {
+    sum += (i + 1) * str.charCodeAt(i);
+  }
+  return sum % 11;
+}
 
 async function fetchCsrfToken() {
   try {
@@ -674,7 +717,8 @@ export function Canvas({
           isDragging: true,
           isDragOverlay: true,
         })}
-        color={getColor(id)}
+        color_primary={getPrimaryColor(id)}
+        color_secondary={getSecondaryColor(id)}
         wrapperStyle={dynamicWrapperStyle}
         renderItem={renderItem}
         dragOverlay
@@ -725,9 +769,14 @@ export function Canvas({
   }
 }
 
-function getColor(id: UniqueIdentifier) {
-  const colorHash = new ColorHash();
-  return colorHash.hex(String(id).slice(0, 3));
+function getPrimaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
+  return PRIMARY_COLOR_LIST[hash];
+}
+
+function getSecondaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
+  return SECONDARY_COLOR_LIST[hash];
 }
 
 type SortableItemProps = {
@@ -802,7 +851,8 @@ function SortableItem({
         overIndex: over ? getIndex(over.id) : overIndex,
         containerId,
       })}
-      color={getColor(id)}
+      color_primary={getPrimaryColor(id)}
+      color_secondary={getSecondaryColor(id)}
       transition={transition}
       transform={transform}
       fadeIn={mountedWhileDragging}

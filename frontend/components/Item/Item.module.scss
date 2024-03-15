@@ -51,7 +51,8 @@
   align-items: center;
   width: calc(100%);
   padding: 15px 15px;
-  background-color: #fff;
+  //background-color: #fff;
+  background-image: linear-gradient(to bottom, var(--color_primary), var(--color_secondary));
   box-shadow:
     0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
     0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15);
@@ -68,7 +69,7 @@
 
 .TextContainer {
   display: inline-block;
-  color: #333;
+  color: #ffffff;
   font-weight: 400;
   font-size: 1rem;
   flex-grow: 1;
@@ -126,11 +127,11 @@
   transform: translateY(-50%);
   left: 0;
   height: 100%;
-  width: 3px;
+  width: 0px;
   display: block;
   border-top-left-radius: 3px;
   border-bottom-left-radius: 3px;
-  background-color: var(--color);
+  background-color: #ffffff;
 }
 
 .Item:hover .Remove {

@@ -11,7 +11,8 @@ import styles from './Item.module.scss';
 
 export type Props = {
   dragOverlay?: boolean;
-  color?: string;
+  color_primary?: string;
+  color_secondary?: string;
   disabled?: boolean;
   dragging?: boolean;
   handle?: boolean;
@@ -46,7 +47,8 @@ export const Item = memo(
   forwardRef<HTMLLIElement, Props>(
     (
       {
-        color,
+        color_primary,
+        color_secondary,
         dragOverlay,
         dragging,
         disabled,
@@ -110,7 +112,8 @@ export const Item = memo(
               '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
               '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
               '--index': index,
-              '--color': color,
+              '--color_primary': color_primary,
+              '--color_secondary': color_secondary,
             } as React.CSSProperties
           }
           ref={ref}
@@ -122,7 +125,8 @@ export const Item = memo(
               handle && styles.withHandle,
               dragOverlay && styles.dragOverlay,
               disabled && styles.disabled,
-              color && styles.color
+              color_primary && styles.color_primary,
+              color_secondary && styles.color_secondary
             )}
             style={style}
             data-cypress='draggable-item'

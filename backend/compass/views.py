@@ -307,6 +307,11 @@ DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,4}$', IGNORECASE)
 DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
 NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{1,3}[a-zA-Z]$', IGNORECASE)
 NUM_ONLY_REGEX = compile(r'^\d{1,4}$', IGNORECASE)
+GRADING_OPTIONS = {
+    'A-F': ['FUL', 'GRD', 'NAU', 'NPD'],
+    'P/D/F': ['PDF', 'FUL', 'NAU'],
+    'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
+}
 
 def make_sort_key(dept):
     def sort_key(course):
@@ -325,6 +330,11 @@ class SearchCourses(View):
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('course', None)
+        term = request.GET.get('term', None)
+        distribution = request.GET.get('distribution', None)
+        levels = request.GET.get('level')
+        grading_options = request.GET.get('grading')
+
         if query:
             init_time = time.time()
             # process queries
@@ -352,35 +362,51 @@ class SearchCourses(View):
             else:
                 return JsonResponse({'courses': []})
 
+            query_conditions = Q()
+
+            if term:
+                query_conditions &= Q(guid__startswith=term)
+
+            if distribution:
+                query_conditions &= Q(
+                    distribution_area_short__iexact=distribution)
+
+            if levels:
+                levels = levels.split(',')
+                level_query = Q()
+                for level in levels:
+                    level_query |= Q(catalog_number__startswith=level)
+                query_conditions &= level_query
+
+            if grading_options:
+                grading_options = grading_options.split(',')
+                grading_filters = []
+                for grading in grading_options:
+                    grading_filters += GRADING_OPTIONS[grading]
+                print(f"Grading filters: {grading_filters}")
+                grading_query = Q()
+                for grading in grading_filters:
+                    grading_query |= Q(grading_basis__iexact=grading)
+                query_conditions &= grading_query
+
             try:
+                filtered_query = query_conditions
+                filtered_query &= Q(department__code__iexact=dept)
+                filtered_query &= Q(catalog_number__iexact=num)
                 exact_match_course = Course.objects.select_related('department').filter(
-                    Q(department__code__iexact=dept) & Q(catalog_number__iexact=num)
+                    filtered_query
                 ).order_by('course_id', '-guid').distinct('course_id')
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
                     return JsonResponse({'courses': serialized_course.data})
                 else:
+                    filtered_query = query_conditions
+                    filtered_query &= Q(crosslistings__icontains=code)
                     courses = Course.objects.select_related('department').filter(
-                        Q(crosslistings__icontains=code)
+                        filtered_query
                     ).order_by('course_id', '-guid').distinct('course_id')
                     if courses:
-                        # custom_sorting_field = Case(
-                        #     When(
-                        #         Q(department__code__icontains=dept)
-                        #         & Q(catalog_number__icontains=num),
-                        #         then=Value(3),
-                        #     ),
-                        #     When(Q(department__code__icontains=dept), then=Value(2)),
-                        #     When(Q(catalog_number__icontains=num), then=Value(1)),
-                        #     default=Value(0),
-                        #     output_field=models.IntegerField(),
-                        # )
-                        # sorted_courses = courses.annotate(
-                        #     custom_sorting=custom_sorting_field
-                        # ).order_by(
-                        #     '-custom_sorting', 'department__code', 'catalog_number', 'title'
-                        # )
                         serialized_courses = CourseSerializer(courses, many=True)
                         sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
                         print(f"Search time: {time.time() - init_time}")

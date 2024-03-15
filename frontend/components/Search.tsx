@@ -12,21 +12,21 @@ import {
 } from '@mui/joy';
 import { LRUCache } from 'typescript-lru-cache';
 
-import { Course } from '@/types';
+import { Course, Filter } from '@/types';
 
 import useSearchStore from '@/store/searchSlice';
 
 import { FilterModal } from './Modal';
 
 const terms: { [key: string]: string } = {
-  'Fall 2023': '1242',
-  'Fall 2022': '1232',
-  'Fall 2021': '1222',
-  'Fall 2020': '1212',
   'Spring 2024': '1244',
+  'Fall 2023': '1242',
   'Spring 2023': '1234',
+  'Fall 2022': '1232',
   'Spring 2022': '1224',
+  'Fall 2021': '1222',
   'Spring 2021': '1214',
+  'Fall 2020': '1212',
 };
 
 const termsInverse: { [key: string]: string } = {
@@ -72,11 +72,7 @@ const levels: { [key: string]: string } = {
   '500': '5',
 };
 
-const gradingBases: { [key: string]: string[] } = {
-  'A-F': ['FUL', 'GRD', 'NAU', 'NPD'],
-  'P/D/F': ['PDF', 'FUL', 'NAU'],
-  Audit: ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
-};
+const gradingBases: string[] = ['A-F', 'P/D/F', 'Audit'];
 
 const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
@@ -109,12 +105,28 @@ const Search: FC = () => {
     setSearchResults(searchResults);
   }, [searchResults, setSearchResults]);
 
-  const search = async (searchQuery: string) => {
+  const search = async (searchQuery: string, filter: Filter) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${process.env.BACKEND}/search/?course=${encodeURIComponent(searchQuery)}`
-      );
+      let queryString = `course=${encodeURIComponent(searchQuery)}`;
+
+      if (filter.termFilter) {
+        queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
+      }
+
+      if (filter.distributionFilter) {
+        queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
+      }
+
+      if (filter.levelFilter.length > 0) {
+        queryString += `&level=${filter.levelFilter.map((item) => encodeURIComponent(item)).join(',')}`;
+      }
+
+      if (filter.gradingFilter.length > 0) {
+        queryString += `&grading=${filter.gradingFilter.map((item) => encodeURIComponent(item)).join(',')}`;
+      }
+
+      const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
       if (response.ok) {
         const data: { courses: Course[] } = await response.json();
         setSearchResults(data.courses);
@@ -138,11 +150,11 @@ const Search: FC = () => {
 
   useEffect(() => {
     if (query) {
-      search(query);
+      search(query, searchFilter);
     } else {
-      search('');
+      search('', searchFilter);
     }
-  }, [query]);
+  }, [query, searchFilter]);
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
@@ -291,7 +303,7 @@ const Search: FC = () => {
         <div>
           <FormLabel>Allowed grading</FormLabel>
           <div className='grid grid-cols-3'>
-            {Object.keys(gradingBases).map((grading) => (
+            {gradingBases.map((grading) => (
               <div key={grading} className='flex items-center mb-2'>
                 <Checkbox
                   size='sm'
