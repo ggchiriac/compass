@@ -304,9 +304,9 @@ class CAS(View):
 
 DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$', IGNORECASE)
 DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,4}$', IGNORECASE)
-DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{3}$', IGNORECASE)
+DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
 NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{3}[a-zA-Z]$', IGNORECASE)
-NUM_ONLY_REGEX = compile(r'^\d{3,4}$', IGNORECASE)
+NUM_ONLY_REGEX = compile(r'^\d{1,4}$', IGNORECASE)
 GRADING_OPTIONS = {
     'A-F': ['FUL', 'GRD', 'NAU', 'NPD'],
     'P/D/F': ['PDF', 'FUL', 'NAU'],
