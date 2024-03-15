@@ -53,6 +53,13 @@ export type Course = {
   crosslistings?: string;
 };
 
+export type Filter = {
+  termFilter: string;
+  distributionFilter: string;
+  levelFilter: string[];
+  gradingFilter: string[];
+};
+
 export type SearchStoreState = {
   searchResults: Course[];
   setSearchResults: (results: Course[]) => void;
@@ -62,6 +69,8 @@ export type SearchStoreState = {
   setError: (error: string | null) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
+  searchFilter: Filter;
+  setSearchFilter: (filter: Filter) => void;
 };
 
 export type CourseProps = {

@@ -9,7 +9,7 @@
   display: block;
   margin: auto;
   overflow: visible;
-  fill: #919eab;
+  fill: #919eab; // Base color of handle and remove button
 }
 
 @media (hover: hover) {
@@ -18,7 +18,7 @@
   }
 
   .Action:hover svg {
-    fill: #6f7b88;
+    fill: #6b7280; // The fill of handle and remove button on hover. This corresponds to tailwind gray-500.
   }
 }
 
@@ -27,7 +27,7 @@
 }
 
 .Action:active svg {
-  fill: var(--fill, #788491);
+  fill: #6b7280; // The fill of handle and remove button "ghost" when dragging
 }
 
 .Action:focus-visible {
