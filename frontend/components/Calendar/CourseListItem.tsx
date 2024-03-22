@@ -1,23 +1,40 @@
-// Rendering individual course items in course list
-
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
+import { ListItem, ListItemText, Typography, Box } from '@mui/material';
 
 import useKairosStore from '@/store/calendarSlice';
 
-const CourseListItem = ({ index, style, data }) => {
-  const course = data[index];
+const CourseListItem = ({ item, selected, onClick }) => {
   const addCourse = useKairosStore((state) => state.addCourse);
 
   const handleClick = () => {
-    addCourse(course);
+    addCourse(item);
+    onClick();
   };
 
   return (
-    <ListItem button style={style} key={index} onClick={handleClick}>
+    <ListItem
+      button
+      onClick={handleClick}
+      selected={selected}
+      sx={{
+        '&.Mui-selected': {
+          backgroundColor: 'action.selected',
+        },
+        '&.Mui-selected:hover': {
+          backgroundColor: 'action.hover',
+        },
+      }}
+    >
       <ListItemText
-        primary={course.title}
-        secondary={`${course.department_code} ${course.catalog_number}`}
+        primary={
+          <Typography variant='subtitle1' component='div'>
+            {item.title}
+          </Typography>
+        }
+        secondary={
+          <Typography variant='body2' color='textSecondary' component='div'>
+            {`${item.department_code} ${item.catalog_number}`}
+          </Typography>
+        }
       />
     </ListItem>
   );

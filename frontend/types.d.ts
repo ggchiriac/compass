@@ -180,6 +180,8 @@ type CalendarEvent = {
   startColumnIndex?: number;
   startRowIndex?: number;
   endRowIndex?: number;
+  width?: number;
+  offsetLeft?: number;
 };
 
 export type Section = {

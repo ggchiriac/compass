@@ -479,7 +479,7 @@ class SearchCourses(View):
                         print(
                             f'Total execution time: {time.time() - start_time:.5f} seconds'
                         )
-                        return JsonResponse({'courses': serialized_courses})
+                        return JsonResponse({'courses': serialized_courses.data})
 
                 print(f'Total execution time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})

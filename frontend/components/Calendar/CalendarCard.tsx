@@ -1,9 +1,12 @@
 import { CalendarEvent } from '@/types';
 
+// TODO: Move this to types.d.ts?
 interface CourseCardProps {
   event: CalendarEvent;
   style?: React.CSSProperties;
   onSectionClick: (section: any) => void;
+  width?: number;
+  offsetLeft?: number;
 }
 
 function getContrastYIQ(hexcolor: string) {
@@ -37,7 +40,13 @@ function convertTo12hFormat(time) {
   return `${convertedHours}:${minutes} ${suffix}`;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, style }) => {
+const CourseCard: React.FC<CourseCardProps> = ({
+  event,
+  onSectionClick,
+  style,
+  width,
+  offsetLeft,
+}) => {
   const backgroundColor = event.color || stringToColor(event.title, event.description);
   const textColor = getContrastYIQ(backgroundColor);
   const handleSectionClick = () => {
@@ -47,8 +56,8 @@ const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, style })
   const startTime = convertTo12hFormat(event.startTime);
   const endTime = convertTo12hFormat(event.endTime);
 
-  const calculateDurationRows = (startRowIndex, endRowIndex) => {
-    return endRowIndex - startRowIndex;
+  const calculateDurationRows = (startRowIndex: number, endRowIndex: number) => {
+    return endRowIndex - startRowIndex + 1;
   };
 
   return (
@@ -57,9 +66,13 @@ const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, style })
       style={{
         backgroundColor: backgroundColor,
         color: textColor,
-        gridColumnStart: event.startColumnIndex || 1,
-        gridRowStart: event.startRowIndex || 1,
-        gridRowEnd: `span ${calculateDurationRows(event.startRowIndex, event.endRowIndex)}`,
+        gridColumn: `${event.startColumnIndex} / span 1`,
+        gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(
+          event.startRowIndex,
+          event.endRowIndex
+        )}`,
+        width: width ? `calc(100% * ${width})` : '100%',
+        marginLeft: offsetLeft ? `calc(100% * ${offsetLeft})` : '0',
         ...style,
       }}
       onClick={handleSectionClick}

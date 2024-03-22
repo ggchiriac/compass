@@ -1,46 +1,45 @@
-// Renders course list and selected courses section
+import { useState } from 'react';
 
-import Paper from '@mui/material/Paper';
-import { FixedSizeList as VirtualList } from 'react-window';
+import { Paper, Typography, Box } from '@mui/material';
+import { Virtuoso } from 'react-virtuoso';
 
 import { CalendarEvent } from '@/types';
 
-import useKairosStore from '@/store/calendarSlice';
+// import useKairosStore from '@/store/calendarSlice';
 
 import CourseListItem from './CourseListItem';
 import SelectedCourses from './SelectedCourses';
-
-const styles = {
-  paper: {
-    margin: '20px 0',
-    overflow: 'auto',
-  },
-  virtualList: {
-    outline: 'none',
-  },
-};
 
 interface CalendarListProps {
   items?: CalendarEvent[];
 }
 
 const CalendarList: React.FC<CalendarListProps> = ({ items = [] }) => {
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  const handleItemClick = (index: number) => {
+    setSelectedIndex(index);
+  };
+
   return (
-    <div>
-      <Paper style={{ ...styles.paper, height: 350, width: '100%' }}>
-        <VirtualList
-          height={350}
-          width='100%'
-          itemSize={46}
-          itemCount={items.length}
-          itemData={items}
-          style={styles.virtualList}
-        >
-          {CourseListItem}
-        </VirtualList>
+    <Box display='flex' flexDirection='column' height='100%'>
+      <Paper elevation={3} sx={{ flexGrow: 1, overflow: 'hidden', borderRadius: '8px' }}>
+        <Virtuoso
+          style={{ height: '400px' }}
+          data={items}
+          itemContent={(index, item) => (
+            <CourseListItem
+              item={item}
+              selected={selectedIndex === index}
+              onClick={() => handleItemClick(index)}
+            />
+          )}
+        />
       </Paper>
-      <SelectedCourses />
-    </div>
+      <Box mt={4}>
+        <SelectedCourses />
+      </Box>
+    </Box>
   );
 };
 

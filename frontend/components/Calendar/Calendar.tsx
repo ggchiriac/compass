@@ -30,7 +30,10 @@ const calculateGridRow = (timeString: string) => {
     adjustedHour = 0;
   }
 
-  return adjustedHour - startHour;
+  const rowsPerHour = 6; // 10-minute increments (60 minutes / 10 minutes)
+  const minuteOffset = Math.floor(minute / 10);
+
+  return (adjustedHour - startHour) * rowsPerHour + minuteOffset;
 };
 
 const dayToStartColumnIndex: Record<string, number> = {
@@ -67,8 +70,8 @@ const Calendar: React.FC = () => {
   const events: CalendarEvent[] = selectedCourses.flatMap((course) => {
     console.log('Processing Course:', course.title);
 
-    return course.sections.flatMap((section) =>
-      section.class_meetings.map((meeting, index) => {
+    const sectionEvents: CalendarEvent[] = course.sections.flatMap((section) => {
+      const classMeetingEvents: CalendarEvent[] = section.class_meetings.map((meeting, index) => {
         const startTime = meeting.start_time;
         const endTime = meeting.end_time;
         const startRowIndex = calculateGridRow(startTime);
@@ -98,8 +101,32 @@ const Calendar: React.FC = () => {
           endRowIndex,
           key: uniqueKey,
         };
-      })
-    );
+      });
+
+      return classMeetingEvents;
+    });
+
+    return sectionEvents;
+  });
+
+  // Group events by start time and end time
+  const groupedEvents: Record<string, CalendarEvent[]> = {};
+  events.forEach((event) => {
+    const key = `${event.startColumnIndex}-${event.startRowIndex}-${event.endRowIndex}`;
+    if (!groupedEvents[key]) {
+      groupedEvents[key] = [];
+    }
+    groupedEvents[key].push(event);
+  });
+
+  // Calculate the width for overlapping events
+  const eventsWithWidth: CalendarEvent[] = Object.values(groupedEvents).flatMap((eventGroup) => {
+    const width = 1 / eventGroup.length;
+    return eventGroup.map((event, index) => ({
+      ...event,
+      width,
+      offsetLeft: index * width,
+    }));
   });
 
   const handleSectionClick = (courseId: string, selectedSection: Section) => {
@@ -126,28 +153,35 @@ const Calendar: React.FC = () => {
     }
   }, []);
 
+  const calculateDurationRows = (startRowIndex: number, endRowIndex: number) => {
+    return endRowIndex - startRowIndex;
+  };
+
   return (
     <>
       <Navbar />
-      <div className='flex flex-col h-full bg-white'>
+      <div className='flex flex-col h-screen bg-white'>
         <div className='sticky top-0 z-30 shadow'>
-          <div className='grid' style={{ gridTemplateColumns: '60px 1fr' }}>
+          <div className='grid grid-cols-[60px_1fr]'>
             <div className='bg-white' />
             <CalendarDays days={days} />
           </div>
         </div>
         <div ref={calendarRef} className='flex-auto overflow-auto relative'>
-          <div className='absolute inset-0 grid' style={{ gridTemplateColumns: '60px 1fr' }}>
+          <div className='absolute inset-0 grid grid-cols-[60px_1fr]'>
             {/* Time Slots */}
             <div
               className='bg-white border-r border-gray-200 grid'
-              style={{ gridTemplateRows: `repeat(${endHour - startHour + 1}, 50px)` }}
+              style={{ gridTemplateRows: `repeat(${(endHour - startHour + 1) * 6}, 1fr)` }}
             >
               {Array.from({ length: endHour - startHour + 1 }, (_, rowIndex) => (
                 <div
                   key={`time-${rowIndex}`}
                   className='border-b border-gray-200 flex items-center justify-end pr-2 text-gray-400'
-                  style={{ fontSize: '0.6rem' }}
+                  style={{
+                    fontSize: '0.6rem',
+                    gridRow: `${rowIndex * 6 + 1} / span 6`,
+                  }}
                 >
                   {formatHour(rowIndex + startHour)}
                 </div>
@@ -158,7 +192,7 @@ const Calendar: React.FC = () => {
               className='grid'
               style={{
                 gridTemplateColumns: `repeat(${days.length}, 1fr)`,
-                gridTemplateRows: `repeat(${endHour - startHour + 1}, 50px)`,
+                gridTemplateRows: `repeat(${(endHour - startHour + 1) * 6}, 1fr)`,
               }}
             >
               {/* Grid Lines */}
@@ -166,7 +200,7 @@ const Calendar: React.FC = () => {
                 <div
                   key={`grid-row-${rowIndex}`}
                   className={`border-b border-gray-200 ${rowIndex === endHour - startHour ? 'border-b-0' : ''}`}
-                  style={{ gridRow: rowIndex + 1, gridColumn: '1 / -1' }}
+                  style={{ gridRow: (rowIndex + 1) * 6, gridColumn: '1 / -1' }}
                 />
               ))}
               {days.map((_, colIndex) => (
@@ -177,14 +211,21 @@ const Calendar: React.FC = () => {
                 />
               ))}
               {/* Events */}
-              {events.map((event) => (
+              {eventsWithWidth.map((event) => (
                 <CourseCard
                   key={event.key}
                   event={event}
                   onSectionClick={(section) => handleSectionClick(event.guid, section)}
+                  width={event.width}
+                  offsetLeft={event.offsetLeft}
                   style={{
                     gridColumn: `${event.startColumnIndex} / span 1`,
-                    gridRow: `${event.startRowIndex} / ${event.endRowIndex}`,
+                    gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(
+                      event.startRowIndex,
+                      event.endRowIndex
+                    )}`,
+                    width: `calc(100% * ${event.width})`,
+                    marginLeft: `calc(100% * ${event.offsetLeft})`,
                   }}
                 />
               ))}
