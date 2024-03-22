@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState, useEffect, FC } from 'react';
 
+import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
 import {
   Button,
@@ -9,19 +10,16 @@ import {
   AutocompleteOption,
   ListItemContent,
 } from '@mui/joy';
-
-import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { LRUCache } from 'typescript-lru-cache';
 
 import { Course, Filter } from '@/types';
 
+import { FilterModal } from '@/components/Modal';
+import useFilterStore from '@/store/calendarFilterSlice';
+import useKairosStore from '@/store/calendarSlice';
 import useSearchStore from '@/store/searchSlice';
 
-import useKairosStore from '@/store/kairosSlice';
-
 import CalendarList from './CalendarList';
-
-import { FilterModal } from '@/components/Modal';
 
 const terms: { [key: string]: string } = {
   'Spring 2024': '1244',
@@ -47,8 +45,8 @@ const termsInverse: { [key: string]: string } = {
 
 const distributionAreas: { [key: string]: string } = {
   'Social Analysis': 'SA',
-  'Science & Engineering w/Lab': 'SEL',
-  'Science & Engineering-No Lab': 'SEN',
+  'Science & Engineering - Lab': 'SEL',
+  'Science & Engineering - No Lab': 'SEN',
   'Quant & Comp Reasoning': 'QCR',
   'Literature and the Arts': 'LA',
   'Historical Analysis': 'HA',
@@ -59,8 +57,8 @@ const distributionAreas: { [key: string]: string } = {
 
 const distributionAreasInverse: { [key: string]: string } = {
   SA: 'Social Analysis',
-  SEL: 'Science & Engineering w/Lab',
-  SEN: 'Science & Engineering-No Lab',
+  SEL: 'Science & Engineering - Lab',
+  SEN: 'Science & Engineering - No Lab',
   QCR: 'Quant & Comp Reasoning',
   LA: 'Literature and the Arts',
   HA: 'Historical Analysis',
@@ -78,7 +76,6 @@ const levels: { [key: string]: string } = {
 };
 
 const gradingBases: string[] = ['A-F', 'P/D/F', 'Audit'];
-
 
 const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
@@ -104,15 +101,31 @@ const CalendarSearch: FC = () => {
     setLoading: state.setLoading,
   }));
 
+  const {
+    termFilter,
+    distributionFilter,
+    levelFilter,
+    gradingFilter,
+    showPopup,
+    setTermFilter,
+    setDistributionFilter,
+    setLevelFilter,
+    setGradingFilter,
+    setFilters,
+    setShowPopup,
+    resetFilters,
+  } = useFilterStore();
+
   const { searchFilter, setSearchFilter } = useSearchStore();
 
-  const [showPopup, setShowPopup] = useState(false);
-  const [termFilter, setTermFilter] = useState(searchFilter.termFilter || '');
-  const [distributionFilter, setDistributionFilter] = useState(
-    searchFilter.distributionFilter || ''
-  );
-  const [levelFilter, setLevelFilter] = useState(searchFilter.levelFilter || []);
-  const [gradingFilter, setGradingFilter] = useState(searchFilter.gradingFilter || []);
+  useEffect(() => {
+    setFilters({
+      termFilter: searchFilter.termFilter,
+      distributionFilter: searchFilter.distributionFilter,
+      levelFilter: searchFilter.levelFilter,
+      gradingFilter: searchFilter.gradingFilter,
+    });
+  }, [searchFilter, setFilters]);
 
   useEffect(() => {
     setCalendarSearchResults(calendarSearchResults);
@@ -191,19 +204,14 @@ const CalendarSearch: FC = () => {
   }, [termFilter, distributionFilter, levelFilter, gradingFilter, setSearchFilter, setShowPopup]);
 
   const handleClose = useCallback(() => {
-    setTermFilter(searchFilter.termFilter);
-    setDistributionFilter(searchFilter.distributionFilter);
-    setLevelFilter(searchFilter.levelFilter);
-    setGradingFilter(searchFilter.gradingFilter);
+    setFilters({
+      termFilter: searchFilter.termFilter,
+      distributionFilter: searchFilter.distributionFilter,
+      levelFilter: searchFilter.levelFilter,
+      gradingFilter: searchFilter.gradingFilter,
+    });
     setShowPopup(false);
-  }, [
-    searchFilter,
-    setTermFilter,
-    setDistributionFilter,
-    setLevelFilter,
-    setGradingFilter,
-    setShowPopup,
-  ]);
+  }, [searchFilter, setFilters, setShowPopup]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -235,17 +243,17 @@ const CalendarSearch: FC = () => {
 
   const handleLevelFilterChange = (level) => {
     if (levelFilter.includes(level)) {
-      setLevelFilter((levelFilter) => levelFilter.filter((item) => item !== level));
+      setLevelFilter(levelFilter.filter((item) => item !== level));
     } else {
-      setLevelFilter((levelFilter) => [...levelFilter, level]);
+      setLevelFilter([...levelFilter, level]);
     }
   };
 
   const handleGradingFilterChange = (grading) => {
     if (gradingFilter.includes(grading)) {
-      setGradingFilter((gradingFilter) => gradingFilter.filter((item) => item !== grading));
+      setGradingFilter(gradingFilter.filter((item) => item !== grading));
     } else {
-      setGradingFilter((gradingFilter) => [...gradingFilter, grading]);
+      setGradingFilter([...gradingFilter, grading]);
     }
   };
 

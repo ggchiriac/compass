@@ -20,7 +20,7 @@ from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from thefuzz import fuzz, process # TODO: Consider adding fuzzy finding to search
+from thefuzz import fuzz, process  # TODO: Consider adding fuzzy finding to search
 
 from data.check_reqs import (
     check_user,
@@ -40,7 +40,7 @@ from .models import (
     UserCourses,
     models,
 )
-from .serializers import CourseSerializer, NewSectionSerializer
+from .serializers import CourseSerializer, CalendarSectionSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -325,6 +325,7 @@ GRADING_OPTIONS = {
     'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
 }
 
+
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
@@ -385,8 +386,7 @@ class SearchCourses(View):
                 query_conditions &= Q(guid__startswith=term)
 
             if distribution:
-                query_conditions &= Q(
-                    distribution_area_short__iexact=distribution)
+                query_conditions &= Q(distribution_area_short__iexact=distribution)
 
             if levels:
                 levels = levels.split(',')
@@ -400,7 +400,7 @@ class SearchCourses(View):
                 grading_filters = []
                 for grading in grading_options:
                     grading_filters += GRADING_OPTIONS[grading]
-                print(f"Grading filters: {grading_filters}")
+                print(f'Grading filters: {grading_filters}')
                 grading_query = Q()
                 for grading in grading_filters:
                     grading_query |= Q(grading_basis__iexact=grading)
@@ -410,15 +410,19 @@ class SearchCourses(View):
                 filtered_query = query_conditions
                 filtered_query &= Q(department__code__iexact=dept)
                 filtered_query &= Q(catalog_number__iexact=num)
-                exact_match_course = Course.objects.select_related('department').filter(
-                    filtered_query
-                ).order_by('course_id', '-guid').distinct('course_id')
+                exact_match_course = (
+                    Course.objects.select_related('department')
+                    .filter(filtered_query)
+                    .order_by('course_id', '-guid')
+                    .distinct()
+                )
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
                     print(
                         f'Total execution time: {time.time() - start_time:.5f} seconds'
                     )
+                    print(serialized_course.data)
                     return JsonResponse({'courses': serialized_course.data})
                 else:
                     courses_start_time = time.time()
@@ -436,9 +440,12 @@ class SearchCourses(View):
 
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
-                    courses = Course.objects.select_related('department').filter(
-                        filtered_query
-                    ).order_by('course_id', '-guid').distinct('course_id')
+                    courses = (
+                        Course.objects.select_related('department')
+                        .filter(filtered_query)
+                        .order_by('course_id', '-guid')
+                        .distinct()
+                    )
                     if courses:
                         sorting_start_time = time.time()
                         custom_sorting_field = Case(
@@ -472,7 +479,7 @@ class SearchCourses(View):
                         print(
                             f'Total execution time: {time.time() - start_time:.5f} seconds'
                         )
-                        return JsonResponse({'courses': serialized_courses.data})
+                        return JsonResponse({'courses': serialized_courses})
 
                 print(f'Total execution time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})
@@ -544,10 +551,16 @@ def update_courses(request):
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
+        course_inst = (
+            Course.objects.select_related('department')
+            .filter(Q(course_id__iexact=course_id))
+            .order_by('-guid')[0]
+        )
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
+            user_course = UserCourses.objects.get(
+                user=user_inst, course__course_id=course_id
+            )
             user_course.delete()
             message = f'User course deleted: {course_id}, {net_id}'
 
@@ -558,9 +571,7 @@ def update_courses(request):
                 user=user_inst, course=course_inst, defaults={'semester': semester}
             )
             if created:
-                message = (
-                    f'User course added: {semester}, {course_id}, {net_id}'
-                )
+                message = f'User course added: {semester}, {course_id}, {net_id}'
             else:
                 message = f'User course updated: {semester}, {course_id}, {net_id}'
 
@@ -760,32 +771,18 @@ def get_course_details(request, course_id):
     except Course.DoesNotExist:
         return JsonResponse({'error': 'Course not found'}, status=404)
 
-
-def get_first_meeting_day(days_string):
-    days_mapping = {
-        'Monday': 1,
-        'Tuesday': 2,
-        'Wednesday': 3,
-        'Thursday': 4,
-        'Friday': 5,
-    }
-    days_list = days_string.split(',')
-    for day in days_list:
-        if day in days_mapping:
-            return days_mapping[day]
-    return None
-
-
+# TODO: Might delete and just use SearchCourses class instead.
 class CalendarSearch(APIView):
-    """
-    Handles search queries for courses in Compass calendar, with timing diagnostics.
-    """
-
     def get(self, request, *args, **kwargs):
         start_time = time.time()
         print('ENDPOINT HIT')
 
         query = request.GET.get('course', '').strip()
+        term = request.GET.get('term', None)
+        distribution = request.GET.get('distribution', None)
+        levels = request.GET.get('level', None)
+        grading_options = request.GET.get('grading', None)
+
         if not query:
             return Response({'courses': []})
 
@@ -793,50 +790,69 @@ class CalendarSearch(APIView):
         print(f'Query processing took: {time.time() - start_time:.2f} seconds')
 
         try:
-            db_start_time = time.time()
             courses = (
-                Course.objects.annotate(
-                    department_match=Case(
-                        When(department__code__iexact=dept, then=1),
-                        default=0,
-                        output_field=IntegerField(),
-                    ),
-                    catalog_number_match=Case(
-                        When(catalog_number__iexact=num, then=1),
-                        default=0,
-                        output_field=IntegerField(),
-                    ),
-                    search_rank=Count('id'),
+                Course.objects.select_related('department')
+                .prefetch_related(
+                    'section_set__classmeeting_set',
+                    'section_set__instructor',
                 )
                 .filter(
-                    Q(course_id__icontains=query)
+                    Q(course_id__icontains=f'{dept}{num}')
                     | Q(title__icontains=query)
-                    | Q(department__code__icontains=dept)
-                    | Q(catalog_number__icontains=num)
+                    | Q(department__code__iexact=dept)
+                    | Q(catalog_number__iexact=num)
                     | Q(crosslistings__icontains=f'{dept} {num}')
-                )
-                .order_by(
-                    '-department_match',
-                    '-catalog_number_match',
-                    'department__code',
-                    'catalog_number',
-                    'title',
                 )
                 .distinct()
             )
-            print(f'DB query setup took: {time.time() - db_start_time:.2f} seconds')
 
-            prefetch_start_time = time.time()
-            courses = courses.select_related('department').prefetch_related(
-                'section_set__classmeeting_set'
+            # Apply filters
+            if term:
+                courses = courses.filter(section__term_id=term)
+
+            if distribution:
+                courses = courses.filter(distribution_area_short__iexact=distribution)
+
+            if levels:
+                levels = levels.split(',')
+                level_query = Q()
+                for level in levels:
+                    level_query |= Q(catalog_number__startswith=level)
+                courses = courses.filter(level_query)
+
+            if grading_options:
+                grading_options = grading_options.split(',')
+                grading_filters = []
+                for grading in grading_options:
+                    grading_filters += GRADING_OPTIONS.get(grading, [])
+                grading_query = Q()
+                for grading in grading_filters:
+                    grading_query |= Q(grading_basis__iexact=grading)
+                courses = courses.filter(grading_query)
+
+            # Apply sorting
+            courses = courses.annotate(
+                department_match=Case(
+                    When(department__code__iexact=dept, then=1),
+                    default=0,
+                    output_field=IntegerField(),
+                ),
+                catalog_number_match=Case(
+                    When(catalog_number__iexact=num, then=1),
+                    default=0,
+                    output_field=IntegerField(),
+                ),
+                search_rank=Count('id'),
+            ).order_by(
+                '-department_match',
+                '-catalog_number_match',
+                'department__code',
+                'catalog_number',
+                'title',
             )
-            print(f'Prefetching took: {time.time() - prefetch_start_time:.2f} seconds')
 
-            serialize_start_time = time.time()
+            # Serialize data
             serialized_courses = CourseSerializer(courses, many=True).data
-            print(
-                f'Serialization took: {time.time() - serialize_start_time:.2f} seconds'
-            )
 
             print(
                 f'Total endpoint processing time: {time.time() - start_time:.2f} seconds'
@@ -867,18 +883,19 @@ class CalendarSearch(APIView):
 
 
 class FetchCourseClassMeetingsView(APIView):
-    """
-    Fetches class meeting times for a given course_id by finding related sections.
-    """
-
     def get(self, request, course_id, format=None):
         start_time = time.time()
         print('ENDPOINT HIT: FetchCourseClassMeetingsView')
         try:
-            # Assuming course_id uniquely identifies a course, adjust if your model differs
-            sections = Section.objects.filter(
-                course__course_id=course_id
-            ).prefetch_related(
+            course = Course.objects.filter(course_id=course_id).first()
+            if not course:
+                print('No course found for given course_id')
+                return Response(
+                    {'error': 'No course found for given course_id'},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            sections = Section.objects.filter(course=course).prefetch_related(
                 Prefetch('classmeeting_set', queryset=ClassMeeting.objects.all())
             )
 
@@ -890,21 +907,25 @@ class FetchCourseClassMeetingsView(APIView):
                 )
 
             db_end_time = time.time()
-            print(
-                f'DB query and prefetching took: {db_end_time - start_time:.2f} seconds'
-            )
+            print(f'DB query and prefetching took: {db_end_time - start_time:.2f} seconds')
 
-            # Serialize section data, including class meetings
-            serialize_start_time = time.time()
-            serializer = NewSectionSerializer(sections, many=True)
+            course_data = {
+                'course_id': course.course_id,
+                'title': course.title,
+                'description': course.description,
+                'distribution_area_short': course.distribution_area_short,
+                'grading_basis': course.grading_basis,
+                'department_code': course.department.code if course.department else None,
+                'crosslistings': course.crosslistings,
+                'sections': CalendarSectionSerializer(sections, many=True).data
+            }
+
             serialize_end_time = time.time()
-            print(
-                f'Serialization took: {serialize_end_time - serialize_start_time:.2f} seconds'
-            )
+            print(f'Serialization took: {serialize_end_time - db_end_time:.2f} seconds')
 
             total_time = time.time() - start_time
             print(f'Total endpoint processing time: {total_time:.2f} seconds')
-            return Response(serializer.data)
+            return Response(course_data)
 
         except Exception as e:
             print(f'Error during class meeting retrieval: {e}')

@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
 
-import useKairosStore from '@/store/kairosSlice';
+import useKairosStore from '@/store/calendarSlice';
 
 const styles = {
   listContainer: {

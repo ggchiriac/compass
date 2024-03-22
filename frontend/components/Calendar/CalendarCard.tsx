@@ -33,10 +33,9 @@ function convertTo12hFormat(time) {
   const [hours, minutes] = time.split(':');
   const hrs = parseInt(hours, 10);
   const suffix = hrs >= 12 ? 'PM' : 'AM';
-  const convertedHours = ((hrs + 11) % 12 + 1); // Converts 0-23 hour format into 1-12 format
+  const convertedHours = ((hrs + 11) % 12) + 1; // Converts 0-23 hour format into 1-12 format
   return `${convertedHours}:${minutes} ${suffix}`;
 }
-
 
 const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, style }) => {
   const backgroundColor = event.color || stringToColor(event.title, event.description);
@@ -66,7 +65,9 @@ const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, style })
       onClick={handleSectionClick}
     >
       <div className='flex flex-col'>
-        <strong className='font-semibold text-xs'>{event.department_code} {event.catalog_number}</strong>
+        <strong className='font-semibold text-xs'>
+          {event.department_code} {event.catalog_number}
+        </strong>
         <time dateTime={event.startTime}>
           {startTime} - {endTime}
         </time>

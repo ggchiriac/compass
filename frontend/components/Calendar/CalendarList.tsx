@@ -5,7 +5,7 @@ import { FixedSizeList as VirtualList } from 'react-window';
 
 import { CalendarEvent } from '@/types';
 
-import useKairosStore from '@/store/kairosSlice';
+import useKairosStore from '@/store/calendarSlice';
 
 import CourseListItem from './CourseListItem';
 import SelectedCourses from './SelectedCourses';

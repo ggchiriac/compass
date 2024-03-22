@@ -3,7 +3,7 @@
 import List from '@mui/material/List';
 import Paper from '@mui/material/Paper';
 
-import useKairosStore from '@/store/kairosSlice';
+import useKairosStore from '@/store/calendarSlice';
 
 import SelectedCourseItem from './SelectedCourseItem';
 
