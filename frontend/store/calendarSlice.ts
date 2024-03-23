@@ -5,6 +5,8 @@ import { CalendarEvent, Section, ClassMeeting } from '@/types';
 interface KairosStoreState {
   selectedCourses: CalendarEvent[];
   calendarSearchResults: CalendarEvent[];
+  termFilter: string;
+  setTermFilter: (term: string) => void;
   recentSearches: string[];
   error: string | null;
   loading: boolean;
@@ -29,40 +31,83 @@ interface KairosStoreState {
   ) => void;
 }
 
-const useKairosStore = create<KairosStoreState>((set) => ({
+const useKairosStore = create<KairosStoreState>((set, get) => ({
   selectedCourses: [],
   calendarSearchResults: [],
+  termFilter: '',
+  setTermFilter: (term) => set({ termFilter: term }),
   recentSearches: [],
   error: null,
   loading: false,
   setSelectedCourses: (courses: CalendarEvent[]) => set({ selectedCourses: courses }),
   addCourse: async (newCourse) => {
-    // Fetch course details from the backend
-    const response = await fetch(
-      `${process.env.BACKEND}/fetch_class_meetings/${newCourse.course_id}/`
-    );
-    const courseDetails = await response.json();
+    set({ loading: true, error: null });
 
-    if (!response.ok) {
-      console.error('Failed to fetch course details:', courseDetails.error);
-      return; // Optionally handle this case in your UI
-    }
+    try {
+      // Get the selected term from the FilterModal
+      const selectedTerm = get().termFilter;
 
-    const courseToAdd = { ...newCourse, ...courseDetails, sections: courseDetails.sections || [] };
-    set((state) => {
-      const isCourseAlreadyAdded = state.selectedCourses.some(
-        (course) => course.guid === newCourse.guid
+      // Include the selected term in the API URL
+      const response = await fetch(
+        `${process.env.BACKEND}/fetch_class_meetings/${newCourse.course_id}/?term=${selectedTerm}`
       );
+      const courseDetails = await response.json();
 
-      if (isCourseAlreadyAdded) {
-        return state;
+      if (!response.ok) {
+        throw new Error(courseDetails.error);
       }
-      console.log('yoyoyo', courseToAdd);
-      return {
-        ...state,
-        selectedCourses: [...state.selectedCourses, courseToAdd],
+
+      const courseToAdd = {
+        ...newCourse,
+        ...courseDetails,
+        sections: courseDetails.sections || [],
       };
-    });
+
+      set((state) => {
+        const existingCourseIndex = state.selectedCourses.findIndex(
+          (course) => course.guid === newCourse.guid
+        );
+
+        if (existingCourseIndex !== -1) {
+          const existingCourse = state.selectedCourses[existingCourseIndex];
+          const updatedSections = courseToAdd.sections.filter(
+            (section) =>
+              !existingCourse.sections.some(
+                (existingSection) => existingSection.class_number === section.class_number
+              )
+          );
+
+          if (updatedSections.length === 0) {
+            return state;
+          }
+
+          const updatedCourse = {
+            ...existingCourse,
+            sections: [...existingCourse.sections, ...updatedSections],
+          };
+
+          return {
+            ...state,
+            selectedCourses: [
+              ...state.selectedCourses.slice(0, existingCourseIndex),
+              updatedCourse,
+              ...state.selectedCourses.slice(existingCourseIndex + 1),
+            ],
+            loading: false,
+          };
+        }
+
+        return {
+          ...state,
+          selectedCourses: [...state.selectedCourses, courseToAdd],
+          loading: false,
+        };
+      });
+
+      console.log('Course Added:', courseToAdd);
+    } catch (error) {
+      set({ error: error.message, loading: false });
+    }
   },
   removeCourse: (courseId) =>
     set((state) => ({

@@ -100,32 +100,17 @@ const Kairos: FC = () => {
           />
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
-            {/* Left Section for Search Results */}
-            <div style={{ width: '360px' }}>
-              <div style={containerStyle}>
-                <CalendarSearch />
-                {/* Render search results here */}
-                {searchResults.map((course, index) => (
-                  <div key={index} style={searchWrapperStyle}>
-                    {/* Render individual course item */}
-                    {renderCourseItem(course)}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Center Section for Calendar */}
-            <div className='flex-grow p-4'>
-              {!isLoading && userProfile && userProfile.netId !== '' ? (
-                <Calendar />
-              ) : (
-                <SkeletonApp /> // Placeholder for loading state
-              )}
-            </div>
-
-            {/* Right section for requirements */}
-            <div style={{ width: '240px' }}>{/* Gonna add stretch goal tuners here soon */}</div>
+          {/* Adjust CalendarSearch container to control width and overflow */}
+          <div className='flex-none w-full lg:max-w-xs p-4 overflow-y-auto'>
+            <CalendarSearch />
+          </div>
+          {/* Adjust Calendar to use available space */}
+          <div className='flex-grow p-4'>
+            {!isLoading && userProfile && userProfile.netId !== '' ? (
+              <Calendar />
+            ) : (
+              <SkeletonApp /> // Placeholder for loading state
+            )}
           </div>
         </main>
       </div>

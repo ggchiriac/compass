@@ -771,6 +771,7 @@ def get_course_details(request, course_id):
     except Course.DoesNotExist:
         return JsonResponse({'error': 'Course not found'}, status=404)
 
+
 # TODO: Might delete and just use SearchCourses class instead.
 class CalendarSearch(APIView):
     def get(self, request, *args, **kwargs):
@@ -886,28 +887,50 @@ class FetchCourseClassMeetingsView(APIView):
     def get(self, request, course_id, format=None):
         start_time = time.time()
         print('ENDPOINT HIT: FetchCourseClassMeetingsView')
+
         try:
             course = Course.objects.filter(course_id=course_id).first()
             if not course:
                 print('No course found for given course_id')
                 return Response(
-                    {'error': 'No course found for given course_id'},
+                    {
+                        'error': "Oops! The course you're looking for is playing hide-and-seek."
+                    },
                     status=status.HTTP_404_NOT_FOUND,
                 )
 
-            sections = Section.objects.filter(course=course).prefetch_related(
-                Prefetch('classmeeting_set', queryset=ClassMeeting.objects.all())
+            # Ensure unique class_sections by refining the queryset
+            sections = Section.objects.filter(course=course).distinct('class_section')
+            unique_sections = []
+            seen_sections = set()
+            for section in sections:
+                if section.class_section not in seen_sections:
+                    seen_sections.add(section.class_section)
+                    unique_sections.append(section)
+
+            if not unique_sections:
+                print('No unique sections found for given course_id')
+                return Response(
+                    {
+                        'error': "Looks like this course is as empty as a student's wallet after buying textbooks."
+                    },
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+            # TODO this should be fixed: Prefetch related class meetings only for unique sections
+            unique_sections_with_meetings = Section.objects.filter(
+                id__in=[section.id for section in unique_sections]
+            ).prefetch_related(
+                Prefetch(
+                    'classmeeting_set',
+                    queryset=ClassMeeting.objects.filter(section__in=unique_sections),
+                )
             )
 
-            if not sections.exists():
-                print('No sections found for given course_id')
-                return Response(
-                    {'error': 'No sections found for given course_id'},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
-
             db_end_time = time.time()
-            print(f'DB query and prefetching took: {db_end_time - start_time:.2f} seconds')
+            print(
+                f'DB query and prefetching took: {db_end_time - start_time:.2f} seconds'
+            )
 
             course_data = {
                 'course_id': course.course_id,
@@ -915,9 +938,13 @@ class FetchCourseClassMeetingsView(APIView):
                 'description': course.description,
                 'distribution_area_short': course.distribution_area_short,
                 'grading_basis': course.grading_basis,
-                'department_code': course.department.code if course.department else None,
+                'department_code': course.department.code
+                if course.department
+                else None,
                 'crosslistings': course.crosslistings,
-                'sections': CalendarSectionSerializer(sections, many=True).data
+                'sections': CalendarSectionSerializer(
+                    unique_sections_with_meetings, many=True
+                ).data,
             }
 
             serialize_end_time = time.time()
@@ -930,6 +957,8 @@ class FetchCourseClassMeetingsView(APIView):
         except Exception as e:
             print(f'Error during class meeting retrieval: {e}')
             return Response(
-                {'error': 'Internal Server Error'},
+                {
+                    'error': 'Oops! Our server is feeling a bit under the weather. Try again later!'
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )

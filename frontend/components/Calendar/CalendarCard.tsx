@@ -4,7 +4,7 @@ import { CalendarEvent } from '@/types';
 interface CourseCardProps {
   event: CalendarEvent;
   style?: React.CSSProperties;
-  onSectionClick: (section: any) => void;
+  onSectionClick: (courseId: string, sectionNumber: string) => void;
   width?: number;
   offsetLeft?: number;
 }
@@ -12,8 +12,8 @@ interface CourseCardProps {
 function getContrastYIQ(hexcolor: string) {
   const hex = hexcolor.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 2), 16);
-  const b = parseInt(hex.slice(4, 2), 16);
+  const g = parseInt(hex.slice(2, 4), 16);
+  const b = parseInt(hex.slice(4, 6), 16);
   const yiq = (r * 299 + g * 587 + b * 114) / 1000;
   return yiq >= 128 ? 'black' : 'white';
 }
@@ -32,7 +32,7 @@ function stringToColor(name: string, description: string) {
   return color;
 }
 
-function convertTo12hFormat(time) {
+function convertTo12hFormat(time: string) {
   const [hours, minutes] = time.split(':');
   const hrs = parseInt(hours, 10);
   const suffix = hrs >= 12 ? 'PM' : 'AM';
@@ -49,15 +49,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
 }) => {
   const backgroundColor = event.color || stringToColor(event.title, event.description);
   const textColor = getContrastYIQ(backgroundColor);
-  const handleSectionClick = () => {
-    onSectionClick(event.selectedSection || event.sections[0]);
-  };
 
   const startTime = convertTo12hFormat(event.startTime);
   const endTime = convertTo12hFormat(event.endTime);
 
   const calculateDurationRows = (startRowIndex: number, endRowIndex: number) => {
-    return endRowIndex - startRowIndex + 1;
+    return endRowIndex - startRowIndex;
   };
 
   return (
@@ -67,15 +64,11 @@ const CourseCard: React.FC<CourseCardProps> = ({
         backgroundColor: backgroundColor,
         color: textColor,
         gridColumn: `${event.startColumnIndex} / span 1`,
-        gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(
-          event.startRowIndex,
-          event.endRowIndex
-        )}`,
-        width: width ? `calc(100% * ${width})` : '100%',
-        marginLeft: offsetLeft ? `calc(100% * ${offsetLeft})` : '0',
-        ...style,
+        gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(event.startRowIndex, event.endRowIndex)}`,
+        width: `calc(100% * ${width})`,
+        marginLeft: `calc(100% * ${offsetLeft})`,
       }}
-      onClick={handleSectionClick}
+      onClick={() => onSectionClick(event.course_id, event.sections)}
     >
       <div className='flex flex-col'>
         <strong className='font-semibold text-xs'>

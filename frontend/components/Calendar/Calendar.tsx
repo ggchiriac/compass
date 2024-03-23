@@ -71,39 +71,42 @@ const Calendar: React.FC = () => {
     console.log('Processing Course:', course.title);
 
     const sectionEvents: CalendarEvent[] = course.sections.flatMap((section) => {
-      const classMeetingEvents: CalendarEvent[] = section.class_meetings.map((meeting, index) => {
+      const classMeetings = section.class_meetings.map((meeting, index) => {
         const startTime = meeting.start_time;
         const endTime = meeting.end_time;
         const startRowIndex = calculateGridRow(startTime);
         const endRowIndex = calculateGridRow(endTime);
 
         // Convert start time and end time to 12-hour format
-        const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
-        const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
+        // const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
+        // const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
 
-        console.log('Course:', course.title);
-        console.log('Section:', section.class_section);
-        console.log('Start Time:', startTimeFormatted);
-        console.log('End Time:', endTimeFormatted);
-        console.log('Start Row Index:', startRowIndex);
-        console.log('End Row Index:', endRowIndex);
-        console.log('---');
+        // console.log('Course:', course.title);
+        // console.log('Section:', section.class_section);
+        // console.log('Start Time:', startTimeFormatted);
+        // console.log('End Time:', endTimeFormatted);
+        // console.log('Start Row Index:', startRowIndex);
+        // console.log('End Row Index:', endRowIndex);
+        // console.log('---');
 
-        const uniqueKey = `${course.course_id}-${section.class_number}-${startTime}-${index}`;
+        // const uniqueKey = `${course.course_id}-${section.class_number}-${startTime}-${index}`;
 
         return {
-          ...course,
-          section,
           startTime,
           endTime,
           startColumnIndex: getStartColumnIndexForDays(meeting.days)[0],
           startRowIndex,
           endRowIndex,
-          key: uniqueKey,
         };
       });
 
-      return classMeetingEvents;
+      const uniqueKey = `${course.course_id}-${section.class_number}`;
+      return {
+        ...course,
+        section,
+        classMeetings,
+        key: uniqueKey,
+      };
     });
 
     return sectionEvents;
@@ -112,11 +115,13 @@ const Calendar: React.FC = () => {
   // Group events by start time and end time
   const groupedEvents: Record<string, CalendarEvent[]> = {};
   events.forEach((event) => {
-    const key = `${event.startColumnIndex}-${event.startRowIndex}-${event.endRowIndex}`;
-    if (!groupedEvents[key]) {
-      groupedEvents[key] = [];
-    }
-    groupedEvents[key].push(event);
+    event.classMeetings.forEach((classMeeting) => {
+      const key = `${classMeeting.startColumnIndex}-${classMeeting.startRowIndex}-${classMeeting.endRowIndex}`;
+      if (!groupedEvents[key]) {
+        groupedEvents[key] = [];
+      }
+      groupedEvents[key].push({ ...event, ...classMeeting });
+    });
   });
 
   // Calculate the width for overlapping events
@@ -167,7 +172,14 @@ const Calendar: React.FC = () => {
             <CalendarDays days={days} />
           </div>
         </div>
-        <div ref={calendarRef} className='flex-auto overflow-auto relative'>
+        <div
+          ref={calendarRef}
+          className='flex-auto overflow-auto relative'
+          style={{
+            '--grid-columns': `repeat(${days.length}, 1fr)`,
+            '--grid-rows': `repeat(${(endHour - startHour + 1) * 6}, 1fr)`,
+          }}
+        >
           <div className='absolute inset-0 grid grid-cols-[60px_1fr]'>
             {/* Time Slots */}
             <div
@@ -218,15 +230,6 @@ const Calendar: React.FC = () => {
                   onSectionClick={(section) => handleSectionClick(event.guid, section)}
                   width={event.width}
                   offsetLeft={event.offsetLeft}
-                  style={{
-                    gridColumn: `${event.startColumnIndex} / span 1`,
-                    gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(
-                      event.startRowIndex,
-                      event.endRowIndex
-                    )}`,
-                    width: `calc(100% * ${event.width})`,
-                    marginLeft: `calc(100% * ${event.offsetLeft})`,
-                  }}
                 />
               ))}
             </div>
