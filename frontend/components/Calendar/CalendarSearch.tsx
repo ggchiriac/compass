@@ -113,7 +113,6 @@ const CalendarSearch: FC = () => {
     setGradingFilter,
     setFilters,
     setShowPopup,
-    resetFilters,
   } = useFilterStore();
 
   const { searchFilter, setSearchFilter } = useSearchStore();

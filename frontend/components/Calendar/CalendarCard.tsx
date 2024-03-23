@@ -40,13 +40,7 @@ function convertTo12hFormat(time: string) {
   return `${convertedHours}:${minutes} ${suffix}`;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({
-  event,
-  onSectionClick,
-  style,
-  width,
-  offsetLeft,
-}) => {
+const CourseCard: React.FC<CourseCardProps> = ({ event, onSectionClick, width, offsetLeft }) => {
   const backgroundColor = event.color || stringToColor(event.title, event.description);
   const textColor = getContrastYIQ(backgroundColor);
 

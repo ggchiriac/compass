@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { format, startOfWeek, addDays, isSameDay, parse } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 
 import { CalendarEvent, Section } from '@/types';
 
@@ -71,7 +71,7 @@ const Calendar: React.FC = () => {
     console.log('Processing Course:', course.title);
 
     const sectionEvents: CalendarEvent[] = course.sections.flatMap((section) => {
-      const classMeetings = section.class_meetings.map((meeting, index) => {
+      const classMeetings = section.class_meetings.map((meeting) => {
         const startTime = meeting.start_time;
         const endTime = meeting.end_time;
         const startRowIndex = calculateGridRow(startTime);
@@ -157,10 +157,6 @@ const Calendar: React.FC = () => {
       calendarRef.current.scrollTop = scrollPosition;
     }
   }, []);
-
-  const calculateDurationRows = (startRowIndex: number, endRowIndex: number) => {
-    return endRowIndex - startRowIndex;
-  };
 
   return (
     <>

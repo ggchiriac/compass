@@ -1,4 +1,4 @@
-import { ListItem, ListItemText, Typography, Box } from '@mui/material';
+import { ListItem, ListItemText, Typography } from '@mui/material';
 
 import useKairosStore from '@/store/calendarSlice';
 

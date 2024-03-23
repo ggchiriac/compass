@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { Paper, Typography, Box } from '@mui/material';
+import { Paper, Box } from '@mui/material';
 import { Virtuoso } from 'react-virtuoso';
 
 import { CalendarEvent } from '@/types';
