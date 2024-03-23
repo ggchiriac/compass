@@ -14,8 +14,8 @@ def fetch_course_detail(course_id, term, req_lib):
     """
     Fetches course details for a given course_id and term.
     """
-    # if course_id == '010855':
-    #     return course_id, {}
+    if course_id == '010855' or '011605':
+        return course_id, {}
     return course_id, req_lib.getJSON(
         req_lib.configs.COURSES_DETAILS, fmt='json', term=term, course_id=course_id
     )

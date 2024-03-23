@@ -2,19 +2,19 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import Calendar from '../../components/Calendar';
+import Calendar from '../../components/Calendar/Calendar';
+import CalendarSearch from '../../components/Calendar/CalendarSearch';
 import Footer from '../../components/Footer';
-// import LoadingComponent from '../../components/LoadingComponent';
 import Navbar from '../../components/Navbar';
-import Search from '../../components/Search';
 import SkeletonApp from '../../components/SkeletonApp';
 import useAuthStore from '../../store/authSlice';
 import UserState from '../../store/userSlice';
 
-const Dashboard: FC = () => {
+const Kairos: FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
+
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
@@ -36,16 +36,13 @@ const Dashboard: FC = () => {
             }}
           />
         </div>
-        <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded overflow-x-auto'>
-          {' '}
-          {/* Adjust the div wrapping CalendarSearch to include padding/margin as needed */}
-          <div className='flex-none w-full max-w-[200px] p-2'>
-            {' '}
-            {/* Adjust the max-width and padding as needed */}
-            <Search />
+        <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
+          {/* Adjust CalendarSearch container to control width and overflow */}
+          <div className='flex-none w-full lg:max-w-xs p-4 overflow-y-auto'>
+            <CalendarSearch />
           </div>
-          {/* Ensure Calendar grows to fill the space, with padding if necessary */}
-          <div className='flex-grow p-2'>
+          {/* Adjust Calendar to use available space */}
+          <div className='flex-grow p-4'>
             {!isLoading && userProfile && userProfile.netId !== '' ? (
               <Calendar />
             ) : (
@@ -59,4 +56,4 @@ const Dashboard: FC = () => {
   );
 };
 
-export default Dashboard;
+export default Kairos;
