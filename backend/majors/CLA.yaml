@@ -527,7 +527,7 @@ req_list:
   max_counted:
   min_needed:
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
+    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
     At the end of the second term of the junior year, a departmental student is advised to select the subject of the senior thesis after consultation with the DUS. The thesis in its final form must be submitted to the department by April 15 of the senior year.
   no_req:
