@@ -145,6 +145,10 @@ def push_requirement(req):
 
     if ('req_list' in req) and (len(req['req_list']) != 0):
         for sub_req in req['req_list']:
+            if 'completed_by_semester' in req_fields:
+                sub_req['completed_by_semester'] = req_fields[
+                    'completed_by_semester'
+                ]
             if 'double_counting_allowed' in req_fields:
                 sub_req['double_counting_allowed'] = req_fields[
                     'double_counting_allowed'
@@ -160,11 +164,10 @@ def push_requirement(req):
         if len(dept_list) != 0:
             req_inst.dept_list = json.dumps(dept_list)
             req_inst.save()
-
-    elif ('excluded_course_list' in req) and (len(req['excluded_course_list']) != 0):
-        course_inst_list = load_course_list(req['excluded_course_list'])
-        for course_inst in course_inst_list:
-            req_inst.excluded_course_list.add(course_inst)
+        if ('excluded_course_list' in req) and (len(req['excluded_course_list']) != 0):
+            course_inst_list, _ = load_course_list(req['excluded_course_list'])
+            for course_inst in course_inst_list:
+                req_inst.excluded_course_list.add(course_inst)
 
     elif (
         (('dist_req' not in req) or (req['dist_req'] == None))

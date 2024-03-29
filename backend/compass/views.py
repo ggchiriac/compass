@@ -662,24 +662,30 @@ def check_requirements(request):
 def requirement_info(request):
     req_id = request.GET.get('reqId', '')
     explanation = ''
-    sorted_data = []
+    sorted_course_list = []
+    completed_by_semester = 8
 
     try:
         req = Requirement.objects.get(id=req_id)
 
         explanation = req.explanation
-        course_list = req.course_list.all().order_by('course_id',
-                                                     '-guid').distinct(
+        completed_by_semester = req.completed_by_semester
+        excluded_course_ids = req.excluded_course_list.values_list(
+            'course_id', flat=True).distinct()
+        course_list = req.course_list.exclude(
+            course_id__in=excluded_course_ids).order_by('course_id',
+                                                        '-guid').distinct(
             'course_id')
         if course_list:
-            serialized_courses = CourseSerializer(course_list, many=True)
-            sorted_data = sorted(serialized_courses.data, key=lambda course : course['crosslistings'])
+            serialized_course_list = CourseSerializer(course_list, many=True)
+            sorted_course_list = sorted(serialized_course_list.data, key=lambda course : course['crosslistings'])
     except Requirement.DoesNotExist:
         pass
 
     info = {}
     info[0] = explanation
-    info[1] = sorted_data
+    info[1] = sorted_course_list
+    info[2] = completed_by_semester
     return JsonResponse(info)
 
 

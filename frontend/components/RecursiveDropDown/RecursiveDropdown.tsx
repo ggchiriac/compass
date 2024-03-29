@@ -38,6 +38,17 @@ interface SatisfactionStatusProps {
   isRestrictions: boolean;
 }
 
+const semesterMap = {
+  1: 'Freshman fall',
+  2: 'Freshman spring',
+  3: 'Sophomore fall',
+  4: 'Sophomore spring',
+  5: 'Junior fall',
+  6: 'Junior spring',
+  7: 'Senior fall',
+  8: 'Senior spring',
+};
+
 // Satisfaction status icon with styling
 const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   satisfied,
@@ -172,16 +183,25 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                     </div>
                   );
                 }
-              } else if (value[0]) {
+              }
+              if (index === '1' && value[0]) {
                 return (
                   <div key={index}>
-                    <strong className={styles.strong}>{'Course List'}: </strong>
+                    <strong className={styles.strong}>{'Course list'}: </strong>
                     {value
                       .map((course) => {
                         return `${course.crosslistings}, `;
                       })
                       .join('')
                       .slice(0, -2)}
+                  </div>
+                );
+              }
+              if (index === '2' && value != 8) {
+                return (
+                  <div key={index}>
+                    <strong className={styles.strong}>{'Complete by'}: </strong>
+                    {semesterMap[value]}
                   </div>
                 );
               }
