@@ -8,7 +8,7 @@ from .configs import (
 
 class ReqLib:
     def __init__(self):
-        self.configurations = Configs()
+        self.configs = Configs()
 
     def _make_request(self, endpoint: str, **kwargs: Any) -> requests.Response:
         base_url = self.configs.get_base_url(endpoint)

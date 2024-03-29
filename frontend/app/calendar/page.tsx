@@ -106,8 +106,10 @@ const Kairos: FC = () => {
             <div style={{ width: '360px' }}>
               <div style={containerStyle}>
                 <CalendarSearch />
+                {/* Render search results here */}
                 {searchResults.map((course, index) => (
                   <div key={index} style={searchWrapperStyle}>
+                    {/* Render individual course item */}
                     {renderCourseItem(course)}
                   </div>
                 ))}
