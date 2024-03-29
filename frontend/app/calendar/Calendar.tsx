@@ -5,7 +5,7 @@ import { format, startOfWeek, addDays, isSameDay, parse } from 'date-fns';
 import { CalendarEvent } from '@/types';
 
 import Navbar from '@/components/Navbar';
-import useKairosStore from '@/store/calendarSlice';
+import useCalendarStore from '@/store/calendarSlice';
 
 import CalendarCard from './CalendarCard';
 import CalendarDays from './CalendarDays';
@@ -51,8 +51,8 @@ const getStartColumnIndexForDays = (daysString: string): number[] => {
 const Calendar: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
-  const selectedCourses = useKairosStore((state) => state.selectedCourses);
-  const setSelectedCourses = useKairosStore((state) => state.setSelectedCourses);
+  const selectedCourses = useCalendarStore((state) => state.selectedCourses);
+  const setSelectedCourses = useCalendarStore((state) => state.setSelectedCourses);
 
   const today = new Date();
   const startDate = startOfWeek(today, { weekStartsOn: 1 });

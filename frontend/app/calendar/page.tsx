@@ -12,7 +12,7 @@ import UserState from '@/store/userSlice';
 import Calendar from './Calendar';
 import CalendarSearch from './CalendarSearch';
 
-const Kairos: FC = () => {
+const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
@@ -135,4 +135,4 @@ const Kairos: FC = () => {
   );
 };
 
-export default Kairos;
+export default CalendarUI;

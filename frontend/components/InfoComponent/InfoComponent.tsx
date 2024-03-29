@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import { Button } from '@mui/joy';
+import { Button as JoyButton } from '@mui/joy';
 import classNames from 'classnames';
 import { createPortal } from 'react-dom';
 
@@ -111,15 +111,15 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
         )}
         <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
           <footer className='mt-auto text-right'>
-            <Button
-              variant='outlined'
+            <JoyButton
+              variant='soft'
               color='neutral'
               onClick={handleClose}
               sx={{ ml: 2 }}
-              size='sm'
+              size='md'
             >
               Close
-            </Button>
+            </JoyButton>
           </footer>
         </div>
       </div>

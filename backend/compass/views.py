@@ -1,47 +1,42 @@
-import json
 import logging
 import time
 from datetime import datetime, timedelta
-from re import IGNORECASE, compile, search, split, sub
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from re import sub, search, split, compile, IGNORECASE
 from urllib.request import urlopen
+from urllib.parse import urlencode
+from urllib.error import HTTPError, URLError
 
+import ujson as json
 from django.conf import settings
-from django.contrib.postgres.search import TrigramSimilarity
-from django.core.cache import cache
-from django.db.models import Case, Count, IntegerField, Q, Value, When
-from django.db.models.functions import Greatest
-from django.db.models.query import Prefetch
+from django.db.models import Q, Value, When, Case
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
-from django.shortcuts import redirect, get_object_or_404
 from django.views import View
+from django.shortcuts import redirect
+from .models import (
+    models,
+    ClassMeeting,
+    Course,
+    Major,
+    Minor,
+    CustomUser,
+    UserCourses,
+    Section,
+    Requirement,
+)
+from .serializers import CourseSerializer
+
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from thefuzz import fuzz, process  # TODO: Consider adding fuzzy finding to search
 
-from data.check_reqs import (
-    check_user,
-    fetch_requirement_info,
-    get_course_comments,
-    get_course_info,
-)
 from data.configs import Configs
 from data.req_lib import ReqLib
-from .models import (
-    ClassMeeting,
-    Course,
-    CustomUser,
-    Major,
-    Minor,
-    Section,
-    UserCourses,
-    models,
+from data.check_reqs import (
+    get_course_info,
+    get_course_comments,
+    check_user,
 )
-from .serializers import CourseSerializer, CalendarSectionSerializer
-
 
 logger = logging.getLogger(__name__)
 
@@ -688,7 +683,7 @@ def course_details(request):
         return JsonResponse({'error': 'Missing parameters'}, status=400)
 
 
-# -------------------------------------- GET COURSE DETAILS --------------------------
+# -------------------------------------- GET COURSE COMMENTS --------------------------
 
 
 def course_comments(request):
@@ -761,8 +756,30 @@ def check_requirements(request):
     return JsonResponse(formatted_dict)
 
 
+# ---------------------------- FETCH REQUIREMENT INFO -----------------------------------#
+
+
 def requirement_info(request):
-    info = fetch_requirement_info(request.GET.get('reqId', ''))
+    req_id = request.GET.get('reqId', '')
+    explanation = ''
+    sorted_data = []
+
+    try:
+        req = Requirement.objects.get(id=req_id)
+
+        explanation = req.explanation
+        course_list = req.course_list.all().order_by('course_id',
+                                                     '-guid').distinct(
+            'course_id')
+        if course_list:
+            serialized_courses = CourseSerializer(course_list, many=True)
+            sorted_data = sorted(serialized_courses.data, key=lambda course : course['crosslistings'])
+    except Requirement.DoesNotExist:
+        pass
+
+    info = {}
+    info[0] = explanation
+    info[1] = sorted_data
     return JsonResponse(info)
 
 
