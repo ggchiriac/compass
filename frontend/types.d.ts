@@ -147,7 +147,7 @@ type CalendarEvent = {
   // Additional fields for UI representation
   color?: string;
   textColor?: string;
-
+  
   // Additional fields for event rendering
   startTime?: string;
   endTime?: string;

@@ -117,6 +117,7 @@ class Instructor(models.Model):
     last_name = models.CharField(max_length=100, db_index=True, null=True)
     full_name = models.CharField(max_length=255, null=True)
 
+
     class Meta:
         db_table = 'Instructor'
 

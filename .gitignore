@@ -14,6 +14,9 @@ node_modules/
 .next/
 /out/
 
+# fonts
+public/fonts/berkeley-mono/
+
 # course data
 [f,s][0-9][0-9][0-9][0-9].csv
 evals.csv
@@ -33,9 +36,6 @@ db.sqlite3
 # Editor settings
 .vscode/
 .zed/
-
-# CAS folder
-backend/cas/
 
 # Virtual environment
 env/
