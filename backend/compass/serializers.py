@@ -63,3 +63,37 @@ class CourseSerializer(serializers.ModelSerializer):
             'sections',
             'crosslistings',
         )
+
+
+# Calendar (temporary serializer)
+class CalendarClassMeetingSerializer(serializers.ModelSerializer):
+    start_time = serializers.TimeField(format='%H:%M')
+    end_time = serializers.TimeField(format='%H:%M')
+
+    class Meta:
+        model = ClassMeeting
+        fields = (
+            'section_id',
+            'meeting_number',
+            'start_time',
+            'end_time',
+            'days',
+            'room',
+            'building_name',
+        )
+
+
+class CalendarSectionSerializer(serializers.ModelSerializer):
+    class_meetings = CalendarClassMeetingSerializer(
+        source='classmeeting_set', many=True, read_only=True
+    )
+
+    class Meta:
+        model = Section
+        fields = (
+            'class_number',
+            'class_section',
+            'class_type',
+            'instructor',
+            'class_meetings',
+        )

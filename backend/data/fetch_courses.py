@@ -2,6 +2,7 @@ import csv
 from req_lib import ReqLib
 
 
+# TODO: Not sure what this file is for anymore. Can probably be deleted.
 def fetch_data(subject, term):
     term_info = req_lib.getJSON(
         req_lib.configs.COURSES_COURSES, fmt='json', term=term, subject=subject

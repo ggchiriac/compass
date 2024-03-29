@@ -43,16 +43,6 @@ export type SettingsModalProps = {
   children: React.ReactNode;
 };
 
-export type Course = {
-  course_id: number;
-  guid: number;
-  department_code: string;
-  catalog_number: number;
-  title: string;
-  originSemesterId?: string;
-  crosslistings?: string;
-};
-
 export type Filter = {
   termFilter: string;
   distributionFilter: string;
@@ -108,8 +98,8 @@ export type DndState = {
   moveCourseWithinSemester: (courseID: string, oldIndex: number, newIndex: number) => void;
 };
 
-export type DragDropContextProps = {
-  searchResults: Course[];
+export type SearchResults = {
+  courses: Course[];
 };
 
 export type MobileMenuState = {
@@ -135,16 +125,56 @@ export type Dictionary = {
   [key: string]: string | Dictionary;
 };
 
+// Courses returned from the API.
+export type Course = {
+  course_id: number;
+  guid: number;
+  department_code: string;
+  catalog_number: number;
+  title: string;
+  description: string;
+  sections?: Section[];
+  originSemesterId?: string;
+  crosslistings?: string;
+};
+
 // Calendar
-type Event = {
-  id: string; // Unique identifier for the event
-  name: string; // Name of the event, e.g., "Breakfast", "Flight to Paris"
-  description: string; // Description or additional details, e.g., "6:00 AM"
-  startTime: string; // ISO 8601 date string indicating the start time of the event
-  endTime: string; // ISO 8601 date string indicating the end time of the event (can be empty if not applicable)
-  color: string; // Color code for UI representation, e.g., "blue", "pink"
-  textColor: string; // Text color code for UI representation
-  gridColumnStart: number; // Numeric representation aligning with the day of the week (1 = Monday, ..., 5 = Friday)
-  gridRowStart: number; // The starting grid row for the event, based on its start time
-  gridRowEnd: number; // The number of rows the event spans, indicating its duration
+type CalendarEvent = {
+  key: string;
+  course: Course;
+  selectedSection?: Section;
+
+  // Additional fields for UI representation
+  color?: string;
+  textColor?: string;
+
+  // Additional fields for event rendering
+  startTime?: string;
+  endTime?: string;
+  startColumnIndex?: number;
+  startRowIndex?: number;
+  endRowIndex?: number;
+  width?: number;
+  offsetLeft?: number;
+};
+
+export type Section = {
+  class_number: number;
+  class_type: string;
+  class_section: string;
+  track: string;
+  seat_reservations: string;
+  capacity: number;
+  status: string;
+  enrollment: number;
+  class_meetings: ClassMeeting[];
+};
+
+export type ClassMeeting = {
+  meeting_number: number;
+  start_time: string;
+  end_time: string;
+  room: string;
+  days: string;
+  building_name: string;
 };

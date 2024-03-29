@@ -1,36 +1,47 @@
+import json
 import logging
 import time
 from datetime import datetime, timedelta
-from re import sub, search, split, compile, IGNORECASE
-from urllib.request import urlopen
-from urllib.parse import urlencode
+from re import IGNORECASE, compile, search, split, sub
 from urllib.error import HTTPError, URLError
-from django.db.models import Q, Value, When, Case
+from urllib.parse import urlencode
+from urllib.request import urlopen
+
+from django.conf import settings
+from django.contrib.postgres.search import TrigramSimilarity
+from django.core.cache import cache
+from django.db.models import Case, Count, IntegerField, Q, Value, When
+from django.db.models.functions import Greatest
+from django.db.models.query import Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
+from django.shortcuts import redirect, get_object_or_404
 from django.views import View
-from django.shortcuts import redirect
-from .models import (
-    models,
-    ClassMeeting,
-    Course,
-    Major,
-    Minor,
-    CustomUser,
-    UserCourses,
-    Section,
-)
-from .serializers import CourseSerializer
-import json
-from data.configs import Configs
-from data.req_lib import ReqLib
+from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from thefuzz import fuzz, process  # TODO: Consider adding fuzzy finding to search
+
 from data.check_reqs import (
-    get_course_info,
+    check_user,
     fetch_requirement_info,
     get_course_comments,
-    check_user,
+    get_course_info,
 )
-from django.conf import settings
+from data.configs import Configs
+from data.req_lib import ReqLib
+from .models import (
+    ClassMeeting,
+    Course,
+    CustomUser,
+    Major,
+    Minor,
+    Section,
+    UserCourses,
+    models,
+)
+from .serializers import CourseSerializer, CalendarSectionSerializer
+
 
 logger = logging.getLogger(__name__)
 
@@ -53,6 +64,10 @@ def fetch_user_info(net_id):
             'last_name': '',
             'class_year': datetime.now().year + 1,
         },
+    )
+
+    print(
+        f'Fetching user info: net_id={net_id}, email={user_inst.email}, first_name={user_inst.first_name}, last_name={user_inst.last_name}'
     )
 
     # Processing major and minors
@@ -82,6 +97,7 @@ def fetch_user_info(net_id):
         or not user_inst.last_name
         or not user_inst.class_year
     ):
+        print(f'Fetching additional user info: net_id={net_id}')
         student_profile = req_lib.getJSON(f'{configs.USERS_FULL}?uid={net_id}')
         profile.update(student_profile[0])
 
@@ -103,6 +119,9 @@ def fetch_user_info(net_id):
             class_year if not user_inst.class_year else user_inst.class_year
         )
         user_inst.save()
+        print(
+            f'User info updated: net_id={net_id}, email={user_inst.email}, first_name={user_inst.first_name}, last_name={user_inst.last_name}, class_year={user_inst.class_year}'
+        )
 
     return_data = {
         'netId': net_id,
@@ -208,12 +227,10 @@ class CAS(View):
                 return None
             first_line, second_line = map(str.strip, map(bytes.decode, response))
             if first_line.startswith('yes'):
-                logger.info(f'Successful validation for ticket: {ticket}')
+                print(f'Successful validation for ticket: {ticket}')
                 return second_line
             else:
-                logger.info(
-                    f'Failed validation for ticket: {ticket}. Response: {first_line}'
-                )
+                print(f'Failed validation for ticket: {ticket}. Response: {first_line}')
                 return None
 
         except (HTTPError, URLError) as e:
@@ -249,22 +266,23 @@ class CAS(View):
     def authenticate(self, request):
         authenticated, net_id = self._is_authenticated(request)
         if authenticated:
+            print(f'Fetching user info for net_id: {net_id}')
             user_info = fetch_user_info(net_id)
+            print(f'User authenticated: {user_info}')
             return JsonResponse({'authenticated': True, 'user': user_info})
         else:
+            print('User not authenticated')
             return JsonResponse({'authenticated': False, 'user': None})
 
     def login(self, request):
         try:
-            logger.info(
-                f'Incoming GET request: {request.GET}, Session: {request.session}'
-            )
-            logger.info(
-                f"Received login request from {request.META.get('REMOTE_ADDR')}"
-            )
+            print(f'Incoming GET request: {request.GET}, Session: {request.session}')
+            print(f"Received login request from {request.META.get('REMOTE_ADDR')}")
 
             authenticated, username = self._is_authenticated(request)
+            print(f'Authenticated: {authenticated}, username: {username}')
             if authenticated:
+                # request.session.flush()
                 return redirect(settings.DASHBOARD)
 
             # Extract ticket from CAS response
@@ -272,17 +290,28 @@ class CAS(View):
             service_url = self._strip_ticket(request)
             if ticket:
                 net_id = self._validate(ticket, service_url)
-                logger.debug(f'Validation returned {username}')
+                print(f'Validation returned username: {username}')
+                print(f'Validation returned net_id: {net_id}')
                 if net_id:
+                    print(f'Validated user: net_id={net_id}')
                     user, created = CustomUser.objects.get_or_create(
                         username=net_id, defaults={'net_id': net_id, 'role': 'student'}
                     )
+                    print(f'User created: {created}, user: {user}')
                     if created:
+                        print(f'Created new user: net_id={net_id}')
                         user.username = net_id
                         user.set_unusable_password()
                         user.major = Major.objects.get(code=UNDECLARED['code'])
+                    else:
+                        print(f'User already exists: net_id={net_id}')
                     user.save()
+                    print(
+                        f'User saved: net_id={net_id}, email={user.email}, first_name={user.first_name}, last_name={user.last_name}'
+                    )
                     request.session['net_id'] = net_id
+                    print(f'User (supposedly) authenticated: net_id={net_id}')
+                    print(f'Redirecting to dashboard: {settings.DASHBOARD}')
                     return redirect(settings.DASHBOARD)
             login_url = f'{self.cas_url}login?service={service_url}'
             return redirect(login_url)
@@ -294,8 +323,8 @@ class CAS(View):
         """
         Logs out the user and redirects to the landing page.
         """
-        logger.info(f'Incoming GET request: {request.GET}, Session: {request.session}')
-        logger.info(f"Received logout request from {request.META.get('REMOTE_ADDR')}")
+        print(f'Incoming GET request: {request.GET}, Session: {request.session}')
+        print(f"Received logout request from {request.META.get('REMOTE_ADDR')}")
         request.session.flush()
         return redirect(settings.HOMEPAGE)
 
@@ -313,6 +342,7 @@ GRADING_OPTIONS = {
     'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
 }
 
+
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
@@ -321,7 +351,9 @@ def make_sort_key(dept):
             if start_index != -1:
                 return crosslistings[start_index:]
         return crosslistings
+
     return sort_key
+
 
 class SearchCourses(View):
     """
@@ -329,6 +361,7 @@ class SearchCourses(View):
     """
 
     def get(self, request, *args, **kwargs):
+        start_time = time.time()
         query = request.GET.get('course', None)
         term = request.GET.get('term', None)
         distribution = request.GET.get('distribution', None)
@@ -336,6 +369,7 @@ class SearchCourses(View):
         grading_options = request.GET.get('grading')
 
         if query:
+            # Process queries
             init_time = time.time()
             # process queries
             trimmed_query = sub(r'\s', '', query)
@@ -343,12 +377,12 @@ class SearchCourses(View):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + " " + num
+                code = dept + ' ' + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
                 result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + " " + num
+                code = dept + ' ' + num
             elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
                 trimmed_query
             ):
@@ -360,6 +394,7 @@ class SearchCourses(View):
                 num = ''
                 code = dept
             else:
+                print(f'Query processing time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})
 
             query_conditions = Q()
@@ -368,8 +403,7 @@ class SearchCourses(View):
                 query_conditions &= Q(guid__startswith=term)
 
             if distribution:
-                query_conditions &= Q(
-                    distribution_area_short__iexact=distribution)
+                query_conditions &= Q(distribution_area_short__iexact=distribution)
 
             if levels:
                 levels = levels.split(',')
@@ -383,7 +417,7 @@ class SearchCourses(View):
                 grading_filters = []
                 for grading in grading_options:
                     grading_filters += GRADING_OPTIONS[grading]
-                print(f"Grading filters: {grading_filters}")
+                print(f'Grading filters: {grading_filters}')
                 grading_query = Q()
                 for grading in grading_filters:
                     grading_query |= Q(grading_basis__iexact=grading)
@@ -393,29 +427,85 @@ class SearchCourses(View):
                 filtered_query = query_conditions
                 filtered_query &= Q(department__code__iexact=dept)
                 filtered_query &= Q(catalog_number__iexact=num)
-                exact_match_course = Course.objects.select_related('department').filter(
-                    filtered_query
-                ).order_by('course_id', '-guid').distinct('course_id')
+                exact_match_course = (
+                    Course.objects.select_related('department')
+                    .filter(filtered_query)
+                    .order_by('course_id', '-guid')
+                    .distinct()
+                )
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
+                    print(
+                        f'Total execution time: {time.time() - start_time:.5f} seconds'
+                    )
+                    print(serialized_course.data)
                     return JsonResponse({'courses': serialized_course.data})
                 else:
+                    courses_start_time = time.time()
+                    courses = (
+                        Course.objects.select_related('department')
+                        .filter(
+                            Q(crosslistings__icontains=code),
+                            section__term_id=9,
+                        )
+                        .distinct()
+                    )
+                    print(
+                        f'Courses query time: {time.time() - courses_start_time:.5f} seconds'
+                    )
+
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
-                    courses = Course.objects.select_related('department').filter(
-                        filtered_query
-                    ).order_by('course_id', '-guid').distinct('course_id')
+                    courses = (
+                        Course.objects.select_related('department')
+                        .filter(filtered_query)
+                        .order_by('course_id', '-guid')
+                        .distinct()
+                    )
                     if courses:
-                        serialized_courses = CourseSerializer(courses, many=True)
-                        sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
-                        print(f"Search time: {time.time() - init_time}")
-                        return JsonResponse({'courses': sorted_data})
-                    return JsonResponse({'courses': []})
+                        sorting_start_time = time.time()
+                        custom_sorting_field = Case(
+                            When(
+                                Q(department__code__icontains=dept)
+                                & Q(catalog_number__icontains=num),
+                                then=Value(3),
+                            ),
+                            When(Q(department__code__icontains=dept), then=Value(2)),
+                            When(Q(catalog_number__icontains=num), then=Value(1)),
+                            default=Value(0),
+                            output_field=models.IntegerField(),
+                        )
+                        sorted_courses = courses.annotate(
+                            custom_sorting=custom_sorting_field
+                        ).order_by(
+                            '-custom_sorting',
+                            'department__code',
+                            'catalog_number',
+                            'title',
+                        )
+                        print(
+                            f'Sorting time: {time.time() - sorting_start_time:.5f} seconds'
+                        )
+
+                        serialization_start_time = time.time()
+                        serialized_courses = CourseSerializer(sorted_courses, many=True)
+                        print(
+                            f'Serialization time: {time.time() - serialization_start_time:.5f} seconds'
+                        )
+                        print(
+                            f'Total execution time: {time.time() - start_time:.5f} seconds'
+                        )
+                        return JsonResponse({'courses': serialized_courses.data})
+
+                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
+                return JsonResponse({'courses': []})
             except Exception as e:
                 logger.error(f'An error occurred while searching for courses: {e}')
+                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'error': 'Internal Server Error'}, status=500)
         else:
+            print(f'Total execution time: {time.time() - start_time:.5f} seconds')
             return JsonResponse({'courses': []})
 
 
@@ -459,6 +549,17 @@ def parse_semester(semester_id, class_year):
     return semester_num
 
 
+# This needs to be changed.
+def get_first_course_inst(course_code):
+    department_code, catalog_number = course_code.split(' ')
+    course_inst = (
+        Course.objects.select_related('department')
+        .filter(department__code=department_code, catalog_number=catalog_number)
+        .first()
+    )
+    return course_inst
+
+
 def update_courses(request):
     try:
         data = json.loads(request.body)
@@ -467,10 +568,16 @@ def update_courses(request):
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
+        course_inst = (
+            Course.objects.select_related('department')
+            .filter(Q(course_id__iexact=course_id))
+            .order_by('-guid')[0]
+        )
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
+            user_course = UserCourses.objects.get(
+                user=user_inst, course__course_id=course_id
+            )
             user_course.delete()
             message = f'User course deleted: {course_id}, {net_id}'
 
@@ -481,9 +588,7 @@ def update_courses(request):
                 user=user_inst, course=course_inst, defaults={'semester': semester}
             )
             if created:
-                message = (
-                    f'User course added: {semester}, {course_id}, {net_id}'
-                )
+                message = f'User course added: {semester}, {course_id}, {net_id}'
             else:
                 message = f'User course updated: {semester}, {course_id}, {net_id}'
 
@@ -667,144 +772,51 @@ def requirement_info(request):
 # TODO: See if this function can replace redundant parts of the code in this file.
 def get_course_details(request, course_id):
     try:
-        course = Course.objects.prefetch_related('sections__class_meetings').get(
-            pk=course_id
+        # Prefetch class meetings for each section
+        class_meetings_prefetch = Prefetch(
+            'sections__class_meetings', queryset=ClassMeeting.objects.all()
         )
+        # Now prefetch sections with their class meetings loaded
+        sections_prefetch = Prefetch(
+            'sections',
+            queryset=Section.objects.prefetch_related(class_meetings_prefetch),
+        )
+        course = Course.objects.prefetch_related(sections_prefetch).get(pk=course_id)
+
         serializer = CourseSerializer(course)
         return JsonResponse(serializer.data)
     except Course.DoesNotExist:
         return JsonResponse({'error': 'Course not found'}, status=404)
 
 
-def get_first_meeting_day(days_string):
-    days_mapping = {
-        'Monday': 1,
-        'Tuesday': 2,
-        'Wednesday': 3,
-        'Thursday': 4,
-        'Friday': 5,
-    }
-    days_list = days_string.split(',')
-    for day in days_list:
-        if day in days_mapping:
-            return days_mapping[day]
-    return None
+class FetchCalendarClasses(APIView):
+    def get(self, request, course_id, format=None):
+        term = request.query_params.get('term')
+        if not term:
+            return Response({'error': 'Missing required parameter: term'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            course = Course.objects.get(course_id=course_id)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
 
+        sections = Section.objects.filter(course=course, term__term_code=term).prefetch_related(
+            Prefetch('classmeeting_set', queryset=ClassMeeting.objects.only('start_time', 'end_time', 'room', 'building_name'))
+        )
 
-def calendar_search(request):
-    query = request.GET.get('query', '').strip()
-    if not query:
-        return JsonResponse({'events': []})
+        if not sections:
+            return Response({'error': 'No sections found for the course'}, status=status.HTTP_404_NOT_FOUND)
 
-    match = DEPT_NUM_REGEX.match(query)
-    if match:
-        dept, num = match.groups()
-    else:
-        return JsonResponse({'events': []})
+        data = [{
+            'class_type': section.class_type,
+            'capacity': section.capacity,
+            'class_meetings': [{
+                'start_time': meeting.start_time,
+                'end_time': meeting.end_time,
+                'building_name': meeting.building_name,
+                'room': meeting.room,
+            } for meeting in section.classmeeting_set.all()]
+        } for section in sections]
 
-    try:
-        courses = Course.objects.filter(
-            Q(department__code__iexact=dept) & Q(catalog_number__iexact=num)
-        ).prefetch_related('department', 'sections__classmeetings')
-
-        # Convert courses and related data to Event[] format for the frontend
-        events = []
-        for course in courses:
-            for section in course.sections.all():
-                for class_meeting in section.classmeetings.all():
-                    event = {
-                        'id': f'{section.class_number}-{class_meeting.meeting_number}',
-                        'name': course.title,
-                        'description': section.class_type,
-                        'startTime': f'{class_meeting.start_time}',
-                        'endTime': f'{class_meeting.end_time}',
-                        'color': 'blue',  # Static for the example; you could map this based on the class type
-                        'textColor': 'white',  # Static for the example
-                        'gridColumnStart': get_first_meeting_day(
-                            class_meeting.days
-                        ),  # Map 'days' to your calendar grid
-                        'gridRowStart': calculate_grid_position(
-                            class_meeting.start_time
-                        ),
-                        'gridRowEnd': calculate_grid_duration(
-                            class_meeting.start_time, class_meeting.end_time
-                        ),
-                    }
-                    events.append(event)
-
-        return JsonResponse({'events': events})
-
-    except Course.DoesNotExist:
-        return JsonResponse({'events': []})
-    except Exception as e:
-        logger.error(f'An error occurred while searching for courses: {e}')
-        return JsonResponse({'error': 'Internal Server Error'}, status=500)
-
-
-# def calculate_grid_row(time_string):
-#     """
-#     Calculate the grid row number for a given time string.
-#     The grid is assumed to start at 7AM and each row represents 15 minutes.
-#     """
-#     time = datetime.datetime.strptime(time_string, '%H:%M').time()
-#     start_hour = 7  # Grid starts at 7AM
-#     slots_per_hour = 4  # Number of 15-minute slots in an hour
-#     hour = time.hour
-#     minute = time.minute
-
-#     # Calculate the starting row based on the number of 15-minute intervals from 7AM
-#     row_start = (hour - start_hour) * slots_per_hour + minute // 15 + 1
-#     return row_start
-
-
-# def calculate_grid_duration(start_time_string, end_time_string):
-#     """
-#     Calculate the duration in grid rows based on start and end time strings.
-#     """
-#     start_time = datetime.datetime.strptime(start_time_string, '%H:%M').time()
-#     end_time = datetime.datetime.strptime(end_time_string, '%H:%M').time()
-#     start_minutes = start_time.hour * 60 + start_time.minute
-#     end_minutes = end_time.hour * 60 + end_time.minute
-
-#     # Calculate the duration in 15-minute intervals
-#     duration = (end_minutes - start_minutes) // 15
-#     return duration
-
-# def calculate_grid_position(start_time):
-#     # Convert time object to datetime for today
-#     start_datetime = datetime.combine(datetime.today(), start_time)
-#     # Define the grid start time
-#     grid_start_time = time(7, 0)  # Grid starts at 7AM
-#     grid_start_datetime = datetime.combine(datetime.today(), grid_start_time)
-#     # Calculate the difference in minutes
-#     difference = (start_datetime - grid_start_datetime).total_seconds() / 60
-#     # Calculate grid position based on 15-minute intervals
-#     return int(difference // 15) + 1
-
-# def calculate_grid_duration(start_time, end_time):
-#     start_datetime = datetime.combine(datetime.today(), start_time)
-#     end_datetime = datetime.combine(datetime.today(), end_time)
-#     # Calculate the duration in minutes
-#     duration = (end_datetime - start_datetime).total_seconds() / 60
-#     # Calculate grid duration based on 15-minute intervals
-#     return int(duration // 15)
-
-
-def calculate_grid_position(start_time):
-    # Assume start_time is a Python time object
-    start_hour = 7  # Grid starts at 7AM
-    slots_per_hour = 4  # 4 slots in an hour (15-minute intervals)
-    row_start = (
-        (start_time.hour - start_hour) * slots_per_hour + start_time.minute // 15 + 1
-    )
-    return row_start
-
-
-def calculate_grid_duration(start_time, end_time):
-    # Assume start_time and end_time are Python time objects
-    start_datetime = datetime.combine(datetime.today(), start_time)
-    end_datetime = datetime.combine(datetime.today(), end_time)
-    duration = (end_datetime - start_datetime).total_seconds() / (
-        15 * 60
-    )  # duration in 15-minute intervals
-    return int(duration)  # Return as an integer number of slots
+        return Response(data)
+    

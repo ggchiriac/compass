@@ -1,8 +1,8 @@
 import argparse
 import csv
 import os
-from .req_lib import ReqLib
 import time
+from req_lib import ReqLib
 from concurrent.futures import ThreadPoolExecutor
 
 # Note to future developers: This script can be made much faster if made asynchronous.
@@ -14,8 +14,8 @@ def fetch_course_detail(course_id, term, req_lib):
     """
     Fetches course details for a given course_id and term.
     """
-    # if course_id == '010855':
-    #     return course_id, {}
+    if course_id == '010855':
+        return course_id, {}
     return course_id, req_lib.getJSON(
         req_lib.configs.COURSES_DETAILS, fmt='json', term=term, course_id=course_id
     )
@@ -45,7 +45,7 @@ def fetch_data(subject, term, req_lib):
     print(f'Fetched {len(course_ids)} course IDs from {subject}.')
 
     # Parallel fetching of course details
-    with ThreadPoolExecutor(max_workers=12) as executor:
+    with ThreadPoolExecutor(max_workers=4) as executor:
         futures = [
             executor.submit(fetch_course_detail, course_id, term, req_lib)
             for course_id in course_ids
@@ -75,7 +75,6 @@ def process_course(term, subject, course, seat_mapping, course_details, writer):
     Extracts information from each course from the courses/courses endpoint,
     and course details from the courses/details endpoint.
     """
-    course_details.get('course_detail', {})
     common_data = extract_common_data(term, subject, course)
     course_details_data = extract_course_details(course_details)
 
@@ -113,12 +112,11 @@ def process_courses(courses, seat_info, course_details, writer):
         for subject in term.get('subjects', []):  # Loop through each subject
             for course in subject.get('courses', []):  # Loop through each course
                 if not course_details:
-                    print(f'No course details provided Possible issue with the server.')
+                    print('No course details provided Possible issue with the server.')
                     continue
                 # Fetch the course details and process each course
                 course_id = course.get('course_id', '')
                 course_dict = course_details.get(course_id)
-
                 if course_dict is None:
                     print(
                         f'Data for course ID {course_id} not found. Possible issue with the server.'
@@ -252,6 +250,10 @@ def extract_course_details(course_details):
     """
     CPU-bound function.
     """
+    if not course_details:
+        print('No course details provided. Possible issue with the server. Skipping...')
+        return {}
+
     course_detail = course_details.get('course_detail', {})
     seat_reservations = course_detail.get('seat_reservations', {}) or {}
     seat_reservation = seat_reservations.get('seat_reservation', [])
@@ -386,6 +388,7 @@ def generate_csv(semester, subjects, query, fieldnames, req_lib):
 def main():
     req_lib = ReqLib()
     query = {
+        'f2024': '1252',
         'f2023': '1242',
         'f2022': '1232',
         'f2021': '1222',

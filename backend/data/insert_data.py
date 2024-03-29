@@ -125,8 +125,8 @@ def insert_courses(rows):
             crosslistings = row['Subject Code'] + ' ' + row['Catalog Number']
 
         # Handle CHI1001, FRE1027, GER1025...
-        pattern = r"([a-zA-Z])([0-9])"
-        replacement = r"\1 \2"
+        pattern = r'([a-zA-Z])([0-9])'
+        replacement = r'\1 \2'
         crosslistings = re.sub(pattern, replacement, crosslistings)
 
         dept_code = row['Subject Code']
@@ -159,7 +159,7 @@ def insert_courses(rows):
             'reading_writing_assignment': row.get('Reading Writing Assignment'),
             'grading_basis': row.get('Grading Basis'),
             'reading_list': reading_list,
-            'crosslistings': crosslistings
+            'crosslistings': crosslistings,
         }
 
         course = existing_courses.get(guid)
@@ -187,6 +187,7 @@ def insert_courses(rows):
 
 # -------------------------------------------------------------------------------------#
 
+
 # For each course in the Course table, take its crosslistings and
 # insert every crosslisting in the Course table as a separate course.
 # Also populate CourseEquivalents table with the links between
@@ -205,7 +206,7 @@ def insert_course_equivalents(rows):
     processed_guids = set()
     new_courses = []
     new_course_equivalents = []
-    updated_course_equivalents = []
+    updated_courses = []
 
     for row in tqdm(rows, desc='Processing Course Equivalents...'):
         primary_guid = row['Course GUID'].strip()
@@ -238,8 +239,9 @@ def insert_course_equivalents(rows):
             # Check if equivalent course exists
             cross_course = course_cache.get((department_code, catalog_number))
             if not cross_course:
+                # Create a new course for the crosslisting
                 cross_course = Course(
-                    guid=primary_guid,  # Same GUID as primary course
+                    guid=f'{department_code}{catalog_number}',
                     course_id=primary_course.course_id,
                     department=cross_department,
                     title=primary_course.title,
@@ -255,18 +257,18 @@ def insert_course_equivalents(rows):
                     reading_writing_assignment=primary_course.reading_writing_assignment,
                     grading_basis=primary_course.grading_basis,
                     reading_list=primary_course.reading_list,
+                    crosslistings=primary_course.crosslistings,
                 )
                 new_courses.append(cross_course)
                 course_cache[(department_code, catalog_number)] = cross_course
-
-            course_equivalent_key = (primary_course.guid, cross_course.guid)
-            if course_equivalent_key in existing_course_equivalents:
-                # Update existing CourseEquivalent
-                course_equivalent = existing_course_equivalents[course_equivalent_key]
-                course_equivalent.equivalence_type = 'CROSS_LIST'
-                updated_course_equivalents.append(course_equivalent)
             else:
-                # Create new CourseEquivalent
+                # Update the crosslistings field of the existing course
+                cross_course.crosslistings = primary_course.crosslistings
+                updated_courses.append(cross_course)
+
+            # Create a new CourseEquivalent record
+            course_equivalent_key = (primary_course.guid, cross_course.guid)
+            if course_equivalent_key not in existing_course_equivalents:
                 course_equivalent = CourseEquivalent(
                     primary_course=primary_course,
                     equivalent_course=cross_course,
@@ -276,10 +278,8 @@ def insert_course_equivalents(rows):
 
     # Perform bulk creation and updating
     Course.objects.bulk_create(new_courses)
+    Course.objects.bulk_update(updated_courses, ['crosslistings'])
     CourseEquivalent.objects.bulk_create(new_course_equivalents, ignore_conflicts=True)
-    CourseEquivalent.objects.bulk_update(
-        updated_course_equivalents, ['equivalence_type']
-    )
 
     logging.info('CourseEquivalent insertion and update completed!')
 
@@ -497,61 +497,53 @@ def insert_class_year_enrollments(rows):
     logging.info('Starting ClassYearEnrollment insertions and updates...')
 
     # Cache for Section objects to reduce database queries
-    # Assuming class_number is unique across semesters
-    section_cache = {section.class_number: section for section in Section.objects.all()}
+    section_cache = {
+        section.class_number: section.id
+        for section in Section.objects.values_list('class_number', 'id')
+    }
 
-    # Collect relevant section IDs
+    # Collect relevant section IDs and enrollment data
     relevant_section_ids = set()
+    enrollment_data = {}
     for row in tqdm(rows, desc='Checking for updates in Class Year Enrollments...'):
         class_number = int(row['Class Number'].strip())
-        if class_number in section_cache:
-            relevant_section_ids.add(section_cache[class_number].id)
+        section_id = section_cache.get(class_number)
+        if section_id:
+            relevant_section_ids.add(section_id)
+            enrollment_info = _parse_class_year_enrollments(
+                row['Class Year Enrollments'], CLASS_YEAR_ENROLLMENT_PATTERN
+            )
+            for class_year, enrl_seats in enrollment_info:
+                key = (section_id, int(class_year) if class_year else None)
+                enrollment_data[key] = int(enrl_seats)
 
-    # Fetch only relevant ClassYearEnrollment objects
+    # Fetch existing ClassYearEnrollment objects
     existing_enrollments = {
-        (enrollment.section.id, enrollment.class_year): enrollment
+        (enrollment.section_id, enrollment.class_year): enrollment
         for enrollment in ClassYearEnrollment.objects.filter(
             section_id__in=relevant_section_ids
-        )
+        ).values('id', 'section_id', 'class_year', 'enrl_seats')
     }
 
     new_enrollments = []
     updated_enrollments = []
 
-    for row in tqdm(rows, desc='Processing Class Year Enrollments...'):
-        class_number = int(row['Class Number'].strip())
-
-        section = section_cache.get(class_number)
-        if not section:
-            logging.error(f'Section not found for Class Number: {class_number}')
-            continue
-
-        enrollment_info = _parse_class_year_enrollments(
-            row['Class Year Enrollments'], CLASS_YEAR_ENROLLMENT_PATTERN
-        )
-
-        if not enrollment_info:  # No restrictions
-            key = (section.id, None)
-            if key not in existing_enrollments:
-                new_enrollment = ClassYearEnrollment(section=section)
-                new_enrollments.append(new_enrollment)
-            continue
-
-        for class_year, enrl_seats in enrollment_info:
-            key = (section.id, int(class_year))
-            if key in existing_enrollments:
-                # Update existing enrollment
-                enrollment = existing_enrollments[key]
-                enrollment.enrl_seats = int(enrl_seats)
+    for key, enrl_seats in enrollment_data.items():
+        section_id, class_year = key
+        if key in existing_enrollments:
+            # Update existing enrollment
+            enrollment = existing_enrollments[key]
+            if enrollment['enrl_seats'] != enrl_seats:
+                enrollment['enrl_seats'] = enrl_seats
                 updated_enrollments.append(enrollment)
-            else:
-                # Create new enrollment
-                new_enrollment = ClassYearEnrollment(
-                    section=section,
-                    class_year=int(class_year),
-                    enrl_seats=int(enrl_seats),
-                )
-                new_enrollments.append(new_enrollment)
+        else:
+            # Create new enrollment
+            new_enrollment = ClassYearEnrollment(
+                section_id=section_id,
+                class_year=class_year,
+                enrl_seats=enrl_seats,
+            )
+            new_enrollments.append(new_enrollment)
 
     # Bulk operations for efficiency
     update_fields = ['enrl_seats']
@@ -607,13 +599,13 @@ def insert_course_data(semester):
 
     try:
         with transaction.atomic():
-            # insert_departments(trimmed_rows)
-            # insert_academic_terms(trimmed_rows)
+            insert_departments(trimmed_rows)
+            insert_academic_terms(trimmed_rows)
             insert_courses(trimmed_rows)
-            # insert_course_equivalents(trimmed_rows)
-            # insert_sections(trimmed_rows)
-            # insert_class_meetings(trimmed_rows)
-            # insert_class_year_enrollments(trimmed_rows)
+            # insert_course_equivalents(trimmed_rows) # TODO: Can probably delete this fn
+            insert_sections(trimmed_rows)
+            insert_class_meetings(trimmed_rows)
+            insert_class_year_enrollments(trimmed_rows)
 
     except Exception as e:
         logging.error(f'Transaction failed: {e}')

@@ -19,7 +19,7 @@ class Configs:
         self.COURSES_RESSEATS = '/courses/resseats'
         self.COURSES_DETAILS = '/courses/details'
         self.USERS_FULL = '/users/full'
-        self.DEPARTMENT = "/departments"
+        self.DEPARTMENT = '/departments'
         self.REFRESH_TOKEN_URL = 'https://api.princeton.edu:443/token'
         self._refreshToken(grant_type='client_credentials')
 
