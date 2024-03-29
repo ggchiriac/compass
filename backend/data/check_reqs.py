@@ -642,35 +642,6 @@ def get_course_info(dept, num):
     except Course.DoesNotExist:
         return None
 
-
-# ---------------------------- FETCH REQUIREMENT INFO -----------------------------------#
-
-
-def fetch_requirement_info(req_id):
-    try:
-        explanation = Requirement.objects.get(id=req_id)
-        explanation = explanation.explanation
-    except Course.DoesNotExist:
-        explanation = ''
-
-    try:
-        course_list = Requirement.objects.get(id=req_id)
-        course_list = course_list.course_list.all()
-        satisfying_courses = []
-        for course in course_list:
-            satisfying_courses.append(
-                f'{course.department.code} {course.catalog_number}'
-            )
-    except Course.DoesNotExist:
-        satisfying_courses = []
-
-    info = {}
-    info[0] = explanation
-    info[1] = satisfying_courses
-
-    return info
-
-
 def main():
     pass
 

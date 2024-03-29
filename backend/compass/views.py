@@ -19,6 +19,7 @@ from .models import (
     CustomUser,
     UserCourses,
     Section,
+    Requirement,
 )
 from .serializers import CourseSerializer
 import json
@@ -26,7 +27,6 @@ from data.configs import Configs
 from data.req_lib import ReqLib
 from data.check_reqs import (
     get_course_info,
-    fetch_requirement_info,
     get_course_comments,
     check_user,
 )
@@ -583,7 +583,7 @@ def course_details(request):
         return JsonResponse({'error': 'Missing parameters'}, status=400)
 
 
-# -------------------------------------- GET COURSE DETAILS --------------------------
+# -------------------------------------- GET COURSE COMMENTS --------------------------
 
 
 def course_comments(request):
@@ -656,8 +656,30 @@ def check_requirements(request):
     return JsonResponse(formatted_dict)
 
 
+# ---------------------------- FETCH REQUIREMENT INFO -----------------------------------#
+
+
 def requirement_info(request):
-    info = fetch_requirement_info(request.GET.get('reqId', ''))
+    req_id = request.GET.get('reqId', '')
+    explanation = ''
+    sorted_data = []
+
+    try:
+        req = Requirement.objects.get(id=req_id)
+
+        explanation = req.explanation
+        course_list = req.course_list.all().order_by('course_id',
+                                                     '-guid').distinct(
+            'course_id')
+        if course_list:
+            serialized_courses = CourseSerializer(course_list, many=True)
+            sorted_data = sorted(serialized_courses.data, key=lambda course : course['crosslistings'])
+    except Requirement.DoesNotExist:
+        pass
+
+    info = {}
+    info[0] = explanation
+    info[1] = sorted_data
     return JsonResponse(info)
 
 
