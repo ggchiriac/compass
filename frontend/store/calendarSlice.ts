@@ -35,9 +35,11 @@ const useCalendarStore = create<calendarStore>((set) => ({
     try {
       const selectedTerm = useFilterStore.getState().termFilter;
       console.log('Selected term in addCourse:', selectedTerm);
+
       const response = await fetch(
-        `${process.env.BACKEND}/fetch_class_meetings/${newCourse.course_id}/?term=${selectedTerm}`
+        `${process.env.BACKEND}/fetch_calendar_classes/${newCourse.course_id}/?term=${selectedTerm}`
       );
+
       const courseDetails = await response.json();
 
       if (!response.ok) {

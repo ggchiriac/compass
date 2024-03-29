@@ -2,6 +2,7 @@
 
 import { useEffect, useState, FC } from 'react';
 
+import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
@@ -22,59 +23,10 @@ const CalendarUI: FC = () => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
 
-  const containerStyle: React.CSSProperties = {
-    display: 'flex',
-    flexDirection: 'column',
-    boxSizing: 'border-box',
-    margin: '10px',
-    borderRadius: '6px',
-    transition: 'background-color 350ms ease',
-    backgroundColor: 'rgba(246, 246, 246, 1)',
-    border: '1px solid rgba(0, 0, 0, 0.05)',
-    fontSize: '1em',
-    overflowY: 'auto',
-    height: '703px',
-  };
-
-  const searchWrapperStyle: React.CSSProperties = {
-    display: 'flex',
-    height: '30px',
-    boxSizing: 'border-box',
-    position: 'relative',
-  };
-
-  const itemStyle: React.CSSProperties = {
-    position: 'relative',
-    height: '30px',
-    display: 'flex',
-    flexGrow: 1,
-    alignItems: 'center',
-    width: '100%',
-    padding: '15px 15px',
-    backgroundImage: 'linear-gradient(to bottom, var(--color_primary), var(--color_secondary))',
-    boxShadow:
-      '0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05), 0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15)',
-    outline: 'none',
-    borderRadius: 'calc(4px / var(--scale-x, 1))',
-    boxSizing: 'border-box',
-    listStyle: 'none',
-    transform: 'scale(var(--scale, 1))',
-    transition: 'box-shadow 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22)',
-  };
-
-  const textContainerStyle: React.CSSProperties = {
-    display: 'inline-block',
-    color: '#ffffff',
-    fontWeight: 400,
-    fontSize: '1rem',
-    flexGrow: 1,
-    overflow: 'hidden',
-  };
-
   const renderCourseItem = (course) => {
     return (
-      <div style={itemStyle}>
-        <div style={textContainerStyle}>
+      <div className={styles.Item}>
+        <div className={styles.TextContainer}>
           <h3>{course.title}</h3>
           <p>{course.code}</p>
           {/* Add more course details */}
@@ -101,19 +53,16 @@ const CalendarUI: FC = () => {
           />
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div className='flex'>
             {/* Left Section for Search Results */}
-            <div style={{ width: '360px' }}>
-              <div style={containerStyle}>
-                <CalendarSearch />
-                {/* Render search results here */}
+            <div className={styles.Container} style={{ width: '360px' }}>
+              <CalendarSearch />
+              {/* Render search results here */}
+              <ul>
                 {searchResults.map((course, index) => (
-                  <div key={index} style={searchWrapperStyle}>
-                    {/* Render individual course item */}
-                    {renderCourseItem(course)}
-                  </div>
+                  <li key={index}>{renderCourseItem(course)}</li>
                 ))}
-              </div>
+              </ul>
             </div>
 
             {/* Center Section for Calendar */}

@@ -8,7 +8,7 @@ from urllib.error import HTTPError, URLError
 
 import ujson as json
 from django.conf import settings
-from django.db.models import Q, Value, When, Case
+from django.db.models import Q, Value, When, Case, Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
 from django.views import View
@@ -356,7 +356,6 @@ class SearchCourses(View):
     """
 
     def get(self, request, *args, **kwargs):
-        start_time = time.time()
         query = request.GET.get('course', None)
         term = request.GET.get('term', None)
         distribution = request.GET.get('distribution', None)
@@ -364,7 +363,6 @@ class SearchCourses(View):
         grading_options = request.GET.get('grading')
 
         if query:
-            # Process queries
             init_time = time.time()
             # process queries
             trimmed_query = sub(r'\s', '', query)
@@ -389,7 +387,6 @@ class SearchCourses(View):
                 num = ''
                 code = dept
             else:
-                print(f'Query processing time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})
 
             query_conditions = Q()
@@ -426,82 +423,62 @@ class SearchCourses(View):
                     Course.objects.select_related('department')
                     .filter(filtered_query)
                     .order_by('course_id', '-guid')
-                    .distinct()
+                    .distinct('course_id')
                 )
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
-                    print(
-                        f'Total execution time: {time.time() - start_time:.5f} seconds'
-                    )
-                    print(serialized_course.data)
                     return JsonResponse({'courses': serialized_course.data})
                 else:
-                    courses_start_time = time.time()
-                    courses = (
-                        Course.objects.select_related('department')
-                        .filter(
-                            Q(crosslistings__icontains=code),
-                            section__term_id=9,
-                        )
-                        .distinct()
-                    )
-                    print(
-                        f'Courses query time: {time.time() - courses_start_time:.5f} seconds'
-                    )
-
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
                     courses = (
                         Course.objects.select_related('department')
                         .filter(filtered_query)
                         .order_by('course_id', '-guid')
-                        .distinct()
+                        .distinct('course_id')
                     )
                     if courses:
-                        sorting_start_time = time.time()
-                        custom_sorting_field = Case(
-                            When(
-                                Q(department__code__icontains=dept)
-                                & Q(catalog_number__icontains=num),
-                                then=Value(3),
-                            ),
-                            When(Q(department__code__icontains=dept), then=Value(2)),
-                            When(Q(catalog_number__icontains=num), then=Value(1)),
-                            default=Value(0),
-                            output_field=models.IntegerField(),
+                        serialized_courses = CourseSerializer(courses, many=True)
+                        sorted_data = sorted(
+                            serialized_courses.data, key=make_sort_key(dept)
                         )
-                        sorted_courses = courses.annotate(
-                            custom_sorting=custom_sorting_field
-                        ).order_by(
-                            '-custom_sorting',
-                            'department__code',
-                            'catalog_number',
-                            'title',
-                        )
-                        print(
-                            f'Sorting time: {time.time() - sorting_start_time:.5f} seconds'
-                        )
-
-                        serialization_start_time = time.time()
-                        serialized_courses = CourseSerializer(sorted_courses, many=True)
-                        print(
-                            f'Serialization time: {time.time() - serialization_start_time:.5f} seconds'
-                        )
-                        print(
-                            f'Total execution time: {time.time() - start_time:.5f} seconds'
-                        )
-                        return JsonResponse({'courses': serialized_courses.data})
-
-                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
-                return JsonResponse({'courses': []})
+                        print(f'Search time: {time.time() - init_time}')
+                        return JsonResponse({'courses': sorted_data})
+                    return JsonResponse({'courses': []})
             except Exception as e:
                 logger.error(f'An error occurred while searching for courses: {e}')
-                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'error': 'Internal Server Error'}, status=500)
         else:
-            print(f'Total execution time: {time.time() - start_time:.5f} seconds')
             return JsonResponse({'courses': []})
+
+
+class GetUserCourses(View):
+    """
+    Retrieves user's courses for frontend
+    """
+
+    def get(self, request, *args, **kwargs):
+        net_id = request.session['net_id']
+        user_inst = CustomUser.objects.get(net_id=net_id)
+        user_course_dict = {}
+
+        if net_id:
+            try:
+                for semester in range(1, 9):
+                    user_courses = Course.objects.filter(
+                        usercourses__user=user_inst, usercourses__semester=semester
+                    )
+                    serialized_courses = CourseSerializer(user_courses, many=True)
+                    user_course_dict[semester] = serialized_courses.data
+
+                return JsonResponse(user_course_dict)
+
+            except Exception as e:
+                logger.error(f'An error occurred while retrieving courses: {e}')
+                return JsonResponse({'error': 'Internal Server Error'}, status=500)
+        else:
+            return JsonResponse({})
 
 
 class GetUserCourses(View):
@@ -768,12 +745,14 @@ def requirement_info(request):
         req = Requirement.objects.get(id=req_id)
 
         explanation = req.explanation
-        course_list = req.course_list.all().order_by('course_id',
-                                                     '-guid').distinct(
-            'course_id')
+        course_list = (
+            req.course_list.all().order_by('course_id', '-guid').distinct('course_id')
+        )
         if course_list:
             serialized_courses = CourseSerializer(course_list, many=True)
-            sorted_data = sorted(serialized_courses.data, key=lambda course : course['crosslistings'])
+            sorted_data = sorted(
+                serialized_courses.data, key=lambda course: course['crosslistings']
+            )
     except Requirement.DoesNotExist:
         pass
 
@@ -786,54 +765,68 @@ def requirement_info(request):
 # --------------------------------- CALENDAR ---------------------------------------#
 
 
-# TODO: See if this function can replace redundant parts of the code in this file.
-def get_course_details(request, course_id):
-    try:
-        # Prefetch class meetings for each section
-        class_meetings_prefetch = Prefetch(
-            'sections__class_meetings', queryset=ClassMeeting.objects.all()
-        )
-        # Now prefetch sections with their class meetings loaded
-        sections_prefetch = Prefetch(
-            'sections',
-            queryset=Section.objects.prefetch_related(class_meetings_prefetch),
-        )
-        course = Course.objects.prefetch_related(sections_prefetch).get(pk=course_id)
-
-        serializer = CourseSerializer(course)
-        return JsonResponse(serializer.data)
-    except Course.DoesNotExist:
-        return JsonResponse({'error': 'Course not found'}, status=404)
-
-
 class FetchCalendarClasses(APIView):
     def get(self, request, course_id, format=None):
         term = request.query_params.get('term')
+
         if not term:
-            return Response({'error': 'Missing required parameter: term'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            course = Course.objects.get(course_id=course_id)
-        except Course.DoesNotExist:
-            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {'error': 'Missing required parameter: term'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-        sections = Section.objects.filter(course=course, term__term_code=term).prefetch_related(
-            Prefetch('classmeeting_set', queryset=ClassMeeting.objects.only('start_time', 'end_time', 'room', 'building_name'))
-        )
+        courses = Course.objects.filter(course_id=course_id)
 
-        if not sections:
-            return Response({'error': 'No sections found for the course'}, status=status.HTTP_404_NOT_FOUND)
+        if not courses:
+            return Response(
+                {'error': 'No courses found'}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        data = [{
-            'class_type': section.class_type,
-            'capacity': section.capacity,
-            'class_meetings': [{
-                'start_time': meeting.start_time,
-                'end_time': meeting.end_time,
-                'building_name': meeting.building_name,
-                'room': meeting.room,
-            } for meeting in section.classmeeting_set.all()]
-        } for section in sections]
+        data = []
+        for course in courses:
+            sections = (
+                Section.objects.filter(course=course, term__term_code=term)
+                .prefetch_related(
+                    Prefetch(
+                        'classmeeting_set',
+                        queryset=ClassMeeting.objects.order_by('meeting_number'),
+                    )
+                )
+                .select_related('term')
+            )
 
+            if not sections:
+                continue
+
+            course_data = {
+                'course_id': course.course_id,
+                'title': course.title,
+                'sections': [],
+            }
+
+            for section in sections:
+                class_meetings = []
+                for meeting in section.classmeeting_set.all():
+                    class_meetings.append(
+                        {
+                            'meeting_id': meeting.id,
+                            'meeting_days': meeting.days,
+                            'start_time': meeting.start_time,
+                            'end_time': meeting.end_time,
+                            'location': meeting.room,
+                        }
+                    )
+
+                section_data = {
+                    'section_id': section.id,
+                    'section_name': section.class_section,
+                    'start_date': section.term.start_date,
+                    'end_date': section.term.end_date,
+                    'class_meetings': class_meetings,
+                }
+                course_data['sections'].append(section_data)
+
+            data.append(course_data)
+
+        print(data)
         return Response(data)
-    

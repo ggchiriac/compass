@@ -52,7 +52,8 @@ const Calendar: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
 
   const selectedCourses = useCalendarStore((state) => state.selectedCourses);
-  const setSelectedCourses = useCalendarStore((state) => state.setSelectedCourses);
+  // const setSelectedCourses = useCalendarStore((state) => state.setSelectedCourses);
+  const updateSelectedSection = useCalendarStore((state) => state.updateSelectedSection);
 
   const today = new Date();
   const startDate = startOfWeek(today, { weekStartsOn: 1 });
@@ -67,27 +68,13 @@ const Calendar: React.FC = () => {
   console.log('Selected Courses:', selectedCourses);
 
   const events: CalendarEvent[] = selectedCourses.flatMap((courseEvent) => {
-    console.log('Processing Course:', courseEvent.course.title);
-
     const sectionEvents: CalendarEvent[] =
-      courseEvent.course.sections?.flatMap((section) => {
+      courseEvent.sections?.flatMap((section) => {
         const classMeetings = section.class_meetings.map((meeting) => {
           const startTime = meeting.start_time;
           const endTime = meeting.end_time;
           const startRowIndex = calculateGridRow(startTime);
           const endRowIndex = calculateGridRow(endTime);
-
-          // Convert start time and end time to 12-hour format
-          const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
-          const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
-
-          console.log('Course:', courseEvent.course.title);
-          console.log('Section:', section.class_section);
-          console.log('Start Time:', startTimeFormatted);
-          console.log('End Time:', endTimeFormatted);
-          console.log('Start Row Index:', startRowIndex);
-          console.log('End Row Index:', endRowIndex);
-          console.log('---');
 
           return {
             startTime,
@@ -98,7 +85,7 @@ const Calendar: React.FC = () => {
           };
         });
 
-        const uniqueKey = `${courseEvent.course.course_id}-${section.class_number}`;
+        const uniqueKey = `${courseEvent.course.course_id}-${section.section_id}`;
         return classMeetings.map((classMeeting) => ({
           key: uniqueKey,
           course: courseEvent.course,
@@ -136,17 +123,10 @@ const Calendar: React.FC = () => {
 
   const handleSectionClick = (event: CalendarEvent) => {
     if (event.selectedSection) {
-      const updatedCourses = selectedCourses.map((courseEvent) => {
-        if (courseEvent.course.course_id === event.course.course_id) {
-          return {
-            ...courseEvent,
-            selectedSection: event.selectedSection,
-          };
-        }
-        return courseEvent;
-      });
-
-      setSelectedCourses(updatedCourses);
+      updateSelectedSection(
+        String(event.course.course_id),
+        String(event.selectedSection.class_section)
+      );
     }
   };
 

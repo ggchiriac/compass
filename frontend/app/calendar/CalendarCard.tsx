@@ -4,7 +4,7 @@ import { CalendarEvent } from '@/types';
 interface CalendarCardProps {
   event: CalendarEvent;
   style?: React.CSSProperties;
-  onSectionClick: () => void;
+  onSectionClick: (courseId: number) => void;
   width?: number;
   offsetLeft?: number;
 }
@@ -57,9 +57,9 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
     return endRowIndex - startRowIndex;
   };
 
-  const handleSectionClick = () => {
-    onSectionClick();
-  };
+  // const handleSectionClick = () => {
+
+  // };
 
   return (
     <div
@@ -72,7 +72,7 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         width: `calc(100% * ${width})`,
         marginLeft: `calc(100% * ${offsetLeft})`,
       }}
-      onClick={handleSectionClick}
+      onClick={() => onSectionClick(event.course.course_id)}
     >
       <div className='flex flex-col'>
         <strong className='font-semibold text-xs'>

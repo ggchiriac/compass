@@ -98,6 +98,19 @@ class Certificate(models.Model):
 # ----------------------------------------------------------------------#
 
 
+class Instructor(models.Model):
+    emplid = models.CharField(max_length=50, unique=True, db_index=True, null=True)
+    first_name = models.CharField(max_length=100, db_index=True, null=True)
+    last_name = models.CharField(max_length=100, db_index=True, null=True)
+    full_name = models.CharField(max_length=255, null=True)
+
+    class Meta:
+        db_table = 'Instructor'
+
+    def __str__(self):
+        return self.full_name
+    
+    
 class AcademicTerm(models.Model):
     term_code = models.CharField(max_length=10, db_index=True, unique=True, null=True)
     suffix = models.CharField(max_length=10, db_index=True)  # e.g., "F2023"
@@ -110,18 +123,6 @@ class AcademicTerm(models.Model):
     def __str__(self):
         return self.term_code
 
-
-class Instructor(models.Model):
-    emplid = models.CharField(max_length=50, unique=True, db_index=True, null=True)
-    first_name = models.CharField(max_length=100, db_index=True, null=True)
-    last_name = models.CharField(max_length=100, db_index=True, null=True)
-    full_name = models.CharField(max_length=255, null=True)
-
-    class Meta:
-        db_table = 'Instructor'
-
-    def __str__(self):
-        return self.full_name
 
 
 class Course(models.Model):
