@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, useEffect, useState, useCallback } from 'react';
 
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
@@ -12,6 +12,8 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import classNames from 'classnames';
+
+import useSearchStore from '@/store/searchSlice';
 
 import LoadingComponent from '../LoadingComponent';
 import SettingsModal from '../Modal';
@@ -35,6 +37,17 @@ interface SatisfactionStatusProps {
   maxCounted: number;
   isRestrictions: boolean;
 }
+
+const semesterMap = {
+  1: 'Freshman fall',
+  2: 'Freshman spring',
+  3: 'Sophomore fall',
+  4: 'Sophomore spring',
+  5: 'Junior fall',
+  6: 'Junior spring',
+  7: 'Senior fall',
+  8: 'Senior spring',
+};
 
 // Satisfaction status icon with styling
 const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
@@ -85,15 +98,8 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 // Dropdown component with refined styling
 const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => {
   const [showPopup, setShowPopup] = useState(false);
+  // const [isLeaf, setIsLeaf] = useState(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
-
-  const handleKeyDown = (event) => {
-    if (event.key === 'Escape' || event.key === 'Enter') {
-      event.preventDefault();
-      event.stopPropagation();
-      handleClose();
-    }
-  };
 
   const handleExplanationClick = (event, reqId) => {
     const url = new URL(`${process.env.BACKEND}/requirement_info/`);
@@ -112,14 +118,42 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       });
     event.stopPropagation();
     setShowPopup(true);
-    document.addEventListener('keydown', handleKeyDown);
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setExplanation('');
     setShowPopup(false);
-    document.removeEventListener('keydown', handleKeyDown);
-  };
+  }, [setExplanation, setShowPopup]); // Dependencies
+
+  const handleSearch = useCallback(() => {
+    if (explanation && explanation[1]) {
+      useSearchStore.getState().setSearchResults(explanation[1]);
+    }
+    handleClose();
+  }, [explanation, handleClose]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        event.stopPropagation();
+        handleSearch();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopPropagation();
+        handleClose();
+      }
+    };
+
+    if (showPopup) {
+      document.addEventListener('keydown', handleKeyDown);
+    }
+
+    // Remove event listener if showPopup is false, or on unmount.
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showPopup, handleClose, handleSearch]);
 
   const modalContent = showPopup ? (
     <SettingsModal>
@@ -149,16 +183,25 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                     </div>
                   );
                 }
-              } else if (value[0]) {
+              }
+              if (index === '1' && value[0]) {
                 return (
                   <div key={index}>
-                    <strong className={styles.strong}>{'Satisfying Courses'}: </strong>
+                    <strong className={styles.strong}>{'Course list'}: </strong>
                     {value
                       .map((course) => {
-                        return `${course}, `;
+                        return `${course.crosslistings}, `;
                       })
                       .join('')
                       .slice(0, -2)}
+                  </div>
+                );
+              }
+              if (index === '2' && value != 8) {
+                return (
+                  <div key={index}>
+                    <strong className={styles.strong}>{'Complete by'}: </strong>
+                    {semesterMap[value]}
                   </div>
                 );
               }
@@ -170,13 +213,15 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         </div>
       </div>
       <footer className='mt-auto text-right'>
-        <JoyButton
-          variant='outlined'
-          color='neutral'
-          onClick={handleClose}
-          sx={{ ml: 2 }}
-          size='sm'
-        >
+        {explanation && explanation[1] && explanation[1].length > 0 && (
+          <JoyButton variant='soft' color='primary' onClick={handleSearch} size='md'>
+            Search Courses
+          </JoyButton>
+        )}
+        <JoyButton variant='soft' color='success' onClick={handleClose} sx={{ ml: 2 }} size='md'>
+          Mark Satisfied
+        </JoyButton>
+        <JoyButton variant='soft' color='neutral' onClick={handleClose} sx={{ ml: 2 }} size='md'>
           Close
         </JoyButton>
       </footer>

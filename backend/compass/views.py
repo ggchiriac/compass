@@ -21,24 +21,25 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from thefuzz import fuzz, process  # TODO: Consider adding fuzzy finding to search
-
-from data.check_reqs import (
-    check_user,
-    fetch_requirement_info,
-    get_course_comments,
-    get_course_info,
-)
-from data.configs import Configs
-from data.req_lib import ReqLib
+from django.shortcuts import redirect
 from .models import (
+    models,
     ClassMeeting,
     Course,
-    CustomUser,
     Major,
     Minor,
-    Section,
+    CustomUser,
     UserCourses,
-    models,
+    Section,
+    Requirement,
+)
+from .serializers import CourseSerializer
+import json
+from data.configs import Configs
+from data.req_lib import ReqLib
+from data.check_reqs import (
+    get_course_info,
+    get_course_comments,
 )
 from .serializers import CourseSerializer, CalendarSectionSerializer
 
@@ -688,7 +689,7 @@ def course_details(request):
         return JsonResponse({'error': 'Missing parameters'}, status=400)
 
 
-# -------------------------------------- GET COURSE DETAILS --------------------------
+# -------------------------------------- GET COURSE COMMENTS --------------------------
 
 
 def course_comments(request):
@@ -761,8 +762,36 @@ def check_requirements(request):
     return JsonResponse(formatted_dict)
 
 
+# ---------------------------- FETCH REQUIREMENT INFO -----------------------------------#
+
+
 def requirement_info(request):
-    info = fetch_requirement_info(request.GET.get('reqId', ''))
+    req_id = request.GET.get('reqId', '')
+    explanation = ''
+    sorted_course_list = []
+    completed_by_semester = 8
+
+    try:
+        req = Requirement.objects.get(id=req_id)
+
+        explanation = req.explanation
+        completed_by_semester = req.completed_by_semester
+        excluded_course_ids = req.excluded_course_list.values_list(
+            'course_id', flat=True).distinct()
+        course_list = req.course_list.exclude(
+            course_id__in=excluded_course_ids).order_by('course_id',
+                                                        '-guid').distinct(
+            'course_id')
+        if course_list:
+            serialized_course_list = CourseSerializer(course_list, many=True)
+            sorted_course_list = sorted(serialized_course_list.data, key=lambda course : course['crosslistings'])
+    except Requirement.DoesNotExist:
+        pass
+
+    info = {}
+    info[0] = explanation
+    info[1] = sorted_course_list
+    info[2] = completed_by_semester
     return JsonResponse(info)
 
 

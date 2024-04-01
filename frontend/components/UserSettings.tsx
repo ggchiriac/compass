@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   Autocomplete,
   AutocompleteOption,
-  Button,
+  Button as JoyButton,
   ListItemContent,
   Input,
   Typography,
@@ -377,12 +377,12 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
           </FormControl> */}
       </div>
       <div className='mt-5 text-right'>
-        <Button variant='soft' color='primary' onClick={handleSave} size='md'>
+        <JoyButton variant='soft' color='primary' onClick={handleSave} size='md'>
           Save
-        </Button>
-        <Button variant='soft' color='neutral' onClick={onClose} sx={{ ml: 2 }} size='md'>
+        </JoyButton>
+        <JoyButton variant='soft' color='neutral' onClick={onClose} sx={{ ml: 2 }} size='md'>
           Cancel
-        </Button>
+        </JoyButton>
       </div>
     </div>
   );
