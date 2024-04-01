@@ -1,17 +1,15 @@
 import json
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from re import IGNORECASE, compile, search, split, sub
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
 from django.conf import settings
-from django.contrib.postgres.search import TrigramSimilarity
 from django.core.cache import cache
 from django.db.models import Case, Count, IntegerField, Q, Value, When
-from django.db.models.functions import Greatest
 from django.db.models.query import Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
@@ -20,10 +18,8 @@ from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from thefuzz import fuzz, process  # TODO: Consider adding fuzzy finding to search
 from django.shortcuts import redirect
 from .models import (
-    models,
     ClassMeeting,
     Course,
     Major,
@@ -40,8 +36,9 @@ from data.req_lib import ReqLib
 from data.check_reqs import (
     get_course_info,
     get_course_comments,
+    check_user,
 )
-from .serializers import CourseSerializer, CalendarSectionSerializer
+from .serializers import CourseSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -65,10 +62,6 @@ def fetch_user_info(net_id):
             'last_name': '',
             'class_year': datetime.now().year + 1,
         },
-    )
-
-    print(
-        f'Fetching user info: net_id={net_id}, email={user_inst.email}, first_name={user_inst.first_name}, last_name={user_inst.last_name}'
     )
 
     # Processing major and minors
@@ -98,7 +91,6 @@ def fetch_user_info(net_id):
         or not user_inst.last_name
         or not user_inst.class_year
     ):
-        print(f'Fetching additional user info: net_id={net_id}')
         student_profile = req_lib.getJSON(f'{configs.USERS_FULL}?uid={net_id}')
         profile.update(student_profile[0])
 
@@ -120,9 +112,6 @@ def fetch_user_info(net_id):
             class_year if not user_inst.class_year else user_inst.class_year
         )
         user_inst.save()
-        print(
-            f'User info updated: net_id={net_id}, email={user_inst.email}, first_name={user_inst.first_name}, last_name={user_inst.last_name}, class_year={user_inst.class_year}'
-        )
 
     return_data = {
         'netId': net_id,
@@ -228,10 +217,12 @@ class CAS(View):
                 return None
             first_line, second_line = map(str.strip, map(bytes.decode, response))
             if first_line.startswith('yes'):
-                print(f'Successful validation for ticket: {ticket}')
+                logger.info(f'Successful validation for ticket: {ticket}')
                 return second_line
             else:
-                print(f'Failed validation for ticket: {ticket}. Response: {first_line}')
+                logger.info(
+                    f'Failed validation for ticket: {ticket}. Response: {first_line}'
+                )
                 return None
 
         except (HTTPError, URLError) as e:
@@ -267,23 +258,22 @@ class CAS(View):
     def authenticate(self, request):
         authenticated, net_id = self._is_authenticated(request)
         if authenticated:
-            print(f'Fetching user info for net_id: {net_id}')
             user_info = fetch_user_info(net_id)
-            print(f'User authenticated: {user_info}')
             return JsonResponse({'authenticated': True, 'user': user_info})
         else:
-            print('User not authenticated')
             return JsonResponse({'authenticated': False, 'user': None})
 
     def login(self, request):
         try:
-            print(f'Incoming GET request: {request.GET}, Session: {request.session}')
-            print(f"Received login request from {request.META.get('REMOTE_ADDR')}")
+            logger.info(
+                f'Incoming GET request: {request.GET}, Session: {request.session}'
+            )
+            logger.info(
+                f"Received login request from {request.META.get('REMOTE_ADDR')}"
+            )
 
             authenticated, username = self._is_authenticated(request)
-            print(f'Authenticated: {authenticated}, username: {username}')
             if authenticated:
-                # request.session.flush()
                 return redirect(settings.DASHBOARD)
 
             # Extract ticket from CAS response
@@ -291,28 +281,17 @@ class CAS(View):
             service_url = self._strip_ticket(request)
             if ticket:
                 net_id = self._validate(ticket, service_url)
-                print(f'Validation returned username: {username}')
-                print(f'Validation returned net_id: {net_id}')
+                logger.debug(f'Validation returned {username}')
                 if net_id:
-                    print(f'Validated user: net_id={net_id}')
                     user, created = CustomUser.objects.get_or_create(
                         username=net_id, defaults={'net_id': net_id, 'role': 'student'}
                     )
-                    print(f'User created: {created}, user: {user}')
                     if created:
-                        print(f'Created new user: net_id={net_id}')
                         user.username = net_id
                         user.set_unusable_password()
                         user.major = Major.objects.get(code=UNDECLARED['code'])
-                    else:
-                        print(f'User already exists: net_id={net_id}')
                     user.save()
-                    print(
-                        f'User saved: net_id={net_id}, email={user.email}, first_name={user.first_name}, last_name={user.last_name}'
-                    )
                     request.session['net_id'] = net_id
-                    print(f'User (supposedly) authenticated: net_id={net_id}')
-                    print(f'Redirecting to dashboard: {settings.DASHBOARD}')
                     return redirect(settings.DASHBOARD)
             login_url = f'{self.cas_url}login?service={service_url}'
             return redirect(login_url)
@@ -324,8 +303,8 @@ class CAS(View):
         """
         Logs out the user and redirects to the landing page.
         """
-        print(f'Incoming GET request: {request.GET}, Session: {request.session}')
-        print(f"Received logout request from {request.META.get('REMOTE_ADDR')}")
+        logger.info(f'Incoming GET request: {request.GET}, Session: {request.session}')
+        logger.info(f"Received logout request from {request.META.get('REMOTE_ADDR')}")
         request.session.flush()
         return redirect(settings.HOMEPAGE)
 
@@ -343,7 +322,6 @@ GRADING_OPTIONS = {
     'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
 }
 
-
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
@@ -352,9 +330,7 @@ def make_sort_key(dept):
             if start_index != -1:
                 return crosslistings[start_index:]
         return crosslistings
-
     return sort_key
-
 
 class SearchCourses(View):
     """
@@ -362,7 +338,6 @@ class SearchCourses(View):
     """
 
     def get(self, request, *args, **kwargs):
-        start_time = time.time()
         query = request.GET.get('course', None)
         term = request.GET.get('term', None)
         distribution = request.GET.get('distribution', None)
@@ -370,7 +345,6 @@ class SearchCourses(View):
         grading_options = request.GET.get('grading')
 
         if query:
-            # Process queries
             init_time = time.time()
             # process queries
             trimmed_query = sub(r'\s', '', query)
@@ -378,12 +352,12 @@ class SearchCourses(View):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + ' ' + num
+                code = dept + " " + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
                 result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + ' ' + num
+                code = dept + " " + num
             elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
                 trimmed_query
             ):
@@ -395,7 +369,6 @@ class SearchCourses(View):
                 num = ''
                 code = dept
             else:
-                print(f'Query processing time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'courses': []})
 
             query_conditions = Q()
@@ -404,7 +377,8 @@ class SearchCourses(View):
                 query_conditions &= Q(guid__startswith=term)
 
             if distribution:
-                query_conditions &= Q(distribution_area_short__iexact=distribution)
+                query_conditions &= Q(
+                    distribution_area_short__iexact=distribution)
 
             if levels:
                 levels = levels.split(',')
@@ -418,7 +392,7 @@ class SearchCourses(View):
                 grading_filters = []
                 for grading in grading_options:
                     grading_filters += GRADING_OPTIONS[grading]
-                print(f'Grading filters: {grading_filters}')
+                print(f"Grading filters: {grading_filters}")
                 grading_query = Q()
                 for grading in grading_filters:
                     grading_query |= Q(grading_basis__iexact=grading)
@@ -428,85 +402,29 @@ class SearchCourses(View):
                 filtered_query = query_conditions
                 filtered_query &= Q(department__code__iexact=dept)
                 filtered_query &= Q(catalog_number__iexact=num)
-                exact_match_course = (
-                    Course.objects.select_related('department')
-                    .filter(filtered_query)
-                    .order_by('course_id', '-guid')
-                    .distinct()
-                )
+                exact_match_course = Course.objects.select_related('department').filter(
+                    filtered_query
+                ).order_by('course_id', '-guid').distinct('course_id')
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
-                    print(
-                        f'Total execution time: {time.time() - start_time:.5f} seconds'
-                    )
-                    print(serialized_course.data)
                     return JsonResponse({'courses': serialized_course.data})
                 else:
-                    courses_start_time = time.time()
-                    courses = (
-                        Course.objects.select_related('department')
-                        .filter(
-                            Q(crosslistings__icontains=code),
-                            section__term_id=9,
-                        )
-                        .distinct()
-                    )
-                    print(
-                        f'Courses query time: {time.time() - courses_start_time:.5f} seconds'
-                    )
-
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
-                    courses = (
-                        Course.objects.select_related('department')
-                        .filter(filtered_query)
-                        .order_by('course_id', '-guid')
-                        .distinct()
-                    )
+                    courses = Course.objects.select_related('department').filter(
+                        filtered_query
+                    ).order_by('course_id', '-guid').distinct('course_id')
                     if courses:
-                        sorting_start_time = time.time()
-                        custom_sorting_field = Case(
-                            When(
-                                Q(department__code__icontains=dept)
-                                & Q(catalog_number__icontains=num),
-                                then=Value(3),
-                            ),
-                            When(Q(department__code__icontains=dept), then=Value(2)),
-                            When(Q(catalog_number__icontains=num), then=Value(1)),
-                            default=Value(0),
-                            output_field=models.IntegerField(),
-                        )
-                        sorted_courses = courses.annotate(
-                            custom_sorting=custom_sorting_field
-                        ).order_by(
-                            '-custom_sorting',
-                            'department__code',
-                            'catalog_number',
-                            'title',
-                        )
-                        print(
-                            f'Sorting time: {time.time() - sorting_start_time:.5f} seconds'
-                        )
-
-                        serialization_start_time = time.time()
-                        serialized_courses = CourseSerializer(sorted_courses, many=True)
-                        print(
-                            f'Serialization time: {time.time() - serialization_start_time:.5f} seconds'
-                        )
-                        print(
-                            f'Total execution time: {time.time() - start_time:.5f} seconds'
-                        )
-                        return JsonResponse({'courses': serialized_courses.data})
-
-                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
-                return JsonResponse({'courses': []})
+                        serialized_courses = CourseSerializer(courses, many=True)
+                        sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
+                        print(f"Search time: {time.time() - init_time}")
+                        return JsonResponse({'courses': sorted_data})
+                    return JsonResponse({'courses': []})
             except Exception as e:
                 logger.error(f'An error occurred while searching for courses: {e}')
-                print(f'Total execution time: {time.time() - start_time:.5f} seconds')
                 return JsonResponse({'error': 'Internal Server Error'}, status=500)
         else:
-            print(f'Total execution time: {time.time() - start_time:.5f} seconds')
             return JsonResponse({'courses': []})
 
 
@@ -550,17 +468,6 @@ def parse_semester(semester_id, class_year):
     return semester_num
 
 
-# This needs to be changed.
-def get_first_course_inst(course_code):
-    department_code, catalog_number = course_code.split(' ')
-    course_inst = (
-        Course.objects.select_related('department')
-        .filter(department__code=department_code, catalog_number=catalog_number)
-        .first()
-    )
-    return course_inst
-
-
 def update_courses(request):
     try:
         data = json.loads(request.body)
@@ -569,16 +476,10 @@ def update_courses(request):
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = (
-            Course.objects.select_related('department')
-            .filter(Q(course_id__iexact=course_id))
-            .order_by('-guid')[0]
-        )
+        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(
-                user=user_inst, course__course_id=course_id
-            )
+            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
             user_course.delete()
             message = f'User course deleted: {course_id}, {net_id}'
 
@@ -589,7 +490,9 @@ def update_courses(request):
                 user=user_inst, course=course_inst, defaults={'semester': semester}
             )
             if created:
-                message = f'User course added: {semester}, {course_id}, {net_id}'
+                message = (
+                    f'User course added: {semester}, {course_id}, {net_id}'
+                )
             else:
                 message = f'User course updated: {semester}, {course_id}, {net_id}'
 
