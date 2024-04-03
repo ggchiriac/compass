@@ -7,7 +7,6 @@ const CalendarSearchItem = ({ course }) => {
 
   const handleClick = () => {
     addCourse(course);
-    console.log('Clicked Course ID:', course.course_id);
   };
 
   return (

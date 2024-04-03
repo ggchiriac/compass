@@ -197,7 +197,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                   </div>
                 );
               }
-              if (index === '2' && value != 8) {
+              if (index === '2' && value !== 8) {
                 return (
                   <div key={index}>
                     <strong className={styles.strong}>{'Complete by'}: </strong>

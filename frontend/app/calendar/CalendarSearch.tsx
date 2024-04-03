@@ -159,7 +159,6 @@ const CalendarSearch: FC = () => {
           addRecentSearch(searchQuery);
           searchCache.set(searchQuery, data.courses);
         }
-        console.log('Search Results (SECTIONS):', data.courses);
       } else {
         setError(`Server returned ${response.status}: ${response.statusText}`);
       }

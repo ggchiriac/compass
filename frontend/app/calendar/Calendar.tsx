@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { format, startOfWeek, addDays, isSameDay, parse } from 'date-fns';
+import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 
 import { CalendarEvent } from '@/types';
 
@@ -64,11 +64,7 @@ const Calendar: React.FC = () => {
     current: isSameDay(date, today),
   }));
 
-  console.log('Selected Courses:', selectedCourses);
-
   const events: CalendarEvent[] = selectedCourses.flatMap((courseEvent) => {
-    console.log('Processing Course:', courseEvent.course.title);
-
     const sectionEvents: CalendarEvent[] =
       courseEvent.course.sections?.flatMap((section) => {
         const classMeetings = section.class_meetings.map((meeting) => {
@@ -78,16 +74,8 @@ const Calendar: React.FC = () => {
           const endRowIndex = calculateGridRow(endTime);
 
           // Convert start time and end time to 12-hour format
-          const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
-          const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
-
-          console.log('Course:', courseEvent.course.title);
-          console.log('Section:', section.class_section);
-          console.log('Start Time:', startTimeFormatted);
-          console.log('End Time:', endTimeFormatted);
-          console.log('Start Row Index:', startRowIndex);
-          console.log('End Row Index:', endRowIndex);
-          console.log('---');
+          // const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
+          // const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
 
           return {
             startTime,

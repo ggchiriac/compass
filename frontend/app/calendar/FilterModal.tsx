@@ -64,7 +64,6 @@ const FilterModal: FC = () => {
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | undefined) => {
               event.stopPropagation();
-              console.log('Selected Term:', terms[newTermName] ?? '');
               setTermFilter(terms[newTermName] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
