@@ -320,6 +320,11 @@ class CustomUser(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='student')
     major = models.ForeignKey(Major, on_delete=models.CASCADE, null=True)
     minors = models.ManyToManyField(Minor)
+    requirements = models.ManyToManyField(
+        'Requirement',
+        related_name='users',
+        blank=True,
+    )  # for manually marked requirements
     net_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     email = models.EmailField(max_length=100, unique=True, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)
