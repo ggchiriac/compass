@@ -749,17 +749,23 @@ def requirement_info(request):
 
 class FetchCalendarClasses(APIView):
     def get(self, request, term, course_id):
+        print(f'Starting fetch process for term: {term}, course_id: {course_id}')
         sections = self.get_sections(term, course_id)
 
         if not sections:
+            print(f'No sections found for term: {term}, course_id: {course_id}')
             return Response(
                 {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
             )
 
+        print(f'Number of sections ready for processing: {len(sections)}')
         sections_data = [self.serialize_section(section) for section in sections]
+
+        print(f'Sections data prepared for response')
         return Response(sections_data, status=status.HTTP_200_OK)
 
     def get_sections(self, term, course_id):
+        print(f'Querying database for sections: term {term}, course_id {course_id}')
         sections = (
             Section.objects.filter(term__term_code=term, course__course_id=course_id)
             .select_related('course')
@@ -779,15 +785,26 @@ class FetchCalendarClasses(APIView):
             )
         )
 
-        # Filter out sections with no class meetings
-        return [section for section in sections if section.class_meetings]
+        # Log some details about the fetched sections to understand the data better
+        for section in sections:
+            if section.class_meetings:
+                print(
+                    f'Section {section.id} has {len(section.class_meetings)} class meetings'
+                )
+
+        filtered_sections = [section for section in sections if section.class_meetings]
+        print(
+            f'Number of sections after filtering those without class meetings: {len(filtered_sections)}'
+        )
+        return filtered_sections
 
     def serialize_section(self, section):
+        print(f'Processing section: ID {section.id}, Section {section.class_section}')
         class_meetings_data = [
             self.serialize_class_meeting(meeting) for meeting in section.class_meetings
         ]
 
-        return {
+        section_data = {
             'sectionId': section.id,
             'classSection': section.class_section,
             'classType': section.class_type,
@@ -798,8 +815,14 @@ class FetchCalendarClasses(APIView):
             'classMeetings': class_meetings_data,
         }
 
+        # Optionally, log specific details about the section being processed
+        print(
+            f'Section {section.id} with {len(class_meetings_data)} class meetings processed'
+        )
+        return section_data
+
     def serialize_class_meeting(self, meeting):
-        return {
+        class_meeting_data = {
             'classMeetingId': meeting.id,
             'meetingDays': meeting.days,
             'startTime': meeting.start_time.strftime('%H:%M'),
@@ -807,3 +830,8 @@ class FetchCalendarClasses(APIView):
             'buildingName': meeting.building_name,
             'room': meeting.room,
         }
+        # Log details about the class meeting being processed
+        print(
+            f"Class meeting {meeting.id} on {meeting.days} from {meeting.start_time.strftime('%H:%M')} to {meeting.end_time.strftime('%H:%M')}"
+        )
+        return class_meeting_data
