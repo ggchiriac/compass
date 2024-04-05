@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
-import useSearchStore from '@/store/searchSlice';
+// import useSearchStore from '@/store/searchSlice';
 import UserState from '@/store/userSlice';
 
 import Calendar from './Calendar';
@@ -17,23 +17,23 @@ const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
-  const searchResults = useSearchStore((state) => state.searchResults);
+  // const searchResults = useSearchStore((state) => state.searchResults);
 
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
 
-  const renderCourseItem = (course) => {
-    return (
-      <div className={styles.Item}>
-        <div className={styles.TextContainer}>
-          <h3>{course.title}</h3>
-          <p>{course.code}</p>
-          {/* Add more course details */}
-        </div>
-      </div>
-    );
-  };
+  // const renderCourseItem = (course) => {
+  //   return (
+  //     <div className={styles.Item}>
+  //       <div className={styles.TextContainer}>
+  //         <h3>{course.title}</h3>
+  //         <p>{course.code}</p>
+  //         {/* Add more course details */}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   return (
     <>
@@ -58,11 +58,11 @@ const CalendarUI: FC = () => {
             <div className={styles.Container} style={{ width: '360px' }}>
               <CalendarSearch />
               {/* Render search results here */}
-              <ul>
+              {/* <ul>
                 {searchResults.map((course, index) => (
                   <li key={index}>{renderCourseItem(course)}</li>
                 ))}
-              </ul>
+              </ul> */}
             </div>
 
             {/* Center Section for Calendar */}

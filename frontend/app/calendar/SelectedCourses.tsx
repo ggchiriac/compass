@@ -30,7 +30,6 @@ import styles from './CalendarSelectedCourses.module.scss';
 
 const SelectedCourses: React.FC = () => {
   const selectedCourses = useCalendarStore((state) => state.selectedCourses);
-
   return (
     <div className={styles.SelectedCourses}>
       <div className={styles.Header}>
@@ -42,7 +41,7 @@ const SelectedCourses: React.FC = () => {
         itemContent={(_, course) => (
           <Item
             key={course.course.guid}
-            value={`${course.course.department_code} ${course.course.catalog_number}`}
+            value={`${course.course.departmentCode} ${course.course.catalogNumber}`}
             // color_primary={getPrimaryColor(course.course.guid)}
             // color_secondary={getSecondaryColor(course.course.guid)}
           />

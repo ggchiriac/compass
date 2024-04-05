@@ -27,7 +27,7 @@ const SelectedCourseItem: React.FC<SelectedCourseItemProps> = ({ course }) => {
       >
         <div className={styles.TextContainer}>
           <div>{course.course.title}</div>
-          <div>{`${course.course.department_code} ${course.course.catalog_number}`}</div>
+          <div>{`${course.course.departmentCode} ${course.course.catalogNumber}`}</div>
         </div>
         <div className={styles.Actions}>
           <button className={styles.Remove} onClick={handleRemove}>

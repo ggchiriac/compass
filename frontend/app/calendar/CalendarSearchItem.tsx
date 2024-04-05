@@ -1,14 +1,20 @@
+// Renders individual courses for the calendar search results
+
 import { ListItem, ListItemText, Typography } from '@mui/material';
 
 import useCalendarStore from '@/store/calendarSlice';
 
 const CalendarSearchItem = ({ course }) => {
   const addCourse = useCalendarStore((state) => state.addCourse);
+  // const selectedCourses = useCalendarStore((state) => state.selectedCourses);
 
   const handleClick = () => {
     addCourse(course);
-    console.log('Clicked Course ID:', course.course_id);
   };
+
+  // useEffect(() => {
+  //   console.log('Course List rn:', selectedCourses.sections);
+  // }, [selectedCourses]);
 
   return (
     <ListItem
@@ -25,12 +31,12 @@ const CalendarSearchItem = ({ course }) => {
       <ListItemText
         primary={
           <Typography variant='subtitle1' component='div'>
-            {course.title}
+            {course.crosslistings}
           </Typography>
         }
         secondary={
           <Typography variant='body2' color='textSecondary' component='div'>
-            {`${course.department_code} ${course.catalog_number}`}
+            {`${course.title}`}
           </Typography>
         }
       />

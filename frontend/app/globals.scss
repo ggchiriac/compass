@@ -1,6 +1,6 @@
-@import 'node_modules/tailwindcss/base';
-@import 'node_modules/tailwindcss/components';
-@import 'node_modules/tailwindcss/utilities';
+@use 'node_modules/tailwindcss/base';
+@use 'node_modules/tailwindcss/components';
+@use 'node_modules/tailwindcss/utilities';
 
 :root {
   --foreground-rgb: 30, 30, 30; /* Dark Gray for text */

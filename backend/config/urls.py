@@ -38,5 +38,9 @@ urlpatterns = [
     path('update_user/', views.update_user, name='update_user'),
     path('requirement_info/', views.requirement_info, name='requirement_info'),
     # Calendar
-    path('fetch_calendar_classes/<str:course_id>/', views.FetchCalendarClasses.as_view(), name='fetch_calendar_classes'),
+    path(
+        'fetch_calendar_classes/<str:term>/<str:course_id>/',
+        views.FetchCalendarClasses.as_view(),
+        name='fetch_calendar_classes',
+    ),
 ]

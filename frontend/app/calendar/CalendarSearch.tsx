@@ -268,7 +268,7 @@ const CalendarSearch: FC = () => {
             options={Object.keys(terms)}
             placeholder='Semester'
             variant='soft'
-            value={termsInverse[termFilter]}
+            value={termFilter ? termsInverse[termFilter] : 'Spring 2024'}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | undefined) => {
               event.stopPropagation();

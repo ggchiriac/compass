@@ -1,6 +1,6 @@
 import logging
 import time
-from datetime import datetime, timedelta
+from datetime import datetime
 from re import sub, search, split, compile, IGNORECASE
 from urllib.request import urlopen
 from urllib.parse import urlencode
@@ -8,13 +8,12 @@ from urllib.error import HTTPError, URLError
 
 import ujson as json
 from django.conf import settings
-from django.db.models import Q, Value, When, Case, Prefetch
+from django.db.models import Q, Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
 from django.views import View
 from django.shortcuts import redirect
 from .models import (
-    models,
     ClassMeeting,
     Course,
     Major,
@@ -30,7 +29,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from data.configs import Configs
+from data.configs.configs import Configs
 from data.req_lib import ReqLib
 from data.check_reqs import (
     get_course_info,
@@ -481,34 +480,6 @@ class GetUserCourses(View):
             return JsonResponse({})
 
 
-class GetUserCourses(View):
-    """
-    Retrieves user's courses for frontend
-    """
-
-    def get(self, request, *args, **kwargs):
-        net_id = request.session['net_id']
-        user_inst = CustomUser.objects.get(net_id=net_id)
-        user_course_dict = {}
-
-        if net_id:
-            try:
-                for semester in range(1, 9):
-                    user_courses = Course.objects.filter(
-                        usercourses__user=user_inst, usercourses__semester=semester
-                    )
-                    serialized_courses = CourseSerializer(user_courses, many=True)
-                    user_course_dict[semester] = serialized_courses.data
-
-                return JsonResponse(user_course_dict)
-
-            except Exception as e:
-                logger.error(f'An error occurred while retrieving courses: {e}')
-                return JsonResponse({'error': 'Internal Server Error'}, status=500)
-        else:
-            return JsonResponse({})
-
-
 # ---------------------------- UPDATE USER COURSES -----------------------------------#
 
 
@@ -766,67 +737,61 @@ def requirement_info(request):
 
 
 class FetchCalendarClasses(APIView):
-    def get(self, request, course_id, format=None):
-        term = request.query_params.get('term')
-
-        if not term:
-            return Response(
-                {'error': 'Missing required parameter: term'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        courses = Course.objects.filter(course_id=course_id)
-
-        if not courses:
-            return Response(
-                {'error': 'No courses found'}, status=status.HTTP_404_NOT_FOUND
-            )
-
-        data = []
-        for course in courses:
-            sections = (
-                Section.objects.filter(course=course, term__term_code=term)
-                .prefetch_related(
-                    Prefetch(
-                        'classmeeting_set',
-                        queryset=ClassMeeting.objects.order_by('meeting_number'),
-                    )
+    def get(self, request, term, course_id):
+        sections = (
+            Section.objects.filter(term__term_code=term, course__course_id=course_id)
+            .select_related('course')
+            .prefetch_related(
+                Prefetch(
+                    'classmeeting_set',
+                    queryset=ClassMeeting.objects.order_by(
+                        'meeting_number',
+                        'days',
+                        'start_time',
+                        'end_time',
+                        'building_name',
+                        'room',
+                    ),
+                    to_attr='class_meetings',
                 )
-                .select_related('term')
+            )
+        )
+
+        if not sections.exists():
+            return Response(
+                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-            if not sections:
-                continue
+        sections_data = []
 
-            course_data = {
-                'course_id': course.course_id,
-                'title': course.title,
-                'sections': [],
-            }
+        for section in sections:
+            class_meetings_data = [
+                self._serialize_class_meeting(class_meeting)
+                for class_meeting in section.class_meetings
+            ]
 
-            for section in sections:
-                class_meetings = []
-                for meeting in section.classmeeting_set.all():
-                    class_meetings.append(
-                        {
-                            'meeting_id': meeting.id,
-                            'meeting_days': meeting.days,
-                            'start_time': meeting.start_time,
-                            'end_time': meeting.end_time,
-                            'location': meeting.room,
-                        }
-                    )
-
-                section_data = {
-                    'section_id': section.id,
-                    'section_name': section.class_section,
-                    'start_date': section.term.start_date,
-                    'end_date': section.term.end_date,
-                    'class_meetings': class_meetings,
+            sections_data.append(
+                {
+                    'sectionId': section.id,
+                    'classSection': section.class_section,
+                    'classType': section.class_type,
+                    'course': {
+                        'courseId': section.course.course_id,
+                        'title': section.course.title,
+                        # Include other relevant course fields
+                    },
+                    'classMeetings': class_meetings_data,
                 }
-                course_data['sections'].append(section_data)
+            )
 
-            data.append(course_data)
+        return Response(sections_data)
 
-        print(data)
-        return Response(data)
+    def _serialize_class_meeting(self, meeting):
+        return {
+            'classMeetingId': meeting.id,
+            'meetingDays': meeting.days,
+            'startTime': meeting.start_time.strftime('%H:%M'),
+            'endTime': meeting.end_time.strftime('%H:%M'),
+            'buildingName': meeting.building_name,
+            'room': meeting.room,
+        }
