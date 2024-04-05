@@ -640,7 +640,7 @@ def get_semesters_from_args():
 def insert_course_data(semester):
     # NOTE: It's recommended to run the script on one semester at a time.
     # Strange database race-like conditions are observed if you try to,
-    # for example, input all semesters as an argument.
+    # for example, input all semesters as an argument (e.g. not all data get inserted)
     # It has also been observed that all-semesters-as-args takes about 2m28s
     # whereas individual semesters takes about ~7s x 9 semesters = 1 minute or so.
 

@@ -2,12 +2,10 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
-// import useSearchStore from '@/store/searchSlice';
 import UserState from '@/store/userSlice';
 
 import Calendar from './Calendar';
@@ -17,23 +15,10 @@ const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
-  // const searchResults = useSearchStore((state) => state.searchResults);
 
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
-
-  // const renderCourseItem = (course) => {
-  //   return (
-  //     <div className={styles.Item}>
-  //       <div className={styles.TextContainer}>
-  //         <h3>{course.title}</h3>
-  //         <p>{course.code}</p>
-  //         {/* Add more course details */}
-  //       </div>
-  //     </div>
-  //   );
-  // };
 
   return (
     <>
@@ -52,17 +37,13 @@ const CalendarUI: FC = () => {
             }}
           />
         </div>
+
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
-          <div className='flex'>
-            {/* Left Section for Search Results */}
-            <div className={styles.Container} style={{ width: '360px' }}>
+          <div className='flex w-full'>
+            {/* Left Section for Search and Requirements */}
+            <div className='w-64 bg-white border-r border-gray-200 p-4'>
               <CalendarSearch />
-              {/* Render search results here */}
-              {/* <ul>
-                {searchResults.map((course, index) => (
-                  <li key={index}>{renderCourseItem(course)}</li>
-                ))}
-              </ul> */}
+              {/* Render search results or requirements here */}
             </div>
 
             {/* Center Section for Calendar */}
@@ -73,9 +54,6 @@ const CalendarUI: FC = () => {
                 <SkeletonApp /> // Placeholder for loading state
               )}
             </div>
-
-            {/* Right section for requirements */}
-            <div style={{ width: '240px' }}>{/* Gonna add stretch goal tuners here soon */}</div>
           </div>
         </main>
       </div>

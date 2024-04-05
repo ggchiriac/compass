@@ -329,8 +329,8 @@ def push_certificates(certificates_path):
 if __name__ == '__main__':
     with transaction.atomic():
         push_degrees(Path('../degrees').resolve())
-        push_major(Path('../majors/COS-AB.yaml').resolve())
-        push_major(Path('../majors/COS-BSE.yaml').resolve())
+        # push_major(Path('../majors/COS-AB.yaml').resolve())
+        # push_major(Path('../majors/COS-BSE.yaml').resolve())
         # push_major(Path('../majors/MAE.yaml').resolve())
         # push_major(Path('../majors/CEE.yaml').resolve())
         # push_major(Path('../majors/CBE.yaml').resolve())
@@ -348,7 +348,7 @@ if __name__ == '__main__':
         # push_major(Path('../majors/MUS.yaml').resolve())
         # push_major(Path('../majors/PHY.yaml').resolve())
         push_minors(Path('../minors').resolve())
-        # push_majors(Path('../majors').resolve())
+        push_majors(Path('../majors').resolve())
 
         # Push Undeclared major into database
         Major.objects.create(**UNDECLARED)

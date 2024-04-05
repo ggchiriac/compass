@@ -83,7 +83,7 @@ export type DraggableProps = {
   id: number;
   children: React.ReactNode;
   className?: string;
-  style?: CSSProperties;
+  style?: React.CSSProperties;
 };
 
 export type DroppableProps = {
@@ -133,7 +133,7 @@ export type Course = {
   catalogNumber: number;
   title: string;
   description: string;
-  sections?: Section[]; // TODO Is a course guaranteed to have sections? (Or at least empty array?)
+  sections: Section[];
   originSemesterId?: string;
   crosslistings?: string;
 };

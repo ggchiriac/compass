@@ -75,9 +75,9 @@ const useCalendarStore = create<calendarStore>((set) => ({
         throw new Error(errorData.error || 'Failed to fetch course details');
       }
 
-      const details = await response.json();
-      console.log('Calendar Search Results!:', details);
-      const calendarEvents: CalendarEvent[] = details.sections.flatMap((section: Section) =>
+      const sections = await response.json();
+      console.log('Calendar Search Results!:', sections);
+      const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
         section.classMeetings.map((classMeeting: ClassMeeting) => ({
           key: `${course.courseId}-${section.sectionId}-${classMeeting.classMeetingId}`,
           course,

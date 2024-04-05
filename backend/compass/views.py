@@ -749,6 +749,17 @@ def requirement_info(request):
 
 class FetchCalendarClasses(APIView):
     def get(self, request, term, course_id):
+        sections = self.get_sections(term, course_id)
+
+        if not sections:
+            return Response(
+                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
+            )
+
+        sections_data = [self.serialize_section(section) for section in sections]
+        return Response(sections_data, status=status.HTTP_200_OK)
+
+    def get_sections(self, term, course_id):
         sections = (
             Section.objects.filter(term__term_code=term, course__course_id=course_id)
             .select_related('course')
@@ -768,36 +779,26 @@ class FetchCalendarClasses(APIView):
             )
         )
 
-        if not sections.exists():
-            return Response(
-                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
-            )
+        # Filter out sections with no class meetings
+        return [section for section in sections if section.class_meetings]
 
-        sections_data = []
+    def serialize_section(self, section):
+        class_meetings_data = [
+            self.serialize_class_meeting(meeting) for meeting in section.class_meetings
+        ]
 
-        for section in sections:
-            class_meetings_data = [
-                self._serialize_class_meeting(class_meeting)
-                for class_meeting in section.class_meetings
-            ]
+        return {
+            'sectionId': section.id,
+            'classSection': section.class_section,
+            'classType': section.class_type,
+            'course': {
+                'courseId': section.course.course_id,
+                'title': section.course.title,
+            },
+            'classMeetings': class_meetings_data,
+        }
 
-            sections_data.append(
-                {
-                    'sectionId': section.id,
-                    'classSection': section.class_section,
-                    'classType': section.class_type,
-                    'course': {
-                        'courseId': section.course.course_id,
-                        'title': section.course.title,
-                        # Include other relevant course fields
-                    },
-                    'classMeetings': class_meetings_data,
-                }
-            )
-
-        return Response(sections_data)
-
-    def _serialize_class_meeting(self, meeting):
+    def serialize_class_meeting(self, meeting):
         return {
             'classMeetingId': meeting.id,
             'meetingDays': meeting.days,
