@@ -637,6 +637,28 @@ def manually_settle(request):
         return JsonResponse({'Unsettled': user_course_inst.id})
 
 
+def mark_satisfied(request):
+    data = json.loads(request.body)
+    req_id = int(data.get('reqId'))
+    marked_satisfied = data.get('markedSatisfied')
+    net_id = request.session['net_id']
+
+    user_inst = CustomUser.objects.get(net_id=net_id)
+    req_inst = Requirement.objects.get(id=req_id)
+
+    if marked_satisfied == "true":
+        user_inst.requirements.add(req_inst)
+        action = "Marked satisfied"
+    elif marked_satisfied == "false":
+        if user_inst.requirements.filter(id=req_id).exists():
+            user_inst.requirements.remove(req_inst)
+            action = "Unmarked satisfied"
+        else:
+            return JsonResponse({'error': 'Requirement not found in user requirements.'})
+
+    return JsonResponse({'Manually satisfied': req_id, 'action': action})
+
+
 def check_requirements(request):
     user_info = fetch_user_info(request.session['net_id'])
 
@@ -673,6 +695,7 @@ def requirement_info(request):
     explanation = ''
     sorted_course_list = []
     completed_by_semester = 8
+    marked_satisfied = False
 
     try:
         req = Requirement.objects.get(id=req_id)
@@ -688,6 +711,10 @@ def requirement_info(request):
         if course_list:
             serialized_course_list = CourseSerializer(course_list, many=True)
             sorted_course_list = sorted(serialized_course_list.data, key=lambda course : course['crosslistings'])
+
+        user_inst = CustomUser.objects.get(net_id=request.session['net_id'])
+        marked_satisfied = user_inst.requirements.filter(id=req_id).exists()
+
     except Requirement.DoesNotExist:
         pass
 
@@ -695,6 +722,8 @@ def requirement_info(request):
     info[0] = explanation
     info[1] = sorted_course_list
     info[2] = completed_by_semester
+    info[3] = req_id
+    info[4] = marked_satisfied
     return JsonResponse(info)
 
 

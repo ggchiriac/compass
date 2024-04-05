@@ -32,6 +32,7 @@ interface DropdownProps {
 
 interface SatisfactionStatusProps {
   satisfied: string;
+  manuallySatisfied: string;
   count: number;
   minNeeded: number;
   maxCounted: number;
@@ -52,6 +53,7 @@ const semesterMap = {
 // Satisfaction status icon with styling
 const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   satisfied,
+  manuallySatisfied,
   count,
   minNeeded,
   maxCounted,
@@ -59,6 +61,9 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 }) => {
   if (isRestrictions) {
     return <InfoOutlinedIcon style={{ color: 'blue', marginLeft: '10px' }} />;
+  }
+  if (manuallySatisfied) {
+    return <CheckCircleOutlineIcon style={{ color: 'gray', marginLeft: '10px' }} />;
   }
   if (maxCounted !== 1) {
     return (
@@ -98,10 +103,12 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 // Dropdown component with refined styling
 const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => {
   const [showPopup, setShowPopup] = useState(false);
-  // const [isLeaf, setIsLeaf] = useState(false);
+  const [markedSatisfied, setMarkedSatisfied] = useState(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleExplanationClick = (event, reqId) => {
+    setIsLoading(true);
     const url = new URL(`${process.env.BACKEND}/requirement_info/`);
     url.searchParams.append('reqId', reqId);
 
@@ -115,13 +122,18 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       .then((response) => response.json())
       .then((data) => {
         setExplanation(data);
-      });
+        if (data) {
+          setMarkedSatisfied(data[4]);
+        }
+      })
+      .finally(() => setIsLoading(false));
     event.stopPropagation();
     setShowPopup(true);
   };
 
   const handleClose = useCallback(() => {
     setExplanation('');
+    setMarkedSatisfied(false);
     setShowPopup(false);
   }, [setExplanation, setShowPopup]); // Dependencies
 
@@ -131,6 +143,36 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     }
     handleClose();
   }, [explanation, handleClose]);
+
+  const handleMarkSatisfied = () => {
+    fetch(`${process.env.BACKEND}/mark_satisfied/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify({ reqId: explanation[3], markedSatisfied: 'true' }),
+    }).then((response) => response.json());
+
+    setMarkedSatisfied(true);
+    checkRequirements();
+  };
+
+  const handleUnmarkSatisfied = () => {
+    fetch(`${process.env.BACKEND}/mark_satisfied/`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+      },
+      body: JSON.stringify({ reqId: explanation[3], markedSatisfied: 'false' }),
+    }).then((response) => response.json());
+
+    setMarkedSatisfied(false);
+    checkRequirements();
+  };
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -218,9 +260,29 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
             Search Courses
           </JoyButton>
         )}
-        <JoyButton variant='soft' color='success' onClick={handleClose} sx={{ ml: 2 }} size='md'>
-          Mark Satisfied
-        </JoyButton>
+        {isLoading ? (
+          <LoadingComponent />
+        ) : markedSatisfied ? (
+          <JoyButton
+            variant='soft'
+            color='warning'
+            onClick={handleUnmarkSatisfied} // Assume you have a function to handle unmarking
+            sx={{ ml: 2 }}
+            size='md'
+          >
+            Unmark Satisfied
+          </JoyButton>
+        ) : (
+          <JoyButton
+            variant='soft'
+            color='success'
+            onClick={handleMarkSatisfied}
+            sx={{ ml: 2 }}
+            size='md'
+          >
+            Mark Satisfied
+          </JoyButton>
+        )}
         <JoyButton variant='soft' color='neutral' onClick={handleClose} sx={{ ml: 2 }} size='md'>
           Close
         </JoyButton>
@@ -247,6 +309,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       if (
         key === 'req_id' ||
         key === 'satisfied' ||
+        key === 'manually_satisfied' ||
         key === 'count' ||
         key === 'min_needed' ||
         key === 'max_counted'
@@ -297,6 +360,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         isObject && 'satisfied' in value ? (
           <SatisfactionStatus
             satisfied={value.satisfied}
+            manuallySatisfied={value.manually_satisfied}
             count={value.count}
             minNeeded={value.min_needed}
             maxCounted={value.max_counted}

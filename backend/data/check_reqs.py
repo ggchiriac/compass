@@ -20,6 +20,7 @@ from compass.models import (
     Major,
     Minor,
     Certificate,
+    CustomUser,
     UserCourses,
     Requirement,
     CourseComments,
@@ -71,13 +72,16 @@ def check_user(net_id, major, minors):
     output = {}
     user_courses = create_courses(net_id)
 
+    user_inst = CustomUser.objects.get(net_id=net_id)
+    manually_satisfied_reqs = list(user_inst.requirements.values_list('id', flat=True))
+
     if major is not None:
         major_code = major['code']
         output[major_code] = {}
 
         if major_code != 'Undeclared':
             formatted_req = check_requirements('Major', major_code,
-                                               user_courses)
+                                               user_courses, manually_satisfied_reqs)
         else:
             formatted_req = {'code': 'Undeclared', 'satisfied': True}
         output[major_code]['requirements'] = formatted_req
@@ -86,7 +90,7 @@ def check_user(net_id, major, minors):
     for minor in minors:
         minor = minor['code']
         output['Minors'][minor] = {}
-        formatted_req = check_requirements('Minor', minor, user_courses)
+        formatted_req = check_requirements('Minor', minor, user_courses, manually_satisfied_reqs)
         output['Minors'][minor]['requirements'] = formatted_req
 
     return output
@@ -112,7 +116,7 @@ def create_courses(net_id):
 
 
 @cumulative_time
-def check_requirements(table, code, courses):
+def check_requirements(table, code, courses, manually_satisfied_reqs):
     """
     Returns information about the requirements satisfied by the courses
     given in course_ids.
@@ -173,7 +177,7 @@ def check_requirements(table, code, courses):
             )
         ).get(code=code)
 
-    req = _init_req(req_inst)
+    req = _init_req(req_inst, manually_satisfied_reqs)
     courses = _init_courses(courses)
     mark_possible_reqs(req, courses)
     assign_settled_courses_to_reqs(req, courses)
@@ -208,13 +212,14 @@ def _init_courses(courses):
 
 # cache this: -2.5s. Also, do this at start up.
 @cumulative_time
-def _init_req(req_inst):
+def _init_req(req_inst, manually_satisfied_reqs):
     req = {
         'inst': req_inst,
         'id': req_inst.id,
         'settled': [],
         'unsettled': [],
         'count': 0,
+        'manually_satisfied': False,
     }
     if (
             hasattr(req_inst, '_prefetched_objects_cache')
@@ -225,7 +230,7 @@ def _init_req(req_inst):
         sub_reqs = req_inst.req_list.all()
 
     if sub_reqs:
-        req['req_list'] = [_init_req(sub_req_inst) for sub_req_inst in
+        req['req_list'] = [_init_req(sub_req_inst, manually_satisfied_reqs) for sub_req_inst in
                            sub_reqs]
 
     if req['inst']._meta.db_table == 'Requirement':
@@ -250,6 +255,9 @@ def _init_req(req_inst):
         if len(req['excluded_course_list']) == 0:
             req.pop('excluded_course_list')
         req['completed_by_semester'] = req_inst.completed_by_semester
+
+        if req['id'] in manually_satisfied_reqs:
+            req['manually_satisfied'] = True
     return req
 
 
@@ -268,7 +276,10 @@ def assign_settled_courses_to_reqs(req, courses):
     newly_satisfied = 0
     if 'req_list' in req:
         for sub_req in req['req_list']:
-            newly_satisfied += assign_settled_courses_to_reqs(sub_req,
+            if sub_req['manually_satisfied']:
+                newly_satisfied += sub_req['inst'].max_counted
+            else:
+                newly_satisfied += assign_settled_courses_to_reqs(sub_req,
                                                               courses)
     elif req['inst'].double_counting_allowed:
         newly_satisfied = mark_all(req, courses)
@@ -499,7 +510,8 @@ def format_req_output(req, courses):
         output['name'] = req['inst'].name
     output['req_id'] = req['id']
     output['satisfied'] = str(
-        (req['inst'].min_needed - req['count'] <= 0))
+        (req['inst'].min_needed - req['count'] <= 0) or req['manually_satisfied'])
+    output['manually_satisfied'] = req['manually_satisfied']
     output['count'] = str(req['count'])
     output['min_needed'] = str(req['inst'].min_needed)
     output['max_counted'] = req['inst'].max_counted
