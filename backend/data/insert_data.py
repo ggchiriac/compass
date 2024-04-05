@@ -624,18 +624,8 @@ def insert_course_data(semester):
 
     try:
         with transaction.atomic():
-<<<<<<< HEAD
-            insert_departments(trimmed_rows)
-            insert_academic_terms(trimmed_rows)
-            insert_courses(trimmed_rows)
-            # insert_course_equivalents(trimmed_rows) # TODO: Can probably delete this fn
-            # insert_sections(trimmed_rows)
-            # insert_class_meetings(trimmed_rows)
-            # insert_class_year_enrollments(trimmed_rows)
-=======
             # with transaction.atomic():
             #     insert_departments(formatted_rows)
->>>>>>> chkpt
 
             # with transaction.atomic():
             #     insert_academic_terms(formatted_rows)

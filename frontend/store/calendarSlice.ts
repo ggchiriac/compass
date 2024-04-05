@@ -2,9 +2,9 @@ import { create } from 'zustand';
 
 import { CalendarEvent, ClassMeeting, Course, Section } from '@/types';
 
-import SelectedCourses from '@/app/calendar/SelectedCourses';
+// import SelectedCourses from '@/app/calendar/SelectedCourses';
 
-import useFilterStore from './filterSlice';
+// import useFilterStore from './filterSlice';
 
 interface calendarStore {
   calendarSearchResults: Course[];
