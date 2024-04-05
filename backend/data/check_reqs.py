@@ -26,6 +26,7 @@ from compass.models import (
     CourseComments,
     CourseEvaluations,
 )
+import constants
 
 
 # Have a custom check_requirements recursive function for minors. Can
@@ -77,8 +78,20 @@ def check_user(net_id, major, minors):
 
     if major is not None:
         major_code = major['code']
-        output[major_code] = {}
+        degree_code = None
 
+        if major_code in constants.AB_MAJORS:
+            degree_code = 'AB'
+        elif major_code in constants.BSE_MAJORS:
+            degree_code = 'BSE'
+        if degree_code:
+            output[degree_code] = {}
+            formatted_req = check_requirements('Degree', degree_code,
+                                               user_courses,
+                                               manually_satisfied_reqs)
+            output[degree_code]['requirements'] = formatted_req
+
+        output[major_code] = {}
         if major_code != 'Undeclared':
             formatted_req = check_requirements('Major', major_code,
                                                user_courses, manually_satisfied_reqs)

@@ -38,6 +38,10 @@ const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirement
             key={tabKey}
             className={tabKey === activeTab ? styles.active : ''}
             onClick={() => handleTabClick(tabKey)}
+            // style={{
+            //   fontWeight: tabsData[tabKey]['satisfied'] ? '500' : 'normal',
+            //   color: tabsData[tabKey]['satisfied'] ? 'green' : 'inherit',
+            // }}
           >
             {tabKey}
           </li>

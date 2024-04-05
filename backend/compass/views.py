@@ -669,6 +669,10 @@ def check_requirements(request):
 
     # Rewrite req_dict so that it is stratified by requirements being met
     formatted_dict = {}
+    if 'AB' in req_dict:
+        formatted_dict['AB'] = req_dict['AB']
+    elif 'BSE' in req_dict:
+        formatted_dict['BSE'] = req_dict['BSE']
     formatted_dict[this_major] = req_dict[this_major]
     for minor in these_minors:
         formatted_dict[minor] = req_dict['Minors'][minor]
