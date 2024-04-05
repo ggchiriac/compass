@@ -28,6 +28,7 @@ interface FilterState {
 
 const useFilterStore = create<FilterState>((set) => ({
   terms: {
+    'Fall 2024': '1252',
     'Spring 2024': '1244',
     'Fall 2023': '1242',
     'Spring 2023': '1234',
@@ -39,6 +40,7 @@ const useFilterStore = create<FilterState>((set) => ({
   },
 
   termsInverse: {
+    '1252': 'Fall 2024',
     '1242': 'Fall 2023',
     '1232': 'Fall 2022',
     '1222': 'Fall 2021',

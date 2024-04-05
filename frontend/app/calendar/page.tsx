@@ -2,12 +2,14 @@
 
 import { useEffect, useState, FC } from 'react';
 
+import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
 import UserState from '@/store/userSlice';
 
+import './Calendar.scss';
 import Calendar from './Calendar';
 import CalendarSearch from './CalendarSearch';
 
@@ -41,7 +43,8 @@ const CalendarUI: FC = () => {
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
           <div className='flex w-full'>
             {/* Left Section for Search and Requirements */}
-            <div className='w-64 bg-white border-r border-gray-200 p-4'>
+            {/* <div className='w-64 bg-white border-r border-gray-200 p-4'> */}
+            <div className={styles.Container} style={{ width: '360px' }}>
               <CalendarSearch />
               {/* Render search results or requirements here */}
             </div>
@@ -51,7 +54,7 @@ const CalendarUI: FC = () => {
               {!isLoading && userProfile && userProfile.netId !== '' ? (
                 <Calendar />
               ) : (
-                <SkeletonApp /> // Placeholder for loading state
+                <SkeletonApp />
               )}
             </div>
           </div>

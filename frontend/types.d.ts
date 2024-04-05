@@ -172,6 +172,6 @@ type CalendarEvent = {
   endRowIndex: number;
   width?: number;
   offsetLeft?: number;
-  color?: string;
+  color?: string; // Primary color (background)
   textColor?: string;
 };

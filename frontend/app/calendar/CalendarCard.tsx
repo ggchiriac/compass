@@ -1,5 +1,5 @@
 import { CalendarEvent } from '@/types';
-import './CalendarCard.css';
+import './Calendar.scss';
 
 interface CalendarCardProps {
   event: CalendarEvent;
@@ -8,29 +8,6 @@ interface CalendarCardProps {
   width?: number;
   offsetLeft?: number;
 }
-
-const getContrastYIQ = (hexcolor: string) => {
-  const hex = hexcolor.replace('#', '');
-  const r = parseInt(hex.slice(0, 2), 16);
-  const g = parseInt(hex.slice(2, 4), 16);
-  const b = parseInt(hex.slice(4, 6), 16);
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-  return yiq >= 128 ? 'black' : 'white';
-};
-
-const stringToColor = (name: string, description: string) => {
-  const base = name + description;
-  let hash = 0;
-  for (let i = 0; i < base.length; i++) {
-    hash = base.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  let color = '#';
-  for (let i = 0; i < 3; i++) {
-    const value = (hash >> (i * 8)) & 0xff;
-    color += `00${value.toString(16)}`.slice(-2);
-  }
-  return color;
-};
 
 const convertTo12hFormat = (time: string) => {
   const [hours, minutes] = time.split(':');
@@ -46,10 +23,6 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
   width,
   offsetLeft,
 }) => {
-  const backgroundColor =
-    event.color || stringToColor(event.course.title, event.course.description);
-  const textColor = getContrastYIQ(backgroundColor);
-
   const startTime = convertTo12hFormat(event.startTime);
   const endTime = convertTo12hFormat(event.endTime);
 
@@ -57,16 +30,34 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
     return endRowIndex - startRowIndex;
   };
 
+  const dayToStartColumnIndex: Record<string, number> = {
+    M: 1, // Monday
+    T: 2, // Tuesday
+    W: 3, // Wednesday
+    Th: 4, // Thursday
+    F: 5, // Friday
+  };
+
+  function getStartColumnIndexForDays(meetingDays: string): number[] {
+    const days = meetingDays.split(',');
+    return days.map((day) => dayToStartColumnIndex[day.trim()]);
+  }
+
+  const classMeeting = event.section.classMeetings.find(
+    (meeting) => getStartColumnIndexForDays(meeting.meetingDays)[0] === event.startColumnIndex
+  );
+
   return (
     <div
-      className='calendar-card'
+      className={`text-xs calendar-card ${event.textColor}`}
       style={{
-        backgroundColor,
-        color: textColor,
+        backgroundColor: event.color,
         gridColumn: `${event.startColumnIndex} / span 1`,
         gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(event.startRowIndex, event.endRowIndex)}`,
         width: `calc(100% * ${width || 1})`,
         marginLeft: `calc(100% * ${offsetLeft || 0})`,
+        overflow: 'hidden',
+        maxHeight: '100%',
       }}
       onClick={onSectionClick}
     >
@@ -82,17 +73,25 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
         </span>
       </div>
       <div className='card-body'>
-        <time dateTime={event.startTime} title={`${startTime} - ${endTime}`}>
-          {startTime} - {endTime}
-        </time>
-        <span
-          className='location'
-          title={`${event.section.classMeetings[0].buildingName} ${event.section.classMeetings[0].room}`}
-        >
-          {event.section.classMeetings[0].buildingName} {event.section.classMeetings[0].room}
-        </span>
+        <div className='event-details'>
+          <div className='event-time'>
+            <time dateTime={event.startTime} title={`${startTime} - ${endTime}`}>
+              {startTime} - {endTime}
+            </time>
+          </div>
+          <div className='event-location'>
+            <span
+              className='location'
+              title={`${classMeeting?.buildingName} ${classMeeting?.room}`}
+            >
+              {classMeeting?.buildingName}
+              <br />
+              {classMeeting?.room}
+            </span>
+          </div>
+        </div>
       </div>
-      <button className='options-button' title='Options'>
+      <button className='options-button' title='Options' style={{ backgroundColor: event.color }}>
         <svg className='options-icon' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
           <path
             strokeLinecap='round'

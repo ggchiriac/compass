@@ -19,6 +19,7 @@ const CalendarSearchResults: React.FC<SearchResults> = ({ courses = [] }) => {
           itemContent={(_, course) => <CalendarSearchItem course={course} />}
         />
       </div>
+
       <div className='mt-4'>
         <SelectedCourses />
       </div>

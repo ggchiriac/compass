@@ -78,16 +78,19 @@ const useCalendarStore = create<calendarStore>((set) => ({
       const sections = await response.json();
       console.log('Calendar Search Results!:', sections);
       const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
-        section.classMeetings.map((classMeeting: ClassMeeting) => ({
-          key: `${course.courseId}-${section.sectionId}-${classMeeting.classMeetingId}`,
-          course,
-          section,
-          startTime: classMeeting.startTime,
-          endTime: classMeeting.endTime,
-          startColumnIndex: getStartColumnIndexForDays(classMeeting.meetingDays)[0],
-          startRowIndex: calculateGridRow(classMeeting.startTime),
-          endRowIndex: calculateGridRow(classMeeting.endTime),
-        }))
+        section.classMeetings.flatMap((classMeeting: ClassMeeting) => {
+          const startColumnIndices = getStartColumnIndexForDays(classMeeting.meetingDays);
+          return startColumnIndices.map((startColumnIndex) => ({
+            key: `${course.courseId}-${section.sectionId}-${classMeeting.classMeetingId}-${startColumnIndex}`,
+            course,
+            section,
+            startTime: classMeeting.startTime,
+            endTime: classMeeting.endTime,
+            startColumnIndex,
+            startRowIndex: calculateGridRow(classMeeting.startTime),
+            endRowIndex: calculateGridRow(classMeeting.endTime),
+          }));
+        })
       );
 
       set((state) => ({
