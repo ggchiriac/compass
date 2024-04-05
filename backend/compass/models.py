@@ -98,19 +98,6 @@ class Certificate(models.Model):
 # ----------------------------------------------------------------------#
 
 
-class AcademicTerm(models.Model):
-    term_code = models.CharField(max_length=10, db_index=True, unique=True, null=True)
-    suffix = models.CharField(max_length=10, db_index=True)  # e.g., "F2023"
-    start_date = models.DateField(null=True)
-    end_date = models.DateField(null=True)
-
-    class Meta:
-        db_table = 'AcademicTerm'
-
-    def __str__(self):
-        return self.term_code
-
-
 class Instructor(models.Model):
     emplid = models.CharField(max_length=50, unique=True, db_index=True, null=True)
     first_name = models.CharField(max_length=100, db_index=True, null=True)
@@ -122,6 +109,19 @@ class Instructor(models.Model):
 
     def __str__(self):
         return self.full_name
+
+
+class AcademicTerm(models.Model):
+    term_code = models.CharField(max_length=10, db_index=True, unique=True, null=True)
+    suffix = models.CharField(max_length=10, db_index=True)  # e.g., "F2023"
+    start_date = models.DateField(null=True)
+    end_date = models.DateField(null=True)
+
+    class Meta:
+        db_table = 'AcademicTerm'
+
+    def __str__(self):
+        return self.term_code
 
 
 class Course(models.Model):
@@ -168,7 +168,7 @@ class Section(models.Model):
     ]
 
     course = models.ForeignKey(Course, on_delete=models.CASCADE, null=True)
-    class_number = models.IntegerField(unique=True, db_index=True, null=True)
+    class_number = models.IntegerField(db_index=True, null=True)
     class_type = models.CharField(
         max_length=50, choices=CLASS_TYPE_CHOICES, db_index=True, default=''
     )
@@ -206,37 +206,6 @@ class ClassMeeting(models.Model):
 
     def __str__(self):
         return f'{self.section} - {self.start_time} to {self.end_time}'
-
-
-# TODO: This class may not be needed anymore.
-class CourseEquivalent(models.Model):
-    EQUIVALENCE_TYPES = (
-        ('CROSS_LIST', 'Cross-Listing'),
-        ('REQUIREMENT', 'Requirement Fulfillment'),
-    )
-
-    primary_course = models.ForeignKey(
-        'Course',
-        related_name='primary_equivalents',
-        on_delete=models.CASCADE,
-        null=True,
-    )
-    equivalent_course = models.ForeignKey(
-        'Course', related_name='equivalents', on_delete=models.CASCADE, null=True
-    )
-    equivalence_type = models.CharField(
-        max_length=12, choices=EQUIVALENCE_TYPES, default='REQUIREMENT'
-    )
-
-    class Meta:
-        db_table = 'CourseEquivalent'
-
-    def __str__(self):
-        primary_title = self.primary_course.title if self.primary_course else 'None'
-        equivalent_title = (
-            self.equivalent_course.title if self.equivalent_course else 'None'
-        )
-        return f'{primary_title} is equivalent to {equivalent_title}'
 
 
 class ClassYearEnrollment(models.Model):

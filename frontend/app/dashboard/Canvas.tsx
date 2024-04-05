@@ -262,11 +262,11 @@ export function Canvas({
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
       prevItems[`Fall ${year}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+        (course) => `${course.courseId}|${course.crosslistings}`
       );
       semester += 1;
       prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+        (course) => `${course.courseId}|${course.crosslistings}`
       );
       semester += 1;
     }
@@ -368,10 +368,8 @@ export function Canvas({
       return {
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
-          )
-          .map((course) => `${course.course_id}|${course.crosslistings}`),
+          .filter((course) => !userCurrentCourses.has(`${course.courseId}|${course.crosslistings}`))
+          .map((course) => `${course.courseId}|${course.crosslistings}`),
       };
     });
   }, [searchResults]);
@@ -742,10 +740,8 @@ export function Canvas({
       const updatedCourses = {
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
-          .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
-          )
-          .map((course) => `${course.course_id}|${course.crosslistings}`),
+          .filter((course) => !userCurrentCourses.has(`${course.courseId}|${course.crosslistings}`))
+          .map((course) => `${course.courseId}|${course.crosslistings}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;

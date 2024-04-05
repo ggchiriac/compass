@@ -353,7 +353,7 @@ const CalendarSearch: FC = () => {
 
   return (
     <>
-      <div>
+      <div className='block w-full text-left pr-3'>
         <label htmlFor='search' className='sr-only'>
           Search courses
         </label>

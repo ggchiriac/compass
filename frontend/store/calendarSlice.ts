@@ -1,71 +1,113 @@
 import { create } from 'zustand';
 
-import { CalendarEvent, Course } from '@/types';
+import { CalendarEvent, ClassMeeting, Course, Section } from '@/types';
+
+import SelectedCourses from '@/app/calendar/SelectedCourses';
 
 import useFilterStore from './filterSlice';
 
 interface calendarStore {
-  selectedCourses: CalendarEvent[];
   calendarSearchResults: Course[];
+  selectedCourses: CalendarEvent[];
   recentSearches: string[];
   error: string | null;
   loading: boolean;
-  addCourse: (newCourse: Course) => Promise<void>;
-  removeCourse: (courseId: string) => void;
-  setSelectedCourses: (courses: CalendarEvent[]) => void;
+
   setCalendarSearchResults: (results: Course[]) => void;
+  setSelectedCourses: (courses: CalendarEvent[]) => void;
   addRecentSearch: (search: string) => void;
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
-  updateSelectedSection: (courseId: string, sectionId: string) => void;
+  addCourse: (course: Course) => Promise<void>;
+  removeCourse: (courseId: string) => void;
   removeSelectedSection: (courseId: string) => void;
-  // isCalendarConflict: (newEvent: CalendarEvent) => boolean;
-  // getCalendarEvents: () => CalendarEvent[];
 }
 
+const startHour = 7;
+const dayToStartColumnIndex: Record<string, number> = {
+  M: 1, // Monday
+  T: 2, // Tuesday
+  W: 3, // Wednesday
+  Th: 4, // Thursday
+  F: 5, // Friday
+};
+
+const calculateGridRow = (timeString: string) => {
+  const [time, period] = timeString.split(' ');
+  const [hour, minute] = time.split(':').map(Number);
+
+  let adjustedHour = hour;
+  if (period === 'PM' && hour !== 12) {
+    adjustedHour += 12;
+  } else if (period === 'AM' && hour === 12) {
+    adjustedHour = 0;
+  }
+
+  const rowsPerHour = 6; // 10-minute increments (60 minutes / 10 minutes)
+  const minuteOffset = Math.floor(minute / 10);
+
+  return (adjustedHour - startHour) * rowsPerHour + minuteOffset;
+};
+
+const getStartColumnIndexForDays = (daysString: string): number[] => {
+  const daysArray = daysString.split(',');
+  return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0);
+};
+
 const useCalendarStore = create<calendarStore>((set) => ({
-  selectedCourses: [],
   calendarSearchResults: [],
+  selectedCourses: [],
   recentSearches: [],
   error: null,
   loading: false,
-  addCourse: async (newCourse) => {
+  addCourse: async (course: Course) => {
     set({ loading: true, error: null });
 
     try {
-      const selectedTerm = useFilterStore.getState().termFilter;
-      console.log('Selected term in addCourse:', selectedTerm);
+      const term = course.guid.substring(0, 4);
+      const course_id = course.guid.substring(4);
       const response = await fetch(
-        `${process.env.BACKEND}/fetch_class_meetings/${newCourse.course_id}/?term=${selectedTerm}`
+        `${process.env.BACKEND}/fetch_calendar_classes/${term}/${course_id}`
       );
-      const courseDetails = await response.json();
 
       if (!response.ok) {
-        throw new Error(courseDetails.error);
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to fetch course details');
       }
 
-      const courseToAdd: CalendarEvent = {
-        ...newCourse,
-        ...courseDetails,
-        selectedSection: courseDetails.sections[0],
-      };
+      const details = await response.json();
+      console.log('Calendar Search Results!:', details);
+      const calendarEvents: CalendarEvent[] = details.sections.flatMap((section: Section) =>
+        section.classMeetings.map((classMeeting: ClassMeeting) => ({
+          key: `${course.courseId}-${section.sectionId}-${classMeeting.classMeetingId}`,
+          course,
+          section,
+          startTime: classMeeting.startTime,
+          endTime: classMeeting.endTime,
+          startColumnIndex: getStartColumnIndexForDays(classMeeting.meetingDays)[0],
+          startRowIndex: calculateGridRow(classMeeting.startTime),
+          endRowIndex: calculateGridRow(classMeeting.endTime),
+        }))
+      );
 
       set((state) => ({
-        selectedCourses: [...state.selectedCourses, courseToAdd],
+        selectedCourses: [...state.selectedCourses, ...calendarEvents],
         loading: false,
       }));
     } catch (error) {
-      set({ error: error.message, loading: false });
+      console.error('Error adding course:', error);
+      set({ error: 'Failed to add course. Please try again.', loading: false });
     }
   },
-  removeCourse: (courseId) =>
+  removeCourse: (courseId) => {
     set((state) => ({
       selectedCourses: state.selectedCourses.filter(
         (event) => String(event.course.guid) !== courseId
       ),
-    })),
-  setSelectedCourses: (courses) => set({ selectedCourses: courses }),
+    }));
+  },
   setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
+  setSelectedCourses: (courses) => set({ selectedCourses: courses }),
   addRecentSearch: (search) => {
     const trimmedSearch = search.trim().slice(0, 120);
     set((state) => ({
@@ -74,58 +116,12 @@ const useCalendarStore = create<calendarStore>((set) => ({
   },
   setError: (error) => set({ error }),
   setLoading: (loading) => set({ loading }),
-  updateSelectedSection: (courseId, sectionId) =>
-    set((state) => ({
-      selectedCourses: state.selectedCourses.map((event) =>
-        String(event.course.guid) === courseId
-          ? {
-              ...event,
-              selectedSection: event.course.sections.find(
-                (section) => String(section.class_number) === sectionId
-              ),
-            }
-          : event
-      ),
-    })),
   removeSelectedSection: (courseId) =>
     set((state) => ({
       selectedCourses: state.selectedCourses.map((event) =>
         String(event.course.guid) === courseId ? { ...event, selectedSection: undefined } : event
       ),
     })),
-  // isCalendarConflict: (newEvent) => {
-  //   const selectedCourses = get().selectedCourses;
-  //   return selectedCourses.some((event) =>
-  //     event.selectedSection.class_meetings.some((meeting) => {
-  //       const newStartTime = new Date(
-  //         `2000-01-01T${newEvent.selectedSection.class_meetings[0].start_time}`
-  //       ).getTime();
-  //       const newEndTime = new Date(
-  //         `2000-01-01T${newEvent.selectedSection.class_meetings[0].end_time}`
-  //       ).getTime();
-  //       const existingStartTime = new Date(`2000-01-01T${meeting.start_time}`).getTime();
-  //       const existingEndTime = new Date(`2000-01-01T${meeting.end_time}`).getTime();
-  //       return (
-  //         newStartTime < existingEndTime &&
-  //         existingStartTime < newEndTime &&
-  //         meeting.days.some((day) => newEvent.selectedSection.class_meetings[0].days.includes(day))
-  //       );
-  //     })
-  //   );
-  // },
-  // getCalendarEvents: () => {
-  //   const selectedCourses = get().selectedCourses;
-  //   return selectedCourses.map((course) => ({
-  //     ...course,
-  //     startTime: course.selectedSection.class_meetings[0].start_time,
-  //     endTime: course.selectedSection.class_meetings[0].end_time,
-  //     startColumnIndex: getStartColumnIndexForDays(
-  //       course.selectedSection.class_meetings[0].days
-  //     )[0],
-  //     startRowIndex: calculateGridRow(course.selectedSection.class_meetings[0].start_time),
-  //     endRowIndex: calculateGridRow(course.selectedSection.class_meetings[0].end_time),
-  //   }));
-  // },
 }));
 
 export default useCalendarStore;

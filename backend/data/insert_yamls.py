@@ -170,9 +170,9 @@ def push_requirement(req):
                 req_inst.excluded_course_list.add(course_inst)
 
     elif (
-        (('dist_req' not in req) or (req['dist_req'] == None))
-        and (('num_courses' not in req) or (req['num_courses'] == None))
-        and (('dept_list' not in req) or (req['dept_list'] == None))
+        (('dist_req' not in req) or (req['dist_req'] is None))
+        and (('num_courses' not in req) or (req['num_courses'] is None))
+        and (('dept_list' not in req) or (req['dept_list'] is None))
     ):
         req_inst.max_counted = 1
         req_inst.min_needed = 0

@@ -127,54 +127,51 @@ export type Dictionary = {
 
 // Courses returned from the API.
 export type Course = {
-  course_id: number;
-  guid: number;
-  department_code: string;
-  catalog_number: number;
+  courseId: number;
+  guid: string;
+  departmentCode: string;
+  catalogNumber: number;
   title: string;
   description: string;
-  sections?: Section[];
+  sections?: Section[]; // TODO Is a course guaranteed to have sections? (Or at least empty array?)
   originSemesterId?: string;
   crosslistings?: string;
+};
+
+export type Section = {
+  sectionId: number;
+  classSection: string;
+  classType: string;
+  instructorId: number;
+  track: string;
+  capacity: number;
+  enrollment: number;
+  seatReservations: string;
+  status: string;
+  classMeetings: ClassMeeting[];
+};
+
+export type ClassMeeting = {
+  classMeetingId: number;
+  meetingDays: string;
+  startTime: string;
+  endTime: string;
+  buildingName: string;
+  room: string;
 };
 
 // Calendar
 type CalendarEvent = {
   key: string;
   course: Course;
-  selectedSection?: Section;
-
-  // Additional fields for UI representation
-  color?: string;
-  textColor?: string;
-
-  // Additional fields for event rendering
-  startTime?: string;
-  endTime?: string;
-  startColumnIndex?: number;
-  startRowIndex?: number;
-  endRowIndex?: number;
+  section: Section;
+  startTime: string;
+  endTime: string;
+  startColumnIndex: number;
+  startRowIndex: number;
+  endRowIndex: number;
   width?: number;
   offsetLeft?: number;
-};
-
-export type Section = {
-  class_number: number;
-  class_type: string;
-  class_section: string;
-  track: string;
-  seat_reservations: string;
-  capacity: number;
-  status: string;
-  enrollment: number;
-  class_meetings: ClassMeeting[];
-};
-
-export type ClassMeeting = {
-  meeting_number: number;
-  start_time: string;
-  end_time: string;
-  room: string;
-  days: string;
-  building_name: string;
+  color?: string;
+  textColor?: string;
 };

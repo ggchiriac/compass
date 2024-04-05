@@ -1,4 +1,4 @@
-import json
+import ujson as json
 import logging
 import time
 from datetime import datetime
@@ -730,58 +730,64 @@ def requirement_info(request):
     info[4] = marked_satisfied
     return JsonResponse(info)
 
-
 # --------------------------------- CALENDAR ---------------------------------------#
 
-
-# TODO: See if this function can replace redundant parts of the code in this file.
-def get_course_details(request, course_id):
-    try:
-        # Prefetch class meetings for each section
-        class_meetings_prefetch = Prefetch(
-            'sections__class_meetings', queryset=ClassMeeting.objects.all()
-        )
-        # Now prefetch sections with their class meetings loaded
-        sections_prefetch = Prefetch(
-            'sections',
-            queryset=Section.objects.prefetch_related(class_meetings_prefetch),
-        )
-        course = Course.objects.prefetch_related(sections_prefetch).get(pk=course_id)
-
-        serializer = CourseSerializer(course)
-        return JsonResponse(serializer.data)
-    except Course.DoesNotExist:
-        return JsonResponse({'error': 'Course not found'}, status=404)
-
-
 class FetchCalendarClasses(APIView):
-    def get(self, request, course_id, format=None):
-        term = request.query_params.get('term')
-        if not term:
-            return Response({'error': 'Missing required parameter: term'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            course = Course.objects.get(course_id=course_id)
-        except Course.DoesNotExist:
-            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        sections = Section.objects.filter(course=course, term__term_code=term).prefetch_related(
-            Prefetch('classmeeting_set', queryset=ClassMeeting.objects.only('start_time', 'end_time', 'room', 'building_name'))
+    def get(self, request, term, course_id):
+        sections = (
+            Section.objects.filter(term__term_code=term, course__course_id=course_id)
+            .select_related('course')
+            .prefetch_related(
+                Prefetch(
+                    'classmeeting_set',
+                    queryset=ClassMeeting.objects.order_by(
+                        'meeting_number',
+                        'days',
+                        'start_time',
+                        'end_time',
+                        'building_name',
+                        'room',
+                    ),
+                    to_attr='class_meetings',
+                )
+            )
         )
 
-        if not sections:
-            return Response({'error': 'No sections found for the course'}, status=status.HTTP_404_NOT_FOUND)
+        if not sections.exists():
+            return Response(
+                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        data = [{
-            'class_type': section.class_type,
-            'capacity': section.capacity,
-            'class_meetings': [{
-                'start_time': meeting.start_time,
-                'end_time': meeting.end_time,
-                'building_name': meeting.building_name,
-                'room': meeting.room,
-            } for meeting in section.classmeeting_set.all()]
-        } for section in sections]
+        sections_data = []
 
-        return Response(data)
-    
+        for section in sections:
+            class_meetings_data = [
+                self._serialize_class_meeting(class_meeting)
+                for class_meeting in section.class_meetings
+            ]
+
+            sections_data.append(
+                {
+                    'sectionId': section.id,
+                    'classSection': section.class_section,
+                    'classType': section.class_type,
+                    'course': {
+                        'courseId': section.course.course_id,
+                        'title': section.course.title,
+                        # Include other relevant course fields
+                    },
+                    'classMeetings': class_meetings_data,
+                }
+            )
+
+        return Response(sections_data)
+
+    def _serialize_class_meeting(self, meeting):
+        return {
+            'classMeetingId': meeting.id,
+            'meetingDays': meeting.days,
+            'startTime': meeting.start_time.strftime('%H:%M'),
+            'endTime': meeting.end_time.strftime('%H:%M'),
+            'buildingName': meeting.building_name,
+            'room': meeting.room,
+        }
