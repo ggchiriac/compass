@@ -785,7 +785,6 @@ class FetchCalendarClasses(APIView):
             )
         )
 
-        # Log some details about the fetched sections to understand the data better
         for section in sections:
             if section.class_meetings:
                 print(
@@ -815,7 +814,6 @@ class FetchCalendarClasses(APIView):
             'classMeetings': class_meetings_data,
         }
 
-        # Optionally, log specific details about the section being processed
         print(
             f'Section {section.id} with {len(class_meetings_data)} class meetings processed'
         )
