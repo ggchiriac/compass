@@ -39,11 +39,11 @@ req_list:
   - LIN 201
 - name: Coursework
   max_counted: 1
-  min_needed: 4
+  min_needed: 3
   max_common_with_major: 1
   req_list:
   - name: Core Courses
-    max_counted: 3
+    max_counted: 1
     min_needed: 1
     explanation: At least one course from the set of “core” courses 
       (LIN 301, LIN 302, LIN 303, LIN 306; LIN 303 may be substituted 
@@ -56,7 +56,7 @@ req_list:
     - LIN 306
     - PHI 334 / LIN 334
   - name: Methods Courses
-    max_counted: 3
+    max_counted: 1
     min_needed: 1
     explanation: At least one course from the set of “methods” courses 
       (LIN 210, LIN 310, LIN 355, LIN 356.
@@ -67,8 +67,8 @@ req_list:
     - LIN 355
     - LIN 356
   - name: Elective Courses
-    max_counted: 2
-    min_needed: 0
+    max_counted: 1
+    min_needed: 2
     explanation: Any two other LIN-designated courses at the 200-level 
       or above (which may be drawn from the sets above). 
       Linguistics-related courses in other departments and programs 

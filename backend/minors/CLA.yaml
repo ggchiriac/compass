@@ -28,7 +28,7 @@ req_list:
   - CLA *
   - CLG 108
   - LAT 108
-  deadline: Junior Spring
+  completed_by_semester: Junior Spring
 - name: Tracks
   max_counted: 1
   min_needed: 1
@@ -69,7 +69,8 @@ req_list:
       - name: Greek Language, Literature, and Culture
         max_counted: 1
         min_needed: 2
-        explanation:
+        explanation: |-
+          <i>Editor's Note: The course list for this requirement is not comprehensive.</i>
         double_counting_allowed: false
         max_common_with_major: 2
         pdfs_allowed: 2
@@ -105,7 +106,8 @@ req_list:
           Reception
         max_counted: 1
         min_needed: 2
-        explanation:
+        explanation: |-
+          <i>Editor's Note: The course list for this requirement is not comprehensive.</i>
         double_counting_allowed: false
         max_common_with_major: 2
         pdfs_allowed: 2
@@ -126,7 +128,8 @@ req_list:
       - name: Medicine, Science, and the Body
         max_counted: 1
         min_needed: 2
-        explanation:
+        explanation: |-
+          <i>Editor's Note: The course list for this requirement is not comprehensive.</i>
         double_counting_allowed: false
         max_common_with_major: 2
         pdfs_allowed: 2
@@ -148,16 +151,16 @@ req_list:
       max_common_with_major: 1
       pdfs_allowed: 1
       course_list:
-        - CLA *
-        - LAT *
-        - HUM *
-        - ART *
-        - ARC *
-        - HLS *
-        - REL *
-        - PHI *
-        - CDH *
-        - PAW *
+      - CLA *
+      - LAT *
+      - HUM *
+      - ART *
+      - ARC *
+      - HLS *
+      - REL *
+      - PHI *
+      - CDH *
+      - PAW *
   - name: Ancient History and Material Culture
     max_counted: 1
     min_needed: 3
@@ -171,62 +174,65 @@ req_list:
       max_common_with_major: 2
       pdfs_allowed: 2
       course_list:
-        - CLA 216
-        - CLA 217
-        - CLA 218
-        - CLA 219
+      - CLA 216
+      - CLA 217
+      - CLA 218
+      - CLA 219
     - name: Track Requirement
       max_counted: 1
       min_needed: 2
-      explanation:
+      explanation: |-
+        <i>Editor's Note: The course list for this requirement is not comprehensive.</i>
       double_counting_allowed: false
       max_common_with_major: 2
       pdfs_allowed: 2
       course_list:
-        - CLA 200
-        - CLA 202
-        - CLA 207
-        - CLA 216
-        - CLA 217
-        - CLA 218
-        - CLA 219
-        - CLA 223
-        - CLA 247
-        - CLA 309
-        - CLA 326
-        - CLA 343
-        - CLA 398
-        - CLA 412
-        - CLA 413
-        - CLA 414
-        - CLA 418
-        - CLA 520
-        - CLA 522
-        - CLA 524
-        - CLA 531
-        - CLA 536
-        - CLA 545
-        - CLA 547
-        - CLA 548
+      - CLA 200
+      - CLA 202
+      - CLA 207
+      - CLA 216
+      - CLA 217
+      - CLA 218
+      - CLA 219
+      - CLA 223
+      - CLA 247
+      - CLA 309
+      - CLA 326
+      - CLA 343
+      - CLA 398
+      - CLA 412
+      - CLA 413
+      - CLA 414
+      - CLA 418
+      - CLA 520
+      - CLA 522
+      - CLA 524
+      - CLA 531
+      - CLA 536
+      - CLA 545
+      - CLA 547
+      - CLA 548
     - name: Relevant Course
       max_counted: 1
       min_needed: 1
       explanation: The fifth course can be a relevant course offered in 
         another department approved by the DUS.
       course_list:
-        - CLA *
-        - LAT *
-        - HUM *
-        - ART *
-        - ARC *
-        - HLS *
-        - REL *
-        - PHI *
-        - CDH *
-        - PAW *
+      - CLA *
+      - LAT *
+      - HUM *
+      - ART *
+      - ARC *
+      - HLS *
+      - REL *
+      - PHI *
+      - CDH *
+      - PAW *
 - name: Reflection Paper
   max_counted: 1
   min_needed: 1
   explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    
     A short (ca. 500 words) reflection paper on how the courses add up to a coherent perspective on the ancient world and its reception is required in the student’s final semester.
   completed_by_semester: 8

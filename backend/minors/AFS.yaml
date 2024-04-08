@@ -42,7 +42,7 @@ req_list:
   max_common_with_major: 2  
   req_list:
   - name: Humanities
-    max_counted: 2
+    max_counted: 1
     min_needed: 1
     explanation: 
     double_counting_allowed: false
@@ -84,7 +84,7 @@ req_list:
     - URB *
     - VIS *
   - name: Social Sciences
-    max_counted: 2
+    max_counted: 1
     min_needed: 1
     explanation: 
     double_counting_allowed: false
@@ -99,7 +99,7 @@ req_list:
     - SPI *
     - ANT *
   - name: Language
-    max_counted: 2
+    max_counted: 1
     min_needed: 1
     explanation: One semester of an African language course is required 
       for the minor. The requirement can be fulfilled by one semester of 
@@ -120,19 +120,62 @@ req_list:
     - SWA 103K
     - SWA 105
     - SWA 107
-  - name: Cross-listed with AFS
+  - name: Fourth Course
     max_counted: 1
-    min_needed: 0
-    explanation: Any courses cross-listed with the Program in African 
-      Studies are preapproved to count toward fulfillment of the minor. 
-      Courses not cross-listed with African Studies, but devoting 
-      significant course time to issues on the continent, may be 
-      submitted for review by the program director for credit.
+    min_needed: 1
+    explanation: One more course in any of the areas above. Furthermore, 
+      Any courses cross-listed with the Program in African Studies are 
+      preapproved to count toward fulfillment of the minor. Courses not 
+      cross-listed with African Studies, but devoting significant course 
+      time to issues on the continent, may be submitted for review by 
+      the program director for credit.
     double_counting_allowed: false
     max_common_with_major: 1
     pdfs_allowed: 0
     course_list:
     - AFS *
+    - AAS *
+    - AFS *
+    - AMS *
+    - ART *
+    - ASA *
+    - CLA *
+    - CLG *
+    - COM *
+    - CWR *
+    - DAN *
+    - EAS *
+    - ENG *
+    - ECS *
+    - GER *
+    - GSS *
+    - HIS *
+    - HLS *
+    - HUM *
+    - JDS *
+    - LAO *
+    - LAS *
+    - LAT *
+    - LIN *
+    - MED *
+    - MOG *
+    - MUS *
+    - MPP *
+    - NES *
+    - PHI *
+    - SAS *
+    - SLA *
+    - THR *
+    - TRA *
+    - URB *
+    - VIS *
+    - EPS *
+    - HIS *
+    - JRN *
+    - POL *
+    - SOC *
+    - SPI *
+    - ANT *
 - name: Independent Work
   max_counted: 1
   min_needed: 1

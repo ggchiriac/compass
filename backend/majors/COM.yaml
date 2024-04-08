@@ -163,7 +163,7 @@ req_list:
     needed.) The three COM courses and four reading courses must be graded. The three
     main rubrics and various tracks are listed below, as well as a description of
     the Historical Requirement.'
-  double_counting_allowed: false
+  double_counting_allowed: true
   req_list:
   - name: Comparative Literature
     max_counted: 1
@@ -206,6 +206,7 @@ req_list:
       departments or programs throughout the university. Course selections generally
       fall into one of five tracks listed below. Each represents the study of literature
       in a different comparative context.
+    double_counting_allowed: false
     req_list:
     - name: Comparative Work in Literatures
       max_counted: 1
@@ -358,15 +359,15 @@ req_list:
       - VIS 4*
       - VIS 5*
   - name: Historical Period
-    max_counted: 0
+    max_counted: 1
     min_needed: 0
     explanation: |-
       <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
 
       One course, which may or may not be one of the nine courses taken for the major, must be dedicated in its entirety to historical periods, literature or cultures before 1800 C.E.
   - name: Theory and Methods of Comparative Literature
-    max_counted: 0
-    min_needed: 0
+    max_counted: 1
+    min_needed: 1
     explanation: |-
       <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
       
@@ -374,7 +375,11 @@ req_list:
     course_list:
     - COM 303
     - COM 301
-
+  - name: Restrictions
+    max_counted: 1
+    min_needed: 0
+    explanation: |-
+      One course, which may or may not be one of the nine courses taken for the major, must be dedicated in its entirety to historical periods, literature or cultures before 1800 C.E.
 - name: Junior Papers
   max_counted: 1
   min_needed: 0

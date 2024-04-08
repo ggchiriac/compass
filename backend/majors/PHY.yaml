@@ -146,8 +146,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i>Editor's Note: Some of these courses may not fulfill this requirement as TigerPath does not check cross-listing.</i>
-
       One additional course in Physics (not including cross-lists) at the 300-level or above.
     course_list:
     - PHY 3*
@@ -217,6 +215,6 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
     In the senior year, in addition to coursework, students write a senior thesis based on their own research. The topic might be chosen from one of the active experimental or theoretical research fields of the Physics Department, or might be suggested by a faculty member with some subsidiary interest. A student could also choose a topic relating physics and another field, such as biophysics, geophysics, the teaching of physics, history of science, or engineering physics. Students whose main adviser is outside the Physics Department must also have a co-adviser who is a faculty member in the Physics Department.

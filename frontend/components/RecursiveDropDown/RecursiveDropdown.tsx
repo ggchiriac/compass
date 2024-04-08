@@ -65,7 +65,7 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   if (manuallySatisfied) {
     return <CheckCircleOutlineIcon style={{ color: 'gray', marginLeft: '10px' }} />;
   }
-  if (maxCounted !== 1) {
+  if (maxCounted > 1) {
     return (
       <>
         {satisfied === 'True' ? (
@@ -207,51 +207,53 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
           maxHeight: '75vh',
         }}
       >
-        <div className={styles.detailRow}>
-          {explanation ? (
+        <div>
+          {explanation === null || explanation === undefined ? (
+            <LoadingComponent />
+          ) : Object.entries(explanation).length > 0 ? (
             Object.entries(explanation).map(([index, value]) => {
               if (index === '0') {
                 if (value) {
                   return (
-                    <div key={index}>
-                      <strong className={styles.strong}>{'Explanation'}:</strong> {value}
+                    <div key={index} className={styles.section}>
+                      <strong className={styles.strong}>{'Explanation'}: </strong>
+                      <span dangerouslySetInnerHTML={{ __html: value }} />
                     </div>
                   );
                 } else {
                   return (
-                    <div key={index}>
-                      <strong className={styles.strong}>{'Explanation'}:</strong>{' '}
+                    <div key={index} className={styles.section}>
+                      <strong className={styles.strong}>{'Explanation'}: </strong>
                       {'No explanation available'}
                     </div>
                   );
                 }
               }
-              if (index === '1' && value[0]) {
+              if (index === '1' && value !== 8) {
                 return (
-                  <div key={index}>
-                    <strong className={styles.strong}>{'Course list'}: </strong>
-                    {value
-                      .map((course) => {
-                        return `${course.crosslistings}, `;
-                      })
-                      .join('')
-                      .slice(0, -2)}
-                  </div>
-                );
-              }
-              if (index === '2' && value !== 8) {
-                return (
-                  <div key={index}>
+                  <div key={index} className={styles.section}>
                     <strong className={styles.strong}>{'Complete by'}: </strong>
                     {semesterMap[value]}
                   </div>
                 );
               }
+              if (index === '2' && value[0]) {
+                return (
+                  <div key={index} className={styles.section}>
+                    <strong className={styles.strong}>{'Course list'}: </strong>
+                    {value
+                      .slice(0, 30)
+                      .map((course, index) => {
+                        const separator = index === 29 && value.length > 30 ? '...' : ', ';
+                        return `${course.crosslistings}${separator}`;
+                      })
+                      .join('')
+                      .slice(0, value.length > 30 ? undefined : -2)}
+                  </div>
+                );
+              }
             })
-          ) : (
-            <LoadingComponent />
-            // <div>Loading...</div>
-          )}
+          ) : null}
         </div>
       </div>
       <footer className='mt-auto text-right'>

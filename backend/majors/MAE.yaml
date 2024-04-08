@@ -153,7 +153,7 @@ req_list:
       - MAE 323
       - CEE 312
       - CEE 361
-    - name: Departmental
+    - name: Optional Departmentals
       max_counted: 0
       min_needed: 0
       explanation: |-

@@ -378,7 +378,7 @@ class SearchCourses(View):
 
             if distribution:
                 query_conditions &= Q(
-                    distribution_area_short__iexact=distribution)
+                    distribution_area_short__icontains=distribution)
 
             if levels:
                 levels = levels.split(',')
@@ -724,8 +724,8 @@ def requirement_info(request):
 
     info = {}
     info[0] = explanation
-    info[1] = sorted_course_list
-    info[2] = completed_by_semester
+    info[1] = completed_by_semester
+    info[2] = sorted_course_list
     info[3] = req_id
     info[4] = marked_satisfied
     return JsonResponse(info)

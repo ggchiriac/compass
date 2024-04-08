@@ -984,15 +984,15 @@ req_list:
   double_counting_allowed: false
   pdfs_allowed: 0
   req_list:
-  - name: Fall
+  - name: Fall Term
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     completed_by_semester: 7
     course_list:
     - ECE 497
-  - name: Spring
+  - name: Spring Term
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     completed_by_semester: 8
     course_list:
     - ECE 498

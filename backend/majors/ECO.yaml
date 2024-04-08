@@ -156,7 +156,7 @@ req_list:
     - SPI 582C
     - SPI 582F
 - name: Optional Tracks
-  max_counted: 0
+  max_counted: 1
   min_needed: 0
   explanation:
   req_list:
@@ -171,17 +171,16 @@ req_list:
     - name: Prerequisites
       max_counted: 1
       min_needed: 2
-      explanation: Complete two Politics courses at any level before entering the
-        program.
+      explanation: Two Politics courses at any level.
       course_list:
       - POL *
     - name: Course Requirements
       max_counted: 1
       min_needed: 3
       explanation: |-
+        <i>Editor's Note:</i> POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.
+        
         In addition to the two Politics prerequisites, a student in the PPE must complete three Politics departmentals, i.e. Politics courses in the 300-level or higher, on a graded basis.
-
-        <i>Note:</i> POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.
       excluded_course_list:
       - POL 345
       - POL 446
@@ -193,13 +192,13 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
     Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Juniors complete a year-long research project, which consists of a research prospectus submitted in December and a final paper submitted in April.
 - name: Senior Thesis
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so TigerPath does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
 
     Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Unlike junior independent work, the senior thesis is expected to be more extensive, with a topic of greater scope and, correspondingly broader analysis and interpretation.
