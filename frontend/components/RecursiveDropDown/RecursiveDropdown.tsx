@@ -138,8 +138,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   }, [setExplanation, setShowPopup]); // Dependencies
 
   const handleSearch = useCallback(() => {
-    if (explanation && explanation[1]) {
-      useSearchStore.getState().setSearchResults(explanation[1]);
+    if (explanation && explanation[2]) {
+      useSearchStore.getState().setSearchResults(explanation[2]);
     }
     handleClose();
   }, [explanation, handleClose]);
@@ -207,10 +207,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
           maxHeight: '75vh',
         }}
       >
-        <div>
-          {explanation === null || explanation === undefined ? (
-            <LoadingComponent />
-          ) : Object.entries(explanation).length > 0 ? (
+        <div className={styles.detailRow}>
+          {explanation ? (
             Object.entries(explanation).map(([index, value]) => {
               if (index === '0') {
                 if (value) {
@@ -253,18 +251,18 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                 );
               }
             })
-          ) : null}
+          ) : (
+            <LoadingComponent />
+          )}
         </div>
       </div>
       <footer className='mt-auto text-right'>
-        {explanation && explanation[1] && explanation[1].length > 0 && (
+        {explanation && explanation[2] && explanation[2].length > 0 && (
           <JoyButton variant='soft' color='primary' onClick={handleSearch} size='md'>
             Search Courses
           </JoyButton>
         )}
-        {isLoading ? (
-          <LoadingComponent />
-        ) : markedSatisfied ? (
+        {isLoading ? null : markedSatisfied ? (
           <JoyButton
             variant='soft'
             color='warning'

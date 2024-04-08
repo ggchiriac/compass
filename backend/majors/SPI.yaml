@@ -363,16 +363,16 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
     
-    Prior to the second semester of senior year, each student must have completed an approved cross-cultural or field experience. The requirement may be satisfied in a number of ways, including but not limited to semester study abroad, summer study abroad, policy-relevant summer jobs in a domestic or international organization, ROTC training, senior thesis research in the field, extended service in an underserved community, or an internship involving public policy work in a nonprofit, government or international agency such as the United Nations, the World Bank, the US Congress, or a state or federal agency.
+    <p>Prior to the second semester of senior year, each student must have completed an approved cross-cultural or field experience. The requirement may be satisfied in a number of ways, including but not limited to semester study abroad, summer study abroad, policy-relevant summer jobs in a domestic or international organization, ROTC training, senior thesis research in the field, extended service in an underserved community, or an internship involving public policy work in a nonprofit, government or international agency such as the United Nations, the World Bank, the US Congress, or a state or federal agency.
     Summer study or thesis research must be done for at least four weeks to qualify. Students must engage in an internship, job or community service project for at least six consecutive weeks at a minimum of 40 hours per week or a total of 240 cumulative hours to qualify. Eligible community service work must involve policy work that will enhance one's learning and understanding of public service.
-    Cross-cultural or field experience gained during the first or sophomore year or as a participant in the Bridge Year Program may count toward this requirement. To meet this requirement, all past or proposed work must be approved by the undergraduate program.
+    Cross-cultural or field experience gained during the first or sophomore year or as a participant in the Bridge Year Program may count toward this requirement. To meet this requirement, all past or proposed work must be approved by the undergraduate program.</p>
 - name: Senior Departmental Examination
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
     
-    The school's senior comprehensive examination is an oral defense of the senior thesis that assesses the student's expertise related to their thesis.
+    <p>The school's senior comprehensive examination is an oral defense of the senior thesis that assesses the student's expertise related to their thesis.</p>
   no_req:

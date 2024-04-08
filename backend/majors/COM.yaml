@@ -169,9 +169,9 @@ req_list:
     max_counted: 1
     min_needed: 2
     explanation: |-
-      <i>Editor's Note: Not all of the courses allowed by Compass will satisfy this requirement. Only the subset that are taught by core COM faculty should count, but Compass does not verify this.</i>
+      <p><i>Editor's Note: Not all of the courses allowed by Compass will satisfy this requirement. Only the subset that are taught by core COM faculty should count, but Compass does not verify this.</i></p>
 
-      All majors must take two COM courses taught by core COM faculty (that is, by faculty listed on the “Core Faculty” list of the departmental website). Those other two COM courses can be 200-, 300-, 400-, or 500-level; with the professor’s permission, advanced students may enroll in 500-level COM courses. These must be Princeton COM courses; no exceptions.
+      <p>All majors must take two COM courses taught by core COM faculty (that is, by faculty listed on the “Core Faculty” list of the departmental website). Those other two COM courses can be 200-, 300-, 400-, or 500-level; with the professor’s permission, advanced students may enroll in 500-level COM courses. These must be Princeton COM courses; no exceptions.</p>
     excluded_course_list:
     - COM 300
     course_list:
@@ -189,11 +189,11 @@ req_list:
     max_counted: 1
     min_needed: 4
     explanation: |-
-      <i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i>
+      <p><i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i></p>
 
-      All majors must take four 200-, 300-, 400-, or 500-level non-English-language reading-based courses. Any course at the 200-level or above taught within any language department at Princeton that is not part of a language instruction sequence may be used to fulfill the requirement, so long as it is based on the reading of texts and/or viewing of films in a non-English language. The focus of such a course must be in the language for which the student is claiming credit. A limited number of secondary readings may be in English (or some other foreign language), but the course must entail a substantial and extended engagement with materials in the original language for which the student is claiming credit. Courses that are part of a language-instruction sequence as well as grammar-review courses are normally excluded; students studying languages with fewer course offerings such as Arabic or Hindi-Urdu may petition the Director of Undergraduate Studies for permission to allow a reading-based course that is part of the language-instruction sequence. Courses do not need to be about literature; courses in film, art, history, philosophy, or the social sciences that are devoted to reading texts in the original language will also fulfill this requirement. Courses in which the primary readings are in translation cannot be counted, but those where the language of discussion and written assignments are in English are allowable. Any questions about whether a course and its readings or viewings qualify for credit should be taken up with the Director of Undergraduate Studies. In the event that a special arrangement is requested in order to claim credit for a course, students must secure such arrangements at the beginning of the semester with both the course professor and the DUS, and follow up with both the professor and DUS at the end of the semester once those conditions have been fulfilled.
+      <p>All majors must take four 200-, 300-, 400-, or 500-level non-English-language reading-based courses. Any course at the 200-level or above taught within any language department at Princeton that is not part of a language instruction sequence may be used to fulfill the requirement, so long as it is based on the reading of texts and/or viewing of films in a non-English language. The focus of such a course must be in the language for which the student is claiming credit. A limited number of secondary readings may be in English (or some other foreign language), but the course must entail a substantial and extended engagement with materials in the original language for which the student is claiming credit. Courses that are part of a language-instruction sequence as well as grammar-review courses are normally excluded; students studying languages with fewer course offerings such as Arabic or Hindi-Urdu may petition the Director of Undergraduate Studies for permission to allow a reading-based course that is part of the language-instruction sequence. Courses do not need to be about literature; courses in film, art, history, philosophy, or the social sciences that are devoted to reading texts in the original language will also fulfill this requirement. Courses in which the primary readings are in translation cannot be counted, but those where the language of discussion and written assignments are in English are allowable. Any questions about whether a course and its readings or viewings qualify for credit should be taken up with the Director of Undergraduate Studies. In the event that a special arrangement is requested in order to claim credit for a course, students must secure such arrangements at the beginning of the semester with both the course professor and the DUS, and follow up with both the professor and DUS at the end of the semester once those conditions have been fulfilled.
 
-      As long as all four reading courses are in non-English languages, this requirement can be fulfilled through any distribution of languages. The courses can be evenly split between two foreign languages, divided with three courses in one foreign language, and one in the other, or even distributed among three or four different languages. Students also have the option of taking all four reading courses in one foreign language, and simply demonstrating reading proficiency in the second foreign language. The Department understands proficiency as the ability to read short texts (such as a short story, poem, essay, or newspaper article) with the aid of a dictionary. The determination will be made at the discretion of the Director of Undergraduate Studies, but typically proficiency may be established through completion of three semesters in a language sequence at Princeton, which for many languages will culminate in a course numbered 107 or 108, or by taking 200-level and higher courses in the language. Certain approved summer programs will also meet the requirement. Students interested in this latter option should confer with the Director of Undergraduate Studies.
+      As long as all four reading courses are in non-English languages, this requirement can be fulfilled through any distribution of languages. The courses can be evenly split between two foreign languages, divided with three courses in one foreign language, and one in the other, or even distributed among three or four different languages. Students also have the option of taking all four reading courses in one foreign language, and simply demonstrating reading proficiency in the second foreign language. The Department understands proficiency as the ability to read short texts (such as a short story, poem, essay, or newspaper article) with the aid of a dictionary. The determination will be made at the discretion of the Director of Undergraduate Studies, but typically proficiency may be established through completion of three semesters in a language sequence at Princeton, which for many languages will culminate in a course numbered 107 or 108, or by taking 200-level and higher courses in the language. Certain approved summer programs will also meet the requirement. Students interested in this latter option should confer with the Director of Undergraduate Studies.</p>
     course_list:
     - LANG 2*
     - LANG 3*
@@ -212,9 +212,9 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |-
-        <i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i>
+        <p><i>Editor's Note: Most of these courses fall under this requirement but Compass does not verify this.</i></p>
 
-        Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed with comparative literature (one of which is COM 300); and two upper-level courses in literature in any other language (including English and courses on readings taught in translation).
+        <p>Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed with comparative literature (one of which is COM 300); and two upper-level courses in literature in any other language (including English and courses on readings taught in translation).</p>
       course_list:
       - LANG 3**
       - LANG 4**
@@ -264,9 +264,9 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |-
-        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i>
+        <p><i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i></p>
 
-        Comparative work in literature and another medium (that is, photography, film, art, art history, architecture or music). Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed in comparative literature (one of which is COM 300); and two upper-level courses in the relevant medium. Both courses must be in the same medium.
+        <p>Comparative work in literature and another medium (that is, photography, film, art, art history, architecture or music). Students in this track choose four reading-based courses in non-English-language literature; three courses listed or cross-listed in comparative literature (one of which is COM 300); and two upper-level courses in the relevant medium. Both courses must be in the same medium.</p>
       course_list:
       - ART 3*
       - ART 4*
@@ -362,16 +362,16 @@ req_list:
     max_counted: 1
     min_needed: 0
     explanation: |-
-      <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
+      <p><i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i></p>
 
-      One course, which may or may not be one of the nine courses taken for the major, must be dedicated in its entirety to historical periods, literature or cultures before 1800 C.E.
+      <p>One course, which may or may not be one of the nine courses taken for the major, must be dedicated in its entirety to historical periods, literature or cultures before 1800 C.E.</p>
   - name: Theory and Methods of Comparative Literature
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i>
+      <p><i>Editor's Note: This requirement is too broad or requires course approval from the major's Director of Undergraduate Studies, so Compass does not check it.</i></p>
       
-      Theoretical issues naturally arise in the study of comparative literature. They may also function as the main focus of a student's work. Theoretical issues are specifically addressed in two departmental courses: COM 303, Comparative History of Literary Theory and COM 301, Theory and Methods of Comparative Literature: Critical and Literary Theory. Upper-level courses in theory, methodology and criticism are offered by other humanities and social science departments as well.
+      <p>Theoretical issues naturally arise in the study of comparative literature. They may also function as the main focus of a student's work. Theoretical issues are specifically addressed in two departmental courses: COM 303, Comparative History of Literary Theory and COM 301, Theory and Methods of Comparative Literature: Critical and Literary Theory. Upper-level courses in theory, methodology and criticism are offered by other humanities and social science departments as well.</p>
     course_list:
     - COM 303
     - COM 301
@@ -384,20 +384,20 @@ req_list:
   max_counted: 1
   min_needed: 0
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
 
-    Majors must write two junior papers. The first paper, some 3,000 words in length, will normally involve the close study of a work from one of the non-English-language literatures in which the student has linguistic competence. Its purpose is to develop the student's basic skills as a reader of complex texts. The second paper should be wider in scope, and might serve as the beginnings of a senior thesis. It will normally be some 8,000 words in length.
+    <p>Majors must write two junior papers. The first paper, some 3,000 words in length, will normally involve the close study of a work from one of the non-English-language literatures in which the student has linguistic competence. Its purpose is to develop the student's basic skills as a reader of complex texts. The second paper should be wider in scope, and might serve as the beginnings of a senior thesis. It will normally be some 8,000 words in length.</p>
 - name: Senior Thesis
   max_counted: 1
   min_needed: 0
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
 
-    Majors must write a senior thesis, normally between 15,000 and 20,000 words, which is comparative in nature and should reflect the student's ability to relate and analyze materials in the area chosen. Creative theses must be accompanied by a substantial critical essay.
+    <p>Majors must write a senior thesis, normally between 15,000 and 20,000 words, which is comparative in nature and should reflect the student's ability to relate and analyze materials in the area chosen. Creative theses must be accompanied by a substantial critical essay.</p>
 - name: Senior Departmental Examination
   max_counted: 1
   min_needed: 0
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
     
-    Majors must take the senior departmental examination, which is a written exam to test their ability to analyze texts and make connections among them. The student consults with their senior faculty adviser to select specific titles from a broad reading list, reads them and answers questions based on the student's particular language proficiency and chosen program of study. Students will also be asked to analyze a passage in their primary language.
+    <p>Majors must take the senior departmental examination, which is a written exam to test their ability to analyze texts and make connections among them. The student consults with their senior faculty adviser to select specific titles from a broad reading list, reads them and answers questions based on the student's particular language proficiency and chosen program of study. Students will also be asked to analyze a passage in their primary language.</p>

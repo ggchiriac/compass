@@ -164,23 +164,23 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
     
-    First-term Program
-    The first-term program consists of two components: junior colloquium and reading groups.
-    The Junior Colloquium: One evening each week throughout the fall term, junior chemistry majors and early majors are required to attend research seminars and departmental trainings. The research seminars, given by the departmental faculty, will introduce students to areas of current research not typically addressed during the coursework. The departmental training sessions include laboratory safety and responsible conduct of research, which prepare students for independent research in the spring.
-    Reading Groups: Juniors will be assigned to one of several reading groups. Over the course of the semester, every group will meet with three separate instructors, one for each of three four-week reading periods. Reading group instructors will utilize current chemical literature to introduce novel research, and the mechanics of scientific writing and presentation. At the end of each reading period, students will submit a critical analysis of a research article.
-    The student's final term grade is calculated by the director of undergraduate studies using the grades on the three papers plus the individual's record of attendance at the evening colloquia.
-    Second-term Program
-    Each student will select a faculty adviser for spring independent work by the start of the spring semester. During the semester, the student will meet regularly with the faculty adviser and begin working on preliminary research in their chosen field. At the end of the term, the student will submit a research proposal for the senior thesis. The proposal will incorporate the experimental results obtained into support for the projected thesis topics. A student's final term grade is determined by the director of undergraduate studies in conjunction with the faculty adviser's evaluation.
+    <p>First-term Program<br>
+    The first-term program consists of two components: junior colloquium and reading groups.<br>
+    The Junior Colloquium: One evening each week throughout the fall term, junior chemistry majors and early majors are required to attend research seminars and departmental trainings. The research seminars, given by the departmental faculty, will introduce students to areas of current research not typically addressed during the coursework. The departmental training sessions include laboratory safety and responsible conduct of research, which prepare students for independent research in the spring.<br>
+    Reading Groups: Juniors will be assigned to one of several reading groups. Over the course of the semester, every group will meet with three separate instructors, one for each of three four-week reading periods. Reading group instructors will utilize current chemical literature to introduce novel research, and the mechanics of scientific writing and presentation. At the end of each reading period, students will submit a critical analysis of a research article.<br>
+    The student's final term grade is calculated by the director of undergraduate studies using the grades on the three papers plus the individual's record of attendance at the evening colloquia.<br>
+    Second-term Program<br>
+    Each student will select a faculty adviser for spring independent work by the start of the spring semester. During the semester, the student will meet regularly with the faculty adviser and begin working on preliminary research in their chosen field. At the end of the term, the student will submit a research proposal for the senior thesis. The proposal will incorporate the experimental results obtained into support for the projected thesis topics. A student's final term grade is determined by the director of undergraduate studies in conjunction with the faculty adviser's evaluation.</p>
   no_req:
 - name: Senior Independent Work
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
     
-    At the end of junior year, each student selects a thesis adviser (who may or may not be the same as the adviser during junior year). The adviser and the student will agree on a topic on which the student will undertake independent original research throughout both terms of senior year. This project will consist largely of original research involving wet laboratory work and/or chemical theory. On or before the University deadline, a written thesis based on this research work must be submitted to the department. The thesis will be evaluated and ranked by a committee of professors, two each from the following areas of study, as appropriate: inorganic chemistry, organic chemistry, physical chemistry, materials science and biochemistry.
+    <p>At the end of junior year, each student selects a thesis adviser (who may or may not be the same as the adviser during junior year). The adviser and the student will agree on a topic on which the student will undertake independent original research throughout both terms of senior year. This project will consist largely of original research involving wet laboratory work and/or chemical theory. On or before the University deadline, a written thesis based on this research work must be submitted to the department. The thesis will be evaluated and ranked by a committee of professors, two each from the following areas of study, as appropriate: inorganic chemistry, organic chemistry, physical chemistry, materials science and biochemistry.</p>
   no_req:
 - name: Senior Departmental Examination
   min_needed: 1
