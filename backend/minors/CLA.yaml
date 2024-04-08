@@ -28,7 +28,7 @@ req_list:
   - CLA *
   - CLG 108
   - LAT 108
-  completed_by_semester: Junior Spring
+  completed_by_semester: 6
 - name: Tracks
   max_counted: 1
   min_needed: 1
