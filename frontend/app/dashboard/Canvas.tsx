@@ -766,7 +766,6 @@ export function Canvas({
 }
 
 function getPrimaryColor(id: UniqueIdentifier) {
-  console.log(id);
   const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
   return PRIMARY_COLOR_LIST[hash];
 }
