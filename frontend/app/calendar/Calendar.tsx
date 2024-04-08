@@ -2,57 +2,61 @@ import { useEffect, useRef } from 'react';
 
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 
+import './Calendar.scss';
 import { CalendarEvent } from '@/types';
 
 import Navbar from '@/components/Navbar';
-import useKairosStore from '@/store/calendarSlice';
+import useCalendarStore from '@/store/calendarSlice';
 
 import CalendarCard from './CalendarCard';
 import CalendarDays from './CalendarDays';
 
 const startHour = 7;
 const endHour = 21;
+
 const formatHour = (hour: number) => {
   const formattedHour = hour % 12 || 12;
   const period = hour < 12 ? 'AM' : 'PM';
   return `${formattedHour}:00 ${period}`;
 };
 
-const calculateGridRow = (timeString: string) => {
-  const [time, period] = timeString.split(' ');
-  const [hour, minute] = time.split(':').map(Number);
-
-  let adjustedHour = hour;
-  if (period === 'PM' && hour !== 12) {
-    adjustedHour += 12;
-  } else if (period === 'AM' && hour === 12) {
-    adjustedHour = 0;
-  }
-
-  const rowsPerHour = 6; // 10-minute increments (60 minutes / 10 minutes)
-  const minuteOffset = Math.floor(minute / 10);
-
-  return (adjustedHour - startHour) * rowsPerHour + minuteOffset;
-};
-
-const dayToStartColumnIndex: Record<string, number> = {
-  M: 1, // Monday
-  T: 2, // Tuesday
-  W: 3, // Wednesday
-  Th: 4, // Thursday
-  F: 5, // Friday
-};
-
-const getStartColumnIndexForDays = (daysString: string): number[] => {
-  const daysArray = daysString.split(',');
-  return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0);
-};
-
 const Calendar: React.FC = () => {
   const calendarRef = useRef<HTMLDivElement>(null);
+  const selectedCourses = useCalendarStore((state) => state.selectedCourses);
+  const setSelectedCourses = useCalendarStore((state) => state.setSelectedCourses);
 
-  const selectedCourses = useKairosStore((state) => state.selectedCourses);
-  const setSelectedCourses = useKairosStore((state) => state.setSelectedCourses);
+  // TODO: Should probably somehow standardize colors in one place across Canvas and here.
+  const PRIMARY_COLOR_LIST: string[] = [
+    '#ff7895',
+    '#e38a62',
+    '#cdaf7b',
+    '#94bb77',
+    '#e2c25e',
+    '#ead196',
+    '#e7bc7d',
+    '#d0b895',
+    '#72b4c9',
+    '#2cdbca',
+    '#a8cadc',
+    '#c5bab6',
+    '#bf91bd',
+  ];
+
+  // const SECONDARY_COLOR_LIST: string[] = [
+  //   '#ff91a9',
+  //   '#e9a88a',
+  //   '#d7bf95',
+  //   '#afcb9a',
+  //   '#e9d186',
+  //   '#f5db9d',
+  //   '#f0d2a8',
+  //   '#dcc9af',
+  //   '#96c7d6',
+  //   '#2ee8d6',
+  //   '#a8d3dc',
+  //   '#cac1be',
+  //   '#c398c1',
+  // ];
 
   const today = new Date();
   const startDate = startOfWeek(today, { weekStartsOn: 1 });
@@ -64,55 +68,38 @@ const Calendar: React.FC = () => {
     current: isSameDay(date, today),
   }));
 
-  const events: CalendarEvent[] = selectedCourses.flatMap((courseEvent) => {
-    const sectionEvents: CalendarEvent[] =
-      courseEvent.course.sections?.flatMap((section) => {
-        const classMeetings = section.class_meetings.map((meeting) => {
-          const startTime = meeting.start_time;
-          const endTime = meeting.end_time;
-          const startRowIndex = calculateGridRow(startTime);
-          const endRowIndex = calculateGridRow(endTime);
+  const getRandomColor = (colorList) => {
+    const randomIndex = Math.floor(Math.random() * colorList.length);
+    return colorList[randomIndex];
+  };
 
-          // Convert start time and end time to 12-hour format
-          // const startTimeFormatted = format(parse(startTime, 'HH:mm', new Date()), 'h:mm a');
-          // const endTimeFormatted = format(parse(endTime, 'HH:mm', new Date()), 'h:mm a');
-
-          return {
-            startTime,
-            endTime,
-            startColumnIndex: getStartColumnIndexForDays(meeting.days)[0],
-            startRowIndex,
-            endRowIndex,
-          };
-        });
-
-        const uniqueKey = `${courseEvent.course.course_id}-${section.class_number}`;
-        return classMeetings.map((classMeeting) => ({
-          key: uniqueKey,
-          course: courseEvent.course,
-          selectedSection: section,
-          startTime: classMeeting.startTime,
-          endTime: classMeeting.endTime,
-          startColumnIndex: classMeeting.startColumnIndex,
-          startRowIndex: classMeeting.startRowIndex,
-          endRowIndex: classMeeting.endRowIndex,
-        }));
-      }) || [];
-
-    return sectionEvents;
-  });
+  const getTextColor = (backgroundColor) => {
+    const rgb = parseInt(backgroundColor.slice(1), 16);
+    const r = (rgb >> 16) & 0xff;
+    const g = (rgb >> 8) & 0xff;
+    const b = (rgb >> 0) & 0xff;
+    const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    return luma < 128 ? 'text-white' : 'text-gray-800';
+  };
 
   // Group events by start time and end time
   const groupedEvents: Record<string, CalendarEvent[]> = {};
-  events.forEach((event) => {
+  selectedCourses.forEach((event) => {
     const key = `${event.startColumnIndex}-${event.startRowIndex}-${event.endRowIndex}`;
     if (!groupedEvents[key]) {
       groupedEvents[key] = [];
     }
-    groupedEvents[key].push(event);
+    // Assigning random colors here
+    const primaryColor = getRandomColor(PRIMARY_COLOR_LIST);
+    const textColor = getTextColor(primaryColor);
+    groupedEvents[key].push({
+      ...event,
+      color: primaryColor,
+      textColor: textColor,
+    });
   });
 
-  // Calculate the width for overlapping events
+  // Calculate the width for overlapping events and maintain color assignment
   const eventsWithWidth: CalendarEvent[] = Object.values(groupedEvents).flatMap((eventGroup) => {
     const width = 1 / eventGroup.length;
     return eventGroup.map((event, index) => ({
@@ -122,13 +109,13 @@ const Calendar: React.FC = () => {
     }));
   });
 
-  const handleSectionClick = (event: CalendarEvent) => {
-    if (event.selectedSection) {
+  const handleClick = (event: CalendarEvent) => {
+    if (event.section) {
       const updatedCourses = selectedCourses.map((courseEvent) => {
-        if (courseEvent.course.course_id === event.course.course_id) {
+        if (courseEvent.course.courseId === event.course.courseId) {
           return {
             ...courseEvent,
-            selectedSection: event.selectedSection,
+            selectedSection: event.section,
           };
         }
         return courseEvent;
@@ -215,7 +202,7 @@ const Calendar: React.FC = () => {
                 <CalendarCard
                   key={event.key}
                   event={event}
-                  onSectionClick={() => handleSectionClick(event)}
+                  onSectionClick={() => handleClick(event)}
                   width={event.width}
                   offsetLeft={event.offsetLeft}
                 />

@@ -1,24 +1,28 @@
-// Renders the selected courses section
+import { Virtuoso } from 'react-virtuoso';
 
-import List from '@mui/material/List';
-import Paper from '@mui/material/Paper';
-
+import { Item } from '@/components/Item';
 import useCalendarStore from '@/store/calendarSlice';
 
-import SelectedCourseItem from './SelectedCourseItem';
+import styles from './CalendarSelectedCourses.module.scss';
 
 const SelectedCourses: React.FC = () => {
   const selectedCourses = useCalendarStore((state) => state.selectedCourses);
-
   return (
-    <Paper className='p-2.5 overflow-auto max-h-[calc(50vh-4rem)]'>
-      <h3 className='text-lg font-semibold'>Selected Courses</h3>
-      <List>
-        {selectedCourses.map((courses) => (
-          <SelectedCourseItem key={courses.course.guid} course={courses} />
-        ))}
-      </List>
-    </Paper>
+    <div className={styles.SelectedCourses}>
+      <div className={styles.Header}>
+        <h3>Selected Courses</h3>
+      </div>
+      <Virtuoso
+        style={{ height: '100%' }}
+        data={selectedCourses}
+        itemContent={(_, course) => (
+          <Item
+            key={course.course.guid}
+            value={`${course.course.departmentCode} ${course.course.catalogNumber}`}
+          />
+        )}
+      />
+    </div>
   );
 };
 

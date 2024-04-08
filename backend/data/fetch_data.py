@@ -14,8 +14,8 @@ def fetch_course_detail(course_id, term, req_lib):
     """
     Fetches course details for a given course_id and term.
     """
-    if course_id == '010855':
-        return course_id, {}
+    # if course_id == '010855':
+    #     return course_id, {}
     return course_id, req_lib.getJSON(
         req_lib.configs.COURSES_DETAILS, fmt='json', term=term, course_id=course_id
     )
@@ -45,7 +45,7 @@ def fetch_data(subject, term, req_lib):
     print(f'Fetched {len(course_ids)} course IDs from {subject}.')
 
     # Parallel fetching of course details
-    with ThreadPoolExecutor(max_workers=4) as executor:
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = [
             executor.submit(fetch_course_detail, course_id, term, req_lib)
             for course_id in course_ids
@@ -73,31 +73,36 @@ def fetch_data(subject, term, req_lib):
 def process_course(term, subject, course, seat_mapping, course_details, writer):
     """
     Extracts information from each course from the courses/courses endpoint,
-    and course details from the courses/details endpoint.
+    and course details from the courses/details endpoint. Handles courses with multiple instructors gracefully.
     """
     common_data = extract_common_data(term, subject, course)
     course_details_data = extract_course_details(course_details)
+    crosslisting_data = extract_crosslisting_data(course.get('crosslistings', []))
 
+    # Pre-process class and meeting data since it's not instructor-dependent
+    classes_data = []
+    for course_class in course.get('classes', []):
+        class_data = extract_class_data(course_class, seat_mapping)
+
+        for meeting in course_class.get('schedule', {}).get('meetings', []):
+            meeting_data = extract_meeting_data(meeting)
+            # Combine class data with each of its meeting data
+            classes_data.append({**class_data, **meeting_data})
+
+    # Process instructor-dependent data
     for instructor in course.get('instructors', []):
         instructor_data = extract_instructor_data(instructor)
-        crosslisting_data = extract_crosslisting_data(course.get('crosslistings', []))
 
-        # for course_class in course.get("classes", []):
-        for course_class in course.get('classes', []):
-            class_data = extract_class_data(course_class, seat_mapping)
-
-            for meeting in course_class.get('schedule', {}).get('meetings', []):
-                meeting_data = extract_meeting_data(meeting)
-
-                row_data = {
-                    **common_data,
-                    **instructor_data,
-                    **crosslisting_data,
-                    **class_data,
-                    **meeting_data,
-                    **course_details_data,
-                }
-                writer.writerow(row_data)
+        # For each class and meeting combination, add instructor data and write row
+        for class_meeting_data in classes_data:
+            row_data = {
+                **common_data,
+                **instructor_data,
+                **crosslisting_data,
+                **class_meeting_data,  # This now includes both class and meeting data
+                **course_details_data,
+            }
+            writer.writerow(row_data)
 
 
 # --------------------------------------------------------------------------------------

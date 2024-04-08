@@ -1,4 +1,3 @@
-import json
 import logging
 import time
 from datetime import datetime
@@ -7,38 +6,32 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
 from urllib.request import urlopen
 
+import ujson as json
 from django.conf import settings
-from django.core.cache import cache
-from django.db.models import Case, Count, IntegerField, Q, Value, When
+from django.db.models import Q
 from django.db.models.query import Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from django.shortcuts import redirect
+
 from .models import (
     ClassMeeting,
     Course,
+    CustomUser,
     Major,
     Minor,
-    CustomUser,
-    UserCourses,
-    Section,
     Requirement,
+    Section,
+    UserCourses,
 )
 from .serializers import CourseSerializer
-import json
-from data.configs import Configs
+from data.check_reqs import check_user, get_course_comments, get_course_info
+from data.configs.configs import Configs
 from data.req_lib import ReqLib
-from data.check_reqs import (
-    get_course_info,
-    get_course_comments,
-    check_user,
-)
-from .serializers import CourseSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -322,6 +315,7 @@ GRADING_OPTIONS = {
     'Audit': ['FUL', 'PDF', 'ARC', 'NGR', 'NOT', 'NPD', 'YR'],
 }
 
+
 def make_sort_key(dept):
     def sort_key(course):
         crosslistings = course['crosslistings']
@@ -330,7 +324,9 @@ def make_sort_key(dept):
             if start_index != -1:
                 return crosslistings[start_index:]
         return crosslistings
+
     return sort_key
+
 
 class SearchCourses(View):
     """
@@ -352,12 +348,12 @@ class SearchCourses(View):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + " " + num
+                code = dept + ' ' + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
                 result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + " " + num
+                code = dept + ' ' + num
             elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
                 trimmed_query
             ):
@@ -392,7 +388,7 @@ class SearchCourses(View):
                 grading_filters = []
                 for grading in grading_options:
                     grading_filters += GRADING_OPTIONS[grading]
-                print(f"Grading filters: {grading_filters}")
+                print(f'Grading filters: {grading_filters}')
                 grading_query = Q()
                 for grading in grading_filters:
                     grading_query |= Q(grading_basis__iexact=grading)
@@ -402,9 +398,12 @@ class SearchCourses(View):
                 filtered_query = query_conditions
                 filtered_query &= Q(department__code__iexact=dept)
                 filtered_query &= Q(catalog_number__iexact=num)
-                exact_match_course = Course.objects.select_related('department').filter(
-                    filtered_query
-                ).order_by('course_id', '-guid').distinct('course_id')
+                exact_match_course = (
+                    Course.objects.select_related('department')
+                    .filter(filtered_query)
+                    .order_by('course_id', '-guid')
+                    .distinct('course_id')
+                )
                 if exact_match_course:
                     # If an exact match is found, return only that course
                     serialized_course = CourseSerializer(exact_match_course, many=True)
@@ -412,13 +411,18 @@ class SearchCourses(View):
                 else:
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
-                    courses = Course.objects.select_related('department').filter(
-                        filtered_query
-                    ).order_by('course_id', '-guid').distinct('course_id')
+                    courses = (
+                        Course.objects.select_related('department')
+                        .filter(filtered_query)
+                        .order_by('course_id', '-guid')
+                        .distinct('course_id')
+                    )
                     if courses:
                         serialized_courses = CourseSerializer(courses, many=True)
-                        sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
-                        print(f"Search time: {time.time() - init_time}")
+                        sorted_data = sorted(
+                            serialized_courses.data, key=make_sort_key(dept)
+                        )
+                        print(f'Search time: {time.time() - init_time}')
                         return JsonResponse({'courses': sorted_data})
                     return JsonResponse({'courses': []})
             except Exception as e:
@@ -476,10 +480,16 @@ def update_courses(request):
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
-        course_inst = Course.objects.select_related('department').filter(Q(course_id__iexact=course_id)).order_by('-guid')[0]
+        course_inst = (
+            Course.objects.select_related('department')
+            .filter(Q(course_id__iexact=course_id))
+            .order_by('-guid')[0]
+        )
 
         if container == 'Search Results':
-            user_course = UserCourses.objects.get(user=user_inst, course__course_id=course_id)
+            user_course = UserCourses.objects.get(
+                user=user_inst, course__course_id=course_id
+            )
             user_course.delete()
             message = f'User course deleted: {course_id}, {net_id}'
 
@@ -490,9 +500,7 @@ def update_courses(request):
                 user=user_inst, course=course_inst, defaults={'semester': semester}
             )
             if created:
-                message = (
-                    f'User course added: {semester}, {course_id}, {net_id}'
-                )
+                message = f'User course added: {semester}, {course_id}, {net_id}'
             else:
                 message = f'User course updated: {semester}, {course_id}, {net_id}'
 
@@ -646,15 +654,17 @@ def mark_satisfied(request):
     user_inst = CustomUser.objects.get(net_id=net_id)
     req_inst = Requirement.objects.get(id=req_id)
 
-    if marked_satisfied == "true":
+    if marked_satisfied == 'true':
         user_inst.requirements.add(req_inst)
-        action = "Marked satisfied"
-    elif marked_satisfied == "false":
+        action = 'Marked satisfied'
+    elif marked_satisfied == 'false':
         if user_inst.requirements.filter(id=req_id).exists():
             user_inst.requirements.remove(req_inst)
-            action = "Unmarked satisfied"
+            action = 'Unmarked satisfied'
         else:
-            return JsonResponse({'error': 'Requirement not found in user requirements.'})
+            return JsonResponse(
+                {'error': 'Requirement not found in user requirements.'}
+            )
 
     return JsonResponse({'Manually satisfied': req_id, 'action': action})
 
@@ -707,14 +717,18 @@ def requirement_info(request):
         explanation = req.explanation
         completed_by_semester = req.completed_by_semester
         excluded_course_ids = req.excluded_course_list.values_list(
-            'course_id', flat=True).distinct()
-        course_list = req.course_list.exclude(
-            course_id__in=excluded_course_ids).order_by('course_id',
-                                                        '-guid').distinct(
-            'course_id')
+            'course_id', flat=True
+        ).distinct()
+        course_list = (
+            req.course_list.exclude(course_id__in=excluded_course_ids)
+            .order_by('course_id', '-guid')
+            .distinct('course_id')
+        )
         if course_list:
             serialized_course_list = CourseSerializer(course_list, many=True)
-            sorted_course_list = sorted(serialized_course_list.data, key=lambda course : course['crosslistings'])
+            sorted_course_list = sorted(
+                serialized_course_list.data, key=lambda course: course['crosslistings']
+            )
 
         user_inst = CustomUser.objects.get(net_id=request.session['net_id'])
         marked_satisfied = user_inst.requirements.filter(id=req_id).exists()
@@ -734,54 +748,89 @@ def requirement_info(request):
 # --------------------------------- CALENDAR ---------------------------------------#
 
 
-# TODO: See if this function can replace redundant parts of the code in this file.
-def get_course_details(request, course_id):
-    try:
-        # Prefetch class meetings for each section
-        class_meetings_prefetch = Prefetch(
-            'sections__class_meetings', queryset=ClassMeeting.objects.all()
-        )
-        # Now prefetch sections with their class meetings loaded
-        sections_prefetch = Prefetch(
-            'sections',
-            queryset=Section.objects.prefetch_related(class_meetings_prefetch),
-        )
-        course = Course.objects.prefetch_related(sections_prefetch).get(pk=course_id)
-
-        serializer = CourseSerializer(course)
-        return JsonResponse(serializer.data)
-    except Course.DoesNotExist:
-        return JsonResponse({'error': 'Course not found'}, status=404)
-
-
 class FetchCalendarClasses(APIView):
-    def get(self, request, course_id, format=None):
-        term = request.query_params.get('term')
-        if not term:
-            return Response({'error': 'Missing required parameter: term'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        try:
-            course = Course.objects.get(course_id=course_id)
-        except Course.DoesNotExist:
-            return Response({'error': 'Course not found'}, status=status.HTTP_404_NOT_FOUND)
-
-        sections = Section.objects.filter(course=course, term__term_code=term).prefetch_related(
-            Prefetch('classmeeting_set', queryset=ClassMeeting.objects.only('start_time', 'end_time', 'room', 'building_name'))
-        )
+    def get(self, request, term, course_id):
+        print(f'Starting fetch process for term: {term}, course_id: {course_id}')
+        sections = self.get_sections(term, course_id)
 
         if not sections:
-            return Response({'error': 'No sections found for the course'}, status=status.HTTP_404_NOT_FOUND)
+            print(f'No sections found for term: {term}, course_id: {course_id}')
+            return Response(
+                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        data = [{
-            'class_type': section.class_type,
-            'capacity': section.capacity,
-            'class_meetings': [{
-                'start_time': meeting.start_time,
-                'end_time': meeting.end_time,
-                'building_name': meeting.building_name,
-                'room': meeting.room,
-            } for meeting in section.classmeeting_set.all()]
-        } for section in sections]
+        print(f'Number of sections ready for processing: {len(sections)}')
+        sections_data = [self.serialize_section(section) for section in sections]
 
-        return Response(data)
-    
+        print(f'Sections data prepared for response')
+        return Response(sections_data, status=status.HTTP_200_OK)
+
+    def get_sections(self, term, course_id):
+        print(f'Querying database for sections: term {term}, course_id {course_id}')
+        sections = (
+            Section.objects.filter(term__term_code=term, course__course_id=course_id)
+            .select_related('course')
+            .prefetch_related(
+                Prefetch(
+                    'classmeeting_set',
+                    queryset=ClassMeeting.objects.order_by(
+                        'meeting_number',
+                        'days',
+                        'start_time',
+                        'end_time',
+                        'building_name',
+                        'room',
+                    ),
+                    to_attr='class_meetings',
+                )
+            )
+        )
+
+        for section in sections:
+            if section.class_meetings:
+                print(
+                    f'Section {section.id} has {len(section.class_meetings)} class meetings'
+                )
+
+        filtered_sections = [section for section in sections if section.class_meetings]
+        print(
+            f'Number of sections after filtering those without class meetings: {len(filtered_sections)}'
+        )
+        return filtered_sections
+
+    def serialize_section(self, section):
+        print(f'Processing section: ID {section.id}, Section {section.class_section}')
+        class_meetings_data = [
+            self.serialize_class_meeting(meeting) for meeting in section.class_meetings
+        ]
+
+        section_data = {
+            'sectionId': section.id,
+            'classSection': section.class_section,
+            'classType': section.class_type,
+            'course': {
+                'courseId': section.course.course_id,
+                'title': section.course.title,
+            },
+            'classMeetings': class_meetings_data,
+        }
+
+        print(
+            f'Section {section.id} with {len(class_meetings_data)} class meetings processed'
+        )
+        return section_data
+
+    def serialize_class_meeting(self, meeting):
+        class_meeting_data = {
+            'classMeetingId': meeting.id,
+            'meetingDays': meeting.days,
+            'startTime': meeting.start_time.strftime('%H:%M'),
+            'endTime': meeting.end_time.strftime('%H:%M'),
+            'buildingName': meeting.building_name,
+            'room': meeting.room,
+        }
+        # Log details about the class meeting being processed
+        print(
+            f"Class meeting {meeting.id} on {meeting.days} from {meeting.start_time.strftime('%H:%M')} to {meeting.end_time.strftime('%H:%M')}"
+        )
+        return class_meeting_data

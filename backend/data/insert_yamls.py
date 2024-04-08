@@ -170,9 +170,9 @@ def push_requirement(req):
                 req_inst.excluded_course_list.add(course_inst)
 
     elif (
-        (('dist_req' not in req) or (req['dist_req'] == None))
-        and (('num_courses' not in req) or (req['num_courses'] == None))
-        and (('dept_list' not in req) or (req['dept_list'] == None))
+        (('dist_req' not in req) or (req['dist_req'] is None))
+        and (('num_courses' not in req) or (req['num_courses'] is None))
+        and (('dept_list' not in req) or (req['dept_list'] is None))
     ):
         req_inst.max_counted = 1
         req_inst.min_needed = 0
@@ -329,8 +329,8 @@ def push_certificates(certificates_path):
 if __name__ == '__main__':
     with transaction.atomic():
         push_degrees(Path('../degrees').resolve())
-        push_major(Path('../majors/COS-AB.yaml').resolve())
-        push_major(Path('../majors/COS-BSE.yaml').resolve())
+        # push_major(Path('../majors/COS-AB.yaml').resolve())
+        # push_major(Path('../majors/COS-BSE.yaml').resolve())
         # push_major(Path('../majors/MAE.yaml').resolve())
         # push_major(Path('../majors/CEE.yaml').resolve())
         # push_major(Path('../majors/CBE.yaml').resolve())
@@ -348,7 +348,7 @@ if __name__ == '__main__':
         # push_major(Path('../majors/MUS.yaml').resolve())
         # push_major(Path('../majors/PHY.yaml').resolve())
         push_minors(Path('../minors').resolve())
-        # push_majors(Path('../majors').resolve())
+        push_majors(Path('../majors').resolve())
 
         # Push Undeclared major into database
         Major.objects.create(**UNDECLARED)

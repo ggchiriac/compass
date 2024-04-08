@@ -656,7 +656,7 @@ def get_course_info(dept, num):
                 department__id=dept_code, catalog_number=num
             ).first()
             if course.course_id:
-                co_id = course.course_id
+                co_id = course.course_id # TODO: co_id is not used?
                 # instructor = "None"
                 # try:
                 #    instructor = Section.objects.filter(course_id=13248).first()

@@ -60,7 +60,7 @@ const FilterModal: FC = () => {
             options={Object.keys(terms)}
             placeholder='Semester'
             variant='soft'
-            value={termFilter ? termsInverse[termFilter] : 'Spring 2024'}
+            value={termsInverse[termFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | undefined) => {
               event.stopPropagation();

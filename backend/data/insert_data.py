@@ -19,7 +19,6 @@ from compass.models import (
     Department,
     AcademicTerm,
     Course,
-    CourseEquivalent,
     Section,
     ClassMeeting,
     ClassYearEnrollment,
@@ -41,6 +40,26 @@ def _parse_class_year_enrollments(str, pattern):
     return pattern.findall(str)
 
 
+def _format_duration(start_time, end_time):
+    elapsed_time = end_time - start_time
+    seconds = elapsed_time.total_seconds()
+
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+
+    # Building a formatted string
+    formatted_duration = []
+    if hours:
+        formatted_duration.append(f'{int(hours)} hours')
+    if minutes:
+        formatted_duration.append(f'{int(minutes)} minutes')
+    if seconds or not formatted_duration:
+        # Rounds seconds to the nearest thousandth
+        formatted_duration.append(f'{seconds:.3f} seconds')
+
+    return ', '.join(formatted_duration)
+
+
 def _parse_time(time_str):
     try:
         return datetime.strptime(time_str, '%I:%M %p').strftime('%H:%M')
@@ -54,28 +73,43 @@ def _parse_time(time_str):
 def insert_departments(rows):
     logging.info('Starting Department insertions and updates...')
 
+    # Create a set of unique departments from the input rows
     unique_departments = {(row['Subject Code'], row['Subject Name']) for row in rows}
-    existing_departments = Department.objects.filter(
-        code__in=[code for code, _ in unique_departments]
-    )
-    existing_codes = {department.code for department in existing_departments}
+
+    # Fetch existing departments into a dictionary for quick access
+    existing_departments_dict = {
+        dept.code: dept
+        for dept in Department.objects.filter(
+            code__in=[code for code, _ in unique_departments]
+        )
+    }
 
     departments_to_create = []
     departments_to_update = []
 
     for code, name in unique_departments:
-        if code in existing_codes:
-            # Update the existing department
-            department = existing_departments.get(code=code)
-            department.name = name
-            departments_to_update.append(department)
+        if code in existing_departments_dict:
+            # Access the existing department from the dictionary
+            department = existing_departments_dict[code]
+            if department.name != name:
+                department.name = name
+                departments_to_update.append(department)
         else:
-            # Create a new department
+            # Prepare a new Department instance for bulk creation
             departments_to_create.append(Department(code=code, name=name))
 
-    Department.objects.bulk_create(departments_to_create)
-    Department.objects.bulk_update(departments_to_update, ['name'])
+    try:
+        with transaction.atomic():
+            if departments_to_create:
+                Department.objects.bulk_create(departments_to_create)
+            if departments_to_update:
+                Department.objects.bulk_update(departments_to_update, ['name'])
+    except Exception as e:
+        logging.error(f'Error in inserting departments: {e}')
 
+    logging.info(
+        f'Inserted {len(departments_to_create)} new departments and updated {len(departments_to_update)} departments.'
+    )
     logging.info('Department insertions and updates completed!')
 
 
@@ -86,25 +120,47 @@ def insert_academic_terms(rows):
     logging.info('Starting AcademicTerm insertions and updates...')
 
     def parse_date(date_str):
+        """Parse a date string into a date object, return None if empty."""
         return datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
 
-    # Assuming the first row has the necessary data
     first_row = rows[0]
 
+    # Prepare new term details
     term_code = first_row['Term Code'].strip()
-    suffix = first_row['Term Name']
-    start_date = parse_date(
-        first_row.get('Course Start Date')
-    )  # Ensure these are the correct column names
-    end_date = parse_date(first_row.get('Course End Date'))
-
-    # Use update_or_create to either update existing records or create a new one
-    AcademicTerm.objects.update_or_create(
-        term_code=term_code,
-        defaults={'suffix': suffix, 'start_date': start_date, 'end_date': end_date},
+    new_details = (
+        first_row['Term Name'],
+        parse_date(first_row.get('Course Start Date')),
+        parse_date(first_row.get('Course End Date')),
     )
 
-    logging.info('AcademicTerm insertions completed!')
+    try:
+        with transaction.atomic():
+            term, created = AcademicTerm.objects.get_or_create(
+                term_code=term_code,
+                defaults=dict(zip(('suffix', 'start_date', 'end_date'), new_details)),
+            )
+
+            if created:
+                logging.info('Inserted 1 new academic term.')
+            else:
+                # Extract existing term details
+                existing_details = (term.suffix, term.start_date, term.end_date)
+
+                if new_details != existing_details:
+                    # Update term if there are differences
+                    AcademicTerm.objects.filter(term_code=term_code).update(
+                        suffix=new_details[0],
+                        start_date=new_details[1],
+                        end_date=new_details[2],
+                    )
+                    logging.info('Updated 1 academic term.')
+                else:
+                    logging.info('No changes detected; no update performed.')
+
+    except Exception as e:
+        logging.error(f'Error in inserting/updating academic terms: {e}')
+
+    logging.info('AcademicTerm insertions and updates completed!')
 
 
 # -------------------------------------------------------------------------------------#
@@ -118,22 +174,21 @@ def insert_courses(rows):
     new_courses = []
     updated_courses = []
 
-    for row in tqdm(rows, desc='Processing Courses'):
+    for row_index, row in enumerate(tqdm(rows, desc='Processing Courses')):
         guid = row.get('Course GUID')
-        crosslistings = row.get('Crosslistings')
-        if crosslistings is None:
-            crosslistings = row['Subject Code'] + ' ' + row['Catalog Number']
-
-        # Handle CHI1001, FRE1027, GER1025...
-        pattern = r'([a-zA-Z])([0-9])'
-        replacement = r'\1 \2'
-        crosslistings = re.sub(pattern, replacement, crosslistings)
-
         dept_code = row['Subject Code']
         department = departments.get(dept_code)
-        if not department:
-            logging.warning(f'Department with code {dept_code} not found!')
+
+        if not guid:
+            logging.warning(f'Course GUID not found on row {row_index + 1}')
             continue
+
+        crosslistings = row.get('Crosslistings')
+        if crosslistings is None:
+            crosslistings = f"{row['Subject Code']} {row['Catalog Number']}"
+
+        # Handle CHI1001, FRE1027, GER1025...
+        crosslistings = re.sub(r'([a-zA-Z])([0-9])', r'\1 \2', crosslistings)
 
         reading_list_entries = [
             f"{row[f'Reading List Title {i}']}//{row[f'Reading List Author {i}']}"
@@ -165,165 +220,111 @@ def insert_courses(rows):
         course = existing_courses.get(guid)
         if course:
             # Update existing course
+            update_required = False
             for key, value in defaults.items():
-                setattr(course, key, value)
-            updated_courses.append(course)
+                if getattr(course, key) != value:
+                    setattr(course, key, value)
+                    update_required = True
+            if update_required:
+                updated_courses.append(course)
         else:
-            # Create new course instance
-            new_course = Course(guid=guid, **defaults)
-            new_courses.append(new_course)
-            existing_courses[guid] = new_course
+            # Check if the course already exists in new_courses
+            new_course = next((c for c in new_courses if c.guid == guid), None)
+            if new_course:
+                # Update the existing new course instance
+                for key, value in defaults.items():
+                    setattr(new_course, key, value)
+            else:
+                # Create a new course instance
+                new_course = Course(guid=guid, **defaults)
+                new_courses.append(new_course)
 
-    # Define the fields to update using list comprehension
     update_fields = [field.name for field in Course._meta.fields if field.name != 'id']
 
-    # Bulk create new courses
-    Course.objects.bulk_create(new_courses)
-    # Bulk update existing courses
-    Course.objects.bulk_update(updated_courses, update_fields)
+    try:
+        with transaction.atomic():
+            if new_courses:
+                Course.objects.bulk_create(new_courses)
 
+            if updated_courses:
+                Course.objects.bulk_update(updated_courses, update_fields)
+    except Exception as e:
+        logging.error(f'Error in inserting/updating courses: {e}')
+
+    logging.info(
+        f'Inserted {len(new_courses)} new courses, updated {len(updated_courses)} existing courses.'
+    )
     logging.info('Course insertions and updates completed!')
 
 
 # -------------------------------------------------------------------------------------#
 
 
-# For each course in the Course table, take its crosslistings and
-# insert every crosslisting in the Course table as a separate course.
-# Also populate CourseEquivalents table with the links between
-# each pair of equivalent courses.
-def insert_course_equivalents(rows):
-    logging.info('Starting CourseEquivalent insertions and updates...')
-
-    departments = {dept.code: dept for dept in Department.objects.all()}
-    course_cache = {course.guid: course for course in Course.objects.all()}
-    existing_course_equivalents = {
-        (ce.primary_course.guid, ce.equivalent_course.guid): ce
-        for ce in CourseEquivalent.objects.select_related(
-            'primary_course', 'equivalent_course'
-        )
-    }
-    processed_guids = set()
-    new_courses = []
-    new_course_equivalents = []
-    updated_courses = []
-
-    for row in tqdm(rows, desc='Processing Course Equivalents...'):
-        primary_guid = row['Course GUID'].strip()
-        if primary_guid in processed_guids or not row['Crosslistings']:
-            continue
-        processed_guids.add(primary_guid)
-
-        primary_course = course_cache.get(primary_guid)
-        if not primary_course:
-            continue
-
-        crosslistings = row['Crosslistings'].split(' / ')
-        for crosslisting in crosslistings[1:]:
-            parts = crosslisting.split()
-            if len(parts) == 2:
-                department_code, catalog_number = parts
-            else:
-                # Attempt to separate the department code and catalog number
-                department_code = ''.join(filter(str.isalpha, crosslisting))
-                catalog_number = ''.join(filter(str.isdigit, crosslisting))
-                if not department_code or not catalog_number:
-                    logging.warning(f'Could not parse crosslisting: {crosslisting}')
-                    continue
-
-            cross_department = departments.get(department_code)
-            if not cross_department:
-                logging.warning(f'Department not found for code: {department_code}')
-                continue
-
-            # Check if equivalent course exists
-            cross_course = course_cache.get((department_code, catalog_number))
-            if not cross_course:
-                # Create a new course for the crosslisting
-                cross_course = Course(
-                    guid=f'{department_code}{catalog_number}',
-                    course_id=primary_course.course_id,
-                    department=cross_department,
-                    title=primary_course.title,
-                    catalog_number=catalog_number,
-                    description=primary_course.description,
-                    drop_consent=primary_course.drop_consent,
-                    add_consent=primary_course.add_consent,
-                    web_address=primary_course.web_address,
-                    transcript_title=primary_course.transcript_title,
-                    long_title=primary_course.long_title,
-                    distribution_area_long=primary_course.distribution_area_long,
-                    distribution_area_short=primary_course.distribution_area_short,
-                    reading_writing_assignment=primary_course.reading_writing_assignment,
-                    grading_basis=primary_course.grading_basis,
-                    reading_list=primary_course.reading_list,
-                    crosslistings=primary_course.crosslistings,
-                )
-                new_courses.append(cross_course)
-                course_cache[(department_code, catalog_number)] = cross_course
-            else:
-                # Update the crosslistings field of the existing course
-                cross_course.crosslistings = primary_course.crosslistings
-                updated_courses.append(cross_course)
-
-            # Create a new CourseEquivalent record
-            course_equivalent_key = (primary_course.guid, cross_course.guid)
-            if course_equivalent_key not in existing_course_equivalents:
-                course_equivalent = CourseEquivalent(
-                    primary_course=primary_course,
-                    equivalent_course=cross_course,
-                    equivalence_type='CROSS_LIST',
-                )
-                new_course_equivalents.append(course_equivalent)
-
-    # Perform bulk creation and updating
-    Course.objects.bulk_create(new_courses)
-    Course.objects.bulk_update(updated_courses, ['crosslistings'])
-    CourseEquivalent.objects.bulk_create(new_course_equivalents, ignore_conflicts=True)
-
-    logging.info('CourseEquivalent insertion and update completed!')
-
-
-# -------------------------------------------------------------------------------------#
-
-
 def insert_instructors(rows):
+    logging.info('Starting instructor insertions and updates...')
+
+    update_fields = ['first_name', 'last_name', 'full_name']
+    new_instructors = []
+    updated_instructors = []
+    marked = []
+
+    # Pre-fetch existing instructors to reduce duplicate checks during processing
     existing_instructors = {
         instructor.emplid: instructor for instructor in Instructor.objects.all()
     }
-    new_instructors = []
-    updated_instructors = []
 
-    for row in tqdm(rows, desc='Processing Instructors'):
+    for row in tqdm(rows, desc='Processing Instructors...'):
         instructor_emplid = row.get('Instructor EmplID', '').strip()
         if not instructor_emplid:
+            logging.warning('Skipping row with missing Instructor EmplID')
             continue
 
         first_name = row.get('Instructor First Name', '').strip()
         last_name = row.get('Instructor Last Name', '').strip()
-        full_name = row.get('Instructor Full Name', f'{first_name} {last_name}'.strip())
+        full_name = row.get('Instructor Full Name', f'{first_name} {last_name}').strip()
 
         instructor = existing_instructors.get(instructor_emplid)
         if instructor:
-            # Update existing instructor
-            instructor.first_name = first_name
-            instructor.last_name = last_name
-            instructor.full_name = full_name
-            updated_instructors.append(instructor)
-        else:
-            # Create new instructor
-            new_instructor = Instructor(
-                emplid=instructor_emplid,
-                first_name=first_name,
-                last_name=last_name,
-                full_name=full_name,
+            # Update existing instructor if there are changes
+            changed = any(
+                [
+                    getattr(instructor, field) != locals()[field]
+                    for field in update_fields
+                ]
             )
-            new_instructors.append(new_instructor)
-            existing_instructors[instructor_emplid] = new_instructor
+            if changed:
+                for field in update_fields:
+                    setattr(instructor, field, locals()[field])
+                updated_instructors.append(instructor)
+        elif not instructor and instructor_emplid not in marked:
+            # Prepare new instructor for bulk creation
+            new_instructors.append(
+                Instructor(
+                    emplid=instructor_emplid,
+                    first_name=first_name,
+                    last_name=last_name,
+                    full_name=full_name,
+                )
+            )
+            marked.append(instructor_emplid)
 
-    Instructor.objects.bulk_create(new_instructors)
-    update_fields = ['first_name', 'last_name', 'full_name']
-    Instructor.objects.bulk_update(updated_instructors, update_fields)
+    try:
+        with transaction.atomic():
+            # Bulk create new instructors
+            if new_instructors:
+                Instructor.objects.bulk_create(new_instructors)
+
+            # Bulk update existing instructors
+            if updated_instructors:
+                Instructor.objects.bulk_update(updated_instructors, update_fields)
+
+    except Exception as e:
+        logging.error(f'Error in processing instructors: {e}')
+
+    logging.info(
+        f'Created {len(new_instructors)} new instructors, updated {len(updated_instructors)} existing instructors.'
+    )
+    logging.info('Instructor processing completed!')
 
     return existing_instructors
 
@@ -331,18 +332,21 @@ def insert_instructors(rows):
 # -------------------------------------------------------------------------------------#
 
 
-def insert_sections(rows):
+def insert_sections(rows, instructor_cache):
     logging.info('Starting Section insertions and updates...')
 
+    # Initial cache of term and course guids to minimize database queries.
     term_cache = {term.term_code: term for term in AcademicTerm.objects.all()}
     course_cache = {course.guid: course for course in Course.objects.all()}
-    instructor_cache = insert_instructors(rows)
+
+    # Load existing sections to avoid duplicates and facilitate updates
     existing_sections = {
-        section.class_number: section for section in Section.objects.all()
+        (section.course.guid, section.class_number): section
+        for section in Section.objects.select_related('course', 'term').all()
     }
+
     new_sections = []
-    updated_sections = []
-    processed_class_numbers = set()
+    updated_section_data = []
 
     for row in tqdm(rows, desc='Processing Sections...'):
         try:
@@ -350,18 +354,19 @@ def insert_sections(rows):
         except ValueError:
             logging.error(f"Invalid class number: {row['Class Number']}")
             continue
-        # Skip if class number already processed
-        if class_number in processed_class_numbers:
-            continue
-        term = term_cache.get(row['Term Code'].strip())
-        course = course_cache.get(row['Course GUID'].strip())
+
+        term_code = row['Term Code'].strip()
+        course_guid = row['Course GUID'].strip()
         instructor_emplid = row.get('Instructor EmplID', '').strip()
+
+        term = term_cache.get(term_code)
+        course = course_cache.get(course_guid)
         instructor = instructor_cache.get(instructor_emplid)
 
-        if not term or not course or not instructor:
-            logging.error('Required data not found for row')
+        if not term or not course:
             continue
 
+        section_key = (course_guid, class_number)
         section_data = {
             'class_number': class_number,
             'class_type': row.get('Class Type', ''),
@@ -372,28 +377,43 @@ def insert_sections(rows):
             'status': row.get('Class Status', ''),
             'enrollment': int(row.get('Class Enrollment', 0)),
             'course_id': course.id,
-            'instructor': instructor,
             'term_id': term.id,
+            'instructor': instructor,
         }
 
-        section = existing_sections.get(class_number)
+        section = existing_sections.get(section_key)
         if section:
+            # Update existing section
+            update_required = False
             for key, value in section_data.items():
-                setattr(section, key, value)
-            updated_sections.append(section)
+                if getattr(section, key) != value:
+                    setattr(section, key, value)
+                    update_required = True
+            if update_required:
+                updated_section_data.append((section.id, section_data))
         else:
+            # Create a new section instance
             new_section = Section(**section_data)
             new_sections.append(new_section)
-            processed_class_numbers.add(class_number)
 
     update_fields = [field.name for field in Section._meta.fields if field.name != 'id']
 
     try:
-        Section.objects.bulk_create(new_sections)
-        Section.objects.bulk_update(updated_sections, update_fields)
+        with transaction.atomic():
+            Section.objects.bulk_create(new_sections)
+            if updated_section_data:
+                # TODO: This is still somehow showing non-zero updates even
+                # we insert the same semester data twice in a row. Bug?
+                Section.objects.bulk_update(
+                    [Section(id=id, **data) for id, data in updated_section_data],
+                    fields=update_fields,
+                )
     except Exception as e:
-        logging.error(f'Error in bulk operation: {e}')
+        logging.error(f'Error in section insertion and update process: {e}')
 
+    logging.info(
+        f'Inserted {len(new_sections)} new sections, updated {len(updated_section_data)} sections.'
+    )
     logging.info('Section processing completed!')
 
 
@@ -402,91 +422,114 @@ def insert_sections(rows):
 
 def insert_class_meetings(rows):
     logging.info('Starting ClassMeeting insertions and updates...')
+
     section_cache = {
-        (section.course.course_id, section.term.id, section.class_section): section
-        for section in Section.objects.select_related('course', 'term')
+        (section.course.guid, section.class_number): section
+        for section in Section.objects.select_related('course', 'term').all()
     }
 
-    term_id_map = {term.term_code: term.id for term in AcademicTerm.objects.all()}
-
-    # Collect relevant section IDs
-    relevant_section_ids = set()
-    for row in tqdm(rows, desc='Checking for updates in Class Meetings...'):
-        course_id = row['Course ID'].strip()
-        term_code = row['Term Code'].strip()
-        class_section = row['Class Section'].strip()
-        term_id = term_id_map.get(term_code)
-        section_key = (course_id, term_id, class_section)
-        section = section_cache.get(section_key)
-        if section:
-            relevant_section_ids.add(section.id)
-
-    # Fetch only relevant ClassMeeting objects
     existing_meetings = {
-        (meeting.section.id, meeting.meeting_number): meeting
-        for meeting in ClassMeeting.objects.filter(section_id__in=relevant_section_ids)
+        (meeting.section_id, meeting.meeting_number): meeting
+        for meeting in ClassMeeting.objects.all()
     }
 
     new_meetings = []
     updated_meetings = []
 
-    for row in tqdm(rows, desc='Processing Class Meetings'):
-        course_id = row['Course ID'].strip()
-        term_code = row['Term Code'].strip()
-        class_section = row['Class Section'].strip()
+    for row in tqdm(rows, desc='Processing Class Meetings...'):
+        course_guid = row['Course GUID'].strip()
+        term_code = int(course_guid[:4])
+        class_number = int(row['Class Number'].strip())
         meeting_number = int(row['Meeting Number'].strip())
 
-        term_id = term_id_map.get(term_code)
-        if term_id is None:
-            logging.warning(f'Term code {term_code} not found in AcademicTerm table')
-            continue
-        section_key = (course_id, term_id, class_section)
-
+        section_key = (course_guid, class_number)
         section = section_cache.get(section_key)
-        if not section:
-            logging.warning(
-                f'Section not found for Course ID: {course_id}, Term Code: {term_code}, Class Section: {class_section}'
-            )
+
+        if section is None:
+            # Class is (likely) canceled and has no sections.
             continue
 
         start_time = _parse_time(row.get('Meeting Start Time', ''))
         end_time = _parse_time(row.get('Meeting End Time', ''))
 
-        if not start_time or not end_time:
-            logging.error('Invalid meeting time format')
+        if not start_time:
+            logging.error(
+                f'Invalid start_time format for Class {class_number} '
+                f'in Term {term_code} on row {row}.'
+            )
+            continue
+
+        if not end_time:
+            logging.error(
+                f'Invalid end_time for Class {class_number} '
+                f'in Term {term_code} on row {row}.'
+            )
             continue
 
         meeting_key = (section.id, meeting_number)
-        if meeting_key in existing_meetings:
+        meeting = existing_meetings.get(meeting_key)
+
+        if meeting:
             # Update existing class meeting
-            meeting = existing_meetings[meeting_key]
-            meeting.start_time = _parse_time(row['Meeting Start Time'])
-            meeting.end_time = _parse_time(row['Meeting End Time'])
+            meeting.meeting_number = meeting_number
+            meeting.start_time = start_time
+            meeting.end_time = end_time
             meeting.room = row.get('Meeting Room', '').strip()
             meeting.days = row.get('Meeting Days', '').strip()
             meeting.building_name = row.get('Building Name', '').strip()
             updated_meetings.append(meeting)
         else:
-            # Create new class meeting
-            new_meeting = ClassMeeting(
-                section=section,
-                meeting_number=meeting_number,
-                start_time=_parse_time(row['Meeting Start Time']),
-                end_time=_parse_time(row['Meeting End Time']),
-                room=row.get('Meeting Room', '').strip(),
-                days=row.get('Meeting Days', '').strip(),
-                building_name=row.get('Building Name', '').strip(),
+            # Check if the class meeting already exists in new_meetings
+            new_meeting = next(
+                (
+                    m
+                    for m in new_meetings
+                    if m.section_id == section.id and m.meeting_number == meeting_number
+                ),
+                None,
             )
-            new_meetings.append(new_meeting)
+            if new_meeting:
+                # Update the existing new class meeting instance
+                new_meeting.start_time = start_time
+                new_meeting.end_time = end_time
+                new_meeting.room = row.get('Meeting Room', '').strip()
+                new_meeting.days = row.get('Meeting Days', '').strip()
+                new_meeting.building_name = row.get('Building Name', '').strip()
+            else:
+                # Create a new class meeting instance
+                new_meeting = ClassMeeting(
+                    section=section,
+                    meeting_number=meeting_number,
+                    start_time=start_time,
+                    end_time=end_time,
+                    room=row.get('Meeting Room', '').strip(),
+                    days=row.get('Meeting Days', '').strip(),
+                    building_name=row.get('Building Name', '').strip(),
+                )
+                new_meetings.append(new_meeting)
 
-    update_fields = ['start_time', 'end_time', 'room', 'days', 'building_name']
+    update_fields = [
+        'meeting_number',
+        'start_time',
+        'end_time',
+        'room',
+        'days',
+        'building_name',
+    ]
 
     try:
-        ClassMeeting.objects.bulk_create(new_meetings)
-        ClassMeeting.objects.bulk_update(updated_meetings, update_fields)
+        with transaction.atomic():
+            ClassMeeting.objects.bulk_create(new_meetings)
+
+            # TODO: This is still somehow showing non-zero updates even
+            # we insert the same semester data twice in a row. Bug?
+            ClassMeeting.objects.bulk_update(updated_meetings, update_fields)
     except Exception as e:
         logging.error(f'Error in bulk operation: {e}')
 
+    logging.info(
+        f'Created {len(new_meetings)} new class meetings and updated {len(updated_meetings)} existing ones.'
+    )
     logging.info('ClassMeeting insertions and updates completed!')
 
 
@@ -496,63 +539,75 @@ def insert_class_meetings(rows):
 def insert_class_year_enrollments(rows):
     logging.info('Starting ClassYearEnrollment insertions and updates...')
 
-    # Cache for Section objects to reduce database queries
+    # Initial cache of Section IDs to minimize database queries.
     section_cache = {
-        section.class_number: section.id
-        for section in Section.objects.values_list('class_number', 'id')
+        (section.course.guid, section.class_number): section.id
+        for section in Section.objects.select_related('course', 'term').all()
     }
 
-    # Collect relevant section IDs and enrollment data
-    relevant_section_ids = set()
-    enrollment_data = {}
-    for row in tqdm(rows, desc='Checking for updates in Class Year Enrollments...'):
+    # Fetch existing enrollments in bulk and create a dictionary for faster lookup
+    existing_enrollments = {
+        (enrollment.section_id, enrollment.class_year): enrollment
+        for enrollment in ClassYearEnrollment.objects.filter(
+            section_id__in=section_cache.values()
+        )
+    }
+
+    new_enrollments = []
+    updated_enrollment_data = []
+
+    for row in tqdm(rows, desc='Processing Class Year Enrollments...'):
+        course_guid = row['Course GUID'].strip()
         class_number = int(row['Class Number'].strip())
-        section_id = section_cache.get(class_number)
+        section_key = (course_guid, class_number)
+        section_id = section_cache.get(section_key)
+
         if section_id:
-            relevant_section_ids.add(section_id)
             enrollment_info = _parse_class_year_enrollments(
                 row['Class Year Enrollments'], CLASS_YEAR_ENROLLMENT_PATTERN
             )
             for class_year, enrl_seats in enrollment_info:
-                key = (section_id, int(class_year) if class_year else None)
-                enrollment_data[key] = int(enrl_seats)
+                try:
+                    class_year = int(class_year) if class_year else None
+                except ValueError:
+                    logging.error(f'Invalid class year: {class_year}')
+                    continue
 
-    # Fetch existing ClassYearEnrollment objects
-    existing_enrollments = {
-        (enrollment.section_id, enrollment.class_year): enrollment
-        for enrollment in ClassYearEnrollment.objects.filter(
-            section_id__in=relevant_section_ids
-        ).values('id', 'section_id', 'class_year', 'enrl_seats')
-    }
+                enrollment_key = (section_id, class_year)
+                existing_enrollment = existing_enrollments.get(enrollment_key)
 
-    new_enrollments = []
-    updated_enrollments = []
+                if existing_enrollment:
+                    if existing_enrollment.enrl_seats != enrl_seats:
+                        updated_enrollment_data.append(
+                            (existing_enrollment.id, enrl_seats)
+                        )
+                else:
+                    new_enrollment = ClassYearEnrollment(
+                        section_id=section_id,
+                        class_year=class_year,
+                        enrl_seats=enrl_seats,
+                    )
+                    new_enrollments.append(new_enrollment)
 
-    for key, enrl_seats in enrollment_data.items():
-        section_id, class_year = key
-        if key in existing_enrollments:
-            # Update existing enrollment
-            enrollment = existing_enrollments[key]
-            if enrollment['enrl_seats'] != enrl_seats:
-                enrollment['enrl_seats'] = enrl_seats
-                updated_enrollments.append(enrollment)
-        else:
-            # Create new enrollment
-            new_enrollment = ClassYearEnrollment(
-                section_id=section_id,
-                class_year=class_year,
-                enrl_seats=enrl_seats,
-            )
-            new_enrollments.append(new_enrollment)
-
-    # Bulk operations for efficiency
-    update_fields = ['enrl_seats']
     try:
-        ClassYearEnrollment.objects.bulk_create(new_enrollments)
-        ClassYearEnrollment.objects.bulk_update(updated_enrollments, update_fields)
+        with transaction.atomic():
+            ClassYearEnrollment.objects.bulk_create(new_enrollments)
+            if updated_enrollment_data:
+                # TODO: This is still somehow showing non-zero updates even
+                # we insert the same semester data twice in a row. Bug?
+                ClassYearEnrollment.objects.bulk_update(
+                    [
+                        ClassYearEnrollment(id=id, enrl_seats=enrl_seats)
+                        for id, enrl_seats in updated_enrollment_data
+                    ],
+                    ['enrl_seats'],
+                )
     except Exception as e:
         logging.error(f'Error in bulk operation: {e}')
 
+    logging.info(
+        f'Created {len(new_enrollments)} new class year enrollments and updated {len(updated_enrollment_data)} existing ones.'
+    )
     logging.info('ClassYearEnrollment insertions and updates completed!')
 
 
@@ -583,6 +638,12 @@ def get_semesters_from_args():
 
 
 def insert_course_data(semester):
+    # NOTE: It's recommended to run the script on one semester at a time.
+    # Strange database race-like conditions are observed if you try to,
+    # for example, input all semesters as an argument (e.g. not all data get inserted)
+    # It has also been observed that all-semesters-as-args takes about 2m28s
+    # whereas individual semesters takes about ~7s x 9 semesters = 1 minute or so.
+
     data = Path(f'{semester}.csv')
 
     if not data.exists():
@@ -593,19 +654,30 @@ def insert_course_data(semester):
         reader = csv.DictReader(file)
         rows = [row for row in reader]
 
-    trimmed_rows = [
+    formatted_rows = [
         {key.strip(): value.strip() for key, value in row.items()} for row in rows
     ]
 
     try:
         with transaction.atomic():
-            insert_departments(trimmed_rows)
-            insert_academic_terms(trimmed_rows)
-            insert_courses(trimmed_rows)
-            # insert_course_equivalents(trimmed_rows) # TODO: Can probably delete this fn
-            # insert_sections(trimmed_rows)
-            # insert_class_meetings(trimmed_rows)
-            # insert_class_year_enrollments(trimmed_rows)
+            with transaction.atomic():
+                insert_departments(formatted_rows)
+
+            with transaction.atomic():
+                insert_academic_terms(formatted_rows)
+
+            with transaction.atomic():
+                insert_courses(formatted_rows)
+
+            with transaction.atomic():
+                instructors = insert_instructors(formatted_rows)
+                insert_sections(formatted_rows, instructors)
+
+            with transaction.atomic():
+                insert_class_meetings(formatted_rows)
+
+            with transaction.atomic():
+                insert_class_year_enrollments(formatted_rows)
 
     except Exception as e:
         logging.error(f'Transaction failed: {e}')
@@ -620,7 +692,8 @@ def main():
     for semester in semesters:
         insert_course_data(semester)
     end_time = datetime.now()
-    print(f'Finished in {end_time - start_time} seconds.')
+
+    print(f'Finished in {_format_duration(start_time, end_time)}.')
 
 
 # -------------------------------------------------------------------------------------#
