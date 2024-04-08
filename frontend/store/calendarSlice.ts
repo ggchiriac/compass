@@ -19,8 +19,8 @@ interface calendarStore {
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
   addCourse: (course: Course) => Promise<void>;
-  removeCourse: (courseId: string) => void;
-  removeSelectedSection: (courseId: string) => void;
+  removeCourse: (guid: string) => void;
+  removeSelectedSection: (guid: string) => void;
 }
 
 const startHour = 7;
@@ -81,7 +81,7 @@ const useCalendarStore = create<calendarStore>((set) => ({
         section.classMeetings.flatMap((classMeeting: ClassMeeting) => {
           const startColumnIndices = getStartColumnIndexForDays(classMeeting.meetingDays);
           return startColumnIndices.map((startColumnIndex) => ({
-            key: `${course.courseId}-${section.sectionId}-${classMeeting.classMeetingId}-${startColumnIndex}`,
+            key: `${course.course_id}-${section.sectionId}-${classMeeting.classMeetingId}-${startColumnIndex}`,
             course,
             section,
             startTime: classMeeting.startTime,
@@ -102,11 +102,9 @@ const useCalendarStore = create<calendarStore>((set) => ({
       set({ error: 'Failed to add course. Please try again.', loading: false });
     }
   },
-  removeCourse: (courseId) => {
+  removeCourse: (guid) => {
     set((state) => ({
-      selectedCourses: state.selectedCourses.filter(
-        (event) => String(event.course.guid) !== courseId
-      ),
+      selectedCourses: state.selectedCourses.filter((event) => String(event.course.guid) !== guid),
     }));
   },
   setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
@@ -119,10 +117,10 @@ const useCalendarStore = create<calendarStore>((set) => ({
   },
   setError: (error) => set({ error }),
   setLoading: (loading) => set({ loading }),
-  removeSelectedSection: (courseId) =>
+  removeSelectedSection: (guid) =>
     set((state) => ({
       selectedCourses: state.selectedCourses.map((event) =>
-        String(event.course.guid) === courseId ? { ...event, selectedSection: undefined } : event
+        String(event.course.guid) === guid ? { ...event, selectedSection: undefined } : event
       ),
     })),
 }));

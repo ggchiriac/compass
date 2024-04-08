@@ -113,21 +113,14 @@ export type MenuItemProps = {
   onClick: () => void;
 };
 
-export type Planner = {
-  classYear: number | null;
-  semesters: Record<string, Semester>;
-  setClassYear: (classYear: number) => void;
-  addCourseToSemester: (semesterId: string, course: Course) => void;
-  removeCourseFromSemester: (semesterId: string, courseId: string) => void;
-};
-
 export type Dictionary = {
   [key: string]: string | Dictionary;
 };
 
 // Courses returned from the API.
+// TODO: Make all snake_case
 export type Course = {
-  courseId: number;
+  course_id: number;
   guid: string;
   departmentCode: string;
   catalogNumber: number;

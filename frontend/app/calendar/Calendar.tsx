@@ -112,7 +112,7 @@ const Calendar: React.FC = () => {
   const handleClick = (event: CalendarEvent) => {
     if (event.section) {
       const updatedCourses = selectedCourses.map((courseEvent) => {
-        if (courseEvent.course.courseId === event.course.courseId) {
+        if (courseEvent.course.course_id === event.course.course_id) {
           return {
             ...courseEvent,
             selectedSection: event.section,
