@@ -157,6 +157,7 @@ const CalendarSearch: FC = () => {
       if (response.ok) {
         const data: { courses: Course[] } = await response.json();
         setCalendarSearchResults(data.courses);
+        console.log('response', data.courses);
         if (data.courses.length > 0) {
           addRecentSearch(searchQuery);
           searchCache.set(searchQuery, data.courses);

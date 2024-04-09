@@ -117,44 +117,8 @@ export type Dictionary = {
   [key: string]: string | Dictionary;
 };
 
-// Courses returned from the API.
-// TODO: Make all snake_case
-export type Course = {
-  course_id: number;
-  guid: string;
-  departmentCode: string;
-  catalogNumber: number;
-  title: string;
-  description: string;
-  sections: Section[];
-  originSemesterId?: string;
-  crosslistings?: string;
-};
-
-export type Section = {
-  sectionId: number;
-  classSection: string;
-  classType: string;
-  instructorId: number;
-  track: string;
-  capacity: number;
-  enrollment: number;
-  seatReservations: string;
-  status: string;
-  classMeetings: ClassMeeting[];
-};
-
-export type ClassMeeting = {
-  classMeetingId: number;
-  meetingDays: string;
-  startTime: string;
-  endTime: string;
-  buildingName: string;
-  room: string;
-};
-
 // Calendar
-type CalendarEvent = {
+export type CalendarEvent = {
   key: string;
   course: Course;
   section: Section;
@@ -165,6 +129,64 @@ type CalendarEvent = {
   endRowIndex: number;
   width?: number;
   offsetLeft?: number;
-  color?: string; // Primary color (background)
+  color?: string;
   textColor?: string;
+};
+
+// Note: types from the API, fields in snake_case.
+
+export type Department = {
+  // From model
+  id: string;
+  code: string;
+  name: string;
+};
+
+export type Instructor = {
+  // From model
+  emplid: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+};
+
+export type Course = {
+  // From model
+  department: Department;
+  guid: string;
+  course_id: number;
+  catalog_number: number;
+  title: string;
+  description: string;
+  crosslistings?: string;
+
+  // Defined fields
+  sections: Section[];
+  origin_semester_id?: string;
+};
+
+export type Section = {
+  // From model
+  id: number;
+  class_section: string;
+  class_type: string;
+  instructor: Instructor;
+  track: string;
+  capacity: number;
+  enrollment: number;
+  seat_reservations: string;
+  status: string;
+
+  // Defined fields
+  class_meetings: ClassMeeting[];
+};
+
+export type ClassMeeting = {
+  // From model
+  id: number;
+  start_time: string;
+  end_time: string;
+  building_name: string;
+  room: string;
+  days: string;
 };

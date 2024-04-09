@@ -13,7 +13,6 @@ from django.db.models.query import Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect
-from django.views import View
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -166,7 +165,7 @@ def update_profile(request):
 # ------------------------------------ LOG IN -----------------------------------------#
 
 
-class CAS(View):
+class CAS(APIView):
     """
     Handles single-sign-on CAS authentication with token-based authentication.
 
@@ -328,7 +327,7 @@ def make_sort_key(dept):
     return sort_key
 
 
-class SearchCourses(View):
+class SearchCourses(APIView):
     """
     Handles search queries for courses.
     """
@@ -431,7 +430,7 @@ class SearchCourses(View):
             return JsonResponse({'courses': []})
 
 
-class GetUserCourses(View):
+class GetUserCourses(APIView):
     """
     Retrieves user's courses for frontend
     """
@@ -749,58 +748,48 @@ def requirement_info(request):
 
 class FetchCalendarClasses(APIView):
     def get(self, request, term, course_id):
-        print(f'Starting fetch process for term: {term}, course_id: {course_id}')
-        sections = self.get_sections(term, course_id)
+        # Combine term and course_id for an initial filter if necessary.
+        # Assuming 'term' and 'course_id' can uniquely identify the sections.
+        # However, the task suggests using them step-by-step.
+        sections = self.get_unique_class_meetings(term, course_id)
 
         if not sections:
-            print(f'No sections found for term: {term}, course_id: {course_id}')
             return Response(
                 {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-        print(f'Number of sections ready for processing: {len(sections)}')
         sections_data = [self.serialize_section(section) for section in sections]
-
-        print(f'Sections data prepared for response')
         return Response(sections_data, status=status.HTTP_200_OK)
 
-    def get_sections(self, term, course_id):
-        print(f'Querying database for sections: term {term}, course_id {course_id}')
-        sections = (
-            Section.objects.filter(term__term_code=term, course__course_id=course_id)
+    def get_unique_class_meetings(self, term, course_id):
+        # First, filter by term which reduces the dataset significantly
+        sections = Section.objects.filter(term__term_code=term)
+
+        # Then, narrow down by course_id
+        sections = sections.filter(course__course_id=course_id)
+
+        # Assuming class_section uniqueness is desired. Adjust as necessary.
+        # Use distinct on 'class_section' to ensure uniqueness. Adjust if using class meeting id instead.
+        unique_sections = (
+            sections.distinct('class_section')
             .select_related('course')
             .prefetch_related(
                 Prefetch(
                     'classmeeting_set',
                     queryset=ClassMeeting.objects.order_by(
-                        'meeting_number',
-                        'days',
-                        'start_time',
-                        'end_time',
-                        'building_name',
-                        'room',
-                    ),
-                    to_attr='class_meetings',
+                        'id'
+                    ),  # or use 'meeting_number' if that's the unique field
+                    to_attr='unique_class_meetings',
                 )
             )
         )
 
-        for section in sections:
-            if section.class_meetings:
-                print(
-                    f'Section {section.id} has {len(section.class_meetings)} class meetings'
-                )
-
-        filtered_sections = [section for section in sections if section.class_meetings]
-        print(
-            f'Number of sections after filtering those without class meetings: {len(filtered_sections)}'
-        )
-        return filtered_sections
+        return unique_sections
 
     def serialize_section(self, section):
-        print(f'Processing section: ID {section.id}, Section {section.class_section}')
         class_meetings_data = [
-            self.serialize_class_meeting(meeting) for meeting in section.class_meetings
+            self.serialize_class_meeting(meeting)
+            for meeting in getattr(section, 'unique_class_meetings', [])
         ]
 
         section_data = {
@@ -813,10 +802,6 @@ class FetchCalendarClasses(APIView):
             },
             'classMeetings': class_meetings_data,
         }
-
-        print(
-            f'Section {section.id} with {len(class_meetings_data)} class meetings processed'
-        )
         return section_data
 
     def serialize_class_meeting(self, meeting):
@@ -828,8 +813,4 @@ class FetchCalendarClasses(APIView):
             'buildingName': meeting.building_name,
             'room': meeting.room,
         }
-        # Log details about the class meeting being processed
-        print(
-            f"Class meeting {meeting.id} on {meeting.days} from {meeting.start_time.strftime('%H:%M')} to {meeting.end_time.strftime('%H:%M')}"
-        )
         return class_meeting_data

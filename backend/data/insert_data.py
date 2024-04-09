@@ -320,53 +320,56 @@ def insert_instructors(rows):
 
     except Exception as e:
         logging.error(f'Error in processing instructors: {e}')
-
     logging.info(
         f'Created {len(new_instructors)} new instructors, updated {len(updated_instructors)} existing instructors.'
     )
     logging.info('Instructor processing completed!')
 
-    return existing_instructors
-
 
 # -------------------------------------------------------------------------------------#
 
 
-def insert_sections(rows, instructor_cache):
+def insert_sections(rows):
     logging.info('Starting Section insertions and updates...')
-
-    # Initial cache of term and course guids to minimize database queries.
+    # Load caches for terms and courses
     term_cache = {term.term_code: term for term in AcademicTerm.objects.all()}
     course_cache = {course.guid: course for course in Course.objects.all()}
 
-    # Load existing sections to avoid duplicates and facilitate updates
+    # Load existing sections to facilitate updates and prevent duplicates
     existing_sections = {
-        (section.course.guid, section.class_number): section
-        for section in Section.objects.select_related('course', 'term').all()
+        (section.course.guid, section.class_number, section.instructor.emplid): section
+        for section in Section.objects.select_related(
+            'course', 'term', 'instructor'
+        ).all()
+    }
+    existing_instructors = {
+        instructor.emplid: instructor for instructor in Instructor.objects.all()
     }
 
     new_sections = []
-    updated_section_data = []
+    updated_sections = []
 
     for row in tqdm(rows, desc='Processing Sections...'):
-        try:
-            class_number = int(row['Class Number'].strip())
-        except ValueError:
-            logging.error(f"Invalid class number: {row['Class Number']}")
-            continue
-
+        class_number = int(row['Class Number'].strip())
         term_code = row['Term Code'].strip()
         course_guid = row['Course GUID'].strip()
         instructor_emplid = row.get('Instructor EmplID', '').strip()
-
-        term = term_cache.get(term_code)
-        course = course_cache.get(course_guid)
-        instructor = instructor_cache.get(instructor_emplid)
-
+        course = (
+            course_cache.get(course_guid)
+            if course_cache
+            else Course.objects.get(guid=course_guid)
+        )
+        term = (
+            term_cache.get(term_code)
+            if term_cache
+            else AcademicTerm.objects.get(term_code=term_code)
+        )
+        instructor = existing_instructors.get(instructor_emplid)
+        # Skip if mandatory information is missing
         if not term or not course:
             continue
 
-        section_key = (course_guid, class_number)
+        section_key = (course_guid, class_number, instructor_emplid)
         section_data = {
             'class_number': class_number,
             'class_type': row.get('Class Type', ''),
@@ -376,23 +379,23 @@ def insert_sections(rows, instructor_cache):
             'capacity': int(row.get('Class Capacity', 0)),
             'status': row.get('Class Status', ''),
             'enrollment': int(row.get('Class Enrollment', 0)),
-            'course_id': course.id,
-            'term_id': term.id,
+            'course': course,
+            'term': term,
             'instructor': instructor,
         }
 
         section = existing_sections.get(section_key)
         if section:
-            # Update existing section
+            # Check and update existing section
             update_required = False
             for key, value in section_data.items():
                 if getattr(section, key) != value:
                     setattr(section, key, value)
                     update_required = True
             if update_required:
-                updated_section_data.append((section.id, section_data))
+                updated_sections.append(section)
         else:
-            # Create a new section instance
+            # Create new section instance
             new_section = Section(**section_data)
             new_sections.append(new_section)
 
@@ -400,19 +403,15 @@ def insert_sections(rows, instructor_cache):
 
     try:
         with transaction.atomic():
-            Section.objects.bulk_create(new_sections)
-            if updated_section_data:
-                # TODO: This is still somehow showing non-zero updates even
-                # we insert the same semester data twice in a row. Bug?
-                Section.objects.bulk_update(
-                    [Section(id=id, **data) for id, data in updated_section_data],
-                    fields=update_fields,
-                )
+            if new_sections:
+                Section.objects.bulk_create(new_sections)
+            if updated_sections:
+                Section.objects.bulk_update(updated_sections, update_fields)
     except Exception as e:
         logging.error(f'Error in section insertion and update process: {e}')
 
     logging.info(
-        f'Inserted {len(new_sections)} new sections, updated {len(updated_section_data)} sections.'
+        f'Inserted {len(new_sections)} new sections, updated {len(updated_sections)} sections.'
     )
     logging.info('Section processing completed!')
 
@@ -424,12 +423,17 @@ def insert_class_meetings(rows):
     logging.info('Starting ClassMeeting insertions and updates...')
 
     section_cache = {
-        (section.course.guid, section.class_number): section
-        for section in Section.objects.select_related('course', 'term').all()
+        (section.course.guid, section.class_number, section.instructor.emplid): section
+        for section in Section.objects.select_related(
+            'course', 'term', 'instructor'
+        ).all()
     }
 
     existing_meetings = {
-        (meeting.section_id, meeting.meeting_number): meeting
+        (
+            meeting.section_id,
+            meeting.meeting_number,
+        ): meeting
         for meeting in ClassMeeting.objects.all()
     }
 
@@ -441,8 +445,8 @@ def insert_class_meetings(rows):
         term_code = int(course_guid[:4])
         class_number = int(row['Class Number'].strip())
         meeting_number = int(row['Meeting Number'].strip())
-
-        section_key = (course_guid, class_number)
+        instructor_emplid = row.get('Instructor EmplID', '').strip()
+        section_key = (course_guid, class_number, instructor_emplid)
         section = section_cache.get(section_key)
 
         if section is None:
@@ -468,16 +472,23 @@ def insert_class_meetings(rows):
 
         meeting_key = (section.id, meeting_number)
         meeting = existing_meetings.get(meeting_key)
-
         if meeting:
-            # Update existing class meeting
-            meeting.meeting_number = meeting_number
-            meeting.start_time = start_time
-            meeting.end_time = end_time
-            meeting.room = row.get('Meeting Room', '').strip()
-            meeting.days = row.get('Meeting Days', '').strip()
-            meeting.building_name = row.get('Building Name', '').strip()
-            updated_meetings.append(meeting)
+            update_required = False
+            fields_to_update = {
+                'start_time': start_time,
+                'end_time': end_time,
+                'room': row.get('Meeting Room', '').strip(),
+                'days': row.get('Meeting Days', '').strip(),
+                'building_name': row.get('Building Name', '').strip(),
+            }
+
+            for field, new_value in fields_to_update.items():
+                if getattr(meeting, field) != new_value:
+                    setattr(meeting, field, new_value)
+                    update_required = True
+
+            if update_required:
+                updated_meetings.append(meeting)
         else:
             # Check if the class meeting already exists in new_meetings
             new_meeting = next(
@@ -528,7 +539,7 @@ def insert_class_meetings(rows):
         logging.error(f'Error in bulk operation: {e}')
 
     logging.info(
-        f'Created {len(new_meetings)} new class meetings and updated {len(updated_meetings)} existing ones.'
+        f'Created {len(new_meetings)} new class meetings and updated {len(updated_meetings)} existing class meetings.'
     )
     logging.info('ClassMeeting insertions and updates completed!')
 
@@ -670,8 +681,10 @@ def insert_course_data(semester):
                 insert_courses(formatted_rows)
 
             with transaction.atomic():
-                instructors = insert_instructors(formatted_rows)
-                insert_sections(formatted_rows, instructors)
+                insert_instructors(formatted_rows)
+
+            with transaction.atomic():
+                insert_sections(formatted_rows)
 
             with transaction.atomic():
                 insert_class_meetings(formatted_rows)

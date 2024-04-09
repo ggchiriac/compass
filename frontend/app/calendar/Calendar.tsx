@@ -62,6 +62,7 @@ const Calendar: React.FC = () => {
   const startDate = startOfWeek(today, { weekStartsOn: 1 });
   const daysOfWeek = Array.from({ length: 5 }, (_, index) => addDays(startDate, index));
 
+  // TODO: Check to see if this renders no courses as current on the weekends (desired)
   const days = daysOfWeek.map((date) => ({
     name: format(date, 'EEEE'),
     date: Number(format(date, 'd')),
@@ -110,6 +111,7 @@ const Calendar: React.FC = () => {
   });
 
   const handleClick = (event: CalendarEvent) => {
+    console.log('arrr', event);
     if (event.section) {
       const updatedCourses = selectedCourses.map((courseEvent) => {
         if (courseEvent.course.course_id === event.course.course_id) {
@@ -136,7 +138,7 @@ const Calendar: React.FC = () => {
   }, []);
 
   return (
-    <>
+    <div>
       <Navbar />
       <div className='flex flex-col h-screen bg-white'>
         <div className='sticky top-0 z-30 shadow'>
@@ -176,7 +178,7 @@ const Calendar: React.FC = () => {
             </div>
             {/* Calendar Grid */}
             <div
-              className='grid'
+              className='grid calendar-container'
               style={{
                 gridTemplateColumns: `repeat(${days.length}, 1fr)`,
                 gridTemplateRows: `repeat(${(endHour - startHour + 1) * 6}, 1fr)`,
@@ -211,7 +213,7 @@ const Calendar: React.FC = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

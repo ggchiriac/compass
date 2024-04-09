@@ -18,7 +18,7 @@ const SelectedCourses: React.FC = () => {
         itemContent={(_, course) => (
           <Item
             key={course.course.guid}
-            value={`${course.course.departmentCode} ${course.course.catalogNumber}`}
+            value={`${course.course.department.code} ${course.course.catalog_number}`}
           />
         )}
       />

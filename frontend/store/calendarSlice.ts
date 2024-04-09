@@ -78,17 +78,17 @@ const useCalendarStore = create<calendarStore>((set) => ({
       const sections = await response.json();
       console.log('Calendar Search Results!:', sections);
       const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
-        section.classMeetings.flatMap((classMeeting: ClassMeeting) => {
-          const startColumnIndices = getStartColumnIndexForDays(classMeeting.meetingDays);
+        section.class_meetings.flatMap((classMeeting: ClassMeeting) => {
+          const startColumnIndices = getStartColumnIndexForDays(classMeeting.days);
           return startColumnIndices.map((startColumnIndex) => ({
-            key: `${course.course_id}-${section.sectionId}-${classMeeting.classMeetingId}-${startColumnIndex}`,
+            key: `${course.course_id}-${section.id}-${classMeeting.id}-${startColumnIndex}`,
             course,
             section,
-            startTime: classMeeting.startTime,
-            endTime: classMeeting.endTime,
+            startTime: classMeeting.start_time,
+            endTime: classMeeting.end_time,
             startColumnIndex,
-            startRowIndex: calculateGridRow(classMeeting.startTime),
-            endRowIndex: calculateGridRow(classMeeting.endTime),
+            startRowIndex: calculateGridRow(classMeeting.start_time),
+            endRowIndex: calculateGridRow(classMeeting.end_time),
           }));
         })
       );
@@ -97,6 +97,7 @@ const useCalendarStore = create<calendarStore>((set) => ({
         selectedCourses: [...state.selectedCourses, ...calendarEvents],
         loading: false,
       }));
+      console.log('waffles:', course);
     } catch (error) {
       console.error('Error adding course:', error);
       set({ error: 'Failed to add course. Please try again.', loading: false });

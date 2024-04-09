@@ -43,8 +43,8 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
     return days.map((day) => dayToStartColumnIndex[day.trim()]);
   }
 
-  const classMeeting = event.section.classMeetings.find(
-    (meeting) => getStartColumnIndexForDays(meeting.meetingDays)[0] === event.startColumnIndex
+  const classMeeting = event.section.class_meetings.find(
+    (meeting) => getStartColumnIndexForDays(meeting.days)[0] === event.startColumnIndex
   );
 
   return (
@@ -64,9 +64,9 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
       <div className='card-header'>
         <strong
           className='course-code'
-          title={`${event.course.departmentCode} ${event.course.catalogNumber}`}
+          title={`${event.course.department.code} ${event.course.catalog_number}`}
         >
-          {event.course.departmentCode} {event.course.catalogNumber}
+          {event.course.department.code} {event.course.catalog_number}
         </strong>
         <span className='course-title' title={event.course.title}>
           {event.course.title}
@@ -82,9 +82,9 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
           <div className='event-location'>
             <span
               className='location'
-              title={`${classMeeting?.buildingName} ${classMeeting?.room}`}
+              title={`${classMeeting?.building_name} ${classMeeting?.room}`}
             >
-              {classMeeting?.buildingName}
+              {classMeeting?.building_name}
               <br />
               {classMeeting?.room}
             </span>

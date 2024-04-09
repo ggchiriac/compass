@@ -349,6 +349,5 @@ if __name__ == '__main__':
         # push_major(Path('../majors/PHY.yaml').resolve())
         push_minors(Path('../minors').resolve())
         push_majors(Path('../majors').resolve())
-
         # Push Undeclared major into database
         Major.objects.create(**UNDECLARED)
