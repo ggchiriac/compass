@@ -136,7 +136,7 @@ export const Item = memo(
           >
             {/* Text Container for InfoComponent */}
             <div className={styles.TextContainer}>
-              <InfoComponent value={value.toString().split('|')[1]} />
+              <InfoComponent value={value?.toString().split('|')[1] ?? ''} />
             </div>
 
             {handle ? <Handle {...handleProps} {...listeners} className={styles.Handle} /> : null}

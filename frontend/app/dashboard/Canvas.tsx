@@ -384,7 +384,7 @@ export function Canvas({
   const recentlyMovedToNewContainer = useRef(false);
   // isSortingContainer is legacy code, since we are not using sortable containers
   const isSortingContainer = false;
-  const [overContainerId, setOverContainerId] = useState(null);
+  const [overContainerId, setOverContainerId] = useState<UniqueIdentifier | null>(null);
 
   /**
    * Custom collision detection strategy optimized for multiple containers
@@ -504,8 +504,8 @@ export function Canvas({
           const activeContainer = findContainer(active.id);
 
           setActiveId(active.id);
-          setActiveContainerId(activeContainer);
-          setOverContainerId(activeContainer);
+          setActiveContainerId(activeContainer ?? null);
+          setOverContainerId(activeContainer ?? null);
           setClonedItems(items);
         }}
         onDragOver={({ active, over }) => {
@@ -516,7 +516,7 @@ export function Canvas({
 
           const overContainer = findContainer(overId);
           const activeContainer = findContainer(active.id);
-          setOverContainerId(overContainer);
+          setOverContainerId(overContainer ?? null);
 
           if (!overContainer || !activeContainer) {
             return;

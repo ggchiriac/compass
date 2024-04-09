@@ -62,9 +62,9 @@ const FilterModal: FC = () => {
             variant='soft'
             value={termsInverse[termFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
-            onChange={(event, newTermName: string | undefined) => {
+            onChange={(event, newTermName: string | null) => {
               event.stopPropagation();
-              setTermFilter(terms[newTermName] ?? '');
+              setTermFilter(terms[newTermName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -85,9 +85,9 @@ const FilterModal: FC = () => {
             variant='soft'
             value={distributionAreasInverse[distributionFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
-            onChange={(event, newDistributionName: string | undefined) => {
+            onChange={(event, newDistributionName: string | null) => {
               event.stopPropagation();
-              setDistributionFilter(distributionAreas[newDistributionName] ?? '');
+              setDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
