@@ -289,12 +289,10 @@ def assign_settled_courses_to_reqs(req, courses):
     newly_satisfied = 0
     if 'req_list' in req:
         for sub_req in req['req_list']:
+            newly_satisfied_added = assign_settled_courses_to_reqs(sub_req, courses)
             if sub_req['manually_satisfied']:
-                newly_satisfied += sub_req['inst'].max_counted
-                assign_settled_courses_to_reqs(sub_req, courses)
-            else:
-                newly_satisfied += assign_settled_courses_to_reqs(sub_req,
-                                                              courses)
+                newly_satisfied_added = sub_req['inst'].max_counted
+            newly_satisfied += newly_satisfied_added
     elif req['inst'].double_counting_allowed:
         newly_satisfied = mark_all(req, courses)
     elif req['inst'].course_list.exists() or req['inst'].dept_list:
