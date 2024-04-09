@@ -145,6 +145,10 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   }, [explanation, handleClose]);
 
   const handleMarkSatisfied = () => {
+    // TODO: What behavior do we want if explanation is null?
+    if (explanation === null) {
+      return;
+    }
     fetch(`${process.env.BACKEND}/mark_satisfied/`, {
       method: 'POST',
       credentials: 'include',
@@ -160,6 +164,10 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   };
 
   const handleUnmarkSatisfied = () => {
+    // TODO: Same as above
+    if (explanation === null) {
+      return;
+    }
     fetch(`${process.env.BACKEND}/mark_satisfied/`, {
       method: 'POST',
       credentials: 'include',
