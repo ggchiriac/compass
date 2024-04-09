@@ -126,15 +126,11 @@ req_list:
       pdfs_allowed: false
       double_counting_allowed: true
       completed_by_semester: 4
-      req_list:
-      - name:
-        max_counted: 1
-        min_needed: 1
-        course_list:
-        - ECE 115
-        - COS 126
-        - COS 217
-        - COS 226
+      course_list:
+      - ECE 115
+      - COS 126
+      - COS 217
+      - COS 226
   - name: Integrated Science Curriculum
     max_counted: 2
     min_needed: 1
@@ -223,11 +219,4 @@ req_list:
       dist_req: SA
   - name: Seven Total Courses
     max_counted: 1
-    min_needed: 7
-    dist_req:
-    - CD
-    - EC
-    - EM
-    - HA
-    - LA
-    - SA
+    num_courses: 7

@@ -50,7 +50,7 @@ req_list:
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <i>Editor's Note: The course list for this requirement is not comprehensive. It contains all upper-level courses with LA designation that require reading in a foreign language. Check with your academic advisor for other options. <\i>
+        <i>Editor's Note: The course list for this requirement is not comprehensive. It contains all upper-level courses with LA designation that require reading in a foreign language. Check with your academic advisor for other options. </i>
       course_list:
       - ARA 309
       - ARA 404

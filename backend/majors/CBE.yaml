@@ -188,7 +188,6 @@ req_list:
     max_counted: 1
     min_needed: 3
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 411
@@ -246,7 +245,6 @@ req_list:
     max_counted: 1
     min_needed: 3
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 260
@@ -276,7 +274,6 @@ req_list:
     max_counted: 1
     min_needed: 3
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - AST 309
@@ -330,7 +327,6 @@ req_list:
     max_counted: 1
     min_needed: 3
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 415
@@ -359,7 +355,6 @@ req_list:
     max_counted: 1
     min_needed: 3
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 422
@@ -434,14 +429,12 @@ req_list:
   explanation: |-
     In addition, students are required to take at least one course each from two of the advanced areas outside their area of concentration to provide technical diversity.
     This means that classes towards your concentration cannot be applied here.
-  double_counting_allowed: true
   pdfs_allowed: false
   req_list:
   - name: Bioengineering and Biotechnology
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 411
@@ -499,7 +492,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 260
@@ -529,7 +521,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - AST 309
@@ -583,7 +574,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 415
@@ -612,7 +602,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 422
@@ -648,7 +637,6 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation:
-    double_counting_allowed: true
     pdfs_allowed: false
     course_list:
     - CBE 342
