@@ -557,6 +557,7 @@ def transform_requirements(requirements):
     requirements.pop('subrequirements')
 
     # Merge the 'satisfied' status and the transformed subrequirements
+    # print(f"requirements: {requirements}, transformed: {transformed}\n")
     return {**requirements, **transformed}
 
 

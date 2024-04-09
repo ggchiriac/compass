@@ -89,18 +89,14 @@ req_list:
   - name: Organic Chemistry I
     min_needed: ALL
     max_counted: 1
-    req_list:
-    - name: CHM 301
-      min_needed: 1
-      max_counted: 1
-      course_list:
-      - CHM 301
-    - name: Organic Chemistry II
-      min_needed: 1
-      max_counted: 1
-      course_list:
-      - CHM 302
-      - CHM 304
+    course_list:
+    - CHM 301
+  - name: Organic Chemistry II
+    min_needed: 1
+    max_counted: 1
+    course_list:
+    - CHM 302
+    - CHM 304
 - name: Core
   min_needed: ALL
   max_counted: 1

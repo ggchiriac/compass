@@ -59,11 +59,11 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   maxCounted,
   isRestrictions,
 }) => {
-  if (isRestrictions) {
-    return <InfoOutlinedIcon style={{ color: 'blue', marginLeft: '10px' }} />;
-  }
   if (manuallySatisfied) {
     return <CheckCircleOutlineIcon style={{ color: 'gray', marginLeft: '10px' }} />;
+  }
+  if (isRestrictions) {
+    return <InfoOutlinedIcon style={{ color: 'blue', marginLeft: '10px' }} />;
   }
   if (maxCounted > 1) {
     return (
@@ -152,7 +152,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ reqId: explanation[3], markedSatisfied: 'true' }),
+      body: JSON.stringify({ reqId: explanation ? explanation[3] : null, markedSatisfied: 'true' }),
     }).then((response) => response.json());
 
     setMarkedSatisfied(true);
@@ -167,7 +167,10 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ reqId: explanation[3], markedSatisfied: 'false' }),
+      body: JSON.stringify({
+        reqId: explanation ? explanation[3] : null,
+        markedSatisfied: 'false',
+      }),
     }).then((response) => response.json());
 
     setMarkedSatisfied(false);
@@ -266,7 +269,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
           <JoyButton
             variant='soft'
             color='warning'
-            onClick={handleUnmarkSatisfied} // Assume you have a function to handle unmarking
+            onClick={handleUnmarkSatisfied}
             sx={{ ml: 2 }}
             size='md'
           >
