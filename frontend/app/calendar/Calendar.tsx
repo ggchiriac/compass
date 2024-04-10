@@ -111,7 +111,6 @@ const Calendar: React.FC = () => {
   });
 
   const handleClick = (event: CalendarEvent) => {
-    console.log('arrr', event);
     if (event.section) {
       const updatedCourses = selectedCourses.map((courseEvent) => {
         if (courseEvent.course.course_id === event.course.course_id) {

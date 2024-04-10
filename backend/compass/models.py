@@ -294,6 +294,7 @@ class CustomUser(AbstractUser):
         related_name='users',
         blank=True,
     )  # for manually marked requirements
+    req_dict = models.JSONField(null=True)
     net_id = models.CharField(max_length=20, unique=True, null=True, blank=True)
     email = models.EmailField(max_length=100, unique=True, null=True, blank=True)
     first_name = models.CharField(max_length=100, null=True, blank=True)

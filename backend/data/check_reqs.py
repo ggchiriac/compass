@@ -55,16 +55,16 @@ import constants
 
 
 def cumulative_time(func):
-    total_time = 0
-
     def wrapper(*args, **kwargs):
-        nonlocal total_time
+        if not hasattr(wrapper, 'total_time'):
+            wrapper.total_time = 0
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
-        total_time += end_time - start_time
+        wrapper.total_time += end_time - start_time
         return result
 
+    wrapper.total_time = 0
     return wrapper
 
 
@@ -106,6 +106,19 @@ def check_user(net_id, major, minors):
         formatted_req = check_requirements('Minor', minor, user_courses, manually_satisfied_reqs)
         output['Minors'][minor]['requirements'] = formatted_req
 
+    print(f"create_courses: {create_courses.total_time} seconds")
+    print(f"check_requirements: {check_requirements.total_time} seconds")
+    print(f"_init_courses: {_init_courses.total_time} seconds")
+    print(f"_init_req: {_init_req.total_time} seconds")
+    print(f"assign_settled_courses_to_reqs: {assign_settled_courses_to_reqs.total_time} seconds")
+    print(f"mark_possible_reqs: {mark_possible_reqs.total_time} seconds")
+    print(f"mark_dist: {mark_dist.total_time} seconds")
+    print(f"mark_courses: {mark_courses.total_time} seconds")
+    print(f"mark_all: {mark_all.total_time} seconds")
+    print(f"mark_settled: {mark_settled.total_time} seconds")
+    print(f"add_course_lists_to_req: {add_course_lists_to_req.total_time} seconds")
+    print(f"format_req_output: {format_req_output.total_time} seconds")
+
     return output
 
 
@@ -117,9 +130,12 @@ def create_courses(net_id):
     )
     for course_inst in course_insts:
         course = {
-            'inst': course_inst.course,
             'id': course_inst.course.id,
             'manually_settled': False,
+            'distribution_area_short': course_inst.course.distribution_area_short,
+            'crosslistings': course_inst.course.crosslistings,
+            'dept_code': course_inst.course.department.code,
+            'cat_num': course_inst.course.catalog_number,
         }
         if course_inst.requirement_id is not None:
             course['settled'] = [course_inst.requirement_id]
@@ -259,14 +275,12 @@ def _init_req(req_inst, manually_satisfied_reqs):
             courses = req_inst.course_list.all()
             excluded_courses = req_inst.excluded_course_list.all()
 
-        req['course_list'] = {course_inst.id for course_inst in courses}
-        if len(req['course_list']) == 0:
-            req.pop('course_list')
+        if courses:
+            req['course_list'] = {course.id for course in courses}
+        if excluded_courses:
+            req['excluded_course_list'] = [course.id for course in
+                                           excluded_courses]
 
-        req['excluded_course_list'] = {course_inst.id for course_inst in
-                                       excluded_courses}
-        if len(req['excluded_course_list']) == 0:
-            req.pop('excluded_course_list')
         req['completed_by_semester'] = req_inst.completed_by_semester
 
         if req['id'] in manually_satisfied_reqs:
@@ -346,9 +360,20 @@ def mark_dist(req, courses):
         for course in sem:
             if req['id'] in course['possible_reqs']:  # already used
                 continue
-            if course['inst'].distribution_area_short in json.loads(
-                    req['inst'].dist_req
-            ):
+            course_dist = course['distribution_area_short']
+            if not course_dist:
+                continue
+
+            course_dist = course_dist.split(" or ")
+            dist_req = json.loads(req['inst'].dist_req)
+            ok = 0
+
+            for area in course_dist:
+                if area in json.loads(req['inst'].dist_req):
+                    ok = 1
+                    break
+
+            if ok == 1:
                 num_marked += 1
                 course['possible_reqs'].append(req['id'])
                 if not req['inst'].double_counting_allowed:
@@ -372,7 +397,7 @@ def mark_courses(req, courses):
                     continue
             if req['inst'].dept_list:
                 for code in json.loads(req['inst'].dept_list):
-                    if code == course['inst'].department.code:
+                    if code == course['dept_code']:
                         num_marked += 1
                         course['possible_reqs'].append(req['id'])
                         if not req['inst'].double_counting_allowed:
@@ -482,41 +507,15 @@ def add_course_lists_to_req(req, courses):
                         break
 
 
-# @cumulative_time
-# def format_courses_output(courses):
-#     """
-#     Enforce the type and order of fields in the courses output
-#     """
-#     output = []
-#     for i, sem in enumerate(courses):
-#         output.append([])
-#         for j, course in enumerate(sem):
-#             output[i].append(collections.OrderedDict())
-#             for key in ['possible_reqs', 'reqs_satisfied']:
-#                 output[i][j][key] = course[key]
-#             output[i][j]['name'] = course['inst'].title
-#             if len(course['settled']) > 0:  # only show if non-empty
-#                 output[i][j]['settled'] = course['settled']
-#     return output
-
-
 @cumulative_time
 def format_req_output(req, courses):
     """
     Enforce the type and order of fields in the req output
     """
     output = collections.OrderedDict()
-    # if (req["inst"]._meta.db_table != 'Requirement') and req["inst"].name:
-    #     output['name'] = req["inst"].name
     if (req['inst']._meta.db_table != 'Requirement') and req[
         'inst'].code:
         output['code'] = req['inst'].code
-    # if (req["inst"]._meta.db_table == 'Major') and req["inst"].degree.exists():
-    #     output['degree'] = req['inst'].degree.all()[0]
-    # if (req["inst"]._meta.db_table == 'Requirement') and req['inst'].pdfs_allowed:
-    #     output['pdfs_allowed'] = str(req['inst'].pdfs_allowed)
-    # if (req["inst"]._meta.db_table == 'Requirement') and req['inst'].completed_by_semester:
-    #     output['completed_by_semester'] = str(req['inst'].completed_by_semester)
     if (req['inst']._meta.db_table == 'Requirement') and req[
         'inst'].name:
         output['name'] = req['inst'].name
@@ -548,9 +547,9 @@ def format_req_output(req, courses):
             for course in semester:
                 if course['id'] in req['settled']:
                     course_output = {
-                        'code': course['inst'].department.code
+                        'code': course['dept_code']
                                 + ' '
-                                + course['inst'].catalog_number,
+                                + course['cat_num'],
                         'id': course['id'],
                         'manually_settled': course['manually_settled'],
                     }
@@ -562,9 +561,9 @@ def format_req_output(req, courses):
             for course in semester:
                 if course['id'] in req['unsettled']:
                     course_output = {
-                        'code': course['inst'].department.code
+                        'code': course['dept_code']
                                 + ' '
-                                + course['inst'].catalog_number,
+                                + course['cat_num'],
                         'id': course['id'],
                         'manually_settled': course['manually_settled'],
                     }
@@ -654,13 +653,10 @@ def get_course_info(dept, num):
             course = Course.objects.filter(
                 department__id=dept_code, catalog_number=num
             ).first()
-            if course.course_id:
-                co_id = course.course_id # TODO: co_id is not used?
+            # if course.course_id:
                 # instructor = "None"
                 # try:
                 #    instructor = Section.objects.filter(course_id=13248).first()
-                #
-                #    print(instructor)
                 # except Section.DoesNotExist:
                 #    instructor = "Information Unavailable"
             # get relevant info and put it in a dictionary
