@@ -157,6 +157,7 @@ def update_profile(request):
         user_inst.minors.set(minor_objects)
 
     user_inst.class_year = updated_class_year
+    user_inst.req_dict = None
     user_inst.save()
     updated_user_info = fetch_user_info(request.session['net_id'])
     return JsonResponse(updated_user_info)
