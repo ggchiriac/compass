@@ -67,6 +67,15 @@ def cumulative_time(func):
     return wrapper
 
 
+def ensure_list(x):
+    if isinstance(x, list):
+        return x
+    elif isinstance(x, str):
+        return [x]
+    else:
+        return []
+
+
 @cumulative_time
 def check_user(net_id, major, minors):
     output = {}
@@ -287,7 +296,7 @@ def serialize_req_inst(req_inst):
     if req['dept_list'] is not None:
         req['dept_list'] = json.loads(req['dept_list'])
     if req['dist_req'] is not None:
-        req['dist_req'] = json.loads(req['dist_req'])
+        req['dist_req'] = ensure_list(json.loads(req['dist_req']))
 
     return req
 
@@ -592,6 +601,7 @@ def format_req_output(req, courses, manually_satisfied_reqs):
                                 + ' '
                                 + course['cat_num'],
                         'id': course['id'],
+                        'crosslistings': course['crosslistings'],
                         'manually_settled': course['manually_settled'],
                     }
                     settled.append(course_output)
@@ -605,6 +615,7 @@ def format_req_output(req, courses, manually_satisfied_reqs):
                         'code': course['dept_code']
                                 + ' '
                                 + course['cat_num'],
+                        'crosslistings': course['crosslistings'],
                         'id': course['id'],
                         'manually_settled': course['manually_settled'],
                     }
@@ -684,50 +695,44 @@ def get_course_comments(dept, num):
 
 # dept is the department code (string) and num is the catalog number (int)
 # returns dictionary containing relevant info
-def get_course_info(dept, num):
-    dept = str(dept)
-    num = str(num)
+def get_course_info(crosslistings):
 
     try:
-        dept_code = Department.objects.filter(code=dept).first().id
-        try:
-            course = Course.objects.filter(
-                department__id=dept_code, catalog_number=num
-            ).first()
-            # if course.course_id:
-                # instructor = "None"
-                # try:
-                #    instructor = Section.objects.filter(course_id=13248).first()
-                # except Section.DoesNotExist:
-                #    instructor = "Information Unavailable"
-            # get relevant info and put it in a dictionary
-            course_dict = {}
-            if course.title:
-                course_dict['Title'] = course.title
-            if course.description:
-                course_dict['Description'] = course.description
-            if course.distribution_area_short:
-                course_dict[
-                    'Distribution Area'] = course.distribution_area_short
-            # if instructor:
-            #    course_dict["Professor"] = instructor
-            if course.reading_list:
-                clean_reading_list = course.reading_list
-                clean_reading_list = clean_reading_list.replace('//',
-                                                                ', by ')
-                clean_reading_list = clean_reading_list.replace(';',
-                                                                '; ')
-                course_dict['Reading List'] = clean_reading_list
-            if course.reading_writing_assignment:
-                course_dict[
-                    'Reading / Writing Assignments'
-                ] = course.reading_writing_assignment
-            if course.grading_basis:
-                course_dict['Grading Basis'] = course.grading_basis
-            return course_dict
+        course = (Course.objects.select_related('department')
+            .filter(crosslistings__icontains=crosslistings)
+            .order_by('-guid')[0])
+        # if course.course_id:
+            # instructor = "None"
+            # try:
+            #    instructor = Section.objects.filter(course_id=13248).first()
+            # except Section.DoesNotExist:
+            #    instructor = "Information Unavailable"
+        # get relevant info and put it in a dictionary
+        course_dict = {}
+        if course.title:
+            course_dict['Title'] = course.title
+        if course.description:
+            course_dict['Description'] = course.description
+        if course.distribution_area_short:
+            course_dict[
+                'Distribution Area'] = course.distribution_area_short
+        # if instructor:
+        #    course_dict["Professor"] = instructor
+        if course.reading_list:
+            clean_reading_list = course.reading_list
+            clean_reading_list = clean_reading_list.replace('//',
+                                                            ', by ')
+            clean_reading_list = clean_reading_list.replace(';',
+                                                            '; ')
+            course_dict['Reading List'] = clean_reading_list
+        if course.reading_writing_assignment:
+            course_dict[
+                'Reading / Writing Assignments'
+            ] = course.reading_writing_assignment
+        if course.grading_basis:
+            course_dict['Grading Basis'] = course.grading_basis
+        return course_dict
 
-        except Course.DoesNotExist:
-            return None
     except Course.DoesNotExist:
         return None
 

@@ -31,14 +31,20 @@ async function fetchCsrfToken() {
 }
 
 function generateClassYears() {
-  const currentYear = new Date().getFullYear() + 1;
-  const classYears = [currentYear, currentYear + 1, currentYear + 2, currentYear + 3];
+  const currentYear = new Date().getFullYear();
+  const classYears = [
+    currentYear,
+    currentYear + 1,
+    currentYear + 2,
+    currentYear + 3,
+    currentYear + 4,
+  ];
   return classYears;
 }
 
 // Should probably id these corresponding to the ids in the database
 const undeclared = { code: 'Undeclared', name: 'Undeclared' };
-const defaultClassYear = new Date().getFullYear() + 1;
+const defaultClassYear = new Date().getFullYear();
 
 // Should probably id these corresponding to the ids in the database
 const majorOptions = [
@@ -175,9 +181,9 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       if (!response.ok) {
         throw new Error('POST request to update profile failed.');
       }
-      onSave(profile);
       updateProfile(profile);
     });
+    onSave(profile);
   }, [updateProfile, firstName, lastName, major, minors, classYear, onSave]);
 
   useEffect(() => {

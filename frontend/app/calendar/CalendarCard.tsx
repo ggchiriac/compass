@@ -64,9 +64,9 @@ const CalendarCard: React.FC<CalendarCardProps> = ({
       <div className='card-header'>
         <strong
           className='course-code'
-          title={`${event.course.department.code} ${event.course.catalog_number}`}
+          title={`${event.course.department_code} ${event.course.catalog_number}`}
         >
-          {event.course.department.code} {event.course.catalog_number}
+          {event.course.department_code} {event.course.catalog_number}
         </strong>
         <span className='course-title' title={event.course.title}>
           {event.course.title}

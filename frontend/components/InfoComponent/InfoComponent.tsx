@@ -21,10 +21,9 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
   const [courseDetails, setCourseDetails] = useState<{ [key: string]: any } | null>(null);
 
   useEffect(() => {
-    if (showPopup && dept && coursenum) {
+    if (showPopup && value) {
       const url = new URL(`${process.env.BACKEND}/course_details/`);
-      url.searchParams.append('dept', dept);
-      url.searchParams.append('coursenum', coursenum);
+      url.searchParams.append('crosslistings', value);
 
       fetch(url.toString(), {
         method: 'GET',
@@ -38,7 +37,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
           setCourseDetails(data);
         });
     }
-  }, [showPopup, dept, coursenum]);
+  }, [showPopup, value]);
 
   const handleKeyDown = (event) => {
     if (event.key === 'Escape' || event.key === 'Enter') {

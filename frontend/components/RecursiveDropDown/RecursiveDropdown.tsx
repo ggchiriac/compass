@@ -123,7 +123,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       .then((data) => {
         setExplanation(data);
         if (data) {
-          setMarkedSatisfied(data[4]);
+          setMarkedSatisfied(data[7]);
         }
       })
       .finally(() => setIsLoading(false));
@@ -138,14 +138,30 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   }, [setExplanation, setShowPopup]); // Dependencies
 
   const handleSearch = useCallback(() => {
-    if (explanation && explanation[2]) {
-      useSearchStore.getState().setSearchResults(explanation[2]);
+    let searchResults = [];
+
+    if (explanation && explanation[5]) {
+      searchResults = [...searchResults, ...explanation[5]];
     }
+    if (explanation && explanation[6]) {
+      searchResults = [...searchResults, ...explanation[6]];
+    }
+
+    searchResults.sort((course1, course2) => {
+      if (course1.crosslistings < course2.crosslistings) {
+        return -1;
+      }
+      if (course1.crosslistings > course2.crosslistings) {
+        return 1;
+      }
+      return 0;
+    });
+
+    useSearchStore.getState().setSearchResults(searchResults);
     handleClose();
   }, [explanation, handleClose]);
 
   const handleMarkSatisfied = () => {
-    // TODO: What behavior do we want if explanation is null?
     if (explanation === null) {
       return;
     }
@@ -156,7 +172,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ reqId: explanation ? explanation[3] : null, markedSatisfied: 'true' }),
+      body: JSON.stringify({ reqId: explanation ? explanation[0] : null, markedSatisfied: 'true' }),
     }).then((response) => response.json());
 
     setMarkedSatisfied(true);
@@ -164,7 +180,6 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   };
 
   const handleUnmarkSatisfied = () => {
-    // TODO: Same as above
     if (explanation === null) {
       return;
     }
@@ -176,7 +191,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        reqId: explanation ? explanation[3] : null,
+        reqId: explanation ? explanation[0] : null,
         markedSatisfied: 'false',
       }),
     }).then((response) => response.json());
@@ -221,7 +236,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         <div className={styles.detailRow}>
           {explanation ? (
             Object.entries(explanation).map(([index, value]) => {
-              if (index === '0') {
+              if (index === '1') {
                 if (value) {
                   return (
                     <div key={index} className={styles.section}>
@@ -238,7 +253,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                   );
                 }
               }
-              if (index === '1' && value !== 8) {
+              if (index === '2' && value !== 8) {
                 return (
                   <div key={index} className={styles.section}>
                     <strong className={styles.strong}>{'Complete by'}: </strong>
@@ -246,20 +261,46 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                   </div>
                 );
               }
-              if (index === '2' && value[0]) {
+              if (index === '3' && value[0]) {
                 return (
                   <div key={index} className={styles.section}>
-                    <strong className={styles.strong}>{'Course list'}: </strong>
+                    <strong className={styles.strong}>
+                      {value.length > 1 ? 'Distribution areas' : 'Distribution area'}:{' '}
+                    </strong>
                     {value
-                      .slice(0, 30)
-                      .map((course, index) => {
-                        const separator = index === 29 && value.length > 30 ? '...' : ', ';
-                        return `${course.crosslistings}${separator}`;
+                      .map((area) => {
+                        return `${area}, `;
                       })
                       .join('')
-                      .slice(0, value.length > 30 ? undefined : -2)}
+                      .slice(0, -2)}
                   </div>
                 );
+              }
+              if (index === '5' && !explanation[3][0]) {
+                return value[0] || explanation[4][0] ? (
+                  <div key={index} className={styles.section}>
+                    <strong className={styles.strong}>{'Course list'}: </strong>
+                    {explanation[4][0]
+                      ? explanation[4]
+                          .map((department) => {
+                            return `${department} (any), `;
+                          })
+                          .join('')
+                          .slice(0, -2)
+                      : null}
+                    {explanation[4][0] && value[0] ? ', ' : null}
+                    {value[0]
+                      ? value
+                          .slice(0, 20)
+                          .map((course, index) => {
+                            const separator = index === 19 && value.length > 20 ? '...' : ', ';
+                            return `${course.crosslistings}${separator}`;
+                          })
+                          .join('')
+                          .slice(0, value.length > 20 ? undefined : -2)
+                      : null}
+                  </div>
+                ) : null;
               }
             })
           ) : (
@@ -268,11 +309,13 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         </div>
       </div>
       <footer className='mt-auto text-right'>
-        {explanation && explanation[2] && explanation[2].length > 0 && (
-          <JoyButton variant='soft' color='primary' onClick={handleSearch} size='md'>
-            Search Courses
-          </JoyButton>
-        )}
+        {explanation &&
+          ((explanation[5] && explanation[5].length > 0) ||
+            (explanation[6] && explanation[6].length > 0)) && (
+            <JoyButton variant='soft' color='primary' onClick={handleSearch} size='md'>
+              Search Courses
+            </JoyButton>
+          )}
         {isLoading ? null : markedSatisfied ? (
           <JoyButton
             variant='soft'
@@ -301,7 +344,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     </SettingsModal>
   ) : null;
 
-  const handleClick = (courseId, reqId) => {
+  const handleClick = (crosslistings, reqId) => {
     fetch(`${process.env.BACKEND}/manually_settle/`, {
       method: 'POST',
       credentials: 'include',
@@ -309,7 +352,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         'Content-Type': 'application/json',
         'X-CSRFToken': csrfToken,
       },
-      body: JSON.stringify({ courseId: courseId, reqId: reqId }),
+      body: JSON.stringify({ crosslistings: crosslistings, reqId: reqId }),
     }).then((response) => response.json());
 
     checkRequirements();
@@ -341,7 +384,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                 backgroundColor: '#f7f7f7',
                 color: '#000',
               }}
-              onClick={() => handleClick(item['id'], value[1])}
+              onClick={() => handleClick(item['crosslistings'], value[1])}
             >
               {item['code']}
             </Button>
@@ -358,7 +401,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                 color: '#000',
                 opacity: 0.5,
               }}
-              onClick={() => handleClick(item['id'], value[1])}
+              onClick={() => handleClick(item['crosslistings'], value[1])}
             >
               {item['code']}
             </Button>

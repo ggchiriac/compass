@@ -213,7 +213,7 @@ type Props = {
 
 export const PLACEHOLDER_ID = 'placeholder';
 export const SEARCH_RESULTS_ID = 'Search Results';
-const defaultClassYear = new Date().getFullYear() + 1;
+const defaultClassYear = new Date().getFullYear();
 
 export function Canvas({
   user,
@@ -570,7 +570,7 @@ export function Canvas({
                   'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({
-                  courseId: active.id.toString().split('|')[0],
+                  crosslistings: active.id.toString().split('|')[1],
                   semesterId: overContainerId,
                 }),
               }).then((response) => response.json());
@@ -759,7 +759,7 @@ export function Canvas({
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
-        courseId: value.toString().split('|')[0],
+        crosslistings: value.toString().split('|')[1],
         semesterId: 'Search Results',
       }),
     }).then((response) => {

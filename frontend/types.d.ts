@@ -151,13 +151,14 @@ export type Instructor = {
 };
 
 export type Course = {
-  // From model
-  department: Department;
+  // From CourseSerializer in backend
+  department_code: string;
   guid: string;
   course_id: number;
   catalog_number: number;
   title: string;
   description: string;
+  distribution_area_short?: string;
   crosslistings?: string;
 
   // Defined fields

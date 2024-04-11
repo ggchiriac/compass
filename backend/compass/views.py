@@ -26,16 +26,18 @@ from .models import (
     Requirement,
     Section,
     UserCourses,
+    Department,
 )
 from .serializers import CourseSerializer
-from data.check_reqs import check_user, get_course_comments, get_course_info
+from data.check_reqs import check_user, get_course_comments, \
+    get_course_info, ensure_list
 from data.configs.configs import Configs
 from data.req_lib import ReqLib
-
 
 logger = logging.getLogger(__name__)
 
 UNDECLARED = {'code': 'Undeclared', 'name': 'Undeclared'}
+
 
 # ------------------------------------ PROFILE ----------------------------------------#
 
@@ -64,7 +66,8 @@ def fetch_user_info(net_id):
     )
 
     minors = [
-        {'code': minor.code, 'name': minor.name} for minor in user_inst.minors.all()
+        {'code': minor.code, 'name': minor.name} for minor in
+        user_inst.minors.all()
     ]
 
     # Initialize profile with default values
@@ -78,17 +81,19 @@ def fetch_user_info(net_id):
 
     # External API call for additional info only if necessary attributes are missing
     if (
-        not user_inst.email
-        or not user_inst.first_name
-        or not user_inst.last_name
-        or not user_inst.class_year
+            not user_inst.email
+            or not user_inst.first_name
+            or not user_inst.last_name
+            or not user_inst.class_year
     ):
-        student_profile = req_lib.getJSON(f'{configs.USERS_FULL}?uid={net_id}')
+        student_profile = req_lib.getJSON(
+            f'{configs.USERS_FULL}?uid={net_id}')
         profile.update(student_profile[0])
 
         # Extracting class year, first name, and last name
         class_year_match = search(r'Class of (\d{4})', profile['dn'])
-        class_year = int(class_year_match.group(1)) if class_year_match else None
+        class_year = int(
+            class_year_match.group(1)) if class_year_match else None
         full_name = profile['displayname'].split(' ')
         first_name, last_name = full_name[0], ' '.join(full_name[1:])
 
@@ -152,7 +157,8 @@ def update_profile(request):
     if isinstance(updated_minors, list):
         # Assuming each minor is represented by its 'code' and you have Minor models
         minor_objects = [
-            Minor.objects.get(code=minor.get('code', '')) for minor in updated_minors
+            Minor.objects.get(code=minor.get('code', '')) for minor in
+            updated_minors
         ]
         user_inst.minors.set(minor_objects)
 
@@ -208,9 +214,11 @@ class CAS(APIView):
                     f'Validation Warning: Received {len(response)} lines from CAS, expected 2. URL: {validation_url}'
                 )
                 return None
-            first_line, second_line = map(str.strip, map(bytes.decode, response))
+            first_line, second_line = map(str.strip,
+                                          map(bytes.decode, response))
             if first_line.startswith('yes'):
-                logger.info(f'Successful validation for ticket: {ticket}')
+                logger.info(
+                    f'Successful validation for ticket: {ticket}')
                 return second_line
             else:
                 logger.info(
@@ -246,13 +254,15 @@ class CAS(APIView):
         Returns:
             (bool, str): Tuple of authentication status and username.
         """
-        return (net_id := request.session.get('net_id', None)) is not None, net_id
+        return (net_id := request.session.get('net_id',
+                                              None)) is not None, net_id
 
     def authenticate(self, request):
         authenticated, net_id = self._is_authenticated(request)
         if authenticated:
             user_info = fetch_user_info(net_id)
-            return JsonResponse({'authenticated': True, 'user': user_info})
+            return JsonResponse(
+                {'authenticated': True, 'user': user_info})
         else:
             return JsonResponse({'authenticated': False, 'user': None})
 
@@ -277,12 +287,14 @@ class CAS(APIView):
                 logger.debug(f'Validation returned {username}')
                 if net_id:
                     user, created = CustomUser.objects.get_or_create(
-                        username=net_id, defaults={'net_id': net_id, 'role': 'student'}
+                        username=net_id,
+                        defaults={'net_id': net_id, 'role': 'student'}
                     )
                     if created:
                         user.username = net_id
                         user.set_unusable_password()
-                        user.major = Major.objects.get(code=UNDECLARED['code'])
+                        user.major = Major.objects.get(
+                            code=UNDECLARED['code'])
                     user.save()
                     request.session['net_id'] = net_id
                     return redirect(settings.DASHBOARD)
@@ -296,15 +308,18 @@ class CAS(APIView):
         """
         Logs out the user and redirects to the landing page.
         """
-        logger.info(f'Incoming GET request: {request.GET}, Session: {request.session}')
-        logger.info(f"Received logout request from {request.META.get('REMOTE_ADDR')}")
+        logger.info(
+            f'Incoming GET request: {request.GET}, Session: {request.session}')
+        logger.info(
+            f"Received logout request from {request.META.get('REMOTE_ADDR')}")
         request.session.flush()
         return redirect(settings.HOMEPAGE)
 
 
 # ------------------------------- SEARCH COURSES --------------------------------------#
 
-DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$', IGNORECASE)
+DEPT_NUM_SUFFIX_REGEX = compile(r'^[a-zA-Z]{3}\d{3}[a-zA-Z]$',
+                                IGNORECASE)
 DEPT_NUM_REGEX = compile(r'^[a-zA-Z]{3}\d{1,4}$', IGNORECASE)
 DEPT_ONLY_REGEX = compile(r'^[a-zA-Z]{1,3}$', IGNORECASE)
 NUM_SUFFIX_ONLY_REGEX = compile(r'^\d{3}[a-zA-Z]$', IGNORECASE)
@@ -345,17 +360,20 @@ class SearchCourses(APIView):
             # process queries
             trimmed_query = sub(r'\s', '', query)
             if DEPT_NUM_SUFFIX_REGEX.match(trimmed_query):
-                result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
+                result = split(r'(\d+[a-zA-Z])', string=trimmed_query,
+                               maxsplit=1)
                 dept = result[0]
                 num = result[1]
                 code = dept + ' ' + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
-                result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
+                result = split(r'(\d+)', string=trimmed_query,
+                               maxsplit=1)
                 dept = result[0]
                 num = result[1]
                 code = dept + ' ' + num
-            elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
-                trimmed_query
+            elif NUM_ONLY_REGEX.match(
+                    trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
+                    trimmed_query
             ):
                 dept = ''
                 num = trimmed_query
@@ -405,8 +423,10 @@ class SearchCourses(APIView):
                 )
                 if exact_match_course:
                     # If an exact match is found, return only that course
-                    serialized_course = CourseSerializer(exact_match_course, many=True)
-                    return JsonResponse({'courses': serialized_course.data})
+                    serialized_course = CourseSerializer(
+                        exact_match_course, many=True)
+                    return JsonResponse(
+                        {'courses': serialized_course.data})
                 else:
                     filtered_query = query_conditions
                     filtered_query &= Q(crosslistings__icontains=code)
@@ -417,16 +437,20 @@ class SearchCourses(APIView):
                         .distinct('course_id')
                     )
                     if courses:
-                        serialized_courses = CourseSerializer(courses, many=True)
+                        serialized_courses = CourseSerializer(courses,
+                                                              many=True)
                         sorted_data = sorted(
-                            serialized_courses.data, key=make_sort_key(dept)
+                            serialized_courses.data,
+                            key=make_sort_key(dept)
                         )
                         print(f'Search time: {time.time() - init_time}')
                         return JsonResponse({'courses': sorted_data})
                     return JsonResponse({'courses': []})
             except Exception as e:
-                logger.error(f'An error occurred while searching for courses: {e}')
-                return JsonResponse({'error': 'Internal Server Error'}, status=500)
+                logger.error(
+                    f'An error occurred while searching for courses: {e}')
+                return JsonResponse({'error': 'Internal Server Error'},
+                                    status=500)
         else:
             return JsonResponse({'courses': []})
 
@@ -445,16 +469,20 @@ class GetUserCourses(APIView):
             try:
                 for semester in range(1, 9):
                     user_courses = Course.objects.filter(
-                        usercourses__user=user_inst, usercourses__semester=semester
+                        usercourses__user=user_inst,
+                        usercourses__semester=semester
                     )
-                    serialized_courses = CourseSerializer(user_courses, many=True)
+                    serialized_courses = CourseSerializer(user_courses,
+                                                          many=True)
                     user_course_dict[semester] = serialized_courses.data
 
                 return JsonResponse(user_course_dict)
 
             except Exception as e:
-                logger.error(f'An error occurred while retrieving courses: {e}')
-                return JsonResponse({'error': 'Internal Server Error'}, status=500)
+                logger.error(
+                    f'An error occurred while retrieving courses: {e}')
+                return JsonResponse({'error': 'Internal Server Error'},
+                                    status=500)
         else:
             return JsonResponse({})
 
@@ -474,34 +502,36 @@ def parse_semester(semester_id, class_year):
 def update_courses(request):
     try:
         data = json.loads(request.body)
-        course_id = data.get('courseId')  # might have to adjust this, print
+        crosslistings = data.get(
+            'crosslistings')  # might have to adjust this, print
         container = data.get('semesterId')
         net_id = request.session['net_id']
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
         course_inst = (
             Course.objects.select_related('department')
-            .filter(Q(course_id__iexact=course_id))
+            .filter(crosslistings__iexact=crosslistings)
             .order_by('-guid')[0]
         )
 
         if container == 'Search Results':
             user_course = UserCourses.objects.get(
-                user=user_inst, course__course_id=course_id
+                user=user_inst, course=course_inst
             )
             user_course.delete()
-            message = f'User course deleted: {course_id}, {net_id}'
+            message = f'User course deleted: {crosslistings}, {net_id}'
 
         else:
             semester = parse_semester(container, class_year)
 
             user_course, created = UserCourses.objects.update_or_create(
-                user=user_inst, course=course_inst, defaults={'semester': semester}
+                user=user_inst, course=course_inst,
+                defaults={'semester': semester}
             )
             if created:
-                message = f'User course added: {semester}, {course_id}, {net_id}'
+                message = f'User course added: {semester}, {crosslistings}, {net_id}'
             else:
-                message = f'User course updated: {semester}, {course_id}, {net_id}'
+                message = f'User course updated: {semester}, {crosslistings}, {net_id}'
 
         return JsonResponse({'status': 'success', 'message': message})
 
@@ -511,7 +541,8 @@ def update_courses(request):
 
         # Return a generic error message to the user
         return JsonResponse(
-            {'status': 'error', 'message': 'An internal error has occurred!'}
+            {'status': 'error',
+             'message': 'An internal error has occurred!'}
         )
 
 
@@ -528,7 +559,8 @@ def update_user(request):
         user_inst.save()
 
         return JsonResponse(
-            {'status': 'success', 'message': 'Class year updated successfully.'}
+            {'status': 'success',
+             'message': 'Class year updated successfully.'}
         )
 
     except Exception as e:
@@ -537,7 +569,8 @@ def update_user(request):
 
         # Return a generic error message to the user
         return JsonResponse(
-            {'status': 'error', 'message': 'An internal error has occurred!'}
+            {'status': 'error',
+             'message': 'An internal error has occurred!'}
         )
 
 
@@ -573,10 +606,12 @@ def transform_data(data):
             satisfied = value['requirements'].pop('satisfied')
 
             # Transform the rest of the requirements
-            transformed_reqs = transform_requirements(value['requirements'])
+            transformed_reqs = transform_requirements(
+                value['requirements'])
 
             # Combine 'satisfied' status and transformed requirements
-            transformed_data[code] = {'satisfied': satisfied, **transformed_reqs}
+            transformed_data[code] = {'satisfied': satisfied,
+                                      **transformed_reqs}
 
     return transformed_data
 
@@ -585,16 +620,11 @@ def transform_data(data):
 
 
 def course_details(request):
-    dept = request.GET.get('dept', '')  # Default to empty string if not provided
-    num = request.GET.get('coursenum', '')
+    crosslistings = request.GET.get('crosslistings')
 
-    if dept and num:
-        try:
-            num = str(num)  # Convert to string
-        except ValueError:
-            return JsonResponse({'error': 'Invalid course number'}, status=400)
+    if crosslistings:
+        course_info = get_course_info(crosslistings)
 
-        course_info = get_course_info(dept, num)
         return JsonResponse(course_info)
     else:
         return JsonResponse({'error': 'Missing parameters'}, status=400)
@@ -604,14 +634,16 @@ def course_details(request):
 
 
 def course_comments(request):
-    dept = request.GET.get('dept', '')  # Default to empty string if not provided
+    dept = request.GET.get('dept',
+                           '')  # Default to empty string if not provided
     num = request.GET.get('coursenum', '')
 
     if dept and num:
         try:
             num = str(num)  # Convert to string
         except ValueError:
-            return JsonResponse({'error': 'Invalid course number'}, status=400)
+            return JsonResponse({'error': 'Invalid course number'},
+                                status=400)
 
         course_comments = get_course_comments(dept, num)
         return JsonResponse(course_comments)
@@ -624,13 +656,16 @@ def course_comments(request):
 
 def manually_settle(request):
     data = json.loads(request.body)
-    course_id = int(data.get('courseId'))
+    crosslistings = data.get('crosslistings')
     req_id = int(data.get('reqId'))
     net_id = request.session['net_id']
     user_inst = CustomUser.objects.get(net_id=net_id)
+    course_inst = (Course.objects.select_related('department')
+            .filter(crosslistings__iexact=crosslistings)
+            .order_by('-guid')[0])
 
     user_course_inst = UserCourses.objects.get(
-        user_id=user_inst.id, course_id=course_id
+        user_id=user_inst.id, course=course_inst
     )
     if user_course_inst.requirement_id is None:
         user_course_inst.requirement_id = req_id
@@ -666,7 +701,8 @@ def mark_satisfied(request):
                 {'error': 'Requirement not found in user requirements.'}
             )
 
-    return JsonResponse({'Manually satisfied': req_id, 'action': action})
+    return JsonResponse(
+        {'Manually satisfied': req_id, 'action': action})
 
 
 def check_requirements(request):
@@ -675,7 +711,8 @@ def check_requirements(request):
     this_major = user_info['major']['code']
     these_minors = [minor['code'] for minor in user_info['minors']]
 
-    req_dict = check_user(user_info['netId'], user_info['major'], user_info['minors'])
+    req_dict = check_user(user_info['netId'], user_info['major'],
+                          user_info['minors'])
 
     # Rewrite req_dict so that it is stratified by requirements being met
     formatted_dict = {}
@@ -707,41 +744,103 @@ def check_requirements(request):
 def requirement_info(request):
     req_id = request.GET.get('reqId', '')
     explanation = ''
-    sorted_course_list = []
     completed_by_semester = 8
+    dist_req = []
+    sorted_dept_list = []
+    sorted_course_list = []
+    sorted_dept_sample_list = []
     marked_satisfied = False
 
     try:
-        req = Requirement.objects.get(id=req_id)
+        req_inst = Requirement.objects.get(id=req_id)
+        user_inst = CustomUser.objects.get(
+            net_id=request.session['net_id'])
 
-        explanation = req.explanation
-        completed_by_semester = req.completed_by_semester
-        excluded_course_ids = req.excluded_course_list.values_list(
-            'course_id', flat=True
-        ).distinct()
-        course_list = (
-            req.course_list.exclude(course_id__in=excluded_course_ids)
-            .order_by('course_id', '-guid')
-            .distinct('course_id')
-        )
-        if course_list:
-            serialized_course_list = CourseSerializer(course_list, many=True)
-            sorted_course_list = sorted(
-                serialized_course_list.data, key=lambda course: course['crosslistings']
+        explanation = req_inst.explanation
+        completed_by_semester = req_inst.completed_by_semester
+        if req_inst.dist_req:
+            dist_req = ensure_list(json.loads(req_inst.dist_req))
+            query = Q()
+            for distribution in dist_req:
+                query |= Q(
+                    distribution_area_short__icontains=distribution)
+            course_list = (Course.objects.select_related('department')
+                           .filter(query)
+                           .order_by('course_id', '-guid')
+                           .distinct('course_id')
+                           )
+        else:
+            excluded_course_ids = req_inst.excluded_course_list.values_list(
+                'course_id', flat=True
+            ).distinct()
+            course_list = (
+                req_inst.course_list.exclude(
+                    course_id__in=excluded_course_ids)
+                .order_by('course_id', '-guid')
+                .distinct('course_id')
             )
 
-        user_inst = CustomUser.objects.get(net_id=request.session['net_id'])
-        marked_satisfied = user_inst.requirements.filter(id=req_id).exists()
+        if course_list:
+            serialized_course_list = CourseSerializer(course_list,
+                                                      many=True)
+            sorted_course_list = sorted(
+                serialized_course_list.data,
+                key=lambda course: course['crosslistings']
+            )
+
+        if req_inst.dept_list:
+            sorted_dept_list = sorted(json.loads(req_inst.dept_list))
+
+            query = Q()
+
+            for dept in sorted_dept_list:
+                # Fetch the IDs of 5 courses for the current department
+                dept_course_ids = (
+                    Course.objects
+                    .select_related('department')
+                    .filter(department__code=dept)
+                    .values_list('id', flat=True)[:5])
+
+                query |= Q(id__in=list(dept_course_ids))
+
+            dept_sample_list = (
+                Course.objects.select_related('department').filter(
+                    query)
+                .order_by('course_id', '-guid')
+                .distinct('course_id'))
+            if dept_sample_list:
+                serialized_dept_sample_list = CourseSerializer(
+                    dept_sample_list, many=True)
+                sorted_dept_sample_list = sorted(
+                    serialized_dept_sample_list.data,
+                    key=lambda course: course['crosslistings']
+                )
+
+        marked_satisfied = user_inst.requirements.filter(
+            id=req_id).exists()
 
     except Requirement.DoesNotExist:
         pass
 
+    # mapping:
+    # 3 -> 0
+    # 0 -> 1
+    # 1 -> 2
+    # 7 -> 3
+    # 5 -> 4
+    # 2 -> 5
+    # 6 -> 6
+    # 4 -> 7
+
     info = {}
-    info[0] = explanation
-    info[1] = completed_by_semester
-    info[2] = sorted_course_list
-    info[3] = req_id
-    info[4] = marked_satisfied
+    info[0] = req_id
+    info[1] = explanation
+    info[2] = completed_by_semester
+    info[3] = dist_req
+    info[4] = sorted_dept_list
+    info[5] = sorted_course_list
+    info[6] = sorted_dept_sample_list
+    info[7] = marked_satisfied
     return JsonResponse(info)
 
 
@@ -757,10 +856,12 @@ class FetchCalendarClasses(APIView):
 
         if not sections:
             return Response(
-                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
+                {'error': 'No sections found'},
+                status=status.HTTP_404_NOT_FOUND
             )
 
-        sections_data = [self.serialize_section(section) for section in sections]
+        sections_data = [self.serialize_section(section) for section in
+                         sections]
         return Response(sections_data, status=status.HTTP_200_OK)
 
     def get_unique_class_meetings(self, term, course_id):
@@ -780,7 +881,8 @@ class FetchCalendarClasses(APIView):
                     'classmeeting_set',
                     queryset=ClassMeeting.objects.order_by(
                         'id'
-                    ),  # or use 'meeting_number' if that's the unique field
+                    ),
+                    # or use 'meeting_number' if that's the unique field
                     to_attr='unique_class_meetings',
                 )
             )
