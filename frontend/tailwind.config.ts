@@ -12,6 +12,12 @@ const config: Config = {
         sans: ['var(--font-geist-sans)'],
         mono: ['var(--font-geist-mono)'],
       },
+      spacing: {
+        '0.5vh': '0.5vh',
+        '1vh': '1vh',
+        '0.5vw': '0.5vw',
+        '1vw': '1vw',
+      },
       colors: {
         // Darker Day Theme
         'day-primary': '#B26400', // Darkened Princeton Orange

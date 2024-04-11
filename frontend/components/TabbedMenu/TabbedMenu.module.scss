@@ -1,8 +1,11 @@
 // TabbedMenu.module.scss
 .tabContainer {
-  width: full;
-  height: 703px;
-  margin: 10px;
+  //width: 25vw;
+  height: 100%;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
   border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 6px;
   overflow: hidden; /* Ensures child elements do not break the rounded corners */

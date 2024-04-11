@@ -232,13 +232,14 @@ export function Canvas({
 }: Props) {
   // This limits the width of the course cards
   const wrapperStyle = () => ({
-    width: 150,
+    width: '10.5vw',
     height: 150,
     transition: 'width 0.3s ease-in-out',
   });
   const searchWrapperStyle = () => ({
+    width: '22vw',
     height: 150,
-    transition: 'width 0.3s ease-in-out',
+    transition: 'width 0.1s ease-in-out',
   });
   const classYear = user.classYear ?? defaultClassYear;
 
@@ -282,7 +283,7 @@ export function Canvas({
   // The width of the semester bins is hard-coded here
   const semesterBinStyle = {
     ...containerStyle,
-    width: '322px',
+    width: '22.5vw',
   };
 
   type Dictionary = {
@@ -491,7 +492,7 @@ export function Canvas({
   };
 
   return (
-    <>
+    <div style={{ display: 'flex', flexDirection: 'row' }}>
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetectionStrategy}
@@ -589,7 +590,13 @@ export function Canvas({
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Left Section for Search Results */}
             {containers.includes('Search Results') && (
-              <div style={{ width: '360px' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: '87vh',
+                }}
+              >
                 {/* issue here with resizing + with requirements dropdowns*/}
                 {/* Try to get this to fixed height*/}
                 <DroppableContainer
@@ -600,7 +607,7 @@ export function Canvas({
                   items={items['Search Results']}
                   scrollable={scrollable}
                   style={containerStyle}
-                  height='703px'
+                  height='85vh'
                 >
                   <SortableContext items={items['Search Results']} strategy={strategy}>
                     {items['Search Results'].map((value, index) => (
@@ -625,48 +632,61 @@ export function Canvas({
             {/* Center Section for other containers in a 2x4 grid */}
             <div
               style={{
+                flexGrow: 1,
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gridTemplateRows: '1fr 1fr 1fr 1fr',
+                height: '87vh',
               }}
             >
               {containers
                 .filter((id) => id !== 'Search Results')
                 .map((containerId) => (
-                  <DroppableContainer
+                  <div
                     key={containerId}
-                    id={containerId}
-                    label={minimal ? undefined : `${containerId}`}
-                    columns={columns}
-                    items={items[containerId]}
-                    scrollable={scrollable}
-                    style={semesterBinStyle}
-                    unstyled={minimal}
-                    height='160px'
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      height: '21.7vh', // Absolutely no clue why this works --george
+                    }}
                   >
-                    <SortableContext items={items[containerId]} strategy={strategy}>
-                      {items[containerId].map((course, index) => (
-                        <SortableItem
-                          disabled={isSortingContainer}
-                          key={index}
-                          id={course}
-                          index={index}
-                          handle={handle}
-                          style={getItemStyles}
-                          wrapperStyle={wrapperStyle}
-                          onRemove={() => handleRemove(course, containerId)}
-                          renderItem={renderItem}
-                          containerId={containerId}
-                          getIndex={getIndex}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DroppableContainer>
+                    <DroppableContainer
+                      key={containerId}
+                      id={containerId}
+                      label={minimal ? undefined : `${containerId}`}
+                      columns={columns}
+                      items={items[containerId]}
+                      scrollable={scrollable}
+                      style={semesterBinStyle}
+                      unstyled={minimal}
+                      height='100%'
+                    >
+                      <SortableContext items={items[containerId]} strategy={strategy}>
+                        {items[containerId].map((course, index) => (
+                          <SortableItem
+                            disabled={isSortingContainer}
+                            key={index}
+                            id={course}
+                            index={index}
+                            handle={handle}
+                            style={getItemStyles}
+                            wrapperStyle={wrapperStyle}
+                            onRemove={() => handleRemove(course, containerId)}
+                            renderItem={renderItem}
+                            containerId={containerId}
+                            getIndex={getIndex}
+                          />
+                        ))}
+                      </SortableContext>
+                    </DroppableContainer>
+                  </div>
                 ))}
             </div>
 
             {/* Right section for requirements */}
-            <div style={{ width: '380px' }}>
+            <div
+              style={{ display: 'flex', flexDirection: 'column', height: '87vh', width: '26vw' }}
+            >
               <TabbedMenu
                 tabsData={academicPlan}
                 csrfToken={csrfToken}
@@ -683,25 +703,25 @@ export function Canvas({
           document.body
         )}
       </DndContext>
-    </>
+    </div>
   );
 
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     // Determine the current overlay width based on overContainerId
-    const currentOverlayWidth = overContainerId === SEARCH_RESULTS_ID ? '340px' : '150px';
+    const currentOverlayWidth = overContainerId === SEARCH_RESULTS_ID ? '22vw' : '10.5vw';
     const currentOverlayLeft =
       activeContainerId === SEARCH_RESULTS_ID && overContainerId !== SEARCH_RESULTS_ID
-        ? '190px'
+        ? '11.5vw'
         : activeContainerId !== SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
-          ? '-190px'
-          : '0px';
+          ? '-11.5vw'
+          : '0vw';
 
     // Modify the wrapperStyle function or directly adjust the style here to use the determined width
     const dynamicWrapperStyle = {
       ...wrapperStyle(), // Spread the original styles
       width: currentOverlayWidth, // Override the width with the current overlay width
       left: currentOverlayLeft,
-      transition: 'width 0.2s ease-in-out, left 0.2s ease-in-out', // Ensure smooth transition
+      transition: 'width 0.1s ease-in-out, left 0.1s ease-in-out', // Ensure smooth transition
     };
 
     return (
