@@ -140,7 +140,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
         }}
         className={classNames(styles.Action)}
       >
-        {value.length > 28 ? `${value.substring(0, 27)}...` : value}
+        {value}
       </div>
       {modalContent && createPortal(modalContent, document.body)}
     </>

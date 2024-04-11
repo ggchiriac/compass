@@ -29,6 +29,10 @@
   border-right: 1px solid #ccc;
   border-top-left-radius: 6px; /* Rounded corners for tabs */
   border-top-right-radius: 6px; /* Rounded corners for tabs */
+  display: flex; /* Use flexbox for centering */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  overflow: hidden; /* Hide text that goes beyond the element's width */
   &:last-child {
     border-right: none;
   }

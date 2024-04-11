@@ -347,7 +347,7 @@ const Search: FC = () => {
             type='text'
             name='search'
             id='search'
-            className='block w-full py-1.5 pl-10 pr-3 text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm'
+            className='block w-full py-1.5 pl-10 pr-9 text-sm text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-600 focus:border-indigo-600'
             placeholder='Search courses'
             autoComplete='off'
             onChange={handleInputChange}

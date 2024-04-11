@@ -14,19 +14,20 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 1em;
   width: 24vw;
+  overflow: hidden;
 
   ul {
     display: grid;
-    gap: 8px 8px;
+    gap: 0.5vw;
     grid-template-columns: repeat(var(--columns, 1), 1fr);
-    grid-auto-rows: auto; /* This ensures that the row height is determined by gap + course card height */
-    align-content: start; /* Starts aligning the content from the beginning of the container */
+    align-content: space-between; /* Starts aligning the content from the beginning of the container */
     list-style: none;
-    padding: 5px;
+    padding-top: 7px;
+    padding-bottom: 5px;
+    padding-left: 6px;
+    padding-right: 5px;
     max-width: 100%;
-    height: 100%; /* Initial ul height is equal to the container height */
     overflow-x: auto;
-    place-items: center;
   }
 
   &.scrollable {

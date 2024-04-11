@@ -230,17 +230,36 @@ export function Canvas({
   // vertical = false,
   scrollable,
 }: Props) {
+  // Heights are relative to viewport height
+  const containerGridHeight = '87vh';
+  const searchGridHeight = '85vh';
+
+  // Widths are relative to viewport width.
+  // Search width is 24vw, inherited from Container.module.scss
+  const semesterWidth = '22.5vw';
+  const requirementsWidth = '26vw';
+  const courseWidth = '10.5vw';
+  const extendedCourseWidth = '22.5vw';
+
+  const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
+
   // This limits the width of the course cards
   const wrapperStyle = () => ({
-    width: '10.5vw',
-    height: 150,
-    transition: 'width 0.3s ease-in-out',
+    width: courseWidth,
   });
   const searchWrapperStyle = () => ({
-    width: '22vw',
-    height: 150,
-    transition: 'width 0.1s ease-in-out',
+    width: '100%',
+    overflow: 'hidden', // Ensure overflow is hidden
+    whiteSpace: 'nowrap', // Keep the text on a single line
+    textOverflow: 'ellipsis', // Add ellipsis to text overflow
   });
+
+  // The width of the semester bins
+  const semesterStyle = {
+    ...containerStyle,
+    width: semesterWidth,
+  };
+
   const classYear = user.classYear ?? defaultClassYear;
 
   const generateSemesters = (classYear: number): Items => {
@@ -279,12 +298,6 @@ export function Canvas({
     [SEARCH_RESULTS_ID]: [], // Initialize search container with no courses
     ...semesters,
   }));
-
-  // The width of the semester bins is hard-coded here
-  const semesterBinStyle = {
-    ...containerStyle,
-    width: '22.5vw',
-  };
 
   type Dictionary = {
     [key: string]: any; // TODO: Aim to replace 'any' with more specific types.
@@ -492,7 +505,7 @@ export function Canvas({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row' }}>
+    <div style={{ display: 'flex', flexDirection: 'row', placeItems: 'center' }}>
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetectionStrategy}
@@ -594,7 +607,7 @@ export function Canvas({
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  height: '87vh',
+                  height: containerGridHeight,
                 }}
               >
                 {/* issue here with resizing + with requirements dropdowns*/}
@@ -607,7 +620,7 @@ export function Canvas({
                   items={items['Search Results']}
                   scrollable={scrollable}
                   style={containerStyle}
-                  height='85vh'
+                  height={searchGridHeight}
                 >
                   <SortableContext items={items['Search Results']} strategy={strategy}>
                     {items['Search Results'].map((value, index) => (
@@ -636,7 +649,6 @@ export function Canvas({
                 display: 'grid',
                 gridTemplateColumns: '1fr 1fr',
                 gridTemplateRows: '1fr 1fr 1fr 1fr',
-                height: '87vh',
               }}
             >
               {containers
@@ -647,7 +659,7 @@ export function Canvas({
                     style={{
                       display: 'flex',
                       flexDirection: 'column',
-                      height: '21.7vh', // Absolutely no clue why this works --george
+                      height: `calc(${containerGridHeight} / 4)`,
                     }}
                   >
                     <DroppableContainer
@@ -657,9 +669,9 @@ export function Canvas({
                       columns={columns}
                       items={items[containerId]}
                       scrollable={scrollable}
-                      style={semesterBinStyle}
+                      style={semesterStyle}
                       unstyled={minimal}
-                      height='100%'
+                      height={`calc(${containerGridHeight} / 4)`}
                     >
                       <SortableContext items={items[containerId]} strategy={strategy}>
                         {items[containerId].map((course, index) => (
@@ -685,7 +697,12 @@ export function Canvas({
 
             {/* Right section for requirements */}
             <div
-              style={{ display: 'flex', flexDirection: 'column', height: '87vh', width: '26vw' }}
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                height: containerGridHeight,
+                width: requirementsWidth,
+              }}
             >
               <TabbedMenu
                 tabsData={academicPlan}
@@ -708,12 +725,13 @@ export function Canvas({
 
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     // Determine the current overlay width based on overContainerId
-    const currentOverlayWidth = overContainerId === SEARCH_RESULTS_ID ? '22vw' : '10.5vw';
+    const currentOverlayWidth =
+      overContainerId === SEARCH_RESULTS_ID ? extendedCourseWidth : courseWidth;
     const currentOverlayLeft =
       activeContainerId === SEARCH_RESULTS_ID && overContainerId !== SEARCH_RESULTS_ID
-        ? '11.5vw'
+        ? `calc(${extendedCourseWidth} - ${courseWidth})`
         : activeContainerId !== SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
-          ? '-11.5vw'
+          ? `calc(${courseWidth} - ${extendedCourseWidth})`
           : '0vw';
 
     // Modify the wrapperStyle function or directly adjust the style here to use the determined width
@@ -721,7 +739,7 @@ export function Canvas({
       ...wrapperStyle(), // Spread the original styles
       width: currentOverlayWidth, // Override the width with the current overlay width
       left: currentOverlayLeft,
-      transition: 'width 0.1s ease-in-out, left 0.1s ease-in-out', // Ensure smooth transition
+      transition: transitionAnimation, // Ensure smooth transition
     };
 
     return (
