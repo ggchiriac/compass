@@ -25,9 +25,9 @@ req_list:
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    <i>Editor's Note: This does not represent an exact list of courses that fulfill these requirements as thematic designations change from semester to semester. Compass also does not account for double counting of geographical distribution courses with thematic areas.</i>
+    <i>Editor's Note: This does not represent an exact list of courses that fulfill these requirements as thematic designations change from semester to semester. Compass also does not account for double counting of geographical distribution courses with thematic areas.</i><br><br>
     
-    Starting with the class of 2023, students must take at least one course in each of the following four thematic areas – Knowledge & Belief (KB), Power & Conflict (PC), Pre-Modern, pre-1700 (PM), Race & Difference (RD). See the department website for a list of courses satisfying each of these areas. Many courses carry more than one designation. A single course may satisfy only one thematic requirement. 
+    Starting with the class of 2023, students must take at least one course in each of the following four thematic areas – Knowledge & Belief (KB), Power & Conflict (PC), Pre-Modern, pre-1700 (PM), Race & Difference (RD). See the department website for a list of courses satisfying each of these areas. Many courses carry more than one designation. A single course may satisfy only one thematic requirement.<br><br>
     
     In addition to the thematic areas, at least two (2) courses must also fulfill the Geographical Distribution Requirements that are principally focused on Africa, Asia, Latin America or the Middle East. These courses may double-count with the thematic courses.
   req_list:
@@ -374,7 +374,7 @@ req_list:
     max_counted: 1
     min_needed: 2
     explanation: |-
-      <i>Editor's Note: This does not represent an exact list of courses that fulfill this requirement as courses change from semester to semester.</i>
+      <i>Editor's Note: This does not represent an exact list of courses that fulfill this requirement as courses change from semester to semester.</i><br><br>
 
        Students are required to take at least two (2) courses that are principally focused on Africa, Asia, Latin America, or the Middle East. These courses may double count with the thematic areas.
     course_list:
@@ -429,7 +429,7 @@ req_list:
       max_counted: 1
       min_needed: 4
       explanation: |-
-        <i>Editor's Note: Compass does not account for double counting of these courses with geographic and thematic distribution areas.</i>
+        <i>Editor's Note: Compass does not account for double counting of these courses with geographic and thematic distribution areas.</i><br><br>
         
         Four of the following courses (with the permission of the director of undergraduate studies, one of these courses may be replaced by a cognate course from another department, for example, in philosophy or sociology of science). These specific courses can and almost certainly will also serve to at least partially meet the geographic and thematic requirements.
       course_list:
@@ -472,9 +472,9 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    Juniors write two junior papers of roughly 25–30 pages in length, one in each semester.
+    Juniors write two junior papers of roughly 25–30 pages in length, one in each semester.<br><br>
     
-    In the fall term of junior year, students are required to enroll in the HIS 400 Junior Seminars.
+    In the fall term of junior year, students are required to enroll in the HIS 400 Junior Seminars.<br><br>
     
     In the spring term of junior year, in consultation with their adviser, the student selects a topic and writes a research paper on an independent basis. Written work equivalent to that submitted in the first term is required. The two semesters of junior independent work must be focused in two different geographical fields and in two different time periods. Students should consult their advisers about this requirement.
   completed_by_semester: 6
@@ -484,7 +484,7 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     The independent work consists of writing a thesis on an approved subject of the student's choice. The thesis usually relies on research in original source materials, but it may also involve reinterpretation of familiar materials.
 - name: Restrictions

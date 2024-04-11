@@ -351,6 +351,8 @@ def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
     old_deficit = req['min_needed'] - req['count']
     if req['max_counted']:
         old_available = req['max_counted'] - req['count']
+    else:
+        old_available = 0
 
     was_satisfied = old_deficit <= 0
     newly_satisfied = 0

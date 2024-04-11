@@ -15,7 +15,7 @@ req_list:
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    Prerequisites for a major in physics are the following five courses: PHY 103-104, PHY 207, and MAT 203-204. These five courses should be completed by the end of sophomore year. 
+    Prerequisites for a major in physics are the following five courses: PHY 103-104, PHY 207, and MAT 203-204. These five courses should be completed by the end of sophomore year. <br><br>
     
     PHY 103 may be replaced by ISC 231-232 (the first term of Integrated Science Sequence) or PHY 105. PHY 104 may be replaced by ISC 233-234 or PHY 106. The PHY 109/110 (spring/summer) sequence is fully equivalent to PHY 104. Students with a particular interest in formal mathematics may instead satisfy the MAT 203-204 prerequisite with either the MAT 215-217 or the MAT 216-218 sequence. Prerequisites for majoring in physics cannot be taken on a pass/D/fail basis.
   completed_by_semester: 4
@@ -176,7 +176,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      One elective course at the 300-level or higher, as detailed below.
+      One elective course at the 300-level or higher, as detailed below.<br><br>
 
       The elective course can be any Physics Department course (including cross-lists) at 300-level or above. 400-level physics courses are particularly recommended. Courses in astrophysics, biophysics or biology, chemistry, computer science, engineering, geophysical science, materials science, plasma physics, and mathematics may also be appropriate depending on the interests of the student. Graduate courses may also be taken with permission from both the instructor and the departmental representative.
     course_list:
@@ -208,13 +208,13 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     In addition to the coursework carried out during the junior year, the student is required to complete two junior papers, each of which is on a research topic of current interest. The purpose of the papers is to give students exposure to how physics research is actually performed by immersing them in journal, as opposed to textbook, literature. Each paper is written in close consultation with a faculty adviser, who is typically performing research in the subject area of the paper. A junior paper may serve as a preliminary investigation of a senior thesis topic. Junior independent work may also be satisfied with a short experimental project.
 - name: Senior Thesis
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     In the senior year, in addition to coursework, students write a senior thesis based on their own research. The topic might be chosen from one of the active experimental or theoretical research fields of the Physics Department, or might be suggested by a faculty member with some subsidiary interest. A student could also choose a topic relating physics and another field, such as biophysics, geophysics, the teaching of physics, history of science, or engineering physics. Students whose main adviser is outside the Physics Department must also have a co-adviser who is a faculty member in the Physics Department.

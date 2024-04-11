@@ -35,7 +35,7 @@ contacts:
 req_list:
 - name: Core Requirements
   max_counted: 1
-  min_needed: 6
+  min_needed: ALL
   explanation: |-
     Requirements for study in the department follow the general 
     requirements for the School of Engineering and Applied Science. 
@@ -50,7 +50,6 @@ req_list:
   - MAE 222
   - MAE 223
   - MAE 224
-  - MAE 321
 - name: Applications of Mathematics
   max_counted: 1
   min_needed: 2
@@ -101,6 +100,7 @@ req_list:
     min_needed: 6
     explanation: |-
       Six courses required for the Aerospace Program.
+    double_counting_allowed: true
     req_list:
     - name: Flight Course
       max_counted: 1
@@ -175,10 +175,6 @@ req_list:
       - CEE 361
       - CEE 362
       - CEE 364
-    # "CEE 362 or CEE 364 may be considered as substitutes for the materials 
-    # requirement. Requires the approval of the Director of Undergraduate Studies."
-    # WHAT IS THE MATERIALS REQUIREMENT??
-
   - name: Engineering Design Courses
     max_counted: 1
     min_needed: 2
@@ -187,7 +183,6 @@ req_list:
       design, including senior independent work. At least two of these
       must be selected from the following list.
     req_list:
-
     - name: Engineering Design
       max_counted: 1
       min_needed: 1
@@ -197,7 +192,6 @@ req_list:
       pdfs_allowed: false
       course_list:
       - MAE 321
-
     - name: Aerospace Systems Design
       max_counted: 1
       min_needed: 1
@@ -206,8 +200,6 @@ req_list:
       course_list:
       - MAE 322
       - MAE 412
-
-
 - name: Mechanical Track
   max_counted: 1
   min_needed: 2
@@ -284,10 +276,6 @@ req_list:
       - CEE 361
       - CEE 362
       - CEE 364
-    # "CEE 362 or CEE 364 may be considered as substitutes for the materials 
-    # requirement. Requires the approval of the Director of Undergraduate Studies."
-    # WHAT IS THE MATERIALS REQUIREMENT??
-
   - name: Engineering Design Courses
     max_counted: 1
     min_needed: 2
@@ -296,7 +284,6 @@ req_list:
       design, including senior independent work. At least two of these
       must be selected from the following list:
     req_list:
-
     - name: Engineering Design
       max_counted: 1
       min_needed: 1
@@ -306,7 +293,6 @@ req_list:
       pdfs_allowed: false
       course_list:
       - MAE 321
-
     - name: Design and Control Engineering
       max_counted: 1
       min_needed: 1
@@ -327,7 +313,6 @@ req_list:
         CEE 477 is an acceptable substitute for the Design and Control
         Engineering category only for Mechanical Engineers who are 
         pursuing the Sustainable Energy Minor.
-
 - name: Senior Independent Work
   max_counted: 1
   min_needed: 1
@@ -336,19 +321,19 @@ req_list:
     engineering programs. All seniors are required to participate in a research or engineering
     project. All projects must include elements of engineering design (engineering design is the
     process of devising a system, component, or process to meet desired needs). The following
-    courses satisfy this requirement: MAE 439 Senior Independent Work (one semester, fall);
-    MAE 440 Senior Independent Work (one semester, spring); MAE 442 Senior Thesis (yearlong);
-    MAE 444 Senior Project (year-long). Students are strongly encouraged to select
+    courses satisfy this requirement: MAE 439 Senior Independent Work (one semester, fall);<br>
+    MAE 440 Senior Independent Work (one semester, spring);<br> MAE 442 Senior Thesis (yearlong);<br>
+    MAE 444 Senior Project (year-long).<br> Students are strongly encouraged to select
     the year-long project or thesis option. Senior projects are intended for teams or groups
     while senior thesis is intended for individuals. For senior project or thesis, work begins in
-    the fall but enrollment is only in spring term when a double grade is awarded. Please note:
+    the fall but enrollment is only in spring term when a double grade is awarded. <br>Please note:
     If a student has selected to participate in a year-long project or thesis and is enrolled in only
     three courses during the fall semester, it is required that they will enroll in Senior Project or
     Thesis during the spring semester. For these students, it will NOT be possible to drop-down
     to a one-semester course of Independent Work without incurring a failure for Independent
     Work in the fall term. In Spring term you must enroll in three courses plus senior thesis or
     senior project (senior thesis and senior project count as two courses). Therefore your senior
-    year course load will be 3 in fall and 5 in spring as opposed to 4 in fall and 4 in spring.
+    year course load will be 3 in fall and 5 in spring as opposed to 4 in fall and 4 in spring.<br>
     There are NO exceptions to this rule even if your total number of courses will exceed 36.
   req_list:
   - name: Senior Independent Work (Fall)

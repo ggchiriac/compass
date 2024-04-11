@@ -840,14 +840,15 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    In senior year, majors are required to participate in the year-long senior colloquium, which provides a space for students to share ideas and gain feedback on their step-by-step plans for the senior thesis. The colloquium adviser helps students achieve departmental benchmarks for drafting their thesis, while individual faculty advisers address students' field-specific questions and provide substantive feedback on drafts. A second reader is assigned to read the thesis at the end of the semester. The thesis adviser and second reader independently submit comments and suggest a grade. If the grades differ, then the adviser and second reader confer and collectively decide the final grade.
+    In senior year, majors are required to participate in the year-long senior colloquium, which provides a space for students to share ideas and gain feedback on their step-by-step plans for the senior thesis. The colloquium adviser helps students achieve departmental benchmarks for drafting their thesis, while individual faculty advisers address students' field-specific questions and provide substantive feedback on drafts. A second reader is assigned to read the thesis at the end of the semester. The thesis adviser and second reader independently submit comments and suggest a grade. If the grades differ, then the adviser and second reader confer and collectively decide the final grade.<br><br>
+    
     The senior comprehensive statement is completed after the senior thesis and has a dual purpose: to narrate the student's scholarly development in AAS, and to describe any work beyond the classroom that reflects the student's commitment to the intellectual, political and artistic traditions of Black studies as a field. The statement is consulted during the senior departmental examination and is used to help calculate honors in the major.
   no_req:
 - name: Senior Departmental Examination
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    <p>The senior departmental examination involves the senior thesis adviser and assigned second reader of the thesis. It consists of two parts: a 10-minute presentation articulating the thesis's main argument and responding to the readers' reports assessing the work, and a discussion of the student's independent work and course of study. Aspects of the senior comprehensive statement may be cited during the discussion part of the exam.</p>
+    The senior departmental examination involves the senior thesis adviser and assigned second reader of the thesis. It consists of two parts: a 10-minute presentation articulating the thesis's main argument and responding to the readers' reports assessing the work, and a discussion of the student's independent work and course of study. Aspects of the senior comprehensive statement may be cited during the discussion part of the exam.
   no_req:

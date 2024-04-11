@@ -427,7 +427,7 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: |-
-    In addition, students are required to take at least one course each from two of the advanced areas outside their area of concentration to provide technical diversity.
+    In addition, students are required to take at least one course each from two of the advanced areas outside their area of concentration to provide technical diversity.<br>
     This means that classes towards your concentration cannot be applied here.
   pdfs_allowed: false
   req_list:

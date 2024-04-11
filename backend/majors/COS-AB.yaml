@@ -212,14 +212,14 @@ req_list:
   max_counted:
   min_needed:
   explanation: |-
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
+    
     All COS AB students are required to complete two semesters of junior
     independent work and a full-year senior thesis in the following 
-    sequence:
+    sequence:<br><br>
 
-    Junior fall: Junior Research Workshop (JRW)  (AB'25 Majors to enroll
-    in one of the following courses for JRW - 
-    Will be listed on Feb. 1, 2023.)
-    Junior spring: Single-term Independent Work project
-    Senior year: full-year senior thesis project
+    Junior fall: Junior Research Workshop (JRW)<br>
+    Junior spring: Single-term Independent Work project<br>
+    Senior year: full-year senior thesis project<br>
     For more details, please see the current COS AB IW Handbook.
   no_req:

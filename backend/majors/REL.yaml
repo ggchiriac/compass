@@ -29,7 +29,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    Undergraduate courses in the Department of Religion are classified in two ways: Traditions, and Themes. Majors must take at least three courses in either a particular tradition in a traditions stream or a particular theme in a thematic stream. 
+    Undergraduate courses in the Department of Religion are classified in two ways: Traditions, and Themes. Majors must take at least three courses in either a particular tradition in a traditions stream or a particular theme in a thematic stream. <br><br>
 
     Students will choose one of the two streams during their junior year in conversation with the director of undergraduate studies (DUS).
   req_list:
@@ -143,9 +143,9 @@ req_list:
     max_counted: 1
     min_needed: 7
     explanation: |-
-      <i>Editor's Note: The department does not offer course lists for the thematic stream, so the course list is too broad.</i>
+      <i>Editor's Note: The department does not offer course lists for the thematic stream, so the course list is too broad.</i><br><br>
       
-      Majors must take at least three courses in either a particular tradition in a traditions stream or a particular theme in a thematic stream.
+      Majors must take at least three courses in either a particular tradition in a traditions stream or a particular theme in a thematic stream.<br><br>
       
       The themes suggested by the department are: Religion and Political Life; Religion, Text, and Media; and Religion and Social Identities.
     course_list:
@@ -161,17 +161,23 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
+    
     In conjunction with REL 399, the Junior Colloquium, during the fall term juniors will produce a five- to seven-page JP proposal. During the spring term, juniors will continue this independent research and write a 30-40 page junior paper under the supervision of a faculty adviser. The DUS will assign advisers. At the end of junior year, students will review their work in the department and discuss with a faculty committee their plans for senior independent work.
   no_req:
 - name: Senior Thesis
   min_needed: 1
   max_counted: 1
   explanation: |-
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
+    
     Every senior will prepare a 70-90 page thesis under the supervision of a faculty adviser.
   no_req:
 - name: Senior Departmental Examination
   min_needed: 1
   max_counted: 1
   explanation: |-
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
+    
     At the end of senior year, students will take an oral examination concerning their senior independent work, focus of study and work in the department generally.
   no_req:

@@ -28,19 +28,19 @@ req_list:
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    Departmental distribution requirements ensure breadth in each major's program of study. Everyone must take at least one course in each of the following areas: 
-    - Literary and Cultural History (LCH)
-    - Literature and Culture before 1700 (pre-1700)
-    - Literature and Culture from 1700-1900 (1700-1900)
-    - Literature and Culture from 1900-present (post-1900)
-    - Difference and Diversity (D&D)
+    Departmental distribution requirements ensure breadth in each major's program of study. Everyone must take at least one course in each of the following areas: <br>
+    - Literary and Cultural History (LCH)<br>
+    - Literature and Culture before 1700 (pre-1700)<br>
+    - Literature and Culture from 1700-1900 (1700-1900)<br>
+    - Literature and Culture from 1900-present (post-1900)<br>
+    - Difference and Diversity (D&D)<br>
     - Theory and Criticism (T&C)
   req_list:
   - name: Literary and Cultural History
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i>
+      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
 
       Literary and Cultural History (LCH) courses ask questions about tradition and transmission over longer periods, and provide background for more specialized study.
     course_list:
@@ -57,10 +57,8 @@ req_list:
   - name: Literature and Culture before 1700
     max_counted: 1
     min_needed: 1
-    explanation: "<i>Editor's Note: This does not represent a comprehensive list of
-      courses that fulfill this requirement as courses change from semester to semester.
-      Some courses may fulfill different requirements depending on their content each
-      semester.</i>"
+    explanation: |-
+      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i>
     course_list:
     - ENG 200
     - ENG 298 / COM 240
@@ -78,10 +76,11 @@ req_list:
   - name: Literature and Culture from 1700-1900
     max_counted: 1
     min_needed: 1
-    explanation: "<i>Editor's Note: This does not represent a comprehensive list of
+    explanation: |-
+      <i>Editor's Note: This does not represent a comprehensive list of
       courses that fulfill this requirement as courses change from semester to semester.
       Some courses may fulfill different requirements depending on their content each
-      semester.</i>"
+      semester.</i>
     course_list:
     - ENG 203
     - ENG 304
@@ -96,10 +95,11 @@ req_list:
   - name: Literature and Culture from 1900-Present
     max_counted: 1
     min_needed: 1
-    explanation: "<i>Editor's Note: This does not represent a comprehensive list of
+    explanation: |-
+      <i>Editor's Note: This does not represent a comprehensive list of
       courses that fulfill this requirement as courses change from semester to semester.
       Some courses may fulfill different requirements depending on their content each
-      semester.</i>"
+      semester.</i>
     course_list:
     - ENG 304
     - ENG 351
@@ -138,10 +138,11 @@ req_list:
   - name: Difference and Diversity
     max_counted: 1
     min_needed: 1
-    explanation: "<i>Editor's Note: This does not represent a comprehensive list of
+    explanation: |-
+      <i>Editor's Note: This does not represent a comprehensive list of
       courses that fulfill this requirement as courses change from semester to semester.
       Some courses may fulfill different requirements depending on their content each
-      semester.</i>"
+      semester.</i>
     course_list:
     - ENG 379 / ENV 383
     - ENG 444 / ASA 444 / AMS 443
@@ -186,7 +187,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i>
+      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
 
       Theory and Criticism (T&C) provides tools for thinking critically across all these periods, identities, and genres.
     course_list:
@@ -256,7 +257,7 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    The JRS is a required introduction to the methods of research and the arts of criticism that must be taken in the fall of junior year. During the sophomore sign-ins, students are placed into one of four seminars at Princeton
+    The JRS is a required introduction to the methods of research and the arts of criticism that must be taken in the fall of junior year. During the sophomore sign-ins, students are placed into one of four seminars at Princeton<br><br>
 
     The completed junior paper takes the form of one 20–30-page JP, which is begun in conjunction with the junior seminar and which students complete in the spring semester, continuing the advising established during the junior seminar for the student's independent work.
   course_list:
@@ -265,15 +266,15 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     The Senior Thesis. Theses are 60-75 pages in length, on a topic chosen in collaboration with the thesis adviser. One chapter or 20 pages of the thesis is due in December.
 - name: Restrictions
   max_counted: 0
   min_needed: 1
   explanation: |-
-    Students who study abroad may count up to two courses taken abroad as departmental courses. The exception to this is the English department's UCL semester: students may count two classes plus the Princeton seminar.
+    Students who study abroad may count up to two courses taken abroad as departmental courses. The exception to this is the English department's UCL semester: students may count two classes plus the Princeton seminar.<br><br>
     
-    The Rule of 12. A student in the A.B. program is limited to 12 one-term courses (plus independent work) in a given department, plus up to two departmental prerequisites taken during the first year or sophomore year. Students who exceed the 31-course requirement for graduation may exceed the Rule of 12 by as many courses (e.g., if you take 32 courses total, you can exceed the rule of 12 by one course). For most English majors, this means only 12 courses primarily designated as English courses (ENG courses or cross-listed courses where ENG comes first—e.g., ENG 327/GSS 332). Departmental cognates do not count against the Rule of 12.
+    The Rule of 12. A student in the A.B. program is limited to 12 one-term courses (plus independent work) in a given department, plus up to two departmental prerequisites taken during the first year or sophomore year. Students who exceed the 31-course requirement for graduation may exceed the Rule of 12 by as many courses (e.g., if you take 32 courses total, you can exceed the rule of 12 by one course). For most English majors, this means only 12 courses primarily designated as English courses (ENG courses or cross-listed courses where ENG comes first—e.g., ENG 327/GSS 332). Departmental cognates do not count against the Rule of 12.<br><br>
     
     Cross-listed courses do not count against the Rule of 12 as long as the home department is not English.

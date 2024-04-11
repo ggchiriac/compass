@@ -31,29 +31,29 @@ req_list:
   req_list:
   - name: Economics
     max_counted: 1
-    min_needed: 3
+    min_needed: 2
     explanation: To enter the department, a student must complete, by the end of sophomore
       year, the prerequisite courses ECO 100, ECO 101, ECO 202 (or equivalent).
       ORF 245 can be substituted for ECO 202. POL 345 followed by POL 346 can also
       be used to satisfy our statistics pre-requirement. (POL 345 alone is not sufficient).
     req_list:
-    - name:
+    - name: Fundamental Economics
       max_counted: 1
       min_needed: 2
       course_list:
       - ECO 100
       - ECO 101
-    - name:
+    - name: Statistics
       max_counted: 1
       min_needed: 1
       req_list:
-      - name:
+      - name: Regular
         max_counted: 1
         min_needed: 1
         course_list:
         - ECO 202
         - ORF 245
-      - name:
+      - name: Politics Sequence
         max_counted: 1
         min_needed: ALL
         course_list:
@@ -63,7 +63,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      Majors must complete MAT 175 (or equivalent) by the end of sophomore year and earn a letter grade of C or better in each course. MAT 201 or EGR 156 can be substituted for MAT 175.
+      Majors must complete MAT 175 (or equivalent) by the end of sophomore year and earn a letter grade of C or better in each course. MAT 201 or EGR 156 can be substituted for MAT 175.<br><br>
       
       It is highly recommended that students who wish to take math-track econometrics (ECO 312) or upper-level finance certificate courses (such as ECO 462, ECO 465 and ECO 466), or pursue graduate studies in economics and finance take MAT 201 and MAT 202 instead of one semester of MAT 175 or EGR 156. Both MAT 201 and MAT 202 should be taken for a letter grade by this subset of students.
     course_list:
@@ -74,7 +74,7 @@ req_list:
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    All majors must pass, on a graded basis, core courses in microeconomics (ECO 300 or 310), macroeconomics (ECO 301 or 311) and econometrics (ECO 302 or 312). These courses must be completed during or before the junior year. Each of the three core courses is offered in two versions to accommodate different levels of preparation in mathematics: ECO 300, ECO 301 and ECO 302 require MAT 175 or equivalent. ECO 310 and ECO 311 require MAT 201. ECO 312 requires MAT 201 + MAT 202.
+    All majors must pass, on a graded basis, core courses in microeconomics (ECO 300 or 310), macroeconomics (ECO 301 or 311) and econometrics (ECO 302 or 312). These courses must be completed during or before the junior year. Each of the three core courses is offered in two versions to accommodate different levels of preparation in mathematics: ECO 300, ECO 301 and ECO 302 require MAT 175 or equivalent. ECO 310 and ECO 311 require MAT 201. ECO 312 requires MAT 201 + MAT 202.<br><br>
 
     Qualified students are encouraged to take the more mathematical versions. It is not necessary to take all three courses in the same version.
   completed_by_semester: 6
@@ -102,7 +102,7 @@ req_list:
   max_counted: 1
   min_needed: 5
   explanation: |-
-    In addition to the three core courses, majors must pass, on a graded basis, five other departmental courses. Departmentals can be any 300-, 400-, or 500-level Economics courses, or an approved cognate.
+    In addition to the three core courses, majors must pass, on a graded basis, five other departmental courses. Departmentals can be any 300-, 400-, or 500-level Economics courses, or an approved cognate.<br><br>
 
     Students planning a senior thesis with empirical emphasis are strongly encouraged to take ECO 313; students planning a theoretical senior thesis are strongly encouraged to take ECO 317 and/or ECO 418.
   req_list:
@@ -156,15 +156,14 @@ req_list:
     - SPI 582C
     - SPI 582F
 - name: Optional Tracks
-  max_counted: 1
+  max_counted: 0
   min_needed: 0
-  explanation:
   req_list:
   - name: Program in Political Economy
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      The Department offers a program in political economy track for Economics concentrators. Program participants meet all the general requirements of Economics concentrators, and, in addition: (1) complete two Politics courses at any level before entering the program; (2) complete three 300-level (or higher) Politics courses during junior and senior years, and (3) conduct junior independent work with a political economy component.
+      The Department offers a program in political economy track for Economics concentrators. Program participants meet all the general requirements of Economics concentrators, and, in addition: (1) complete two Politics courses at any level before entering the program; (2) complete three 300-level (or higher) Politics courses during junior and senior years, and (3) conduct junior independent work with a political economy component.<br><br>
 
       One Politics course approved as an Economics cognate may also count toward the program’s requirements. Admission to the program takes place at the beginning of the junior year, in consultation with the Political Economy Representative in Economics. Concentrators who successfully complete the program’s requirements receive a certificate in Political Economy from the Department.  The coordinator of the program is Professor Silvia Weyerbrock.
     req_list:
@@ -178,9 +177,9 @@ req_list:
       max_counted: 1
       min_needed: 3
       explanation: |-
-        <p><i>Editor's Note: POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.</i></p>
+        <i>Editor's Note: POL 345 and POL 346 will not count any longer as POL courses in PPE, as they now can be used to cover the statistics prerequisite for the Economics major.</i><br><br>
         
-        <p>In addition to the two Politics prerequisites, a student in the PPE must complete three Politics departmentals, i.e. Politics courses in the 300-level or higher, on a graded basis.</p>
+        In addition to the two Politics prerequisites, a student in the PPE must complete three Politics departmentals, i.e. Politics courses in the 300-level or higher, on a graded basis.
       excluded_course_list:
       - POL 345
       - POL 446
@@ -192,13 +191,13 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
-    <p>Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Juniors complete a year-long research project, which consists of a research prospectus submitted in December and a final paper submitted in April.</p>
+    Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Juniors complete a year-long research project, which consists of a research prospectus submitted in December and a final paper submitted in April.
 - name: Senior Thesis
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
-    <p>Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Unlike junior independent work, the senior thesis is expected to be more extensive, with a topic of greater scope and, correspondingly broader analysis and interpretation.</p>
+    Independent work is designed to afford concentrators the opportunity to identify and explore their research interests in depth. Students are expected to develop a carefully reasoned exposition that critically analyzes a problem using basic principles of economics. Unlike junior independent work, the senior thesis is expected to be more extensive, with a topic of greater scope and, correspondingly broader analysis and interpretation.

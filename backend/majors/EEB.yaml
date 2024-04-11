@@ -165,16 +165,16 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    Early in the fall semester, students will attend periodic meetings on Tuesday evenings that will include presentations by EEB faculty members on their research and on opportunities for senior independent work. After the faculty presentations, students will identify those faculty with whom they are interested in working. If the faculty member agrees to take on a particular student, together they will develop a plan of study.
+    Early in the fall semester, students will attend periodic meetings on Tuesday evenings that will include presentations by EEB faculty members on their research and on opportunities for senior independent work. After the faculty presentations, students will identify those faculty with whom they are interested in working. If the faculty member agrees to take on a particular student, together they will develop a plan of study.<br>
     During the second half of the fall term, students participate in a tutorial in which they work closely with a faculty member to address a problem and write a first junior paper. In the spring semester, students carry out a program of independent research with their faculty adviser, which can include empirical or theoretical work. Students will summarize this research project in a second junior paper, which can be structured either as a research project, a literature review or a research proposal. The second junior paper is due in early May.
   no_req:
 - name: Senior Independent Work
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     During the fall of junior year, each student selects a senior thesis adviser (see above). The adviser and the student choose a research project that the student generally pursues during the summer preceding senior year and both terms of the senior year. The research project can involve primarily laboratory, field, data mining, theoretical or library study that will be written and presented as a senior thesis.
   no_req:
@@ -182,7 +182,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     A one-hour oral examination, consisting of a defense of the thesis research and general questions in the biological sciences, will be held in May.
   no_req:

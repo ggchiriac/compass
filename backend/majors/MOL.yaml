@@ -34,7 +34,7 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |- 
-        To enter the Department of Molecular Biology, students must have completed MOL 214 with a grade of C or better. CHM 201/207 and 202 or equivalent are also required to enter the department. (For the Class of 2027 and beyond, the equivalent is AP + CHM202/215 or requirement fulfillment through the chemistry placement test.) 
+        To enter the Department of Molecular Biology, students must have completed MOL 214 with a grade of C or better. CHM 201/207 and 202 or equivalent are also required to enter the department. (For the Class of 2027 and beyond, the equivalent is AP + CHM202/215 or requirement fulfillment through the chemistry placement test.)<br><br>
 
         An alternate path into the department is through the integrated science curriculum (see below).
       req_list:
@@ -46,6 +46,7 @@ req_list:
       - name: General Chemistry
         max_counted: 1
         min_needed: 1
+        double_counting_allowed: true
         req_list:
         - name: Basic General Chemistry
           max_counted: 1
@@ -57,8 +58,8 @@ req_list:
           max_counted: 1
           min_needed: 2
           course_list:
-            - CHM 207
-            - CHM 202
+          - CHM 207
+          - CHM 202
     - name: Organic Chemistry
       max_counted: 1
       min_needed: 1
@@ -194,7 +195,7 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: |-
-    The following core courses are required: MOL 342, MOL 345, MOL 348 and MOL 320/350. Except under very special circumstances, these courses must be taken before senior year. MOL 350 is offered in the fall to junior majors and is the conventional path for the major. MOL 320 has limited enrollment and is offered in the spring to sophomores who intend to major in MOL and plan to study abroad, or have taken/are concurrently taking MOL 348 and want an early introduction to research methods and laboratory experience. MOL 320 and MOL 350 are considered equivalent courses and only one can be taken.
+    The following core courses are required: MOL 342, MOL 345, MOL 348 and MOL 320/350. Except under very special circumstances, these courses must be taken before senior year. MOL 350 is offered in the fall to junior majors and is the conventional path for the major. MOL 320 has limited enrollment and is offered in the spring to sophomores who intend to major in MOL and plan to study abroad, or have taken/are concurrently taking MOL 348 and want an early introduction to research methods and laboratory experience. MOL 320 and MOL 350 are considered equivalent courses and only one can be taken.<br><br>
 
     All four departmental core courses count toward the eight required departmentals. No substitutions are allowed except in the case of study abroad which, if it entails intensive research and with advanced permission, can substitute for MOL 350.
   completed_by_semester: 6
@@ -216,9 +217,9 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: |-
-    <i>Editor's Note: If a student took CHM 301 and 304, they only need to take 2 more departmentals, not 3.</i>
+    <i>Editor's Note: If a student took CHM 301 and 304, they only need to take 2 more departmentals, not 3.</i><br><br>
     
-    All students must take a total of at least eight departmentals. In addition to the four departmental core courses, students must take at least one 300-, 400-, or 500-level course with MOL as the primary listing. The remaining three departmentals can be chosen from among all 300-or-higher-level MOL, MOL-cross-listed, or other approved courses (see list on department website). Note that CHM 301, CHM 304 and CHM 337 qualify as departmentals. Only courses taken at Princeton count as departmentals; there are no exceptions to this rule.
+    All students must take a total of at least eight departmentals. In addition to the four departmental core courses, students must take at least one 300-, 400-, or 500-level course with MOL as the primary listing. The remaining three departmentals can be chosen from among all 300-or-higher-level MOL, MOL-cross-listed, or other approved courses (see list on department website). Note that CHM 301, CHM 304 and CHM 337 qualify as departmentals. Only courses taken at Princeton count as departmentals; there are no exceptions to this rule.<br><br>
 
     Any course that is a prerequisite, requirement or departmental must be taken for a letter grade (no pass/D/fail). The sole exception is that, at the point of declaring the MOL major, students may appeal to "uncover" a single P grade in order to meet a prerequisite or requirement for entry. See the Office of the Dean of the College's policy on appealing to rescind a P grade.
   pdfs_allowed: 0
@@ -254,12 +255,12 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     In the fall semester of the junior year students participate in tutorials in which they read papers from the original literature and prepare two short papers on assigned topics. In the spring semester, students carry out independent work with a faculty adviser with whom they will eventually do their senior thesis research, culminating in a paper in the form of a grant proposal.
 - name: Senior Independent work
   explanation: |-
-    <i>Editor's Note: Concentrators of this major do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     During the senior year each student, with the guidance of a faculty adviser, undertakes a major research effort. This research project can be a laboratory or non-laboratory-based study that will be written and presented as a senior thesis.
   max_counted: 1

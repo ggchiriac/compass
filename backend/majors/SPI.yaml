@@ -273,16 +273,16 @@ req_list:
   min_needed: ALL
   max_counted: 1
   explanation: |-
-    Students must complete six (6) elective courses according to the following guidelines. Students must earn a grade of C or higher in all courses counting toward elective requirements.
-    Among the six (6) electives, a student may take only three electives from one department. For the major as a whole, a student may not take more than five courses from one department.
-    Regional Focus: Students should also pursue regional focus across their SPIA coursework. Thus, across the SPIA prerequisites, core and electives, students must take at least two courses that focus substantively on a particular continent. The senior thesis can count toward the regional focus requirement.
+    Students must complete six (6) elective courses according to the following guidelines. Students must earn a grade of C or higher in all courses counting toward elective requirements.<br>
+    Among the six (6) electives, a student may take only three electives from one department. For the major as a whole, a student may not take more than five courses from one department.<br>
+    Regional Focus: Students should also pursue regional focus across their SPIA coursework. Thus, across the SPIA prerequisites, core and electives, students must take at least two courses that focus substantively on a particular continent. The senior thesis can count toward the regional focus requirement.<br>
     Up to three elective courses may be taken in semester-long study abroad programs.
   req_list:
   - name: Disciplinary Breadth
     min_needed: 3
     max_counted: 1
     explanation: |-
-      Take one course from three SPIA-related departments (EEB, HIS, POL, PSY, SOC) not already covered by the intellectual depth requirement noted below. ECO is excluded because it is already a required prerequisite and core course. Prerequisites and core courses may double-count; ECO courses may not.
+      Take one course from three SPIA-related departments (EEB, HIS, POL, PSY, SOC) not already covered by the intellectual depth requirement noted below. ECO is excluded because it is already a required prerequisite and core course. Prerequisites and core courses may double-count; ECO courses may not.<br>
       By graduation, we strongly encourage students to have taken courses in departments where they have not yet taken a course (for example in a natural science, if they are focusing on the social sciences).
     req_list:
     - name: Ecology and Evolutionary Biology
@@ -314,7 +314,7 @@ req_list:
     min_needed: 1
     max_counted: 1
     explanation: |-
-      Disciplinary Depth: Take three courses in one SPIA-affiliated department, e.g., ECO, EEB, HIS, POL, PSY, SOC, SPI or:
+      Disciplinary Depth: Take three courses in one SPIA-affiliated department, e.g., ECO, EEB, HIS, POL, PSY, SOC, SPI or:<br>
       Thematic Depth: Take three courses that address a given theme. Courses are drawn from SPIA-affiliated departments or SPIA-approved courses.
     req_list:
       - name: Disciplinary Depth
@@ -363,16 +363,16 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    <p>Prior to the second semester of senior year, each student must have completed an approved cross-cultural or field experience. The requirement may be satisfied in a number of ways, including but not limited to semester study abroad, summer study abroad, policy-relevant summer jobs in a domestic or international organization, ROTC training, senior thesis research in the field, extended service in an underserved community, or an internship involving public policy work in a nonprofit, government or international agency such as the United Nations, the World Bank, the US Congress, or a state or federal agency.
-    Summer study or thesis research must be done for at least four weeks to qualify. Students must engage in an internship, job or community service project for at least six consecutive weeks at a minimum of 40 hours per week or a total of 240 cumulative hours to qualify. Eligible community service work must involve policy work that will enhance one's learning and understanding of public service.
-    Cross-cultural or field experience gained during the first or sophomore year or as a participant in the Bridge Year Program may count toward this requirement. To meet this requirement, all past or proposed work must be approved by the undergraduate program.</p>
+    Prior to the second semester of senior year, each student must have completed an approved cross-cultural or field experience. The requirement may be satisfied in a number of ways, including but not limited to semester study abroad, summer study abroad, policy-relevant summer jobs in a domestic or international organization, ROTC training, senior thesis research in the field, extended service in an underserved community, or an internship involving public policy work in a nonprofit, government or international agency such as the United Nations, the World Bank, the US Congress, or a state or federal agency.<br>
+    Summer study or thesis research must be done for at least four weeks to qualify. Students must engage in an internship, job or community service project for at least six consecutive weeks at a minimum of 40 hours per week or a total of 240 cumulative hours to qualify. Eligible community service work must involve policy work that will enhance one's learning and understanding of public service.<br>
+    Cross-cultural or field experience gained during the first or sophomore year or as a participant in the Bridge Year Program may count toward this requirement. To meet this requirement, all past or proposed work must be approved by the undergraduate program.
 - name: Senior Departmental Examination
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    <p>The school's senior comprehensive examination is an oral defense of the senior thesis that assesses the student's expertise related to their thesis.</p>
+    The school's senior comprehensive examination is an oral defense of the senior thesis that assesses the student's expertise related to their thesis.
   no_req:

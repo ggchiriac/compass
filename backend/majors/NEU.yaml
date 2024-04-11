@@ -277,7 +277,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     In the fall semester of junior year, students are required to participate in tutorials, read papers from the original literature and prepare papers on assigned topics. In the spring term, students write a research proposal with the guidance of a faculty adviser with whom they will eventually do their senior thesis.
   no_req:
@@ -285,7 +285,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     During the senior year each student, with the guidance of a faculty adviser, undertakes a major research effort. This research project can be a laboratory or independent study that will be written and presented as a senior thesis.
   no_req:
@@ -293,7 +293,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     Students are required to present their work to two thesis readers during an oral exam. The exam usually takes about 30 minutes and students should be prepared to describe the background of the thesis, defend its contents and propose future directions. The grade for the oral defense will be the average of the two from the faculty members. 
   no_req:

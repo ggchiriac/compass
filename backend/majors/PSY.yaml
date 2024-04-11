@@ -85,17 +85,17 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    With help from the department, and by talking to faculty and researching faculty webpages, students find an adviser from the Department of Psychology. The primary goal of the fall JP in psychology is for students to practice how to formulate a question and to query the literature. The paper should involve critical analysis and original synthesis, with a topic chosen collaboratively by student and adviser. The fall JP is typically 10-20 pages and is graded by the student's adviser.
-    Students may remain with the same adviser from the fall semester or find a different adviser whose interests overlap their own. The primary purpose of the spring paper is to prepare students for writing a thesis by having them formulate an original idea and embody it in a paper. The spring JP is typically 20-40 pages and is graded by the student's adviser.
+    With help from the department, and by talking to faculty and researching faculty webpages, students find an adviser from the Department of Psychology. The primary goal of the fall JP in psychology is for students to practice how to formulate a question and to query the literature. The paper should involve critical analysis and original synthesis, with a topic chosen collaboratively by student and adviser. The fall JP is typically 10-20 pages and is graded by the student's adviser.<br>
+    Students may remain with the same adviser from the fall semester or find a different adviser whose interests overlap their own. The primary purpose of the spring paper is to prepare students for writing a thesis by having them formulate an original idea and embody it in a paper. The spring JP is typically 20-40 pages and is graded by the student's adviser.<br>
     Students will give a 10-minute presentation midway through the fall and spring semesters to show their progress on their respective JP. Student presentations will occur in a group setting that includes 4-6 other juniors and a faculty member who grades the presentations.
   no_req:
 - name: Senior Independent Work
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     Each psychology senior works in close consultation with a faculty adviser to develop, carry out and write a senior thesis. The resulting thesis serves as the basis for the first part of the senior departmental xxam (see below). Although the length varies depending on type of thesis (experimental write-ups are often shorter), the final thesis is typically between 40 and 80 pages. The senior thesis grade is determined jointly by two readers: the student's adviser and the second reader assigned by the department. These two grades are averaged together to obtain a single grade for the written component of the senior thesis.
   no_req:
@@ -103,7 +103,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     The Senior Departmental Exam is a 60-minute oral examination conducted by two members of the faculty, typically the student's adviser and a second reader. The exam is a defense of the senior thesis and a discussion of its implications. During the first 10-15 minutes, students present a summary of their thesis, and then answer the faculty members' questions about their thesis for the remainder of the examination time. The two faculty members present will determine an examination grade based on the quality of the presentation and the student's ability to answer questions.
   no_req:

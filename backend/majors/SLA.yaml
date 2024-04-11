@@ -41,7 +41,7 @@ req_list:
   min_needed: 5
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: The list of cognates for this requirement is too broad.</i>
+    <i>Editor's Note: The list of cognates for this requirement is too broad.</i><br><br>
     
     A minimum of eight departmental courses is required, in addition to a required junior methods seminar. Four upper-level courses must be within the department, two of which must be from the core survey courses (SLA 219, 220, 221); the other four courses may be from cognate areas depending on the student's particular interests. For example, if the major is 19th-century prose, the program might include courses from French or German literature. Students with a strong interest in Russian and Soviet studies might take area courses in the Program in Russian and Eurasian Studies such as Russian history, politics, anthropology or sociology. These are only sample suggestions. The program is flexible and strives to satisfy as wide a range of interests as possible.
   course_list:
@@ -87,7 +87,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     Slavic majors are required to take a credit-bearing methods seminar in the fall of their junior year. This seminar will be devoted to various approaches to the field in Russian (or other Slavic languages), including one seminar session on research methods with Dr. Thomas Keenan (tkeenan@princeton.edu), the Firestone Library Slavic, East European, and Eurasian Studies librarian; and including, but not limited to, examples of scholarship written by Slavic department faculty. The final assignment for the seminar is an annotated bibliography that reflects the research the student has undertaken in preparation for the fall JP. Separate from the grade for the seminar, juniors receive one grade for their fall JP and one for their spring JP. Each JP is 20-25 pages long and written in English. It incorporates Russian (or other Slavic language) resources to a significant degree and comprises one-half of the overall junior independent grade. Please refer to the Slavic Department Guide to Independent Work for the most up-to-date guidelines for each assignment.
   no_req:
@@ -95,7 +95,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     In senior year, the student's independent work, written under departmental supervision, consists of a thesis of about 20,000 words to be submitted two weeks before the first day of the spring term reading period. After the thesis is submitted, students give a brief (5-minute) presentation in Russian (or relevant Slavic language), and after each presentation there is a question and answer period in English, for the Slavic department faculty and fellow students. Total presentation time will run roughly 15 minutes per student. This presentation does not receive a grade.
   no_req:
@@ -103,7 +103,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     Graduating seniors are required to take a comprehension examination on Russian literature. Together with the thesis and departmental grades, this examination is one of three components that determine departmental honors. The take-home exam is based on a core list of works taught in the three survey courses offered by the department. Students may substitute a limited number of works based on their individual interests for the comprehensive exam. The finalized list must be submitted to the director of undergraduate studies one month before the exam.
   no_req:

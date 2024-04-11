@@ -29,9 +29,9 @@ req_list:
   max_counted: 1
   min_needed: ALL
   explanation: |-
-    In addition to the general prerequisites and the requirements for independent work, each student is required to complete 10 courses in three related areas: history and theory, technology, and design. The history and theory distribution requires six courses: three history and theory of architecture courses, two of which are ARC 308 and ARC 403; two courses in history and theory of urbanism and landscape; and two upper-level courses in art and archaeology. The technology distribution requires two courses, one of which is ARC 311: Building Science and Technology-Building Systems. The design seminar distribution requires one course, although we currently list only one undergraduate design seminar: ARC 206. 
-    Architecture majors take the following sequence of courses in their junior and senior years: junior studio, which consists of ARC 350 and ARC 351, and two required history and theory courses: ARC 308: History of Architectural Theory, taken in the fall of junior year; and ARC 403: Topics in the History and Theory of Architecture, in the fall semester of senior year. These courses introduce methodologies of historical analysis and research, the literature of the field and varieties of architectural writing. 
-    In the fall semester of their senior year, students are required to enroll in ARC 404: Advanced Design Studio. ARC 404 is centered around independent design projects that synthesize students' training and interests and investigate new approaches to representation. 
+    In addition to the general prerequisites and the requirements for independent work, each student is required to complete 10 courses in three related areas: history and theory, technology, and design. The history and theory distribution requires six courses: three history and theory of architecture courses, two of which are ARC 308 and ARC 403; two courses in history and theory of urbanism and landscape; and two upper-level courses in art and archaeology. The technology distribution requires two courses, one of which is ARC 311: Building Science and Technology-Building Systems. The design seminar distribution requires one course, although we currently list only one undergraduate design seminar: ARC 206.<br>
+    Architecture majors take the following sequence of courses in their junior and senior years: junior studio, which consists of ARC 350 and ARC 351, and two required history and theory courses: ARC 308: History of Architectural Theory, taken in the fall of junior year; and ARC 403: Topics in the History and Theory of Architecture, in the fall semester of senior year. These courses introduce methodologies of historical analysis and research, the literature of the field and varieties of architectural writing.<br>
+    In the fall semester of their senior year, students are required to enroll in ARC 404: Advanced Design Studio. ARC 404 is centered around independent design projects that synthesize students' training and interests and investigate new approaches to representation.<br> 
     Students should check with the academic programs office and director of undergraduate studies to determine which one-time-only courses are being offered during the academic year.
   req_list:
   - name: History and Theory of Architecture
@@ -135,16 +135,16 @@ req_list:
   max_counted: 1
   min_needed: 0
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    <p>The senior thesis in architecture is a year-long project that begins with ARC 403 in the fall semester. Faculty thesis advisers are assigned at the end of the fall term of senior year, and students work closely with their adviser to formulate their topic, define research methods, organize thesis material and refine the presentation of the scholarship.
-    The senior thesis is intended to be a detailed project, presenting a well-argued piece of research on a precise architectural theme, and may include several forms of representation. For example, students commonly utilize architectural drawings, models, video, photographs and computer-generated drawings and models. The final presentation and oral defense of the senior thesis in the spring constitute a section of the departmental examination.</p>
+    The senior thesis in architecture is a year-long project that begins with ARC 403 in the fall semester. Faculty thesis advisers are assigned at the end of the fall term of senior year, and students work closely with their adviser to formulate their topic, define research methods, organize thesis material and refine the presentation of the scholarship.<br>
+    The senior thesis is intended to be a detailed project, presenting a well-argued piece of research on a precise architectural theme, and may include several forms of representation. For example, students commonly utilize architectural drawings, models, video, photographs and computer-generated drawings and models. The final presentation and oral defense of the senior thesis in the spring constitute a section of the departmental examination.
   no_req:
 - name: Senior Departmental Examination
   max_counted: 1
   min_needed: 0
   explanation: |-
-    <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    <p>All students in the architecture program take the departmental examination [DC1] in May of their senior year. The exam consists of a dialog with one's adviser and second reader around the thesis itself and a brief (10-15 minutes) presentation summarizing the student's principal questions, findings and contribution to existing research. Students typically show images and highlight what was most interesting and exciting about the project.</p>
+    All students in the architecture program take the departmental examination [DC1] in May of their senior year. The exam consists of a dialog with one's adviser and second reader around the thesis itself and a brief (10-15 minutes) presentation summarizing the student's principal questions, findings and contribution to existing research. Students typically show images and highlight what was most interesting and exciting about the project.
   no_req:

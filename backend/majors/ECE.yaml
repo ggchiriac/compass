@@ -77,9 +77,9 @@ req_list:
   min_needed: 1
   explanation: |-
     Three courses in a chosen major and one course one 300-/400-level 
-    ECE elective course in an area distinct from the major. 
+    ECE elective course in an area distinct from the major.<br><br> 
     
-    ORF 309 cannot be used to satisfy the Breadth requirement.
+    ORF 309 cannot be used to satisfy the Breadth requirement.<br><br>
     
     Junior independent work (397, 398) and the senior thesis (497, 498) 
     cannot be used to fulfill the Major or Breadth requirements.
@@ -89,25 +89,25 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
       
-      ECE304 Electronic Circuits: Devices to ICs (S)
+      ECE304 Electronic Circuits: Devices to ICs (S)<br><br>
       
-      Two courses from:
+      Two courses from:<br><br>
       
-      ECE 445 Solid-State Electronic Devices (F)
-      ECE 368 Intro to Wireless Communication Systems (S)
-      COS / ECE 375 Computer Architecture and Organization (S)
-      ECE 373 / ENE 373 Power Electronics and Smart Grids
-      ECE 382 Probabilistic Systems and Information Processing (S)
-      ECE 462 Design of VLSI (F)
-      ECE 464 Embedded Computing (S)
-      ECE 472 Secure Computers (S)
-      ECE 475 Computer Architecture (S)
-      ECE 481 Power Electronics (F)
-      ECE 482 Digital Signal Processing (F)
+      ECE 445 Solid-State Electronic Devices (F)<br>
+      ECE 368 Intro to Wireless Communication Systems (S)<br>
+      COS / ECE 375 Computer Architecture and Organization (S)<br>
+      ECE 373 / ENE 373 Power Electronics and Smart Grids<br>
+      ECE 382 Probabilistic Systems and Information Processing (S)<br>
+      ECE 462 Design of VLSI (F)<br>
+      ECE 464 Embedded Computing (S)<br>
+      ECE 472 Secure Computers (S)<br>
+      ECE 475 Computer Architecture (S)<br>
+      ECE 481 Power Electronics (F)<br>
+      ECE 482 Digital Signal Processing (F)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
       One 300-/400-level ECE elective course not on the list above.
     req_list:
@@ -154,52 +154,48 @@ req_list:
       - ECE 498
   - name: Data and Information
     max_counted: 1
-    min_needed: ALL
+    min_needed: 3
     explanation: |-
       ORF 309* Probability and Stochastic Systems (F & S) is required, 
       plus two or three courses from this list. Then two or three 
-      courses from the list.*
+      courses from the list.*<br><br>
 
-      ECE 346 Intelligent Robotic Systems (S)   
-      ECE 364*** Machine Learning for Predictive Data Analysis (F)
-      ECE 368 Intro to Wireless Communication Systems (S)
-      ECE 381 Networks: Friends, Money and Bytes (S)
-      ECE 382 Probabilistic Systems and Information Processing (S) 
-      ECE/COS 432 Information Security (F & S)
-
-      ECE433/COS435** Introduction to   Reinforcement Learning (S)
-      ECE434/COS 434**Machine Learning Theory (F)
-      ECE 435** Machine Learning and Pattern Recognition (F)
-
-      ECE 470 Principles of Blockchains (F)
-      ECE 482 Digital Signal Processing  (F)
-
+      ECE 346 Intelligent Robotic Systems (S)<br>
+      ECE 364*** Machine Learning for Predictive Data Analysis (F)<br>
+      ECE 368 Intro to Wireless Communication Systems (S)<br>
+      ECE 381 Networks: Friends, Money and Bytes (S)<br>
+      ECE 382 Probabilistic Systems and Information Processing (S)<br>
+      ECE/COS 432 Information Security (F & S)<br>
+      ECE433/COS435** Introduction to Reinforcement Learning (S)<br>
+      ECE434/COS 434**Machine Learning Theory (F)<br>
+      ECE 435** Machine Learning and Pattern Recognition (F)<br>
+      ECE 470 Principles of Blockchains (F)<br>
+      ECE 482 Digital Signal Processing  (F)<br>
       ECE 483 Signal Processing and Optimization in Smart Grids – 
-      ONE-TIME COURSE (S ‘23)
-
-      ECE 486 Transmission and Compression of Information 
-      COS 302/ECE305** Mathematics for Numerical Computing & ML (F)
-      COS 324*** Introduction to Machine Learning (F)
-      COS 402** Artificial Intelligence
-      COS 424** Fundamentals of Machine Learning (S)
-      COS 429 Computer Vision (F)
-      ORF 350*** Analysis of Big Data (S)
-      ORF 363 Computing and Optimization for the Physical and Social 
-      Sciences (also COS 323) (F)
+      ONE-TIME COURSE (S ‘23)<br>
+      ECE 486 Transmission and Compression of Information<br>
+      COS 302/ECE305** Mathematics for Numerical Computing & ML (F)<br>
+      COS 324*** Introduction to Machine Learning (F)<br>
+      COS 402** Artificial Intelligence<br>
+      COS 424** Fundamentals of Machine Learning (S)<br>
+      COS 429 Computer Vision (F)<br>
+      ORF 350*** Analysis of Big Data (S)<br>
+      ORF 363 Computing and Optimization for the Physical and Social<br>
+      Sciences (also COS 323) (F)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
-      One 300-/400-level ECE elective course not on the list above.
+      One 300-/400-level ECE elective course not on the list above.<br><br>
 
       * ORF 309 can fulfill either the 300-level math requirement, or 
-      serve as one of the 3 Data and Information courses, but not both.
+      serve as one of the 3 Data and Information courses, but not both.<br><br>
 
       If ORF 309 is taken to fulfill the 300-level math requirement, 
       take 2 ECE courses from this list, plus any other course on this 
       list. **2 of these 3 courses can be machine learning but not all 
-      three.
+      three.<br>
       If ORF 309 is taken as one of the 3 D&I courses (implying another 
-      300-level math course) take any 2 ECE courses from the list.
+      300-level math course) take any 2 ECE courses from the list.<br>
       ***Only one of the following machine learning courses may be 
       applied to this concentration since they have overlapping content:  
       ECE364, ORF350 and COS324.
@@ -272,16 +268,16 @@ req_list:
       explanation: |-
         ORF 309 can fulfill either the 300-level math requirement, or 
         serve as one of the 3 Data and Information courses, but not 
-        both.
+        both.<br><br>
 
         If ORF 309 is taken to fulfill the 300-level math requirement, 
         take 2 ECE courses from this list, plus any other course on this 
         list. 2 of these 3 courses can be machine learning but not all 
         three. That is, ECE 435, ECE 434 / COS 434, and 
-        COS 302 / ECE 305 or COS 424 are not valid sequences.
+        COS 302 / ECE 305 or COS 424 are not valid sequences.<br><br>
     
         If ORF 309 is taken as one of the 3 D&I courses (implying another 
-        300-level math course) take any 2 ECE courses from the list.
+        300-level math course) take any 2 ECE courses from the list.<br><br>
         
         Only one of the following machine learning courses may be 
         applied to this concentration since they have overlapping content:  
@@ -290,25 +286,25 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
 
-      COS / ECE 375 Computer Architecture and Organization (S)
+      COS / ECE 375 Computer Architecture and Organization (S)<br><br>
 
-      Two courses from:
+      Two courses from:<br><br>
 
-      ECE 368 Intro to Wireless Communication Systems (S)
-      ECE 462 Design of VLSI (F)
-      ECE 464 Embedded Computing (S)
-      ECE 470 Principles of Blockchains (F)
-      ECE 472 Architecture for Secure Computers/Smartphones (S)
+      ECE 368 Intro to Wireless Communication Systems (S)<br>
+      ECE 462 Design of VLSI (F)<br>
+      ECE 464 Embedded Computing (S)<br>
+      ECE 470 Principles of Blockchains (F)<br>
+      ECE 472 Architecture for Secure Computers/Smartphones (S)<br>
 
-      ECE473 / COS473 Elements of Decentralized Finance (S)
-      ECE 475 Computer Architecture (S)
-      COS 318 Operating Systems (F)
-      COS 320 Compiling Techniques (S)
-      COS 461 Computer Networks (S)
+      ECE473 / COS473 Elements of Decentralized Finance (S)<br>
+      ECE 475 Computer Architecture (S)<br>
+      COS 318 Operating Systems (F)<br>
+      COS 320 Compiling Techniques (S)<br>
+      COS 461 Computer Networks (S)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
 
       One 300-/400-level ECE elective course not on the list above.
     req_list:
@@ -356,26 +352,26 @@ req_list:
     max_counted: 1
     min_needed: 4
     explanation: |-
-      Three courses from:
+      Three courses from:<br><br>
 
-      ECE 345 Intro to Robotics (F)
-      ECE 346 Intelligent Robotic Systems (S)
-      ECE 304 Electronic Circuits: Devices to ICs (S)
-      COS / ECE 375 Computer Architecture and Organization (F)
-      ECE 364** Machine Learning for Predictive Data Analysis (F)
+      ECE 345 Intro to Robotics (F)<br>
+      ECE 346 Intelligent Robotic Systems (S)<br>
+      ECE 304 Electronic Circuits: Devices to ICs (S)<br>
+      COS / ECE 375 Computer Architecture and Organization (F)<br>
+      ECE 364** Machine Learning for Predictive Data Analysis (F)<br><br>
 
-      ECE433/COS435** Introduction to Reinforcement Learning (S)
+      ECE433/COS435** Introduction to Reinforcement Learning (S)<br><br>
 
-      ECE 435** Machine Learning and Pattern Recognition (F)
-      ECE 464 Embedded Computing (S)
-      ECE 481 Power Electronics (F)
-      COS 324** Introduction to Machine Learning (F)
-      COS 429 Computer Vision (F)
-      MAE 433 Automatic Control Systems (F)**
+      ECE 435** Machine Learning and Pattern Recognition (F)<br>
+      ECE 464 Embedded Computing (S)<br>
+      ECE 481 Power Electronics (F)<br>
+      COS 324** Introduction to Machine Learning (F)<br>
+      COS 429 Computer Vision (F)<br>
+      MAE 433 Automatic Control Systems (F)**<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
-      One 300-/400-level ECE elective course not on the list above.
+      One 300-/400-level ECE elective course not on the list above.<br><br>
 
       **Only one Machine Learning course may be used for this major.
     req_list:
@@ -426,22 +422,22 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
 
-      ECE 342** Principles of Quantum Engineering (S)
+      ECE 342** Principles of Quantum Engineering (S)<br><br>
 
-      Two courses from:
+      Two courses from:<br><br>
 
-      ECE 396 Introduction to Quantum Computing (F)
-      ECE 441 Solid-State Physics I (F)
-      ECE 453 Optical & Quantum Electronics (F)
-      ECE 456 Quantum Optics (S)
-      ECE 457 Experimental Methods in Quantum Computing (F)
-      ECE 568 Implementations of Quantum Information (F)
+      ECE 396 Introduction to Quantum Computing (F)<br>
+      ECE 441 Solid-State Physics I (F)<br>
+      ECE 453 Optical & Quantum Electronics (F)<br>
+      ECE 456 Quantum Optics (S)<br>
+      ECE 457 Experimental Methods in Quantum Computing (F)<br>
+      ECE 568 Implementations of Quantum Information (F)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
-      One 300-/400-level ECE elective course not on the list above.
+      One 300-/400-level ECE elective course not on the list above.<br><br>
 
       **PHY 208 and 305 can be taken in lieu of ECE 342, but are counted 
       as one course for the concentration requirement.
@@ -495,28 +491,28 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
 
-      COS/ECE 432 Information Security (F & S)
+      COS/ECE 432 Information Security (F & S)<br><br>
 
-      Two courses from:
+      Two courses from:<br><br>
 
-      COS / ECE 375 Computer Architecture and Organization (F)
-      ECE 364** Machine Learning for Predictive Data Analysis (F)
-      ECE 435** Machine Learning and Pattern Recognition (F)
-      ECE 464 Embedded Computing (S)
-      ECE 470 Principles of Blockchains (F)
-      ECE 472  Architecture for Secure Computers/Smartphones (S)
-      ECE 473 / COS 473 Elements of Decentralized Finance (S)
+      COS / ECE 375 Computer Architecture and Organization (F)<br>
+      ECE 364** Machine Learning for Predictive Data Analysis (F)<br>
+      ECE 435** Machine Learning and Pattern Recognition (F)<br>
+      ECE 464 Embedded Computing (S)<br>
+      ECE 470 Principles of Blockchains (F)<br>
+      ECE 472  Architecture for Secure Computers/Smartphones (S)<br>
+      ECE 473 / COS 473 Elements of Decentralized Finance (S)<br>
 
-      COS 324** Introduction to Machine Learning (F, S)
-      COS 424** Fundamentals of Machine Learning
-      COS 433 Cryptography (S)
-      COS 461 Computer Networks (S)
+      COS 324** Introduction to Machine Learning (F, S)<br>
+      COS 424** Fundamentals of Machine Learning<br>
+      COS 433 Cryptography (S)<br>
+      COS 461 Computer Networks (S)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
-      One 300-/400-level ECE elective course not on the list above.
+      One 300-/400-level ECE elective course not on the list above.<br><br>
 
       **Only one Machine Learning course may be applied towards this 
       concentration.
@@ -576,37 +572,37 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
 
-      ECE 445 Solid-State Electronic Devices (F) (Pre-req is ECE308**)
+      ECE 445 Solid-State Electronic Devices (F) (Pre-req is ECE308**)<br><br>
 
-      Two courses from:
+      Two courses from:<br><br>
 
-      ECE 304* Electronic Circuits: Devices to ICs (S)
-      ECE 308** Electronic and Photonic Devices (F)
-      ECE 342 Principles of Quantum Engineering (S)
+      ECE 304* Electronic Circuits: Devices to ICs (S)<br>
+      ECE 308** Electronic and Photonic Devices (F)<br>
+      ECE 342 Principles of Quantum Engineering (S)<br>
 
       ECE 373 / ENE 373* Power Electronics and Smart Grids (not offered 
-      Spring ‘24)
-      ECE 431 Solar Energy Conversion (S)
-      ECE 441 Solid-State Physics I (F)
-      ECE 449 Micro-Nanofabrication and Thin-Film Processing (S)
-      ECE 451 Bioelectronics and Biosensors (S)
+      Spring ‘24)<br>
+      ECE 431 Solar Energy Conversion (S)<br>
+      ECE 441 Solid-State Physics I (F)<br>
+      ECE 449 Micro-Nanofabrication and Thin-Film Processing (S)<br>
+      ECE 451 Bioelectronics and Biosensors (S)<br>
 
-      ECE 481* Power Electronics (F)
-      ECE 557  Solar Cells 
-      MAE 324 Structure and Properties of Materials (F)
-      MAE 424 Energy Storage Systems (S)
-      MSE 301 Materials Science and Engineering (S)
-      MSE 302 Laboratory Techniques in Materials Science (F)
-      MSE 505 Characterization of Materials (S)
+      ECE 481* Power Electronics (F)<br>
+      ECE 557  Solar Cells <br>
+      MAE 324 Structure and Properties of Materials (F)<br>
+      MAE 424 Energy Storage Systems (S)<br>
+      MSE 301 Materials Science and Engineering (S)<br>
+      MSE 302 Laboratory Techniques in Materials Science (F)<br>
+      MSE 505 Characterization of Materials (S)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
       
-      One 300-/400-level ECE elective course not on the list above.
+      One 300-/400-level ECE elective course not on the list above.<br><br>
 
       * Only one circuits (304 or 481) course may be applied towards 
-      this concentration.
+      this concentration.<br>
       **ECE308 does not count if taken as part of the Foundation 
       Requirement
     req_list:
@@ -673,21 +669,21 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Three courses from:
+      Three courses from:<br><br>
 
-      ECE 304 Electronic Circuits: Devices to ICs (S)
+      ECE 304 Electronic Circuits: Devices to ICs (S)<br>
 
-      ECE 451 Bioelectronics and Biosensors (S)
-      ECE 452 Biomedical Imaging (S)
-      ECE 480 fMRI Decoding: Reading Minds (S '23)
+      ECE 451 Bioelectronics and Biosensors (S)<br>
+      ECE 452 Biomedical Imaging (S)<br>
+      ECE 480 fMRI Decoding: Reading Minds (S '23)<br>
 
-      COS 429 Computer Vision (F)
-      COS 455 Genomics & Computational Molecular Biology (F)
-      MAE 344 Biomechanics and Biomaterials (S)
-      NEU 427 Systems Neuroscience (S)
-      NEU 437 Computational Neuroscience (S)
+      COS 429 Computer Vision (F)<br>
+      COS 455 Genomics & Computational Molecular Biology (F)<br>
+      MAE 344 Biomechanics and Biomaterials (S)<br>
+      NEU 427 Systems Neuroscience (S)<br>
+      NEU 437 Computational Neuroscience (S)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
 
       One 300-/400-level ECE elective course not on the list above.
     req_list:
@@ -728,23 +724,23 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Required:
+      Required:<br><br>
 
-      ECE 351 Foundations of Modern Optics (F)
+      ECE 351 Foundations of Modern Optics (F)<br><br>
 
-      Two courses from:
+      Two courses from:<br><br>
 
-      ECE 342 Principles of Quantum Engineering (S)
+      ECE 342 Principles of Quantum Engineering (S)<br>
 
-      ECE 431 Solar Energy Conversion (S)
-      ECE 452 Biomedical Imaging (S)
-      ECE 453 Optical & Quantum Electronics (F)
-      ECE 455 Optical and Photonic Systems for Environmental Sensing (F)
-      ECE 458 Photonics and Light Wave Communications (F)
-      ECE 456 Quantum Optics (S)
-      MAE 521 Optics and Lasers (F)
+      ECE 431 Solar Energy Conversion (S)<br>
+      ECE 452 Biomedical Imaging (S)<br>
+      ECE 453 Optical & Quantum Electronics (F)<br>
+      ECE 455 Optical and Photonic Systems for Environmental Sensing (F)<br>
+      ECE 458 Photonics and Light Wave Communications (F)<br>
+      ECE 456 Quantum Optics (S)<br>
+      MAE 521 Optics and Lasers (F)<br><br>
       
-      Breadth:
+      Breadth:<br><br>
 
       One 300-/400-level ECE elective course not on the list above.
     req_list:
@@ -789,22 +785,22 @@ req_list:
     max_counted: 1
     min_needed: ALL
     explanation: |-
-      Three courses from:
+      Three courses from:<br><br>
 
-      ECE 373 / ENE 373 Power Electronics and Smart Grids
+      ECE 373 / ENE 373 Power Electronics and Smart Grids<br>
 
-      ECE 445 Solid-State Electronic Devices (F)
-      ECE 431 Solar Energy Conversion (not offered '21-'22)
-      ECE 455 Optical and Photonic Systems for Environmental Sensing (S)
-      ECE 481 Power Electronics (F)
+      ECE 445 Solid-State Electronic Devices (F)<br>
+      ECE 431 Solar Energy Conversion (not offered '21-'22)<br>
+      ECE 455 Optical and Photonic Systems for Environmental Sensing (S)<br>
+      ECE 481 Power Electronics (F)<br>
 
-      ECE 483 Signal Processing and Optimization in Smart Grids 
-      –ONE-TIME COURSE (S ’23)
+      ECE 483 Signal Processing and Optimization in Smart Grids
+      –ONE-TIME COURSE (S ’23)<br>
       ECE 557 Solar Cells: Physics, Materials, and Technology 
-      (not offered '21-22)
-      MAE 424 Energy Storage Systems
+      (not offered '21-22)<br>
+      MAE 424 Energy Storage Systems<br><br>
       
-      Breadth:
+      Breadth:<br><br>
 
       One 300-/400-level ECE elective course not on the list above.
     req_list:

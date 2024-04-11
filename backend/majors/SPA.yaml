@@ -31,7 +31,7 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    Departmental courses cover a wide array of literary, cultural, social, historical and political topics. Students are therefore able to pursue courses of study that are tailor-made to their own individual interests. The department offers four different tracks for majors.
+    Departmental courses cover a wide array of literary, cultural, social, historical and political topics. Students are therefore able to pursue courses of study that are tailor-made to their own individual interests. The department offers four different tracks for majors.<br>
     Please note that an upper division course is any course above Spanish 209 or POR 209.
   req_list:
   - name: One Language
@@ -197,28 +197,28 @@ req_list:
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    Majors are strongly advised to take SPA/POR 330 during the fall of their junior year. This course is designed to introduce students to research methods and to guide them in the production of their first junior paper.
-    Majors should discuss as soon as possible their area of interest with the director of undergraduate studies in order to find the most appropriate advisers for the junior papers (JPs). By the end of September (first JP), and by mid-February (second JP), all juniors should have contacted their advisers to discuss a plan of work.
-    The first JP (fall semester) should be about 4,000 words, and the second JP (spring semester) should be between 5,000 and 8,000 words. Both JPs may be written in English, in which case a three-page summary in the target language must be provided. Or, the JP can be written in the target language, in which case a summary is not needed. Any extensions beyond the University deadline date need preapproval from both the director of undergraduate studies and the residential college dean. All JPs must include the University's honor pledge.
+    Majors are strongly advised to take SPA/POR 330 during the fall of their junior year. This course is designed to introduce students to research methods and to guide them in the production of their first junior paper.<br>
+    Majors should discuss as soon as possible their area of interest with the director of undergraduate studies in order to find the most appropriate advisers for the junior papers (JPs). By the end of September (first JP), and by mid-February (second JP), all juniors should have contacted their advisers to discuss a plan of work.<br>
+    The first JP (fall semester) should be about 4,000 words, and the second JP (spring semester) should be between 5,000 and 8,000 words. Both JPs may be written in English, in which case a three-page summary in the target language must be provided. Or, the JP can be written in the target language, in which case a summary is not needed. Any extensions beyond the University deadline date need preapproval from both the director of undergraduate studies and the residential college dean. All JPs must include the University's honor pledge.<br>
     Majors following two languages are encouraged to write one JP in each of the languages of the majors.
   no_req:
 - name: Senior Thesis
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
-    Majors should select a senior thesis adviser by the end of September at the latest. The senior thesis is normally written in English and should be between 15,000 and 20,000 words. Topics chosen in the past have ranged over the whole field of Spanish and Portuguese studies, from linguistic problems and literary techniques through close textual analysis to thematic and ideological studies. Students primarily interested in culture and civilization have written on art, political and economic issues, education and a variety of social questions. The senior thesis is a major commitment of a student's time and energy, and the most important yardstick for choosing a topic is willingness to spend many hours on a particular set of texts or problems. Please visit the Mudd Library website for inspiration and a listing of previous senior thesis topics over the years. More detailed information can be found in the Senior Thesis Handbook.
-    Any extensions beyond the University deadline date need preapproval from both the director of undergraduate studies and the residential college dean.
+    Majors should select a senior thesis adviser by the end of September at the latest. The senior thesis is normally written in English and should be between 15,000 and 20,000 words. Topics chosen in the past have ranged over the whole field of Spanish and Portuguese studies, from linguistic problems and literary techniques through close textual analysis to thematic and ideological studies. Students primarily interested in culture and civilization have written on art, political and economic issues, education and a variety of social questions. The senior thesis is a major commitment of a student's time and energy, and the most important yardstick for choosing a topic is willingness to spend many hours on a particular set of texts or problems. Please visit the Mudd Library website for inspiration and a listing of previous senior thesis topics over the years. More detailed information can be found in the Senior Thesis Handbook.<br>
+    Any extensions beyond the University deadline date need preapproval from both the director of undergraduate studies and the residential college dean.<br>
     Resources are available to assist students with the costs of senior thesis research, including, when appropriate, travel abroad. The best time to use them is the summer preceding senior year.
   no_req:
 - name: Senior Departmental Examination
   min_needed: 1
   max_counted: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
     
     The senior departmental/comprehensive exam will consist of an oral presentation of the thesis. It will be followed by questions regarding the thesis content and bibliography, as well as questions related to the coursework done by the student in the department.
   no_req:

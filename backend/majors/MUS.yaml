@@ -34,7 +34,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i>
+      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement.</i><br><br>
       
       One Culture & Criticism course.
     course_list:
@@ -74,7 +74,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: |-
-      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i>
+      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i><br><br>
       
       One Materials & Making course.
     course_list:
@@ -125,7 +125,7 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: |-
-      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i>
+      <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i><br><br>
     
       Two additional Culture & Criticism courses.
   course_list:
@@ -165,7 +165,7 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: |-
-    <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i>
+    <i> Editor's note: The course list is not comprehensive. Other courses in the department may satisfy this requirement. </i><br><br>
     
     Two additional courses in Materials and Making (one of the three total M&M courses, including the M&M prerequisite, must include a significant musicianship/ear-training component; current eligible courses are MUS 106, MUS 245, MUS 261, MUS 316, and MUS 319, or an alternative approved by the DUS);
   course_list:
@@ -249,13 +249,13 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     Junior independent work begins in the fall, usually in the context of the junior seminar, and continues into the spring with a faculty adviser. The nature of this work can vary greatly, but for reference, it might consist of a research paper of approximately 30–40 pages, or an original composition of roughly 6–10 minutes (which would typically include a short paper detailing motivations and context for the composition). These are only guidelines, and the eventual scale of the work will depend on its nature. The specific goals for the project are worked out with a faculty adviser (identified during the fall semester), resulting in a proposal consisting of a summary of the project aims and context, an outline and references to related work (bibliography for research papers, associated repertoire for compositions and other material as appropriate to the project); this proposal should be submitted to the adviser and DUS before the end of fall semester, though the grade for the proposal will be held and included in the final grade for the year-long project.
 - name: Senior Independent Work
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     The senior independent work consists of a year-long project devised by the student and approved by a faculty adviser. Again, for reference, it might consist of a research paper of approximately 60–80 pages, or an original composition of roughly 12–20 minutes (including a short accompanying paper), but the specific topics can vary widely, as described above; as with the JIW, these are only guidelines, and the eventual scale of the work will depend on its nature. Ideally, a faculty adviser will be identified in the spring of junior year to help the student develop an appropriate scope for the project. The JIW and SIW topics need not be related, but often are. The thesis grade is the average of the grades given by the faculty adviser and a second faculty reader.

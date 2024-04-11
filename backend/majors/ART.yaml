@@ -74,7 +74,7 @@ req_list:
           max_counted: 1
           min_needed: 2
           explanation: |-
-            <i>Editor's Note: The course list does not account for the fact that the studio courses must be in at least two different media.</i>
+            <i>Editor's Note: The course list does not account for the fact that the studio courses must be in at least two different media.</i><br><br>
             
             Two studio courses in at least two different media.
           course_list:
@@ -134,9 +134,9 @@ req_list:
           max_counted: 1
           min_needed: 4
           explanation: |-
-            <p><i>Editor's Note: The course list does not account for chronological restrictions.</i></p>
+            <i>Editor's Note: The course list does not account for chronological restrictions.</i><br><br>
             
-            <p>The Department of Art and Archaeology courses must include one course from Group 1 (ancient) or Group 2 (medieval/early modern) and one course from Group 3 (19th century to the present). The remaining two courses may come from any group. When multiple courses are selected from the same group, breadth in chronological and geographic focus among them is encouraged.</p>
+            The Department of Art and Archaeology courses must include one course from Group 1 (ancient) or Group 2 (medieval/early modern) and one course from Group 3 (19th century to the present). The remaining two courses may come from any group. When multiple courses are selected from the same group, breadth in chronological and geographic focus among them is encouraged.
           course_list:
           - ART *
       - name: Film
@@ -149,9 +149,9 @@ req_list:
           max_counted: 1
           min_needed: 2
           explanation: |-
-            <p><i>Editor's Note: The course list does not account for the fact that the studio courses must be in at least two different media.</i></p>
+            <i>Editor's Note: The course list does not account for the fact that the studio courses must be in at least two different media.</i><br><br>
             
-            <p>Two studio courses in at least two different media Screenwriting courses are accepted as a different medium from film production courses.</p>
+            Two studio courses in at least two different media Screenwriting courses are accepted as a different medium from film production courses.
           course_list:
           - VIS 201 / ARC 201
           - VIS 202 / ARC 202
@@ -202,37 +202,37 @@ req_list:
           max_counted: 1
           min_needed: 3
           explanation: |-
-            <p><i>Editor's Note: The course list does not account for chronological restrictions.</i></p>
+            <i>Editor's Note: The course list does not account for chronological restrictions.</i><br><br>
             
-            <p>The Department of Art and Archaeology courses must include: one course from Group 1 (ancient) or Group 2 (medieval/early modern); one course from Group 3 (19th century to the present); and two from any group. For two ART courses, film students may substitute film courses cross-listed with ART.</p>
+            The Department of Art and Archaeology courses must include: one course from Group 1 (ancient) or Group 2 (medieval/early modern); one course from Group 3 (19th century to the present); and two from any group. For two ART courses, film students may substitute film courses cross-listed with ART.
           course_list:
           - ART ***
     - name: Junior Independent Work
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>Junior independent work begins in the fall, in the context of the junior seminar. It continues into the spring in partnership with two faculty advisers, one from VIS and one from ART. Students are provided with studio space and prepare independent work over the course of the year, culminating in an exhibition as part of the Spring Junior Group Thesis Show. Film students work throughout their junior year to create a junior film.
-        All Practice of Art juniors assemble a writing portfolio consisting of multiple short essays amounting to approximately 10 pages (2,500 words). The essays reflect on the creating process and discuss the relation of the work to the student's broader studies, especially in art history. The essays should include a bibliography. The grade for independent work is the average of the grade from the VIS and ART advisers. For further description of the portfolios, see the Undergraduate Handbook.
-        The Junior Independent Work requirement in Practice of Art includes two colloquia with the History of Art cohort, one in the fall and one in the spring.</p>
+        Junior independent work begins in the fall, in the context of the junior seminar. It continues into the spring in partnership with two faculty advisers, one from VIS and one from ART. Students are provided with studio space and prepare independent work over the course of the year, culminating in an exhibition as part of the Spring Junior Group Thesis Show. Film students work throughout their junior year to create a junior film.<br>
+        All Practice of Art juniors assemble a writing portfolio consisting of multiple short essays amounting to approximately 10 pages (2,500 words). The essays reflect on the creating process and discuss the relation of the work to the student's broader studies, especially in art history. The essays should include a bibliography. The grade for independent work is the average of the grade from the VIS and ART advisers. For further description of the portfolios, see the Undergraduate Handbook.<br>
+        The Junior Independent Work requirement in Practice of Art includes two colloquia with the History of Art cohort, one in the fall and one in the spring.
       no_req:
     - name: Senior Independent Work
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>By the end of the second week of the fall term of senior year, students must have three advisers, including one from the Department of Art and Archaeology faculty, who is selected in consultation with the director of undergraduate studies. The senior independent work is a major studio project completed by the end of the spring term, done in consultation with the student's advisers, and a writing portfolio consisting of multiple short essays amounting to approximately 20 pages (5,000 words). The essays reflect on the creating process and discuss the relation of the work to the student's broader studies, especially in art history. The essays should include a bibliography. For further description of the portfolios, see the Undergraduate Handbook. Students are assigned semiprivate studios on the second floor of 185 Nassau. Students present their work in an exhibition at the end of the year at the Lewis Center. An “Advisers' Thesis Critique” is performed by the ART and VIS advisers in the presence of the exhibit. The grade for the senior independent work is the average of the grade given by the ART and VIS advisers during the thesis critique and for the written component. 
-        The senior independent work requirement in Practice of Art includes two colloquia with the History of Art cohort, one in the fall and one in the spring.</p>
+        By the end of the second week of the fall term of senior year, students must have three advisers, including one from the Department of Art and Archaeology faculty, who is selected in consultation with the director of undergraduate studies. The senior independent work is a major studio project completed by the end of the spring term, done in consultation with the student's advisers, and a writing portfolio consisting of multiple short essays amounting to approximately 20 pages (5,000 words). The essays reflect on the creating process and discuss the relation of the work to the student's broader studies, especially in art history. The essays should include a bibliography. For further description of the portfolios, see the Undergraduate Handbook. Students are assigned semiprivate studios on the second floor of 185 Nassau. Students present their work in an exhibition at the end of the year at the Lewis Center. An “Advisers' Thesis Critique” is performed by the ART and VIS advisers in the presence of the exhibit. The grade for the senior independent work is the average of the grade given by the ART and VIS advisers during the thesis critique and for the written component.<br> 
+        The senior independent work requirement in Practice of Art includes two colloquia with the History of Art cohort, one in the fall and one in the spring.
       no_req:
     - name: Senior Departmental Examination
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>The senior departmental examination in the Practice of Arts has two parts. (1) A one-hour critical discussion (the “Crit”) of the senior thesis exhibition in the latter half of the spring term, in the presence of each student's exhibition. The discussion is open to all Program in Visual Arts faculty and Practice of Art/certificate students. All Visual Arts faculty who attend the Crit will grade it, and those grades will be averaged. (2) Practice of Art students participate in the same comprehensive exam ("Comps") as the History of Art students (see above). The VIS primary adviser and the ART adviser will be two of the three faculty present at the comprehensive exam; the three grades will be averaged for the Comps grade. The final grade on the transcript for the departmental examination is the average of the Crit grade and the Comps grade.</p>
+        The senior departmental examination in the Practice of Arts has two parts. (1) A one-hour critical discussion (the “Crit”) of the senior thesis exhibition in the latter half of the spring term, in the presence of each student's exhibition. The discussion is open to all Program in Visual Arts faculty and Practice of Art/certificate students. All Visual Arts faculty who attend the Crit will grade it, and those grades will be averaged. (2) Practice of Art students participate in the same comprehensive exam ("Comps") as the History of Art students (see above). The VIS primary adviser and the ART adviser will be two of the three faculty present at the comprehensive exam; the three grades will be averaged for the Comps grade. The final grade on the transcript for the departmental examination is the average of the Crit grade and the Comps grade.
       no_req:
   - name: History of Art
     max_counted: 1
@@ -259,9 +259,9 @@ req_list:
         max_counted: 1
         min_needed: 7
         explanation: |-
-          <p><i>Editor's Note: The course list does not account for chronological restrictions.</i></p>
+          <i>Editor's Note: The course list does not account for chronological restrictions.</i><br><br>
           
-          <p>Students must take at least one course in each of the following three distribution areas: Group 1 (ancient), Group 2 (medieval/early modern), and Group 3 (19th century to the present).</p>
+          Students must take at least one course in each of the following three distribution areas: Group 1 (ancient), Group 2 (medieval/early modern), and Group 3 (19th century to the present).
         course_list:
           - ART ***
       - name: Seminars
@@ -273,8 +273,8 @@ req_list:
           - ART 4*
           - ART 5*
       - name: Restrictions
-        max_counted: 1
-        min_needed: 0
+        max_counted: 0
+        min_needed: 1
         explanation: Seven of the 10 courses must be taught by Art and Archaeology departmental faculty.
     - name: Junior Seminar
       max_counted: 1
@@ -287,23 +287,23 @@ req_list:
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>Junior Independent Work (JIW) begins in the fall, in the context of the junior seminar (ART 400), and continues into the spring with a faculty adviser whom the student selects in consultation with the director of undergraduate studies. JIW consists of a research paper of approximately 30-40 pages (7,500-10,000 words) on any topic related to visual and material culture. Assignments in ART 400 help students conceptualize and implement their research agendas. The JIW requirement in History of Art includes two colloquia with the Practice of Art cohort, one in the fall and one in the spring.</p>
+        Junior Independent Work (JIW) begins in the fall, in the context of the junior seminar (ART 400), and continues into the spring with a faculty adviser whom the student selects in consultation with the director of undergraduate studies. JIW consists of a research paper of approximately 30-40 pages (7,500-10,000 words) on any topic related to visual and material culture. Assignments in ART 400 help students conceptualize and implement their research agendas. The JIW requirement in History of Art includes two colloquia with the Practice of Art cohort, one in the fall and one in the spring.
       no_req:
     - name: Senior Independent Work
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>The senior independent work consists of a year-long research project of approximately 60-80 pages (15,000-20,000 words). The student selects a faculty adviser in the spring of their junior year and submits a progress report to the director of undergraduate studies by mid-November of their senior year. For further deadlines see the Undergraduate Handbook; for further details on thesis writing and research, see the Independent Work Guide in the History of Art. The thesis grade is the average of the grades given by the faculty adviser and a second faculty reader. The Senior Independent Work requirement in History of Art includes two colloquia with the Practice of Art cohort, one in the fall and one in the spring.</p>
+        The senior independent work consists of a year-long research project of approximately 60-80 pages (15,000-20,000 words). The student selects a faculty adviser in the spring of their junior year and submits a progress report to the director of undergraduate studies by mid-November of their senior year. For further deadlines see the Undergraduate Handbook; for further details on thesis writing and research, see the Independent Work Guide in the History of Art. The thesis grade is the average of the grades given by the faculty adviser and a second faculty reader. The Senior Independent Work requirement in History of Art includes two colloquia with the Practice of Art cohort, one in the fall and one in the spring.
       no_req:
     - name: Senior Departmental Examination
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <p><i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i></p>
+        <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
         
-        <p>The senior comprehensive departmental examination ("Comps") consists of a one-hour oral examination discussing the senior thesis and also covering material from departmental courses. It is attended by three faculty members, consisting of the adviser of the senior thesis, the second reader, and one additional faculty member. The exam grade is the average of the grades given by the three examiners.</p>
+        The senior comprehensive departmental examination ("Comps") consists of a one-hour oral examination discussing the senior thesis and also covering material from departmental courses. It is attended by three faculty members, consisting of the adviser of the senior thesis, the second reader, and one additional faculty member. The exam grade is the average of the grades given by the three examiners.
       no_req:

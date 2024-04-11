@@ -69,7 +69,7 @@ req_list:
         max_counted: 3
         min_needed: 1
         explanation: |-
-          <i>Editor's Note: The list of courses satisfying this requirement is not comprehensive.</i>
+          <i>Editor's Note: The list of courses satisfying this requirement is not comprehensive.</i><br><br>
           
           A maximum of three cognate courses in related humanities departments such as philosophy and religion.
         course_list:
@@ -207,7 +207,7 @@ req_list:
       max_counted: 1
       min_needed: 2
       explanation: |-
-        <i>Editor's Note: The list of courses satisfying this requirement is not comprehensive.</i>
+        <i>Editor's Note: The list of courses satisfying this requirement is not comprehensive.</i><br><br>
         
         Two cognate courses pertaining to linguistics.
       course_list:
@@ -244,7 +244,7 @@ req_list:
       max_counted: 1
       min_needed: 3
       explanation: |-
-        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i>
+        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i><br><br>
       
         Three upper-level courses in a second literature.
       course_list:
@@ -301,7 +301,7 @@ req_list:
       max_counted: 1
       min_needed: 4
       explanation: |-
-        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i>
+        <i>Editor's Note: Not all of these courses fall under this requirement and Compass does not verify this.</i><br><br>
 
         Four cognate courses in German/European politics or political theory will be taken in the Department of Politics (at least two of which should be 300-level courses). Recommended cognates in politics include POL 210, 230, 240 and 385.
       req_list:
@@ -342,7 +342,7 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i>
+    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
 
     During senior year, students will write a thesis on a subject developed together with and approved by their thesis adviser. By the end of the fourth week of the first senior term, students will submit to their advisers a tentative outline of the proposed thesis. Further progress reports (as announced by the department) are required. Five weeks before the departmental examination, students must deliver to their adviser and to the director of undergraduate studies a copy of the thesis (signed and in PDF format).
 - name: Restrictions

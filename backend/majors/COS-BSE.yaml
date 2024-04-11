@@ -169,8 +169,7 @@ req_list:
   min_needed: 3
   explanation: |-
     Students must take three COS courses numbered 300 - 400 level. 
-    Graduate courses do not count as electives.
-
+    Graduate courses do not count as electives.<br>
     Alternatively, up to two electives may be chosen from a list of 
     approved courses from other departments.  Any 300- or 400- level 
     Math or ECE  or ORF course that does not duplicate COS content, 
@@ -178,7 +177,7 @@ req_list:
     Graduate courses in other departments may not be used as electives. 
   req_list:
   - name: Upper-level Departmentals
-    max_counted: 1
+    max_counted: 3
     min_needed: 1
     explanation:
     course_list:
@@ -214,14 +213,14 @@ req_list:
   min_needed: 1
   explanation: |-
     All COS B.S.E. students must complete at least one semester of 
-    independent work at some point in their junior or senior year.
+    independent work at some point in their junior or senior year.<br><br>
 
     B.S.E. students must elect one semester of independent work by 
     enrolling in 397 (junior fall), 398 (junior spring), 497 
     (senior fall), or 498 (senior spring). One additional semester of 
     independent work may be counted as one of the departmental courses. 
     B.S.E. students are also welcome, but not required, to complete a 
-    senior thesis.
+    senior thesis.<br><br>
 
     More information about B.S.E. independent work options can be found
     in the current COS BSE IW Handbook.

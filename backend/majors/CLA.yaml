@@ -216,7 +216,7 @@ req_list:
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <i>Editor's Note: The course list for this requirement is not comprehensive.</i>
+        <i>Editor's Note: The course list for this requirement is not comprehensive.</i><br><br>
         
         One course substantially dealing with ancient material culture.
       course_list:
@@ -240,7 +240,7 @@ req_list:
       max_counted: 1
       min_needed: 1
       explanation: |-
-        <i>Editor's Note: The course list for this requirement is not exact. Please check with your academic advisor.</i>
+        <i>Editor's Note: The course list for this requirement is not exact. Please check with your academic advisor.</i><br><br>
         
         One course on premodern (i.e., pre-1789) history or non-industrial societies beyond Greece and Rome.
       course_list:
