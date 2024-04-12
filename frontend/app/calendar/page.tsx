@@ -6,6 +6,7 @@ import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
+import tabbedMenu from '@/components/TabbedMenu/TabbedMenu.module.scss';
 import useAuthStore from '@/store/authSlice';
 import UserState from '@/store/userSlice';
 
@@ -14,7 +15,7 @@ import Calendar from './Calendar';
 import CalendarSearch from './CalendarSearch';
 
 const CalendarUI: FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
 
@@ -41,7 +42,7 @@ const CalendarUI: FC = () => {
         </div>
 
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
-          <div className='flex w-full'>
+          <div className='flex w-full h-full'>
             {/* Left Section for Search and Requirements */}
             {/* <div className='w-64 bg-white border-r border-gray-200 p-4'> */}
             <div className={styles.Container} style={{ width: '360px' }}>
@@ -56,6 +57,15 @@ const CalendarUI: FC = () => {
               ) : (
                 <SkeletonApp />
               )}
+            </div>
+
+            {/* Right Section for Event Details */}
+            <div className={tabbedMenu.tabContainer} style={{ width: '15%' }}>
+              <div className={tabbedMenu.tabContent}>
+                <div className='text-sm font-medium text-gray-500'>
+                  <strong> Future features </strong> will be available here. Stay tuned!
+                </div>
+              </div>
             </div>
           </div>
         </main>

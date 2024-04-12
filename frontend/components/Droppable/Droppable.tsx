@@ -1,3 +1,5 @@
+import { ReactNode } from 'react';
+
 import { useDroppable, UniqueIdentifier } from '@dnd-kit/core';
 import classNames from 'classnames';
 
@@ -5,7 +7,7 @@ import { droppable } from './droppable-svg';
 import styles from './Droppable.module.scss';
 
 export type DroppableProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   dragging: boolean;
   id: UniqueIdentifier;
 };

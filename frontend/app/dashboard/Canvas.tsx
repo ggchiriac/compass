@@ -902,7 +902,7 @@ function SortableItem({
 }
 
 function useMountStatus() {
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState<boolean>(false);
 
   useEffect(() => {
     const timeout = setTimeout(() => setIsMounted(true), 500);

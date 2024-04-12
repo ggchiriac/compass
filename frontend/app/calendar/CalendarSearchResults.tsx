@@ -1,3 +1,5 @@
+import { FC } from 'react';
+
 import { Virtuoso } from 'react-virtuoso';
 
 import { SearchResults } from '@/types';
@@ -8,7 +10,7 @@ import CalendarSearchItem from './CalendarSearchItem';
 import styles from './CalendarSelectedCourses.module.scss';
 import SelectedCourses from './SelectedCourses';
 
-const CalendarSearchResults: React.FC<SearchResults> = ({ courses = [] }) => {
+const CalendarSearchResults: FC<SearchResults> = ({ courses = [] }) => {
   return (
     <div className={`${containerStyles.Container} ${styles.Container}`}>
       <div className={containerStyles.Header}></div>

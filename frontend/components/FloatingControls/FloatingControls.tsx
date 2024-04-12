@@ -1,9 +1,11 @@
+import { ReactNode } from 'react';
+
 import classNames from 'classnames';
 
 import styles from './FloatingControls.module.scss';
 
 export type FloatingControlsProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function FloatingControls({ children }: FloatingControlsProps) {

@@ -2,7 +2,7 @@ import { FC } from 'react';
 
 import { createPortal } from 'react-dom';
 
-import { SettingsModalProps } from '../types';
+import { SettingsModalProps } from '@/types';
 
 const SettingsModal: FC<SettingsModalProps> = ({ children }) => {
   return createPortal(

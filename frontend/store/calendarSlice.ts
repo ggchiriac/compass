@@ -2,28 +2,29 @@ import { create } from 'zustand';
 
 import { CalendarEvent, ClassMeeting, Course, Section } from '@/types';
 
-// import SelectedCourses from '@/app/calendar/SelectedCourses';
-
-// import useFilterStore from './filterSlice';
-
 interface calendarStore {
   calendarSearchResults: Course[];
   selectedCourses: CalendarEvent[];
+
   recentSearches: string[];
+
   error: string | null;
   loading: boolean;
 
-  setCalendarSearchResults: (results: Course[]) => void;
-  setSelectedCourses: (courses: CalendarEvent[]) => void;
-  addRecentSearch: (search: string) => void;
+  setCalendarSearchResults: (results: Course[]) => void; // Sets search results
+  setSelectedCourse: (event: CalendarEvent) => void; // Adds course to selectedCourses
+
+  addRecentSearch: (search: string) => void; // Caches search to recent searches
+
+  addCourseToCalendar: (course: Course) => Promise<void>; // Render to calendar
+  removeCourse: (guid: string) => void; // Removes course from calendar
+  removeSelectedSection: (guid: string) => void; // Deactivates a selected section
+
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
-  addCourse: (course: Course) => Promise<void>;
-  removeCourse: (guid: string) => void;
-  removeSelectedSection: (guid: string) => void;
 }
 
-const startHour = 7;
+const startHour = 8;
 const dayToStartColumnIndex: Record<string, number> = {
   M: 1, // Monday
   T: 2, // Tuesday
@@ -32,6 +33,7 @@ const dayToStartColumnIndex: Record<string, number> = {
   F: 5, // Friday
 };
 
+const headerRows = 2; // Rows taken up by the header
 const calculateGridRow = (timeString: string) => {
   const [time, period] = timeString.split(' ');
   const [hour, minute] = time.split(':').map(Number);
@@ -46,7 +48,7 @@ const calculateGridRow = (timeString: string) => {
   const rowsPerHour = 6; // 10-minute increments (60 minutes / 10 minutes)
   const minuteOffset = Math.floor(minute / 10);
 
-  return (adjustedHour - startHour) * rowsPerHour + minuteOffset;
+  return (adjustedHour - startHour) * rowsPerHour + minuteOffset + headerRows;
 };
 
 const getStartColumnIndexForDays = (daysString: string): number[] => {
@@ -54,13 +56,28 @@ const getStartColumnIndexForDays = (daysString: string): number[] => {
   return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0);
 };
 
-const useCalendarStore = create<calendarStore>((set) => ({
+const useCalendarStore = create<calendarStore>((set, get) => ({
   calendarSearchResults: [],
   selectedCourses: [],
   recentSearches: [],
   error: null,
   loading: false,
-  addCourse: async (course: Course) => {
+
+  setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
+  addRecentSearch: (search) =>
+    set((state) => ({ recentSearches: [...state.recentSearches, search] })),
+  setError: (error) => set({ error }),
+  setLoading: (loading) => set({ loading }),
+
+  addCourseToCalendar: async (course: Course) => {
+    const selectedCourses = get().selectedCourses;
+
+    if (selectedCourses.some((event) => event.course.guid === course.guid)) {
+      console.log('Course already added:', course);
+      // TODO: Return a snackbar/toast or something nice if the course is already added
+      return;
+    }
+
     set({ loading: true, error: null });
 
     try {
@@ -76,19 +93,20 @@ const useCalendarStore = create<calendarStore>((set) => ({
       }
 
       const sections = await response.json();
-      console.log('Calendar Search Results!:', sections);
+
       const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
         section.class_meetings.flatMap((classMeeting: ClassMeeting) => {
           const startColumnIndices = getStartColumnIndexForDays(classMeeting.days);
           return startColumnIndices.map((startColumnIndex) => ({
-            key: `${course.course_id}-${section.id}-${classMeeting.id}-${startColumnIndex}`,
-            course,
-            section,
+            key: `${course.guid}-${section.id}-${classMeeting.id}-${startColumnIndex}`,
+            course: course,
+            section: section,
             startTime: classMeeting.start_time,
             endTime: classMeeting.end_time,
             startColumnIndex,
             startRowIndex: calculateGridRow(classMeeting.start_time),
             endRowIndex: calculateGridRow(classMeeting.end_time),
+            isActive: true,
           }));
         })
       );
@@ -97,27 +115,76 @@ const useCalendarStore = create<calendarStore>((set) => ({
         selectedCourses: [...state.selectedCourses, ...calendarEvents],
         loading: false,
       }));
-      console.log('waffles:', course);
     } catch (error) {
       console.error('Error adding course:', error);
       set({ error: 'Failed to add course. Please try again.', loading: false });
     }
   },
+
   removeCourse: (guid) => {
     set((state) => ({
       selectedCourses: state.selectedCourses.filter((event) => String(event.course.guid) !== guid),
     }));
   },
-  setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
-  setSelectedCourses: (courses) => set({ selectedCourses: courses }),
-  addRecentSearch: (search) => {
-    const trimmedSearch = search.trim().slice(0, 120);
+
+  toggleSectionVisibility: (sectionId: number) => {
     set((state) => ({
-      recentSearches: [...new Set([trimmedSearch, ...state.recentSearches])].slice(0, 5),
+      selectedCourses: state.selectedCourses.map((event) => {
+        if (event.section.id === sectionId) {
+          return { ...event, isActive: !event.isActive };
+        }
+        return event;
+      }),
     }));
   },
-  setError: (error) => set({ error }),
-  setLoading: (loading) => set({ loading }),
+
+  activateSection: (sectionId: number) => {
+    set((state) => ({
+      selectedCourses: state.selectedCourses.map((event) => {
+        if (event.section.class_type === 'Precept' || event.section.class_type === 'Lab') {
+          return { ...event, isActive: event.section.id === sectionId };
+        }
+        return event;
+      }),
+    }));
+  },
+
+  setSelectedCourse: (event: CalendarEvent) =>
+    set((state) => {
+      console.log('Attempting to add section to selected:', event.section);
+
+      const newEvents: CalendarEvent[] = event.section.class_meetings.map(
+        (classMeeting: ClassMeeting) => {
+          const startColumnIndices = getStartColumnIndexForDays(classMeeting.days);
+          return {
+            key: `${event.section.class_section}-${classMeeting.id}`,
+            course: event.course,
+            section: event.section,
+            startTime: classMeeting.start_time,
+            endTime: classMeeting.end_time,
+            startColumnIndex: startColumnIndices[0],
+            startRowIndex: calculateGridRow(classMeeting.start_time),
+            endRowIndex: calculateGridRow(classMeeting.end_time),
+            isActive: state.selectedCourses.some(
+              (selectedEvent: CalendarEvent) => selectedEvent.section.id === event.section.id
+            ),
+          };
+        }
+      );
+
+      console.log('Updating calendar events:', newEvents);
+
+      return {
+        ...state,
+        selectedCourses: state.selectedCourses.map((selectedEvent: CalendarEvent) => {
+          const updatedEvent = newEvents.find(
+            (newEvent: CalendarEvent) => newEvent.section.id === selectedEvent.section.id
+          );
+          return updatedEvent ? updatedEvent : selectedEvent;
+        }),
+      };
+    }),
+
   removeSelectedSection: (guid) =>
     set((state) => ({
       selectedCourses: state.selectedCourses.map((event) =>

@@ -24,8 +24,8 @@ const MenuItem: FC<MenuItemProps> = ({ isActive, children, onClick }) => (
 );
 
 const DropdownMenu: FC = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [blur, setBlur] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
+  const [blur, setBlur] = useState<boolean>(false);
   const [username, setUsername] = useState('Profile');
   const [userProfile, updateProfile] = useUserSlice((state) => [
     state.profile,

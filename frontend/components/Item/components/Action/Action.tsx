@@ -1,10 +1,10 @@
-import { forwardRef, CSSProperties } from 'react';
+import { CSSProperties, forwardRef, HTMLAttributes } from 'react';
 
 import classNames from 'classnames';
 
 import styles from './Action.module.scss';
 
-export type ActionProps = React.HTMLAttributes<HTMLButtonElement> & {
+export type ActionProps = HTMLAttributes<HTMLButtonElement> & {
   active?: {
     fill: string;
     background: string;

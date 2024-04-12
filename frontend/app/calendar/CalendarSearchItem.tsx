@@ -1,20 +1,14 @@
-// Renders individual courses for the calendar search results
+// Renders individual courses to the calendar from the calendar search results
 
 import { ListItem, ListItemText, Typography } from '@mui/material';
 
 import useCalendarStore from '@/store/calendarSlice';
 
 const CalendarSearchItem = ({ course }) => {
-  const addCourse = useCalendarStore((state) => state.addCourse);
-  // const selectedCourses = useCalendarStore((state) => state.selectedCourses);
-
+  const addCourseToCalendar = useCalendarStore((state) => state.addCourseToCalendar);
   const handleClick = () => {
-    addCourse(course);
+    addCourseToCalendar(course);
   };
-
-  // useEffect(() => {
-  //   console.log('Course List rn:', selectedCourses.sections);
-  // }, [selectedCourses]);
 
   return (
     <ListItem

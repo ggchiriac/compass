@@ -1,19 +1,17 @@
-import { forwardRef, Ref, RefCallback } from 'react';
+import { CSSProperties, forwardRef, HTMLAttributes, ReactNode, Ref, RefCallback } from 'react';
 
 import classNames from 'classnames';
-
-// import { Handle, Remove } from '../Item';
 
 import styles from './Container.module.scss';
 
 export type ContainerProps = {
-  children: React.ReactNode;
+  children: ReactNode;
   columns?: number;
-  label?: string | React.ReactNode;
-  style?: React.CSSProperties;
+  label?: string | ReactNode;
+  style?: CSSProperties;
   horizontal?: boolean;
   hover?: boolean;
-  handleProps?: React.HTMLAttributes<HTMLDivElement | HTMLButtonElement>;
+  handleProps?: HTMLAttributes<HTMLDivElement | HTMLButtonElement>;
   scrollable?: boolean;
   shadow?: boolean;
   placeholder?: boolean;
@@ -60,7 +58,7 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
             ...style,
             '--columns': columns,
             height: height,
-          } as React.CSSProperties
+          } as CSSProperties
         }
         className={classNames(
           styles.Container,

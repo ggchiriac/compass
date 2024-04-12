@@ -1,7 +1,9 @@
+import { ReactNode } from 'react';
+
 import styles from './OverflowWrapper.module.scss';
 
 type OverflowWraperProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function OverflowWrapper({ children }: OverflowWraperProps) {

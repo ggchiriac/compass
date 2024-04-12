@@ -1,3 +1,4 @@
+// Variables
 $primary-color: #666;
 $font-size-base: 0.9rem;
 $hover-transition: 0.3s ease;
@@ -8,6 +9,7 @@ $box-shadow-hover:
   0 6px 12px rgba(0, 0, 0, 0.2),
   0 12px 24px rgba(0, 0, 0, 0.2);
 
+// Mixins
 @mixin box-shadow($shadow) {
   box-shadow: $shadow;
 }
@@ -16,22 +18,46 @@ $box-shadow-hover:
   transition: $properties $duration $ease;
 }
 
+@mixin ellipsis {
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@mixin media-query($breakpoint) {
+  @media (max-width: $breakpoint) {
+    @content;
+  }
+}
+
+// Calendar Card
 .calendar-card {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   border-radius: 6px;
   @include box-shadow($box-shadow-base);
-  padding: 16px;
-  margin: 6px;
+  padding: 4px;
+  margin: 2px;
+  box-sizing: border-box;
   @include transition;
   overflow: hidden;
   cursor: pointer;
   position: relative;
+  width: 100%;
 
   &:hover {
     transform: translateY(-4px);
     @include box-shadow($box-shadow-hover);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .options-button {
+      opacity: 1;
+    }
   }
 
   &::before {
@@ -46,10 +72,6 @@ $box-shadow-hover:
     @include transition(opacity, $hover-transition);
   }
 
-  &:hover::before {
-    opacity: 1;
-  }
-
   .card-header {
     display: flex;
     align-items: center;
@@ -60,17 +82,8 @@ $box-shadow-hover:
   .course-title,
   .time,
   .location {
-    max-width: 100%;
-    font-size: $font-size-base;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .course-code {
-    font-weight: bold;
-    font-size: 1.1rem;
-    margin-right: 12px;
+    font-size: 14px;
+    @include ellipsis;
   }
 
   .course-title {
@@ -106,14 +119,10 @@ $box-shadow-hover:
     flex-shrink: 0;
     @include transition(background-color $hover-transition, transform $hover-transition);
     opacity: 0;
-  }
 
-  &:hover .options-button {
-    opacity: 1;
-  }
-
-  .options-button:hover {
-    transform: scale(1.1);
+    &:hover {
+      transform: scale(1.1);
+    }
   }
 
   .options-icon {
@@ -121,6 +130,65 @@ $box-shadow-hover:
   }
 }
 
+// Media Queries
+@include media-query(768px) {
+  .calendar-card {
+    padding: 8px;
+    margin: 3px;
+
+    .course-title,
+    .time,
+    .location {
+      font-size: 12px;
+    }
+  }
+
+  :root {
+    --grid-row-height: 8px;
+  }
+}
+
+@include media-query(480px) {
+  .calendar-card {
+    flex-direction: row;
+
+    .card-header,
+    .card-body {
+      flex: 1;
+    }
+  }
+}
+
 .calendar-container {
-  height: 1000px;
+  display: grid;
+  grid-template-columns:
+    [time-col-start] auto [time-col-end grid-start] repeat(var(--days-length), 1fr)
+    [grid-end];
+  overflow: hidden;
+  height: 100vh;
+}
+
+.calendar-time {
+  grid-column: time-col-start / time-col-end;
+  font-weight: bold;
+  display: flex;
+  flex-direction: column;
+  background-color: #f7f7f7;
+  border-right: 1px solid #ccc;
+  padding: 8px 0;
+}
+
+.time-slot {
+  flex: 1;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.calendar-main {
+  grid-column: grid-start / grid-end;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  height: 100vh;
+  background-color: #fff;
 }

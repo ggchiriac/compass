@@ -1,4 +1,4 @@
-import { memo, forwardRef, useEffect } from 'react';
+import { CSSProperties, memo, forwardRef, ReactElement, ReactNode, useEffect } from 'react';
 
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
@@ -23,10 +23,10 @@ export type Props = {
   transform?: Transform | null;
   listeners?: DraggableSyntheticListeners;
   sorting?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   transition?: string | null;
-  wrapperStyle?: React.CSSProperties;
-  value: React.ReactNode; // This should be the text that appears on the course card
+  wrapperStyle?: CSSProperties;
+  value: ReactNode; // This should be the text that appears on the course card
   onRemove?(): void;
   renderItem?(args: {
     dragOverlay: boolean;
@@ -35,12 +35,12 @@ export type Props = {
     index: number | undefined;
     fadeIn: boolean;
     listeners: DraggableSyntheticListeners;
-    ref: React.Ref<HTMLElement>;
-    style: React.CSSProperties | undefined;
+    ref: Ref<HTMLElement>;
+    style: CSSProperties | undefined;
     transform: Props['transform'];
     transition: Props['transition'];
     value: Props['value'];
-  }): React.ReactElement;
+  }): ReactElement;
 };
 
 export const Item = memo(
@@ -114,7 +114,7 @@ export const Item = memo(
               '--index': index,
               '--color_primary': color_primary,
               '--color_secondary': color_secondary,
-            } as React.CSSProperties
+            } as CSSProperties
           }
           ref={ref}
         >

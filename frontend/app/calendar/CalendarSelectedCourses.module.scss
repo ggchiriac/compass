@@ -23,9 +23,9 @@
   transform: scale(var(--scale, 1));
   transition: box-shadow 200ms cubic-bezier(0.18, 0.67, 0.6, 1.22);
 
-  .text-container {
+  .textContainer {
     display: inline-block;
-    color: #ffffff;
+    color: black;
     font-weight: 400;
     font-size: 1rem;
     flex-grow: 1;
