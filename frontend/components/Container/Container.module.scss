@@ -14,6 +14,7 @@
   border: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 1em;
   width: 24vw;
+  overflow: hidden; // IMPORTANT: prevents dynamic resizing of container + makes scrollbars cleaner
 
   ul {
     display: grid;
@@ -24,7 +25,7 @@
     padding-left: 0.4vw;
     padding-right: 0.4vw;
     width: 100%;
-    height: 100%; // IMPORTANT. This prevents the unnecessary scrollbars
+    height: 100%; // IMPORTANT: This prevents the unnecessary scrollbars
     overflow-x: auto;
   }
 
