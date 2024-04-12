@@ -123,7 +123,15 @@ const DropdownMenu: FC = () => {
       </Menu>
 
       {blur && (
-        <SettingsModal>
+        <SettingsModal
+          setShowPopup={() => setBlur(false)}
+          setTermFilter={() => {}}
+          setDistributionFilter={() => {}}
+          setLevelFilter={() => {}}
+          setGradingFilter={() => {}}
+          handleCancel={() => {}}
+          handleSave={() => {}}
+        >
           <UserSettings
             profile={userProfile}
             onClose={() => setBlur(false)}

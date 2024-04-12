@@ -42,7 +42,7 @@ export type ProfileProps = {
 
 interface SettingsModalProps {
   children?: ReactNode;
-  setShowPopup: (show: boolean) => void;
+  setShowPopup?: (show: boolean) => void; // TODO: Should this be optional or required?
   setTermFilter: (term: string) => void;
   setDistributionFilter: (distribution: string) => void;
   setLevelFilter: (level: string[]) => void;

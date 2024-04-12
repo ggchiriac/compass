@@ -1,4 +1,4 @@
-import { CSSProperties, memo, forwardRef, ReactElement, ReactNode, useEffect } from 'react';
+import { CSSProperties, memo, forwardRef, ReactElement, ReactNode, Ref, useEffect } from 'react';
 
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
@@ -26,7 +26,7 @@ export type Props = {
   style?: CSSProperties;
   transition?: string | null;
   wrapperStyle?: CSSProperties;
-  value: ReactNode; // This should be the text that appears on the course card
+  value: ReactNode; // Note: This should be the text that appears on the course card
   onRemove?(): void;
   renderItem?(args: {
     dragOverlay: boolean;

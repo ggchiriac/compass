@@ -224,7 +224,14 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   }, [showPopup, handleCancel, handleSearch]);
 
   const modalContent = showPopup ? (
-    <SettingsModal>
+    <SettingsModal
+      setTermFilter={() => {}}
+      setDistributionFilter={() => {}}
+      setLevelFilter={() => {}}
+      setGradingFilter={() => {}}
+      handleCancel={() => {}}
+      handleSave={() => {}}
+    >
       <div
         style={{
           overflowWrap: 'break-word',

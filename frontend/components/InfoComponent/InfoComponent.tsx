@@ -59,7 +59,14 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
   };
 
   const modalContent = showPopup ? (
-    <SettingsModal>
+    <SettingsModal
+      setTermFilter={() => {}}
+      setDistributionFilter={() => {}}
+      setLevelFilter={() => {}}
+      setGradingFilter={() => {}}
+      handleCancel={() => {}}
+      handleSave={() => {}}
+    >
       <div className={styles.modal} style={{ width: '85%', height: '75%', padding: '25px' }}>
         {' '}
         {/* Ensure full width */}

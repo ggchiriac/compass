@@ -11,7 +11,7 @@ interface CalendarHeaderProps {
   style?: CSSProperties;
 }
 
-const DayCell: FC<{ day: Day, index: number }> = memo(({ day, index }) => {
+const DayCell: FC<{ day: Day; index: number }> = memo(({ day, index }) => {
   // Adjusting the styling to match the CalendarGrid day labels
   return (
     <div
@@ -37,7 +37,7 @@ DayCell.displayName = 'DayCell';
 
 const CalendarHeader: FC<CalendarHeaderProps> = ({ days, style }) => {
   const gridTemplateColumns: string = `minmax(60px, 100px) repeat(${days.length}, 1fr)`;
-  
+
   return (
     <header className='sticky top-0 z-30 shadow-lg bg-white w-full' style={style}>
       <div
