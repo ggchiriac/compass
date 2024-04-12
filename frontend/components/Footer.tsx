@@ -3,7 +3,7 @@ import { SVGProps } from 'react';
 const navigation = [
   {
     name: 'GitHub',
-    href: 'https://github.com/cos333project/compass/',
+    href: 'https://github.com/ggchiriac/compass/',
     icon: (props: SVGProps<SVGSVGElement>) => (
       <svg fill='currentColor' viewBox='0 0 24 24' {...props}>
         <path
@@ -35,7 +35,7 @@ export default function Footer() {
           ))}
         </div>
         <div className='mt-8 md:order-1 md:mt-0'>
-          <p className='text-center text-xs leading-5 text-gray-500'>hoagie plan &copy; 2024.</p>
+          <p className='text-center text-xs leading-5 text-gray-500'>hoagieplan &copy; 2024.</p>
         </div>
       </div>
     </footer>

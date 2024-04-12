@@ -1,5 +1,5 @@
 """
-ASGI config for the Compass project.
+ASGI config for hoagieplan.
 
 It exposes the ASGI callable as a module-level variable named ``application``.
 

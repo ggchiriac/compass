@@ -1,6 +1,6 @@
-# Compass: Your Guiding Star at Princeton 🧭
+# hoagieplan: Your Guiding Star at Princeton 🧭
 
-**Compass** aims to be the ultimate academic planner for Princeton students, offering not just major tracking but also minor and certificate guidance tailored to your course history. Backed by robust algorithms and clean UI, consider this your academic GPS.
+**hoagieplan** aims to be the ultimate academic planner for Princeton students, offering not just major tracking but also minor and certificate guidance tailored to your course history. Backed by robust algorithms and clean UI, consider this your academic GPS.
 
 ## Table of Contents
 - [🌟 Features](#features)
@@ -55,4 +55,4 @@ Auth
 
 ## License
 
-Compass is licensed under the terms of the [MIT License](LICENSE).
+hoagieplan is licensed under the terms of the [MIT License](LICENSE).

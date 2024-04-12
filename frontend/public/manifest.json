@@ -1,6 +1,6 @@
 {
-    "name": "Compass",
-    "short_name": "Compass",
+    "name": "hoagieplan",
+    "short_name": "hoagieplan",
     "theme_color": "#0F1E2F",
     "background_color": "#0F1E2F",
     "display": "standalone",

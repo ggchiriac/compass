@@ -1,4 +1,4 @@
-# GitHub Actions for the Compass Project
+# GitHub Actions for the hoagieplan Project
 
 ## Overview
 

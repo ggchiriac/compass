@@ -6,275 +6,276 @@ degree: AB
 explanation: |-
   English majors must take a total of 10 courses: the Junior Seminar (ENG 300), one designated course in Literary and Cultural History (LCH), and eight departmental courses. The junior seminar is a topical introduction to research methods in the discipline and prepares students for their independent work. Literary and Cultural History (LCH) courses ask questions about tradition and transmission over longer periods, and provide background for more specialized study.
 urls:
-- https://ua.princeton.edu/academic-units/department-english
-- https://english.princeton.edu/undergraduate/program
+  - https://ua.princeton.edu/academic-units/department-english
+  - https://english.princeton.edu/undergraduate/program
 contacts:
-- type: Chair
-  name: Simon Gikandi
-  email: sgikandi@princeton.edu
-- type: Director of Undergraduate Studies
-  name: Russ Leo
-  email: rleo@princeton.edu
+  - type: Chair
+    name: Simon Gikandi
+    email: sgikandi@princeton.edu
+  - type: Director of Undergraduate Studies
+    name: Russ Leo
+    email: rleo@princeton.edu
 req_list:
-- name: Prerequisites
-  max_counted: 1
-  min_needed: 1
-  explanation: There are no specific prerequisite courses for the major in
-    English, but prospective majors should take at least one course in English
-    in the first and second years.
-  course_list:
-  - ENG *
-- name: Distribution Requirements
-  max_counted: 1
-  min_needed: ALL
-  explanation: |-
-    Departmental distribution requirements ensure breadth in each major's program of study. Everyone must take at least one course in each of the following areas: <br>
-    - Literary and Cultural History (LCH)<br>
-    - Literature and Culture before 1700 (pre-1700)<br>
-    - Literature and Culture from 1700-1900 (1700-1900)<br>
-    - Literature and Culture from 1900-present (post-1900)<br>
-    - Difference and Diversity (D&D)<br>
-    - Theory and Criticism (T&C)
-  req_list:
-  - name: Literary and Cultural History
+  - name: Prerequisites
     max_counted: 1
     min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
-
-      Literary and Cultural History (LCH) courses ask questions about tradition and transmission over longer periods, and provide background for more specialized study.
+    explanation: There are no specific prerequisite courses for the major in
+      English, but prospective majors should take at least one course in English
+      in the first and second years.
     course_list:
-    - ENG 200
-    - AAS 359 / ENG 366
-    - COM 235 / ECS 340 / ENG 237
-    - LAS 307 / ENG 257 / COM 381
-    - THR 376 / COM 385 / ENG 276 / HLS 385
-    - ENG 415 / JRN 415 / COM 446 / AFS 415
-    - AAS 353 / ENG 352
-    - ASA 201 / ENG 209
-    - HUM 216
-    - HUM 217
-  - name: Literature and Culture before 1700
-    max_counted: 1
-    min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i>
-    course_list:
-    - ENG 200
-    - ENG 298 / COM 240
-    - ENG 317 / GSS 407
-    - ENG 319
-    - ENG 313 / MED 313
-    - ENG 318 / THR 310
-    - ENG 359 / COM 359
-    - ENG 390 / COM 392 / HUM 390
-    - ENG 325 / COM 371
-    - ENG 400 / MED 400
-    - ENG 402 / MED 401
-    - ENG 409 / THR 410 / HUM 409
-    - ENG 448 / THR 448 / HUM 448 / COM 440
-  - name: Literature and Culture from 1700-1900
-    max_counted: 1
-    min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of
-      courses that fulfill this requirement as courses change from semester to semester.
-      Some courses may fulfill different requirements depending on their content each
-      semester.</i>
-    course_list:
-    - ENG 203
-    - ENG 304
-    - ENG 331 / ECS 382
-    - ENG 351
-    - ENG 334
-    - ENG 339 / COM 342 / GSS 438
-    - ENG 345
-    - ENG 384 / GSS 394
-    - ENG 409 / THR 410 / HUM 409
-    - ENG 341 / ECS 382
-  - name: Literature and Culture from 1900-Present
-    max_counted: 1
-    min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of
-      courses that fulfill this requirement as courses change from semester to semester.
-      Some courses may fulfill different requirements depending on their content each
-      semester.</i>
-    course_list:
-    - ENG 304
-    - ENG 351
-    - ENG 379 / ENV 383
-    - ENG 444 / ASA 444 / AMS 443
-    - AAS 359 / ENG 366
-    - AMS 425 / ENG 423
-    - ASA 224 / ENG 224 / GSS 226
-    - ENV 363 / ENG 263
-    - HUM 352 / ENG 252 / URB 352 / THR 360
-    - THR 376 / COM 385 / ENG 276 / HLS 385
-    - ENG 354 / AAS 354 / THR 351
-    - ENG 357
-    - ENG 360
-    - ENG 361 / THR 364 / COM 321
-    - ENG 368 / AMS 340
-    - ENG 383 / AAS 340 / GSS 395 / AMS 483
-    - ENG 405
-    - ENG 415 / JRN 415 / COM 446 / AFS 415
-    - ECS 342 / ENG 349
-    - LAO 340 / ENG 354
-    - THR 347 / ENG 274
-    - ENG 259 / AMS 259
-    - ENG 269
-    - ENG 275
-    - ENG 3555
-    - ENG 358 / LAS 385 / AMS 396 / AAS 343
-    - ENG 401 / AMS 401
-    - AAS 230 / ENG 231
-    - AAS 359 / ENG 366
-    - AAS 392 / ENG 392
-    - AMS 317 / ENG 249
-    - AMS 334 / ENG 234
-    - HUM 307 / ENG 277
-    - THR 316 / ENG 217
-  - name: Difference and Diversity
-    max_counted: 1
-    min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of
-      courses that fulfill this requirement as courses change from semester to semester.
-      Some courses may fulfill different requirements depending on their content each
-      semester.</i>
-    course_list:
-    - ENG 379 / ENV 383
-    - ENG 444 / ASA 444 / AMS 443
-    - AAS 359 / ENG 366
-    - ASA 224 / ENG 224 / GSS 226
-    - GSS 223 / ENG 254
-    - GSS 303 / AMS 313 / ENG 283
-    - HUM 352 / ENG 252 / URB 352 / THR 360
-    - LAO 347 / ENG 247
-    - LAS 307 / ENG 257 / COM 381
-    - THR 300 / COM 359 / ENG 373 / ANT 359
-    - ENG 354 / AAS 354/ THR 351
-    - ENG 359 / COM 359
-    - ENG 383 / AAS 340 / GSS 395 / AMS 483
-    - ENG 384 / GSS 394
-    - ENG 405
-    - ENG 415 / JRN 415 / COM 446 / AFS 415
-    - AAS 353 / ENG 352
-    - AMS 322 / ENG 242
-    - ASA 201 / ENG 209
-    - LAO 340 / ENG 354
-    - THR 347 / ENG 274
-    - ENG 246 / HUM 246 / CLA 246 / CWR 246
-    - ENG 358 / LAS 385 / AMS 396 / AAS 343
-    - ENG 387
-    - ENG 404 / NES 404 / AMS 402
-    - ENG 409 / THR 410 / HUM 409
-    - ENG 411 / AMS 411 / AAS 413
-    - AAS 230 / ENG 231
-    - AAS 326 / ENG 286
-    - AAS 359 / ENG 366
-    - AAS 392 / ENG 392
-    - AMS 404 / ENG 454
-    - AMS 415 / ENG 435
-    - ASA 389 / ENG 289
-    - ATL 499 / ENG 499
-    - COM 322 / ENG 282
-    - COM 464 / ENG 464
-    - GSS 400 / ENG 264
-    - LAO 347 / ENG 247
-  - name: Theory and Criticism
-    max_counted: 1
-    min_needed: 1
-    explanation: |-
-      <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
-
-      Theory and Criticism (T&C) provides tools for thinking critically across all these periods, identities, and genres.
-    course_list:
-    - ENG 203
-    - ENG 317 / GSS 407
-    - ENG 444 / ASA 444 / AMS 443
-    - AMS 425 / ENG 423
-    - CLA 208 / ENG 240 / LIN 208 / TRA 208
-    - ENV 363 / ENG 263
-    - HUM 328 / ENG 270 / ART 396
-    - HUM 346 / ENG 256 / CDH 346
-    - THR 300 / COM 359 / ENG 373 / ANT 359
-    - ENG 306
-    - ENG 359 / COM 359
-    - ENG 387
-    - ENG 388
-    - ENG 411 / AMS 411 / AAS 413
-    - HUM 307 / ENG 277
-- name: Tracks
-  max_counted: 1
-  min_needed: 1
-  explanation:
-  req_list:
-  - name: English
-    max_counted: 1
-    min_needed: 3
-    explanation: Three additional ENG or ENG cross-listed courses.
-    course_list:
-    - ENG *
-  - name: Creative Writing
-    max_counted: 1
-    min_needed: 3
-    explanation: 'Creative Writing: students accepted to the minor program in
-      Creative Writing may cognate two CWR courses as departmental courses in English,
-      and may substitute a thesis in CWR for the thesis in English. Final admission
-      depends on the permission of the Program in Creative Writing to write a creative
-      thesis in the spring of junior year. Students not approved to write a creative
-      thesis may cognate one course in CWR.'
-    req_list:
-    - name: English
-      max_counted: 1
-      min_needed: 1
-      course_list:
       - ENG *
-    - name: Cognates
-      max_counted: 2
-      min_needed: 1
-      course_list:
-      - CWR *
-  - name: Theater
+  - name: Distribution Requirements
     max_counted: 1
-    min_needed: 3
-    explanation: Students accepted to the minor program in Theater
-      may cognate two THR courses as departmental courses in English.
+    min_needed: ALL
+    explanation: |-
+      Departmental distribution requirements ensure breadth in each major's program of study. Everyone must take at least one course in each of the following areas: <br>
+      - Literary and Cultural History (LCH)<br>
+      - Literature and Culture before 1700 (pre-1700)<br>
+      - Literature and Culture from 1700-1900 (1700-1900)<br>
+      - Literature and Culture from 1900-present (post-1900)<br>
+      - Difference and Diversity (D&D)<br>
+      - Theory and Criticism (T&C)
     req_list:
-    - name: English
-      max_counted: 1
-      min_needed: 1
-      course_list:
-      - ENG *
-    - name: Cognates
-      max_counted: 2
-      min_needed: 1
-      course_list:
-      - THR *
-- name: Junior Seminar
-  max_counted: 1
-  min_needed: 1
-  explanation: |-
-    The JRS is a required introduction to the methods of research and the arts of criticism that must be taken in the fall of junior year. During the sophomore sign-ins, students are placed into one of four seminars at Princeton<br><br>
+      - name: Literary and Cultural History
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
 
-    The completed junior paper takes the form of one 20–30-page JP, which is begun in conjunction with the junior seminar and which students complete in the spring semester, continuing the advising established during the junior seminar for the student's independent work.
-  course_list:
-  - ENG 300
-- name: Senior Thesis
-  max_counted: 1
-  min_needed: 1
-  explanation: |-
-    <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so Compass does not check it.</i><br><br>
+          Literary and Cultural History (LCH) courses ask questions about tradition and transmission over longer periods, and provide background for more specialized study.
+        course_list:
+          - ENG 200
+          - AAS 359 / ENG 366
+          - COM 235 / ECS 340 / ENG 237
+          - LAS 307 / ENG 257 / COM 381
+          - THR 376 / COM 385 / ENG 276 / HLS 385
+          - ENG 415 / JRN 415 / COM 446 / AFS 415
+          - AAS 353 / ENG 352
+          - ASA 201 / ENG 209
+          - HUM 216
+          - HUM 217
+      - name: Literature and Culture before 1700
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i>
+        course_list:
+          - ENG 200
+          - ENG 298 / COM 240
+          - ENG 317 / GSS 407
+          - ENG 319
+          - ENG 313 / MED 313
+          - ENG 318 / THR 310
+          - ENG 359 / COM 359
+          - ENG 390 / COM 392 / HUM 390
+          - ENG 325 / COM 371
+          - ENG 400 / MED 400
+          - ENG 402 / MED 401
+          - ENG 409 / THR 410 / HUM 409
+          - ENG 448 / THR 448 / HUM 448 / COM 440
+      - name: Literature and Culture from 1700-1900
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of
+          courses that fulfill this requirement as courses change from semester to semester.
+          Some courses may fulfill different requirements depending on their content each
+          semester.</i>
+        course_list:
+          - ENG 203
+          - ENG 304
+          - ENG 331 / ECS 382
+          - ENG 351
+          - ENG 334
+          - ENG 339 / COM 342 / GSS 438
+          - ENG 345
+          - ENG 384 / GSS 394
+          - ENG 409 / THR 410 / HUM 409
+          - ENG 341 / ECS 382
+      - name: Literature and Culture from 1900-Present
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of
+          courses that fulfill this requirement as courses change from semester to semester.
+          Some courses may fulfill different requirements depending on their content each
+          semester.</i>
+        course_list:
+          - ENG 304
+          - ENG 351
+          - ENG 379 / ENV 383
+          - ENG 444 / ASA 444 / AMS 443
+          - AAS 359 / ENG 366
+          - AMS 425 / ENG 423
+          - ASA 224 / ENG 224 / GSS 226
+          - ENV 363 / ENG 263
+          - HUM 352 / ENG 252 / URB 352 / THR 360
+          - THR 376 / COM 385 / ENG 276 / HLS 385
+          - ENG 354 / AAS 354 / THR 351
+          - ENG 357
+          - ENG 360
+          - ENG 361 / THR 364 / COM 321
+          - ENG 368 / AMS 340
+          - ENG 383 / AAS 340 / GSS 395 / AMS 483
+          - ENG 405
+          - ENG 415 / JRN 415 / COM 446 / AFS 415
+          - ECS 342 / ENG 349
+          - LAO 340 / ENG 354
+          - THR 347 / ENG 274
+          - ENG 259 / AMS 259
+          - ENG 269
+          - ENG 275
+          - ENG 3555
+          - ENG 358 / LAS 385 / AMS 396 / AAS 343
+          - ENG 401 / AMS 401
+          - AAS 230 / ENG 231
+          - AAS 359 / ENG 366
+          - AAS 392 / ENG 392
+          - AMS 317 / ENG 249
+          - AMS 334 / ENG 234
+          - HUM 307 / ENG 277
+          - THR 316 / ENG 217
+      - name: Difference and Diversity
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of
+          courses that fulfill this requirement as courses change from semester to semester.
+          Some courses may fulfill different requirements depending on their content each
+          semester.</i>
+        course_list:
+          - ENG 379 / ENV 383
+          - ENG 444 / ASA 444 / AMS 443
+          - AAS 359 / ENG 366
+          - ASA 224 / ENG 224 / GSS 226
+          - GSS 223 / ENG 254
+          - GSS 303 / AMS 313 / ENG 283
+          - HUM 352 / ENG 252 / URB 352 / THR 360
+          - LAO 347 / ENG 247
+          - LAS 307 / ENG 257 / COM 381
+          - THR 300 / COM 359 / ENG 373 / ANT 359
+          - ENG 354 / AAS 354/ THR 351
+          - ENG 359 / COM 359
+          - ENG 383 / AAS 340 / GSS 395 / AMS 483
+          - ENG 384 / GSS 394
+          - ENG 405
+          - ENG 415 / JRN 415 / COM 446 / AFS 415
+          - AAS 353 / ENG 352
+          - AMS 322 / ENG 242
+          - ASA 201 / ENG 209
+          - LAO 340 / ENG 354
+          - THR 347 / ENG 274
+          - ENG 246 / HUM 246 / CLA 246 / CWR 246
+          - ENG 358 / LAS 385 / AMS 396 / AAS 343
+          - ENG 387
+          - ENG 404 / NES 404 / AMS 402
+          - ENG 409 / THR 410 / HUM 409
+          - ENG 411 / AMS 411 / AAS 413
+          - AAS 230 / ENG 231
+          - AAS 326 / ENG 286
+          - AAS 359 / ENG 366
+          - AAS 392 / ENG 392
+          - AMS 404 / ENG 454
+          - AMS 415 / ENG 435
+          - ASA 389 / ENG 289
+          - ATL 499 / ENG 499
+          - COM 322 / ENG 282
+          - COM 464 / ENG 464
+          - GSS 400 / ENG 264
+          - LAO 347 / ENG 247
+      - name: Theory and Criticism
+        max_counted: 1
+        min_needed: 1
+        explanation: |-
+          <i>Editor's Note: This does not represent a comprehensive list of courses that fulfill this requirement as courses change from semester to semester. Some courses may fulfill different requirements depending on their content each semester.</i><br><br>
 
-    The Senior Thesis. Theses are 60-75 pages in length, on a topic chosen in collaboration with the thesis adviser. One chapter or 20 pages of the thesis is due in December.
-- name: Restrictions
-  max_counted: 0
-  min_needed: 1
-  explanation: |-
-    Students who study abroad may count up to two courses taken abroad as departmental courses. The exception to this is the English department's UCL semester: students may count two classes plus the Princeton seminar.<br><br>
-    
-    The Rule of 12. A student in the A.B. program is limited to 12 one-term courses (plus independent work) in a given department, plus up to two departmental prerequisites taken during the first year or sophomore year. Students who exceed the 31-course requirement for graduation may exceed the Rule of 12 by as many courses (e.g., if you take 32 courses total, you can exceed the rule of 12 by one course). For most English majors, this means only 12 courses primarily designated as English courses (ENG courses or cross-listed courses where ENG comes first—e.g., ENG 327/GSS 332). Departmental cognates do not count against the Rule of 12.<br><br>
-    
-    Cross-listed courses do not count against the Rule of 12 as long as the home department is not English.
+          Theory and Criticism (T&C) provides tools for thinking critically across all these periods, identities, and genres.
+        course_list:
+          - ENG 203
+          - ENG 317 / GSS 407
+          - ENG 444 / ASA 444 / AMS 443
+          - AMS 425 / ENG 423
+          - CLA 208 / ENG 240 / LIN 208 / TRA 208
+          - ENV 363 / ENG 263
+          - HUM 328 / ENG 270 / ART 396
+          - HUM 346 / ENG 256 / CDH 346
+          - THR 300 / COM 359 / ENG 373 / ANT 359
+          - ENG 306
+          - ENG 359 / COM 359
+          - ENG 387
+          - ENG 388
+          - ENG 411 / AMS 411 / AAS 413
+          - HUM 307 / ENG 277
+  - name: Tracks
+    max_counted: 1
+    min_needed: 1
+    explanation:
+    req_list:
+      - name: English
+        max_counted: 1
+        min_needed: 3
+        explanation: Three additional ENG or ENG cross-listed courses.
+        course_list:
+          - ENG *
+      - name: Creative Writing
+        max_counted: 1
+        min_needed: 3
+        explanation:
+          "Creative Writing: students accepted to the minor program in
+          Creative Writing may cognate two CWR courses as departmental courses in English,
+          and may substitute a thesis in CWR for the thesis in English. Final admission
+          depends on the permission of the Program in Creative Writing to write a creative
+          thesis in the spring of junior year. Students not approved to write a creative
+          thesis may cognate one course in CWR."
+        req_list:
+          - name: English
+            max_counted: 1
+            min_needed: 1
+            course_list:
+              - ENG *
+          - name: Cognates
+            max_counted: 2
+            min_needed: 1
+            course_list:
+              - CWR *
+      - name: Theater
+        max_counted: 1
+        min_needed: 3
+        explanation: Students accepted to the minor program in Theater
+          may cognate two THR courses as departmental courses in English.
+        req_list:
+          - name: English
+            max_counted: 1
+            min_needed: 1
+            course_list:
+              - ENG *
+          - name: Cognates
+            max_counted: 2
+            min_needed: 1
+            course_list:
+              - THR *
+  - name: Junior Seminar
+    max_counted: 1
+    min_needed: 1
+    explanation: |-
+      The JRS is a required introduction to the methods of research and the arts of criticism that must be taken in the fall of junior year. During the sophomore sign-ins, students are placed into one of four seminars at Princeton<br><br>
+
+      The completed junior paper takes the form of one 20–30-page JP, which is begun in conjunction with the junior seminar and which students complete in the spring semester, continuing the advising established during the junior seminar for the student's independent work.
+    course_list:
+      - ENG 300
+  - name: Senior Thesis
+    max_counted: 1
+    min_needed: 1
+    explanation: |-
+      <i>Editor's Note: Majors do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
+      The Senior Thesis. Theses are 60-75 pages in length, on a topic chosen in collaboration with the thesis adviser. One chapter or 20 pages of the thesis is due in December.
+  - name: Restrictions
+    max_counted: 0
+    min_needed: 1
+    explanation: |-
+      Students who study abroad may count up to two courses taken abroad as departmental courses. The exception to this is the English department's UCL semester: students may count two classes plus the Princeton seminar.<br><br>
+
+      The Rule of 12. A student in the A.B. program is limited to 12 one-term courses (plus independent work) in a given department, plus up to two departmental prerequisites taken during the first year or sophomore year. Students who exceed the 31-course requirement for graduation may exceed the Rule of 12 by as many courses (e.g., if you take 32 courses total, you can exceed the rule of 12 by one course). For most English majors, this means only 12 courses primarily designated as English courses (ENG courses or cross-listed courses where ENG comes first—e.g., ENG 327/GSS 332). Departmental cognates do not count against the Rule of 12.<br><br>
+
+      Cross-listed courses do not count against the Rule of 12 as long as the home department is not English.
