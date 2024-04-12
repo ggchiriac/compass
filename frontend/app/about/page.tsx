@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { SVGProps, useState, useEffect } from 'react';
 
 import Image from 'next/image';
 
@@ -39,7 +39,7 @@ const teamMembers = [
 const navigation = [
   {
     name: 'LinkedIn',
-    icon: (props: React.SVGProps<SVGSVGElement>) => (
+    icon: (props: SVGProps<SVGSVGElement>) => (
       <svg
         xmlns='http://www.w3.org/2000/svg'
         x='0px'
@@ -63,7 +63,7 @@ const navigation = [
 ];
 
 const About = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { checkAuthentication } = useAuthStore();
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 
 import { Button as JoyButton } from '@mui/joy';
 import classNames from 'classnames';
@@ -14,10 +14,10 @@ interface InfoComponentProps {
   value: string;
 }
 
-const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
+const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
   const dept = value.split(' ')[0];
   const coursenum = value.split(' ')[1];
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   const [courseDetails, setCourseDetails] = useState<{ [key: string]: any } | null>(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
 
   const handleKeyDown = (event) => {
     if (event.key === 'Escape' || event.key === 'Enter') {
-      handleClose(event);
+      handleCancel(event);
     }
   };
 
@@ -52,7 +52,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
     document.addEventListener('keydown', handleKeyDown);
   };
 
-  const handleClose = (event) => {
+  const handleCancel = (event) => {
     event.preventDefault();
     event.stopPropagation();
     setShowPopup(false);
@@ -114,7 +114,7 @@ const InfoComponent: React.FC<InfoComponentProps> = ({ value }) => {
             <JoyButton
               variant='soft'
               color='neutral'
-              onClick={handleClose}
+              onClick={handleCancel}
               sx={{ ml: 2 }}
               size='md'
             >

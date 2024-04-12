@@ -14,7 +14,7 @@ import UserState from '../../store/userSlice';
 import { Canvas } from './Canvas';
 
 const Dashboard: FC = () => {
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
   useEffect(() => {

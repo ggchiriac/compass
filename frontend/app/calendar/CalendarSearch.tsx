@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, useEffect, FC } from 'react';
+import { ChangeEvent, useCallback, useRef, useState, useEffect, FC } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
@@ -17,11 +17,14 @@ import { Course, Filter } from '@/types';
 import { FilterModal } from '@/components/Modal';
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
-import useSearchStore from '@/store/searchSlice';
 
 import CalendarSearchResults from './CalendarSearchResults';
 
-const terms: { [key: string]: string } = {
+interface TermMap {
+  [key: string]: string;
+}
+
+const terms: TermMap = {
   'Fall 2024': '1252',
   'Spring 2024': '1244',
   'Fall 2023': '1242',
@@ -33,19 +36,7 @@ const terms: { [key: string]: string } = {
   'Fall 2020': '1212',
 };
 
-const termsInverse: { [key: string]: string } = {
-  '1252': 'Fall 2024',
-  '1242': 'Fall 2023',
-  '1232': 'Fall 2022',
-  '1222': 'Fall 2021',
-  '1212': 'Fall 2020',
-  '1244': 'Spring 2024',
-  '1234': 'Spring 2023',
-  '1224': 'Spring 2022',
-  '1214': 'Spring 2021',
-};
-
-const distributionAreas: { [key: string]: string } = {
+const distributionAreas: TermMap = {
   'Social Analysis': 'SA',
   'Science & Engineering - Lab': 'SEL',
   'Science & Engineering - No Lab': 'SEN',
@@ -57,19 +48,7 @@ const distributionAreas: { [key: string]: string } = {
   'Culture & Difference': 'CD',
 };
 
-const distributionAreasInverse: { [key: string]: string } = {
-  SA: 'Social Analysis',
-  SEL: 'Science & Engineering - Lab',
-  SEN: 'Science & Engineering - No Lab',
-  QCR: 'Quant & Comp Reasoning',
-  LA: 'Literature and the Arts',
-  HA: 'Historical Analysis',
-  EM: 'Ethical Thought & Moral Values',
-  EC: 'Epistemology & Cognition',
-  CD: 'Culture & Difference',
-};
-
-const levels: { [key: string]: string } = {
+const levels: TermMap = {
   '100': '1',
   '200': '2',
   '300': '3',
@@ -79,12 +58,41 @@ const levels: { [key: string]: string } = {
 
 const gradingBases: string[] = ['A-F', 'P/D/F', 'Audit'];
 
+function buildQuery(searchQuery: string, filter: Filter): string {
+  let queryString = `course=${encodeURIComponent(searchQuery)}`;
+
+  if (filter.termFilter) {
+    queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
+  }
+  if (filter.distributionFilter) {
+    queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
+  }
+  if (filter.levelFilter.length > 0) {
+    queryString += `&level=${filter.levelFilter.map(encodeURIComponent).join(',')}`;
+  }
+  if (filter.gradingFilter.length > 0) {
+    queryString += `&grading=${filter.gradingFilter.map(encodeURIComponent).join(',')}`;
+  }
+
+  return queryString;
+}
+
 const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
   entryExpirationTimeInMS: 1000 * 60 * 60 * 24,
 });
 
+function invert(obj: TermMap): TermMap {
+  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [value, key]));
+}
+
 const CalendarSearch: FC = () => {
+  const [isClient, setIsClient] = useState<boolean>(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   const [query, setQuery] = useState<string>('');
   const timerRef = useRef<number>();
   const {
@@ -117,74 +125,94 @@ const CalendarSearch: FC = () => {
     setShowPopup,
   } = useFilterStore();
 
-  const { searchFilter, setSearchFilter } = useSearchStore();
+  useEffect(() => {
+    const storedFilters = localStorage.getItem('filter-settings');
+    if (storedFilters) {
+      const parsedFilters: Filter = JSON.parse(storedFilters);
+      setFilters({
+        termFilter: parsedFilters.termFilter || '',
+        distributionFilter: parsedFilters.distributionFilter || '',
+        levelFilter: parsedFilters.levelFilter || [],
+        gradingFilter: parsedFilters.gradingFilter || [],
+      });
+    }
+  }, []);
 
   useEffect(() => {
-    setFilters({
-      termFilter: searchFilter.termFilter,
-      distributionFilter: searchFilter.distributionFilter,
-      levelFilter: searchFilter.levelFilter,
-      gradingFilter: searchFilter.gradingFilter,
-    });
-  }, [searchFilter, setFilters]);
+    localStorage.setItem(
+      'filter-settings',
+      JSON.stringify({
+        termFilter,
+        distributionFilter,
+        levelFilter,
+        gradingFilter,
+      })
+    );
+  }, [termFilter, distributionFilter, levelFilter, gradingFilter]);
 
   useEffect(() => {
-    setCalendarSearchResults(calendarSearchResults);
-  }, [calendarSearchResults, setCalendarSearchResults]);
+    const storedShowPopup = localStorage.getItem('show-popup');
+    if (storedShowPopup === 'true') {
+      setShowPopup(true);
+    }
+  }, [setShowPopup]);
 
-  const search = async (searchQuery: string, filter: Filter) => {
-    setLoading(true);
-    try {
-      let queryString = `course=${encodeURIComponent(searchQuery)}`;
+  useEffect(() => {
+    localStorage.setItem('show-popup', showPopup.toString());
+  }, [showPopup]);
 
-      if (filter.termFilter) {
-        queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
-      }
+  // TODO: is this needed?
+  // useEffect(() => {
+  //   setCalendarSearchResults(calendarSearchResults);
+  // }, [calendarSearchResults, setCalendarSearchResults]);
 
-      if (filter.distributionFilter) {
-        queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
-      }
+  const search = useCallback(
+    async (searchQuery: string, filter: Filter): Promise<void> => {
+      setLoading(true);
+      try {
+        const queryString = buildQuery(searchQuery, filter);
+        console.log('query is', queryString);
+        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
 
-      if (filter.levelFilter.length > 0) {
-        queryString += `&level=${filter.levelFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
+        if (!response.ok) {
+          throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
 
-      if (filter.gradingFilter.length > 0) {
-        queryString += `&grading=${filter.gradingFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
-
-      const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
-      if (response.ok) {
         const data: { courses: Course[] } = await response.json();
         setCalendarSearchResults(data.courses);
-        console.log('response', data.courses);
+
         if (data.courses.length > 0) {
           addRecentSearch(searchQuery);
           searchCache.set(searchQuery, data.courses);
         }
-      } else {
-        setError(`Server returned ${response.status}: ${response.statusText}`);
+      } catch (error: any) {
+        setError(`There was an error fetching courses: ${error.message || ''}`);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setError('There was an error fetching courses.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [setLoading, setCalendarSearchResults, addRecentSearch, setError]
+  );
 
-  function retrieveCachedSearch(search) {
-    setCalendarSearchResults(searchCache.get(search));
+  function retrieveCachedSearch(search: string) {
+    setCalendarSearchResults(searchCache.get(search) || []);
   }
 
   useEffect(() => {
+    const filters = {
+      termFilter,
+      distributionFilter,
+      levelFilter,
+      gradingFilter,
+    };
     if (query) {
-      search(query, searchFilter);
+      search(query, filters);
     } else {
-      search('', searchFilter);
+      search('', filters);
     }
-  }, [query, searchFilter]);
+  }, [query]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -195,25 +223,20 @@ const CalendarSearch: FC = () => {
   };
 
   const handleSave = useCallback(() => {
-    const filter = {
+    const filters = {
       termFilter,
       distributionFilter,
       levelFilter,
       gradingFilter,
     };
-    setSearchFilter(filter);
+    setFilters(filters);
     setShowPopup(false);
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setSearchFilter, setShowPopup]);
+    localStorage.setItem('filter-settings', JSON.stringify(filters));
+  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
 
-  const handleClose = useCallback(() => {
-    setFilters({
-      termFilter: searchFilter.termFilter,
-      distributionFilter: searchFilter.distributionFilter,
-      levelFilter: searchFilter.levelFilter,
-      gradingFilter: searchFilter.gradingFilter,
-    });
+  const handleCancel = useCallback(() => {
     setShowPopup(false);
-  }, [searchFilter, setFilters, setShowPopup]);
+  }, [setShowPopup]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -224,21 +247,19 @@ const CalendarSearch: FC = () => {
       } else if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
-        handleClose();
+        handleCancel();
       }
     };
 
     if (showPopup) {
       document.addEventListener('keydown', handleKeyDown);
     }
-
-    // Remove event listener if showPopup is false, or on unmount.
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showPopup, handleSave, handleClose]);
+  }, [showPopup, handleSave, handleCancel]);
 
-  const handleAdjustmentsClick = (event) => {
+  const handleSettingsChange = (event) => {
     event.stopPropagation();
     setShowPopup(true);
   };
@@ -259,100 +280,109 @@ const CalendarSearch: FC = () => {
     }
   };
 
-  const modalContent = showPopup ? (
-    <FilterModal>
-      <div className='grid grid-cols-1 gap-6'>
-        <div>
-          <FormLabel>Semester</FormLabel>
-          <Autocomplete
-            multiple={false}
-            autoHighlight
-            options={Object.keys(terms)}
-            placeholder='Semester'
-            variant='soft'
-            value={termFilter ? termsInverse[termFilter] : 'Spring 2024'}
-            isOptionEqualToValue={(option, value) => value === '' || option === value}
-            onChange={(event, newTermName: string | undefined) => {
-              event.stopPropagation();
-              setTermFilter(terms[newTermName] ?? '');
-            }}
-            getOptionLabel={(option) => option.toString()}
-            renderOption={(props, option) => (
-              <AutocompleteOption {...props} key={option}>
-                <ListItemContent>{option}</ListItemContent>
-              </AutocompleteOption>
-            )}
-          />
-        </div>
-        <div>
-          <FormLabel>Distribution area</FormLabel>
-          <Autocomplete
-            multiple={false}
-            autoHighlight
-            options={Object.keys(distributionAreas)}
-            placeholder='Distribution area'
-            variant='soft'
-            value={distributionAreasInverse[distributionFilter]}
-            isOptionEqualToValue={(option, value) => value === '' || option === value}
-            onChange={(event, newDistributionName: string | undefined) => {
-              event.stopPropagation();
-              setDistributionFilter(distributionAreas[newDistributionName] ?? '');
-            }}
-            getOptionLabel={(option) => option.toString()}
-            renderOption={(props, option) => (
-              <AutocompleteOption {...props} key={option}>
-                <ListItemContent>{option}</ListItemContent>
-              </AutocompleteOption>
-            )}
-          />
-        </div>
-        <div>
-          <FormLabel>Course level</FormLabel>
-          <div className='grid grid-cols-3'>
-            {Object.keys(levels).map((level) => (
-              <div key={level} className='flex items-center mb-2'>
-                <Checkbox
-                  size='sm'
-                  id={`level-${level}`}
-                  name='level'
-                  checked={levelFilter.includes(levels[level])}
-                  onChange={() => handleLevelFilterChange(levels[level])}
-                />
-                <span className='ml-2 text-sm font-medium text-gray-800'>{level}</span>
-              </div>
-            ))}
+  const modalContent =
+    isClient && showPopup ? (
+      <FilterModal
+        setShowPopup={setShowPopup}
+        setTermFilter={setTermFilter}
+        setDistributionFilter={setDistributionFilter}
+        setLevelFilter={setLevelFilter}
+        setGradingFilter={setGradingFilter}
+        handleSave={handleSave}
+        handleCancel={handleCancel}
+      >
+        <div className='grid grid-cols-1 gap-6'>
+          <div>
+            <FormLabel>Semester</FormLabel>
+            <Autocomplete
+              multiple={false}
+              autoHighlight
+              options={Object.keys(terms)}
+              placeholder='Semester'
+              variant='soft'
+              value={termFilter ? invert(terms)[termFilter] : 'Fall 2024'}
+              isOptionEqualToValue={(option, value) => value === '' || option === value}
+              onChange={(event, newTermName: string | null) => {
+                event.stopPropagation();
+                setTermFilter(terms[newTermName ?? ''] ?? '');
+              }}
+              getOptionLabel={(option) => option.toString()}
+              renderOption={(props, option) => (
+                <AutocompleteOption {...props} key={option}>
+                  <ListItemContent>{option}</ListItemContent>
+                </AutocompleteOption>
+              )}
+            />
+          </div>
+          <div>
+            <FormLabel>Distribution area</FormLabel>
+            <Autocomplete
+              multiple={false}
+              autoHighlight
+              options={Object.keys(distributionAreas)}
+              placeholder='Distribution area'
+              variant='soft'
+              value={invert(distributionAreas)[distributionFilter]}
+              isOptionEqualToValue={(option, value) => value === '' || option === value}
+              onChange={(event, newDistributionName: string | null) => {
+                event.stopPropagation();
+                setDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
+              }}
+              getOptionLabel={(option) => option.toString()}
+              renderOption={(props, option) => (
+                <AutocompleteOption {...props} key={option}>
+                  <ListItemContent>{option}</ListItemContent>
+                </AutocompleteOption>
+              )}
+            />
+          </div>
+          <div>
+            <FormLabel>Course level</FormLabel>
+            <div className='grid grid-cols-3'>
+              {Object.keys(levels).map((level) => (
+                <div key={level} className='flex items-center mb-2'>
+                  <Checkbox
+                    size='sm'
+                    id={`level-${level}`}
+                    name='level'
+                    checked={levelFilter.includes(levels[level])}
+                    onChange={() => handleLevelFilterChange(levels[level])}
+                  />
+                  <span className='ml-2 text-sm font-medium text-gray-800'>{level}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+          <div>
+            <FormLabel>Allowed grading</FormLabel>
+            <div className='grid grid-cols-3'>
+              {gradingBases.map((grading) => (
+                <div key={grading} className='flex items-center mb-2'>
+                  <Checkbox
+                    size='sm'
+                    id={`grading-${grading}`}
+                    name='grading'
+                    checked={gradingFilter.includes(grading)}
+                    onChange={() => handleGradingFilterChange(grading)}
+                  />
+                  <span className='ml-2 text-sm font-medium text-gray-800'>{grading}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-        <div>
-          <FormLabel>Allowed grading</FormLabel>
-          <div className='grid grid-cols-3'>
-            {gradingBases.map((grading) => (
-              <div key={grading} className='flex items-center mb-2'>
-                <Checkbox
-                  size='sm'
-                  id={`grading-${grading}`}
-                  name='grading'
-                  checked={gradingFilter.includes(grading)}
-                  onChange={() => handleGradingFilterChange(grading)}
-                />
-                <span className='ml-2 text-sm font-medium text-gray-800'>{grading}</span>
-              </div>
-            ))}
+        <footer className='mt-auto text-right'>
+          <div className='mt-5 text-right'>
+            <Button variant='soft' color='primary' onClick={handleSave} size='md'>
+              Save
+            </Button>
+            <Button variant='soft' color='neutral' onClick={handleCancel} sx={{ ml: 2 }} size='md'>
+              Cancel
+            </Button>
           </div>
-        </div>
-      </div>
-      <footer className='mt-auto text-right'>
-        <div className='mt-5 text-right'>
-          <Button variant='soft' color='primary' onClick={handleSave} size='md'>
-            Save
-          </Button>
-          <Button variant='soft' color='neutral' onClick={handleClose} sx={{ ml: 2 }} size='md'>
-            Cancel
-          </Button>
-        </div>
-      </footer>
-    </FilterModal>
-  ) : null;
+        </footer>
+      </FilterModal>
+    ) : null;
 
   return (
     <>
@@ -376,7 +406,7 @@ const CalendarSearch: FC = () => {
           <button
             type='button'
             className='absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md hover:bg-dnd-gray group'
-            onClick={handleAdjustmentsClick}
+            onClick={handleSettingsChange}
             aria-label='Adjust search settings'
           >
             <AdjustmentsHorizontalIcon

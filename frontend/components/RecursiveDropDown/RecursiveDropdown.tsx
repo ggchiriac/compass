@@ -102,10 +102,10 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 
 // Dropdown component with refined styling
 const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => {
-  const [showPopup, setShowPopup] = useState(false);
-  const [markedSatisfied, setMarkedSatisfied] = useState(false);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [markedSatisfied, setMarkedSatisfied] = useState<boolean>(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleExplanationClick = (event, reqId) => {
     setIsLoading(true);
@@ -131,7 +131,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     setShowPopup(true);
   };
 
-  const handleClose = useCallback(() => {
+  const handleCancel = useCallback(() => {
     setExplanation('');
     setMarkedSatisfied(false);
     setShowPopup(false);
@@ -141,8 +141,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     if (explanation && explanation[2]) {
       useSearchStore.getState().setSearchResults(explanation[2]);
     }
-    handleClose();
-  }, [explanation, handleClose]);
+    handleCancel();
+  }, [explanation, handleCancel]);
 
   const handleMarkSatisfied = () => {
     fetch(`${process.env.BACKEND}/mark_satisfied/`, {
@@ -183,7 +183,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       } else if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
-        handleClose();
+        handleCancel();
       }
     };
 
@@ -195,7 +195,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showPopup, handleClose, handleSearch]);
+  }, [showPopup, handleCancel, handleSearch]);
 
   const modalContent = showPopup ? (
     <SettingsModal>
@@ -283,7 +283,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
             Mark Satisfied
           </JoyButton>
         )}
-        <JoyButton variant='soft' color='neutral' onClick={handleClose} sx={{ ml: 2 }} size='md'>
+        <JoyButton variant='soft' color='neutral' onClick={handleCancel} sx={{ ml: 2 }} size='md'>
           Close
         </JoyButton>
       </footer>

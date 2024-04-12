@@ -1,4 +1,5 @@
 // TODO: Check all of these with Cmd + Shift + F and delete any unused ones
+import { CSSProperties, ReactNode } from 'react';
 
 export type AuthState = {
   user?: Profile;
@@ -39,9 +40,16 @@ export type ProfileProps = {
   onSave: (updatedProfile: Profile) => void;
 };
 
-export type SettingsModalProps = {
-  children: React.ReactNode;
-};
+interface SettingsModalProps {
+  children?: ReactNode;
+  setShowPopup: (show: boolean) => void;
+  setTermFilter: (term: string) => void;
+  setDistributionFilter: (distribution: string) => void;
+  setLevelFilter: (level: string[]) => void;
+  setGradingFilter: (grading: string[]) => void;
+  handleCancel: () => void;
+  handleSave: () => void;
+}
 
 export type Filter = {
   termFilter: string;
@@ -74,21 +82,21 @@ export type Semester = {
 };
 
 export type SemesterBinProps = {
-  children?: React.ReactNode;
+  children?: ReactNode;
   semester: Semester;
   className?: string;
 };
 
 export type DraggableProps = {
   id: number;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
 export type DroppableProps = {
   id: string;
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 };
 
@@ -109,7 +117,7 @@ export type MobileMenuState = {
 
 export type MenuItemProps = {
   isActive: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
   onClick: () => void;
 };
 
@@ -131,51 +139,49 @@ export type CalendarEvent = {
   offsetLeft?: number;
   color?: string;
   textColor?: string;
+
+  // Defined fields
+  isActive: boolean;
 };
 
 // Note: types from the API, fields in snake_case.
 
-export type Department = {
-  // From model
-  id: string;
-  code: string;
-  name: string;
-};
-
-export type Instructor = {
-  // From model
-  emplid: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-};
-
 export type Course = {
   // From model
-  department: Department;
+  id: number;
   guid: string;
   course_id: number;
   catalog_number: number;
   title: string;
   description: string;
-  crosslistings?: string;
-
-  // Defined fields
+  drop_consent: string;
+  add_consent: string;
+  web_address: string;
+  transcript_title: string;
+  long_title: string;
+  distribution_area_long: string;
+  distribution_area_short: string;
+  reading_writing_assignment: string;
+  grading_basis: string;
+  reading_list: string;
+  department_code: string;
   sections: Section[];
-  origin_semester_id?: string;
+  crosslistings: string;
 };
+
 
 export type Section = {
   // From model
   id: number;
-  class_section: string;
+  class_number: number;
   class_type: string;
-  instructor: Instructor;
+  class_section: string;
   track: string;
-  capacity: number;
-  enrollment: number;
   seat_reservations: string;
+  instructor_name: string;
+  capacity: number;
   status: string;
+  enrollment: number;
 
   // Defined fields
   class_meetings: ClassMeeting[];
@@ -184,9 +190,10 @@ export type Section = {
 export type ClassMeeting = {
   // From model
   id: number;
+  meeting_number: number;
   start_time: string;
   end_time: string;
-  building_name: string;
   room: string;
   days: string;
+  building_name: string;
 };

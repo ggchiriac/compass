@@ -1,11 +1,13 @@
+import { CSSProperties, ReactNode } from 'react';
+
 import classNames from 'classnames';
 
 import styles from './Wrapper.module.scss';
 
 type Props = {
-  children: React.ReactNode;
+  children: ReactNode;
   center?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
 };
 
 export function Wrapper({ children, center, style }: Props) {

@@ -1,4 +1,4 @@
-import { forwardRef } from 'react';
+import { CSSProperties, forwardRef, ReactNode } from 'react';
 
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
@@ -22,10 +22,10 @@ type DraggableProps = {
   handle?: boolean;
   label?: string;
   listeners?: DraggableSyntheticListeners;
-  style?: React.CSSProperties;
-  buttonStyle?: React.CSSProperties;
+  style?: CSSProperties;
+  buttonStyle?: CSSProperties;
   transform?: Transform | null;
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
 export const Draggable = forwardRef<HTMLButtonElement, DraggableProps>(function Draggable(
@@ -56,7 +56,7 @@ export const Draggable = forwardRef<HTMLButtonElement, DraggableProps>(function 
           ...style,
           '--translate-x': `${transform?.x ?? 0}px`,
           '--translate-y': `${transform?.y ?? 0}px`,
-        } as React.CSSProperties
+        } as CSSProperties
       }
     >
       <button

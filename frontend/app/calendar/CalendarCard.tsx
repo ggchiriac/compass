@@ -1,106 +1,83 @@
+import { FC, CSSProperties } from 'react';
+
 import { CalendarEvent } from '@/types';
+
 import './Calendar.scss';
 
 interface CalendarCardProps {
   event: CalendarEvent;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   onSectionClick: () => void;
   width?: number;
   offsetLeft?: number;
+  startIndex: number;
+  endIndex: number;
 }
 
-const convertTo12hFormat = (time: string) => {
-  const [hours, minutes] = time.split(':');
-  const hrs = parseInt(hours, 10);
-  const suffix = hrs >= 12 ? 'PM' : 'AM';
-  const convertedHours = ((hrs + 11) % 12) + 1;
-  return `${convertedHours}:${minutes} ${suffix}`;
-};
-
-const CalendarCard: React.FC<CalendarCardProps> = ({
+const CalendarCard: FC<CalendarCardProps> = ({
   event,
   onSectionClick,
-  width,
-  offsetLeft,
+  width = 1,
+  offsetLeft = 0,
+  startIndex,
+  endIndex,
 }) => {
-  const startTime = convertTo12hFormat(event.startTime);
-  const endTime = convertTo12hFormat(event.endTime);
-
-  const calculateDurationRows = (startRowIndex: number, endRowIndex: number) => {
-    return endRowIndex - startRowIndex;
-  };
-
   const dayToStartColumnIndex: Record<string, number> = {
-    M: 1, // Monday
-    T: 2, // Tuesday
-    W: 3, // Wednesday
-    Th: 4, // Thursday
-    F: 5, // Friday
+    M: 1,
+    T: 2,
+    W: 3,
+    Th: 4,
+    F: 5,
   };
 
-  function getStartColumnIndexForDays(meetingDays: string): number[] {
+  const getStartColumnIndexForDays = (meetingDays: string): number[] => {
+    console.log(`Mapping meeting days: ${meetingDays}`);
     const days = meetingDays.split(',');
-    return days.map((day) => dayToStartColumnIndex[day.trim()]);
-  }
+    const indices = days.map((day) => dayToStartColumnIndex[day.trim()]);
+    console.log(`Column indices for days ${meetingDays}:`, indices);
+    return indices;
+  };
 
-  const classMeeting = event.section.class_meetings.find(
-    (meeting) => getStartColumnIndexForDays(meeting.days)[0] === event.startColumnIndex
+  const relevantMeetings = event.section.class_meetings.filter((meeting) =>
+    getStartColumnIndexForDays(meeting.days).includes(event.startColumnIndex)
+  );
+
+  console.log(
+    `Relevant meetings found for event starting at row ${event.startRowIndex}:`,
+    relevantMeetings
   );
 
   return (
     <div
-      className={`text-xs calendar-card ${event.textColor}`}
+      className={`calendar-card ${event.textColor}`}
       style={{
         backgroundColor: event.color,
-        gridColumn: `${event.startColumnIndex} / span 1`,
-        gridRow: `${event.startRowIndex + 1} / span ${calculateDurationRows(event.startRowIndex, event.endRowIndex)}`,
-        width: `calc(100% * ${width || 1})`,
-        marginLeft: `calc(100% * ${offsetLeft || 0})`,
+        gridRow: `${startIndex} / ${endIndex}`,
+        gridColumn: `${event.startColumnIndex + 1} / span 1`,
+        width: `calc(100% * ${width})`,
+        marginLeft: `calc(100% * ${offsetLeft})`,
         overflow: 'hidden',
-        maxHeight: '100%',
       }}
       onClick={onSectionClick}
     >
-      <div className='card-header'>
-        <strong
-          className='course-code'
-          title={`${event.course.department.code} ${event.course.catalog_number}`}
-        >
-          {event.course.department.code} {event.course.catalog_number}
-        </strong>
-        <span className='course-title' title={event.course.title}>
-          {event.course.title}
-        </span>
-      </div>
+      {/* <div className='card-header'></div>
       <div className='card-body'>
-        <div className='event-details'>
-          <div className='event-time'>
-            <time dateTime={event.startTime} title={`${startTime} - ${endTime}`}>
-              {startTime} - {endTime}
-            </time>
+        {relevantMeetings.map((classMeeting, index) => (
+          <div key={index} className='event-details'>
+            <div className='event-department'>
+              <span className='department-code'>{event.course.department_code}</span>
+              <span className='catalog-number'>{event.course.catalog_number}</span>
+            </div>
+            <div className='event-location'>
+              <span className='building-name'>{classMeeting.building_name}</span>
+            </div>
           </div>
-          <div className='event-location'>
-            <span
-              className='location'
-              title={`${classMeeting?.building_name} ${classMeeting?.room}`}
-            >
-              {classMeeting?.building_name}
-              <br />
-              {classMeeting?.room}
-            </span>
-          </div>
-        </div>
+        ))}
+      </div> */}
+      <div className='event-department'>
+        {event.course.department_code} {event.course.catalog_number}
       </div>
-      <button className='options-button' title='Options' style={{ backgroundColor: event.color }}>
-        <svg className='options-icon' fill='none' stroke='currentColor' viewBox='0 0 24 24'>
-          <path
-            strokeLinecap='round'
-            strokeLinejoin='round'
-            strokeWidth={2}
-            d='M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z'
-          />
-        </svg>
-      </button>
+      {/* Button */}
     </div>
   );
 };

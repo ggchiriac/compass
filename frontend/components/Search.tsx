@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, useCallback, FC } from 'react';
+import { ChangeEvent, useRef, useState, useEffect, useCallback, FC } from 'react';
 
 import { MagnifyingGlassIcon } from '@heroicons/react/20/solid';
 import { AdjustmentsHorizontalIcon } from '@heroicons/react/24/outline';
@@ -95,7 +95,7 @@ const Search: FC = () => {
     }));
   const { searchFilter, setSearchFilter } = useSearchStore();
 
-  const [showPopup, setShowPopup] = useState(false);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   const [termFilter, setTermFilter] = useState(searchFilter.termFilter || '');
   const [distributionFilter, setDistributionFilter] = useState(
     searchFilter.distributionFilter || ''
@@ -158,7 +158,7 @@ const Search: FC = () => {
     }
   }, [query, searchFilter]);
 
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
@@ -179,7 +179,7 @@ const Search: FC = () => {
     setShowPopup(false);
   }, [termFilter, distributionFilter, levelFilter, gradingFilter, setSearchFilter, setShowPopup]);
 
-  const handleClose = useCallback(() => {
+  const handleCancel = useCallback(() => {
     setTermFilter(searchFilter.termFilter);
     setDistributionFilter(searchFilter.distributionFilter);
     setLevelFilter(searchFilter.levelFilter);
@@ -203,7 +203,7 @@ const Search: FC = () => {
       } else if (event.key === 'Escape') {
         event.preventDefault();
         event.stopPropagation();
-        handleClose();
+        handleCancel();
       }
     };
 
@@ -215,7 +215,7 @@ const Search: FC = () => {
     return () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
-  }, [showPopup, handleSave, handleClose]);
+  }, [showPopup, handleSave, handleCancel]);
 
   const handleAdjustmentsClick = (event) => {
     event.stopPropagation();
@@ -239,7 +239,15 @@ const Search: FC = () => {
   };
 
   const modalContent = showPopup ? (
-    <FilterModal>
+    <FilterModal
+      setShowPopup={setShowPopup}
+      setTermFilter={setTermFilter}
+      setDistributionFilter={setDistributionFilter}
+      setLevelFilter={setLevelFilter}
+      setGradingFilter={setGradingFilter}
+      handleSave={handleSave}
+      handleCancel={handleCancel}
+    >
       <div className='grid grid-cols-1 gap-6'>
         <div>
           <FormLabel>Semester</FormLabel>
@@ -325,7 +333,7 @@ const Search: FC = () => {
           <Button variant='soft' color='primary' onClick={handleSave} size='md'>
             Save
           </Button>
-          <Button variant='soft' color='neutral' onClick={handleClose} sx={{ ml: 2 }} size='md'>
+          <Button variant='soft' color='neutral' onClick={handleCancel} sx={{ ml: 2 }} size='md'>
             Cancel
           </Button>
         </div>

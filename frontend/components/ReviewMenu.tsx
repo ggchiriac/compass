@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FC, useState, useEffect } from 'react';
 
 import { Rating } from '@mui/material';
 
@@ -7,7 +7,7 @@ interface ReviewMenuProps {
   coursenum: string;
 }
 
-const ReviewMenu: React.FC<ReviewMenuProps> = ({ dept, coursenum }) => {
+const ReviewMenu: FC<ReviewMenuProps> = ({ dept, coursenum }) => {
   const [reviews, setReviews] = useState<string[]>([]);
   const [rating, setRating] = useState<number>(0);
 

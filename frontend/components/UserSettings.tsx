@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { FC, useState, useEffect, useCallback } from 'react';
 
 import {
   Autocomplete,
@@ -125,7 +125,7 @@ const minorOptions = [
   { code: 'VPL', name: 'Values and Public Life' },
 ];
 
-const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
+const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   const { updateProfile } = useUserSlice((state) => state);
   const [firstName, setFirstName] = useState<string>(profile.firstName);
   const [lastName, setLastName] = useState<string>(profile.lastName);
@@ -134,7 +134,7 @@ const UserSettings: React.FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   const [minors, setMinors] = useState<MajorMinorType[]>(profile.minors || []);
   // const [timeFormat24h, setTimeFormat24h] = useState<boolean>(profile.timeFormat24h);
   // const [themeDarkMode, setThemeDarkMode] = useState<boolean>(profile.themeDarkMode);
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
 
   const handleMinorsChange = (_, newMinors: MajorMinorType[]) => {
     const uniqueMinors = Array.from(new Set(newMinors.map((minor) => minor.code))).map((code) =>

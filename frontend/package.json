@@ -1,6 +1,6 @@
 {
   "name": "compass",
-  "version": "1.5",
+  "version": "1.7",
   "private": true,
   "scripts": {
     "dev": "next dev -p 3000 --turbo",
@@ -37,7 +37,7 @@
     "sass": "^1.71.1",
     "typescript": "5.3.3",
     "typescript-lru-cache": "^2.0.0",
-    "vercel": "^33.5.1",
+    "vercel": "34.0.0",
     "webpack-bundle-analyzer": "^4.10.1",
     "zustand": "^4.4.7"
   },

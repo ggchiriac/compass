@@ -1,11 +1,11 @@
-import { HTMLAttributes, FC } from 'react';
+import { HTMLAttributes, FC, ReactNode } from 'react';
 
 import classNames from 'classnames';
 
 import styles from './Button.module.scss';
 
 export type Props = HTMLAttributes<HTMLButtonElement> & {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export const Button: FC<Props> = ({ children, ...props }) => {

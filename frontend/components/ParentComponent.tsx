@@ -7,7 +7,7 @@
 // // Other imports...
 
 // function ParentComponent() {
-//   const [showAccountSettings, setShowAccountSettings] = useState(false);
+//   const [showAccountSettings, setShowAccountSettings] = useState<boolean>(false);
 
 //   const handleUserSettingsClick = () => {
 //     setShowAccountSettings(true);

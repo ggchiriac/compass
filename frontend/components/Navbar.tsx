@@ -1,4 +1,4 @@
-import { memo, FC } from 'react';
+import { memo, MouseEvent, FC } from 'react';
 
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -24,7 +24,7 @@ const Navbar: FC = () => {
   }));
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenuStore();
 
-  const handleDashboardClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleDashboardClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     login();
   };

@@ -372,8 +372,7 @@ class SearchCourses(APIView):
                 query_conditions &= Q(guid__startswith=term)
 
             if distribution:
-                query_conditions &= Q(
-                    distribution_area_short__icontains=distribution)
+                query_conditions &= Q(distribution_area_short__icontains=distribution)
 
             if levels:
                 levels = levels.split(',')
@@ -748,37 +747,42 @@ def requirement_info(request):
 
 class FetchCalendarClasses(APIView):
     def get(self, request, term, course_id):
-        # Combine term and course_id for an initial filter if necessary.
-        # Assuming 'term' and 'course_id' can uniquely identify the sections.
-        # However, the task suggests using them step-by-step.
         sections = self.get_unique_class_meetings(term, course_id)
-
+        print('term', term)
         if not sections:
             return Response(
                 {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
             )
 
         sections_data = [self.serialize_section(section) for section in sections]
+        for section_data in sections_data:
+            print(f"ID: {section_data['id']}")
+            print(f"Class Section: {section_data['class_section']}")
+            print(f"Class Type: {section_data['class_type']}")
+            print(f"Course ID: {section_data['course']['course_id']}")
+            print(f"Course Title: {section_data['course']['title']}")
+            for meeting in section_data['class_meetings']:
+                print(f"  Meeting ID: {meeting['id']}")
+                print(f"  Days: {meeting['days']}")
+                print(f"  Start Time: {meeting['start_time']}")
+                print(f"  End Time: {meeting['end_time']}")
+                print(f"  Building Name: {meeting['building_name']}")
+                print(f"  Room: {meeting['room']}")
         return Response(sections_data, status=status.HTTP_200_OK)
 
     def get_unique_class_meetings(self, term, course_id):
-        # First, filter by term which reduces the dataset significantly
+        print(term)
         sections = Section.objects.filter(term__term_code=term)
 
-        # Then, narrow down by course_id
         sections = sections.filter(course__course_id=course_id)
 
-        # Assuming class_section uniqueness is desired. Adjust as necessary.
-        # Use distinct on 'class_section' to ensure uniqueness. Adjust if using class meeting id instead.
         unique_sections = (
             sections.distinct('class_section')
             .select_related('course')
             .prefetch_related(
                 Prefetch(
                     'classmeeting_set',
-                    queryset=ClassMeeting.objects.order_by(
-                        'id'
-                    ),  # or use 'meeting_number' if that's the unique field
+                    queryset=ClassMeeting.objects.order_by('id'),
                     to_attr='unique_class_meetings',
                 )
             )
@@ -793,24 +797,25 @@ class FetchCalendarClasses(APIView):
         ]
 
         section_data = {
-            'sectionId': section.id,
-            'classSection': section.class_section,
-            'classType': section.class_type,
+            'id': section.id,
+            'class_section': section.class_section,
+            'class_type': section.class_type,
             'course': {
-                'courseId': section.course.course_id,
+                'course_id': section.course.course_id,
                 'title': section.course.title,
             },
-            'classMeetings': class_meetings_data,
+            'class_meetings': class_meetings_data,
         }
         return section_data
 
     def serialize_class_meeting(self, meeting):
         class_meeting_data = {
-            'classMeetingId': meeting.id,
-            'meetingDays': meeting.days,
-            'startTime': meeting.start_time.strftime('%H:%M'),
-            'endTime': meeting.end_time.strftime('%H:%M'),
-            'buildingName': meeting.building_name,
+            'id': meeting.id,
+            'days': meeting.days,
+            'start_time': meeting.start_time.strftime('%H:%M'),
+            'end_time': meeting.end_time.strftime('%H:%M'),
+            'building_name': meeting.building_name,
             'room': meeting.room,
         }
         return class_meeting_data
+
