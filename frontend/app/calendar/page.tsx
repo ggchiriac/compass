@@ -2,7 +2,7 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import styles from '@/components/Container/Container.module.scss';
+// import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
@@ -12,7 +12,7 @@ import UserState from '@/store/userSlice';
 
 import './Calendar.scss';
 import Calendar from './Calendar';
-import CalendarSearch from './CalendarSearch';
+// import CalendarSearch from './CalendarSearch';
 
 const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -45,10 +45,10 @@ const CalendarUI: FC = () => {
           <div className='flex w-full h-full'>
             {/* Left Section for Search and Requirements */}
             {/* <div className='w-64 bg-white border-r border-gray-200 p-4'> */}
-            <div className={styles.Container} style={{ width: '360px' }}>
+
+            {/* <div className={styles.Container} style={{ width: '360px' }}>
               <CalendarSearch />
-              {/* Render search results or requirements here */}
-            </div>
+            </div> */}
 
             {/* Center Section for Calendar */}
             <div className='flex-grow p-4'>
@@ -63,7 +63,7 @@ const CalendarUI: FC = () => {
             <div className={tabbedMenu.tabContainer} style={{ width: '15%' }}>
               <div className={tabbedMenu.tabContent}>
                 <div className='text-sm font-medium text-gray-500'>
-                  <strong> Future features </strong> will be available here. Stay tuned!
+                  <strong> Calendar features </strong> will be available soon. Stay tuned!
                 </div>
               </div>
             </div>
