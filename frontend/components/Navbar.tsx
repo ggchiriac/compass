@@ -37,7 +37,7 @@ const Navbar: FC = () => {
         <div className='flex lg:flex-1'>
           <a href='.' className='-m-1.5 p-1.5'>
             <span className='sr-only'>hoagieplan</span>
-            <Image src='/logo.png' height={45} width={45} alt='hoagieplan Logo' />
+            <Image src='/logo.png' height={50} width={50} alt='hoagieplan Logo' />
           </a>
         </div>
         <div className='flex lg:hidden'>
@@ -80,7 +80,7 @@ const Navbar: FC = () => {
           <div className='flex items-center justify-between'>
             <a href='/' className='-m-1.5 p-1.5'>
               <span className='sr-only'>hoagieplan</span>
-              <Image src='/logo.png' height={45} width={45} alt='hoagieplan Logo' />
+              <Image src='/logo.png' height={50} width={50} alt='hoagieplan Logo' />
             </a>
             <button
               type='button'
