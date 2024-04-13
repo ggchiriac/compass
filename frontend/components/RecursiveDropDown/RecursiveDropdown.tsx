@@ -106,6 +106,24 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   const [markedSatisfied, setMarkedSatisfied] = useState<boolean>(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [expanded, setExpanded] = useState(new Set());
+
+  const handleChange = (event, key) => {
+    if (event.type === 'keydown' && (event.key === 'Enter' || event.keyCode === 13)) {
+      event.preventDefault(); // Prevent the default action
+      return; // Exit without toggling the state
+    }
+
+    setExpanded((prev) => {
+      const newExpanded = new Set(prev);
+      if (newExpanded.has(key)) {
+        newExpanded.delete(key);
+      } else {
+        newExpanded.add(key);
+      }
+      return newExpanded;
+    });
+  };
 
   const handleExplanationClick = (event, reqId) => {
     setIsLoading(true);
@@ -446,6 +464,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
         <Accordion
           key={key}
           style={{ margin: '0', boxShadow: 'none', borderBottom: '1px solid #e0e0e0' }}
+          expanded={!expanded.has(key)}
+          onChange={(event) => handleChange(event, key)} // TODO: disable propagation in modals
         >
           <AccordionSummary
             expandIcon={hasNestedItems && !hasItems ? <ExpandMoreIcon /> : null}
