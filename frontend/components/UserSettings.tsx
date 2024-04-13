@@ -182,8 +182,8 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
         throw new Error('POST request to update profile failed.');
       }
       updateProfile(profile);
+      onSave(profile);
     });
-    onSave(profile);
   }, [updateProfile, firstName, lastName, major, minors, classYear, onSave]);
 
   useEffect(() => {
