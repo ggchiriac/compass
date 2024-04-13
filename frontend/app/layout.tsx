@@ -8,7 +8,7 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
 export const metadata: Metadata = {
-  title: 'hoagieplan',
+  title: 'Plan by Hoagie',
   description: 'Princeton, All In One',
   manifest: 'manifest.json',
 };

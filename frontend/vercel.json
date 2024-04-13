@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://pacific-turkey-01kmjukk3iaexh4uohdgmw2n.herokudns.com/$1"
+      "destination": "https://iw-compass-8a42583e776b.herokuapp.com/$1"
     }
   ]
 }
