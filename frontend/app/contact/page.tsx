@@ -45,7 +45,7 @@ const Contact = () => {
                 <div className='mt-8'>
                   <h2 className='text-2xl font-semibold'>Email Us</h2>
                   <a href='mailto:cos-compass@princeton.edu' className='text-blue-600 mt-2 block'>
-                    cos-compass@princeton.edu
+                    hoagie@princeton.edu
                   </a>
                 </div>
 
@@ -60,7 +60,7 @@ const Contact = () => {
                       rel='noopener noreferrer'
                       className='text-blue-600 ml-1'
                     >
-                      Google Form.
+                      form.
                     </a>
                   </p>
                 </div>

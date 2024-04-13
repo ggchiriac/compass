@@ -13,6 +13,14 @@ const nextConfig = {
     PUCOMPASS: process.env.PUCOMPASS,
     BACKEND: process.env.BACKEND,
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${process.env.BACKEND}/:path*`,
+      },
+    ];
+  },
   ...withPWA({
     dest: 'public',
     register: true,

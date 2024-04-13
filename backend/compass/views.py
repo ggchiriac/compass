@@ -130,53 +130,58 @@ def fetch_user_info(net_id):
     ]
 
     try:
-        if not all(
-            [
-                user_inst.email,
-                user_inst.first_name,
-                user_inst.last_name,
-                user_inst.class_year,
-            ]
+        # Check if any of the required attributes are not set
+        if (
+            not user_inst.email
+            or not user_inst.first_name
+            or not user_inst.last_name
+            or not user_inst.class_year
         ):
+            # Fetch the student profile
             student_profile = req_lib.getJSON(f'{configs.USERS_FULL}?uid={net_id}')
             profile = student_profile[0]
 
+            # Extract and update the class year if not already set
             class_year_match = search(r'Class of (\d{4})', profile['dn'])
+            class_year = int(class_year_match.group(1)) if class_year_match else None
             user_inst.class_year = (
-                int(class_year_match.group(1))
-                if class_year_match
-                else user_inst.class_year
+                class_year if not user_inst.class_year else user_inst.class_year
             )
 
+            # Extract and update the first name and last name if not already set
             full_name = profile['displayname'].split(' ')
+            first_name, last_name = full_name[0], ' '.join(full_name[1:])
             user_inst.first_name = (
-                full_name[0] if not user_inst.first_name else user_inst.first_name
+                first_name if not user_inst.first_name else user_inst.first_name
             )
             user_inst.last_name = (
-                ' '.join(full_name[1:])
-                if not user_inst.last_name
-                else user_inst.last_name
+                last_name if not user_inst.last_name else user_inst.last_name
             )
+
+            # Update the email if not already set
             user_inst.email = profile.get('mail', user_inst.email)
 
+            # Save the updated user instance
             user_inst.save()
+
+        # Prepare the return data structure
+        return_data = {
+            'netId': net_id,
+            'email': user_inst.email,
+            'firstName': user_inst.first_name,
+            'lastName': user_inst.last_name,
+            'classYear': user_inst.class_year,
+            'major': major,
+            'minors': minors,
+        }
+        return return_data
+
     except (KeyError, IndexError) as e:
+        # Log and raise an error if there is a problem with processing profile data
         logger.error(f'Error processing external profile data for {net_id}: {e}')
         raise UserProfileNotFoundError(
             'Failed to update user profile from external source'
         ) from e
-
-    return_data = {
-        'netId': net_id,
-        'email': user_inst.email,
-        'firstName': user_inst.first_name,
-        'lastName': user_inst.last_name,
-        'classYear': user_inst.class_year,
-        'major': major,
-        'minors': minors,
-    }
-
-    return return_data
 
 
 def profile(request):
@@ -216,7 +221,7 @@ def update_profile(request):
     except CustomUser.DoesNotExist:
         return JsonResponse({'error': 'User not found'}, status=404)
 
-    with transaction.atomic():  # Use a transaction to ensure atomicity of the update operations
+    with transaction.atomic():
         # Update user's basic information
         user_inst.username = net_id
         user_inst.first_name = updated_first_name
@@ -349,6 +354,7 @@ class CASAuthBackend:
                 logger.debug(f'user: {user}')
                 logger.debug(f'created: {created}')
                 if created:
+                    user.username = net_id
                     user.set_unusable_password()
                     user.major = Major.objects.get(code=UNDECLARED['code'])
                     user.save()
@@ -361,7 +367,7 @@ class CAS(APIView):
     Handles single-sign-on CAS authentication with token-based authentication.
     """
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         """
         Handles GET requests to the CAS endpoint.
 
