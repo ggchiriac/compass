@@ -169,7 +169,6 @@ export type Course = {
   crosslistings: string;
 };
 
-
 export type Section = {
   // From model
   id: number;

@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://pacific-turkey-01kmjukk3iaexh4uohdgmw2n.herokudns.com/$1"
+    }
+  ]
+}

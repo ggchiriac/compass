@@ -93,14 +93,16 @@ def check_user(net_id, major, minors):
             degree_code = 'BSE'
         if degree_code:
             output[degree_code] = {}
-            formatted_req = check_requirements(user_inst, 'Degree', degree_code,
-                                               user_courses)
+            formatted_req = check_requirements(
+                user_inst, 'Degree', degree_code, user_courses
+            )
             output[degree_code]['requirements'] = formatted_req
 
         output[major_code] = {}
         if major_code != 'Undeclared':
-            formatted_req = check_requirements(user_inst, 'Major', major_code,
-                                               user_courses)
+            formatted_req = check_requirements(
+                user_inst, 'Major', major_code, user_courses
+            )
         else:
             formatted_req = {'code': 'Undeclared', 'satisfied': True}
         output[major_code]['requirements'] = formatted_req
@@ -131,9 +133,7 @@ def check_user(net_id, major, minors):
 @cumulative_time
 def create_courses(user_inst):
     courses = [[] for i in range(8)]
-    course_insts = UserCourses.objects.select_related('user').filter(
-        user=user_inst
-    )
+    course_insts = UserCourses.objects.select_related('user').filter(user=user_inst)
     for course_inst in course_insts:
         course = {
             'id': course_inst.course.id,
@@ -167,8 +167,7 @@ def check_requirements(user_inst, table, code, courses):
     """
 
     req = cached_init_req(user_inst, table, code)
-    manually_satisfied_reqs = list(
-        user_inst.requirements.values_list('id', flat=True))
+    manually_satisfied_reqs = list(user_inst.requirements.values_list('id', flat=True))
     courses = _init_courses(courses)
     mark_possible_reqs(req, courses)
     assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs)
@@ -236,28 +235,26 @@ def _init_req(req_inst):
     req = serialize_req_inst(req_inst)
 
     if (
-            hasattr(req_inst, '_prefetched_objects_cache')
-            and 'req_list' in req_inst._prefetched_objects_cache
+        hasattr(req_inst, '_prefetched_objects_cache')
+        and 'req_list' in req_inst._prefetched_objects_cache
     ):
         sub_reqs = req_inst._prefetched_objects_cache['req_list']
     else:
         sub_reqs = req_inst.req_list.all()
 
     if sub_reqs:
-        req['req_list'] = [
-            _init_req(sub_req_inst) for
-            sub_req_inst in
-            sub_reqs]
+        req['req_list'] = [_init_req(sub_req_inst) for sub_req_inst in sub_reqs]
 
     if req['table'] == 'Requirement':
         if (
-                hasattr(req_inst, '_prefetched_objects_cache')
-                and 'course_list' in req_inst._prefetched_objects_cache
-                and 'excluded_course_list' in req_inst._prefetched_objects_cache
+            hasattr(req_inst, '_prefetched_objects_cache')
+            and 'course_list' in req_inst._prefetched_objects_cache
+            and 'excluded_course_list' in req_inst._prefetched_objects_cache
         ):
             courses = req_inst._prefetched_objects_cache['course_list']
             excluded_courses = req_inst._prefetched_objects_cache[
-                'excluded_course_list']
+                'excluded_course_list'
+            ]
         else:
             courses = req_inst.course_list.all()
             excluded_courses = req_inst.excluded_course_list.all()
@@ -266,8 +263,9 @@ def _init_req(req_inst):
         if len(req['course_list']) == 0:
             req.pop('course_list')
 
-        req['excluded_course_list'] = [course_inst.id for course_inst in
-                                       excluded_courses]
+        req['excluded_course_list'] = [
+            course_inst.id for course_inst in excluded_courses
+        ]
         if len(req['excluded_course_list']) == 0:
             req.pop('excluded_course_list')
 
@@ -300,6 +298,7 @@ def serialize_req_inst(req_inst):
 
     return req
 
+
 @cumulative_time
 def prefetch_req_inst(table, code):
     req_inst = None
@@ -309,8 +308,7 @@ def prefetch_req_inst(table, code):
             Prefetch(
                 'req_list',
                 queryset=Requirement.objects.prefetch_related(
-                    Prefetch('req_list',
-                             queryset=Requirement.objects.all())
+                    Prefetch('req_list', queryset=Requirement.objects.all())
                 ),
             )
         ).get(code=code)
@@ -319,8 +317,7 @@ def prefetch_req_inst(table, code):
             Prefetch(
                 'req_list',
                 queryset=Requirement.objects.prefetch_related(
-                    Prefetch('req_list',
-                             queryset=Requirement.objects.all()),
+                    Prefetch('req_list', queryset=Requirement.objects.all()),
                     'course_list',
                     'excluded_course_list',
                 ),
@@ -331,8 +328,7 @@ def prefetch_req_inst(table, code):
             Prefetch(
                 'req_list',
                 queryset=Requirement.objects.prefetch_related(
-                    Prefetch('req_list',
-                             queryset=Requirement.objects.all()),
+                    Prefetch('req_list', queryset=Requirement.objects.all()),
                     'course_list',
                     'excluded_course_list',
                 ),
@@ -340,6 +336,7 @@ def prefetch_req_inst(table, code):
         ).get(code=code)
 
     return req_inst
+
 
 @cumulative_time
 def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
@@ -358,7 +355,9 @@ def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
     newly_satisfied = 0
     if 'req_list' in req:
         for sub_req in req['req_list']:
-            newly_satisfied_added = assign_settled_courses_to_reqs(sub_req, courses, manually_satisfied_reqs)
+            newly_satisfied_added = assign_settled_courses_to_reqs(
+                sub_req, courses, manually_satisfied_reqs
+            )
             if sub_req['id'] in manually_satisfied_reqs:
                 newly_satisfied_added = sub_req['max_counted']
             newly_satisfied += newly_satisfied_added
@@ -419,7 +418,7 @@ def mark_dist(req, courses):
             if not course_dist:
                 continue
 
-            course_dist = course_dist.split(" or ")
+            course_dist = course_dist.split(' or ')
             dist_req = req['dist_req']
             ok = 0
 
@@ -491,21 +490,19 @@ def mark_settled(req, courses):
     num_marked = 0
     for sem in courses:
         for course in sem:
-            if len(course[
-                       'reqs_satisfied']) > 0:  # already used in some subreq
+            if len(course['reqs_satisfied']) > 0:  # already used in some subreq
                 continue
             if len(course['settled']) > 0:
-                for p in course[
-                    'settled']:  # go through the settled requirement ids
+                for p in course['settled']:  # go through the settled requirement ids
                     if (p == req['id']) and (
-                            p in course['possible_reqs']
+                        p in course['possible_reqs']
                     ):  # course was settled into this requirement
                         num_marked += 1
                         course['reqs_satisfied'].append(p)
                         break
             # or course is manually settled to this req...
             elif (course['num_settleable'] == 1) and (
-                    req['id'] in course['possible_reqs']
+                req['id'] in course['possible_reqs']
             ):
                 num_marked += 1
                 course['reqs_satisfied'].append(req['id'])
@@ -571,10 +568,10 @@ def format_req_output(req, courses, manually_satisfied_reqs):
     if req['table'] == 'Requirement' and req['name']:
         output['name'] = req['name']
     output['req_id'] = req['id']
-    output['manually_satisfied'] = (
-                req['id'] in manually_satisfied_reqs)
+    output['manually_satisfied'] = req['id'] in manually_satisfied_reqs
     output['satisfied'] = str(
-        (req['min_needed'] - req['count'] <= 0) or output['manually_satisfied'])
+        (req['min_needed'] - req['count'] <= 0) or output['manually_satisfied']
+    )
     output['count'] = str(req['count'])
     output['min_needed'] = str(req['min_needed'])
     output['max_counted'] = req['max_counted']
@@ -599,9 +596,7 @@ def format_req_output(req, courses, manually_satisfied_reqs):
             for course in semester:
                 if course['id'] in req['settled']:
                     course_output = {
-                        'code': course['dept_code']
-                                + ' '
-                                + course['cat_num'],
+                        'code': course['dept_code'] + ' ' + course['cat_num'],
                         'id': course['id'],
                         'crosslistings': course['crosslistings'],
                         'manually_settled': course['manually_settled'],
@@ -614,9 +609,7 @@ def format_req_output(req, courses, manually_satisfied_reqs):
             for course in semester:
                 if course['id'] in req['unsettled']:
                     course_output = {
-                        'code': course['dept_code']
-                                + ' '
-                                + course['cat_num'],
+                        'code': course['dept_code'] + ' ' + course['cat_num'],
                         'crosslistings': course['crosslistings'],
                         'id': course['id'],
                         'manually_settled': course['manually_settled'],
@@ -638,16 +631,14 @@ def get_course_comments(dept, num):
         dept_code = Department.objects.filter(code=dept).first().id
         try:
             this_course_id = (
-                Course.objects.filter(department__id=dept_code,
-                                      catalog_number=num)
+                Course.objects.filter(department__id=dept_code, catalog_number=num)
                 .first()
                 .guid
             )
             this_course_id = this_course_id[4:]
             try:
                 comments = list(
-                    CourseComments.objects.filter(
-                        course_guid__endswith=this_course_id)
+                    CourseComments.objects.filter(course_guid__endswith=this_course_id)
                 )
                 li = []
                 for commentobj in comments:
@@ -660,9 +651,8 @@ def get_course_comments(dept, num):
                     element = element.replace('it?s', "it's")
                     element = element.replace('?s', "'s")
                     element = element.replace('?r', "'r")
-                    if element[0] == '[' and element[
-                        len(element) - 1] == ']':
-                        element = element[1: len(element) - 1]
+                    if element[0] == '[' and element[len(element) - 1] == ']':
+                        element = element[1 : len(element) - 1]
 
                     cleaned_li.append(element)
 
@@ -698,17 +688,18 @@ def get_course_comments(dept, num):
 # dept is the department code (string) and num is the catalog number (int)
 # returns dictionary containing relevant info
 def get_course_info(crosslistings):
-
     try:
-        course = (Course.objects.select_related('department')
+        course = (
+            Course.objects.select_related('department')
             .filter(crosslistings__icontains=crosslistings)
-            .order_by('-guid')[0])
+            .order_by('-guid')[0]
+        )
         # if course.course_id:
-            # instructor = "None"
-            # try:
-            #    instructor = Section.objects.filter(course_id=13248).first()
-            # except Section.DoesNotExist:
-            #    instructor = "Information Unavailable"
+        # instructor = "None"
+        # try:
+        #    instructor = Section.objects.filter(course_id=13248).first()
+        # except Section.DoesNotExist:
+        #    instructor = "Information Unavailable"
         # get relevant info and put it in a dictionary
         course_dict = {}
         if course.title:
@@ -716,16 +707,13 @@ def get_course_info(crosslistings):
         if course.description:
             course_dict['Description'] = course.description
         if course.distribution_area_short:
-            course_dict[
-                'Distribution Area'] = course.distribution_area_short
+            course_dict['Distribution Area'] = course.distribution_area_short
         # if instructor:
         #    course_dict["Professor"] = instructor
         if course.reading_list:
             clean_reading_list = course.reading_list
-            clean_reading_list = clean_reading_list.replace('//',
-                                                            ', by ')
-            clean_reading_list = clean_reading_list.replace(';',
-                                                            '; ')
+            clean_reading_list = clean_reading_list.replace('//', ', by ')
+            clean_reading_list = clean_reading_list.replace(';', '; ')
             course_dict['Reading List'] = clean_reading_list
         if course.reading_writing_assignment:
             course_dict[
