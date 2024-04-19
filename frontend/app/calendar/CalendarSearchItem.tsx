@@ -5,9 +5,9 @@ import { ListItem, ListItemText, Typography } from '@mui/material';
 import useCalendarStore from '@/store/calendarSlice';
 
 const CalendarSearchItem = ({ course }) => {
-  const addCourseToCalendar = useCalendarStore((state) => state.addCourseToCalendar);
+  const addCourse = useCalendarStore((state) => state.addCourse);
   const handleClick = () => {
-    addCourseToCalendar(course);
+    addCourse(course);
   };
 
   return (

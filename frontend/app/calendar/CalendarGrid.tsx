@@ -30,6 +30,8 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
     const gridTemplateColumns: string = `minmax(10%, auto) repeat(${days.length}, 1fr)`;
     const gridTemplateRows: string = `auto repeat(${totalRows}, 1fr)`;
 
+    const headerRows = 2; // Rows taken up by the header
+
     return (
       <div className='grid calendar-container' style={{ gridTemplateColumns, gridTemplateRows }}>
         {/* Filled-in top left cell */}
@@ -75,7 +77,7 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
             className='calendar-time bg-white border-l border-r flex items-center justify-end pr-2'
             style={{
               fontSize: '0.75rem',
-              gridRow: `${rowIndex * 6 + 2} / span 6`,
+              gridRow: `${rowIndex * 6 + headerRows} / span 6`,
               gridColumn: '1',
               borderColor: calendarColors.gridBorder,
               borderBottom: `1px solid ${calendarColors.gridBorder}`,
@@ -94,7 +96,7 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
             key={`grid-row-${rowIndex}`}
             className='border-b'
             style={{
-              gridRow: `${rowIndex + 2}`,
+              gridRow: `${rowIndex + headerRows}`,
               gridColumn: '2 / -1',
               borderColor: calendarColors.gridBorder,
               visibility: (rowIndex + 1) % 6 !== 0 ? 'hidden' : 'visible',

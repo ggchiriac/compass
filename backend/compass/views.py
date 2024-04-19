@@ -1019,22 +1019,17 @@ class FetchCalendarClasses(APIView):
 
     def get_unique_class_meetings(self, term, course_id):
         print(term)
-        sections = Section.objects.filter(term__term_code=term)
-
-        sections = sections.filter(course__course_id=course_id)
-
-        unique_sections = (
-            sections.distinct('class_section')
-            .select_related('course')
-            .prefetch_related(
-                Prefetch(
-                    'classmeeting_set',
-                    queryset=ClassMeeting.objects.order_by('id'),
-                    to_attr='unique_class_meetings',
-                )
-            )
+        sections = Section.objects.filter(
+            term__term_code=term, course__course_id=course_id
         )
 
+        unique_sections = sections.select_related('course').prefetch_related(
+            Prefetch(
+                'classmeeting_set',
+                queryset=ClassMeeting.objects.order_by('id'),
+                to_attr='unique_class_meetings',
+            )
+        )
         return unique_sections
 
     def serialize_section(self, section):

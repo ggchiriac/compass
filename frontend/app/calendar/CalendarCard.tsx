@@ -77,6 +77,8 @@ const CalendarCard: FC<CalendarCardProps> = ({
       <div className='event-department'>
         {event.course.department_code} {event.course.catalog_number}
       </div>
+      {/* TODO: Add start time, end time, building name, room number*/}
+      <div className='text-xs event-department'>{event.section.class_section}</div>
       {/* Button */}
     </div>
   );

@@ -46,7 +46,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('daisyui'), require('@tailwindcss/forms')],
+  plugins: [require('daisyui'), require('evergreen-ui'), require('@tailwindcss/forms')],
   // plugins: [require('@tailwindcss/forms')],
 };
 

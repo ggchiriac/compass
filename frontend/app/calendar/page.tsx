@@ -2,26 +2,44 @@
 
 import { useEffect, useState, FC } from 'react';
 
-// import styles from '@/components/Container/Container.module.scss';
+import { Pane, Tablist, Tab, IconButton, ChevronLeftIcon, ChevronRightIcon } from 'evergreen-ui';
+
+import styles from '@/components/Container/Container.module.scss';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import tabbedMenu from '@/components/TabbedMenu/TabbedMenu.module.scss';
 import useAuthStore from '@/store/authSlice';
+import useFilterStore from '@/store/filterSlice';
 import UserState from '@/store/userSlice';
 
 import './Calendar.scss';
 import Calendar from './Calendar';
-// import CalendarSearch from './CalendarSearch';
+import CalendarSearch from './CalendarSearch';
 
 const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState(1);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
+  const { terms, termFilter, setTermFilter } = useFilterStore((state) => state);
 
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
+
+  const semesters = Object.keys(terms);
+  const semestersPerPage = 4;
+  const totalPages = Math.ceil(semesters.length / semestersPerPage);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    setTermFilter(terms[semesters[(page - 1) * semestersPerPage]]);
+  };
+
+  const startIndex = (currentPage - 1) * semestersPerPage;
+  const endIndex = startIndex + semestersPerPage;
+  const displayedSemesters = semesters.slice(startIndex, endIndex);
 
   return (
     <>
@@ -40,30 +58,55 @@ const CalendarUI: FC = () => {
             }}
           />
         </div>
-
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded-lg overflow-hidden'>
           <div className='flex w-full h-full'>
             {/* Left Section for Search and Requirements */}
-            {/* <div className='w-64 bg-white border-r border-gray-200 p-4'> */}
-
-            {/* <div className={styles.Container} style={{ width: '360px' }}>
+            <div className={styles.Container} style={{ width: '20%' }}>
               <CalendarSearch />
-            </div> */}
-
+            </div>
             {/* Center Section for Calendar */}
             <div className='flex-grow p-4'>
+              <Pane display='flex' justifyContent='center' alignItems='center' marginBottom={16}>
+                <IconButton
+                  icon={ChevronLeftIcon}
+                  appearance='minimal'
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  marginRight={8}
+                />
+                <Tablist>
+                  {displayedSemesters.map((semester) => (
+                    <Tab
+                      key={semester}
+                      isSelected={termFilter === terms[semester]}
+                      onSelect={() => setTermFilter(terms[semester])}
+                      marginRight={8}
+                      paddingX={12}
+                      paddingY={8}
+                    >
+                      {semester}
+                    </Tab>
+                  ))}
+                </Tablist>
+                <IconButton
+                  icon={ChevronRightIcon}
+                  appearance='minimal'
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  marginLeft={8}
+                />
+              </Pane>
               {!isLoading && userProfile && userProfile.netId !== '' ? (
                 <Calendar />
               ) : (
                 <SkeletonApp />
               )}
             </div>
-
             {/* Right Section for Event Details */}
-            <div className={tabbedMenu.tabContainer} style={{ width: '15%' }}>
+            <div className={tabbedMenu.tabContainer} style={{ width: '20%' }}>
               <div className={tabbedMenu.tabContent}>
                 <div className='text-sm font-medium text-gray-500'>
-                  <strong> Calendar features </strong> will be available soon. Stay tuned!
+                  <strong>Calendar features</strong> will be available soon. Stay tuned!
                 </div>
               </div>
             </div>

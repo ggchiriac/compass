@@ -8,7 +8,6 @@ import containerStyles from '@/components/Container/Container.module.scss';
 
 import CalendarSearchItem from './CalendarSearchItem';
 import styles from './CalendarSelectedCourses.module.scss';
-import SelectedCourses from './SelectedCourses';
 
 const CalendarSearchResults: FC<SearchResults> = ({ courses = [] }) => {
   return (
@@ -20,10 +19,6 @@ const CalendarSearchResults: FC<SearchResults> = ({ courses = [] }) => {
           data={courses}
           itemContent={(_, course) => <CalendarSearchItem course={course} />}
         />
-      </div>
-
-      <div className='mt-4'>
-        <SelectedCourses />
       </div>
     </div>
   );

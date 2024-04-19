@@ -6,34 +6,21 @@ import './Calendar.scss';
 import { CalendarEvent } from '@/types';
 
 import useCalendarStore from '@/store/calendarSlice';
+import useFilterStore from '@/store/filterSlice';
 
 import CalendarBody from './CalendarBody';
 
-const START_HOUR: number = 8;
+const START_HOUR: number = 9;
 const END_HOUR: number = 21;
 
 const Calendar: FC = () => {
   const calendarElementRef = useRef<HTMLDivElement>(null);
-  const { selectedCourses, setSelectedCourse } = useCalendarStore((state) => ({
-    selectedCourses: state.selectedCourses,
-    setSelectedCourse: state.setSelectedCourse,
+  const { termFilter } = useFilterStore((state) => state);
+  const { selectedCourses } = useCalendarStore((state) => ({
+    selectedCourses: state.getSelectedCourses(termFilter).filter((course) => course.isActive),
   }));
 
-  const COLOR_PALETTE: string[] = [
-    '#ff7895',
-    '#e38a62',
-    '#cdaf7b',
-    '#94bb77',
-    '#e2c25e',
-    '#ead196',
-    '#e7bc7d',
-    '#d0b895',
-    '#72b4c9',
-    '#2cdbca',
-    '#a8cadc',
-    '#c5bab6',
-    '#bf91bd',
-  ];
+  const defaultColor: string = '#657786';
 
   const today: Date = new Date();
   const weekStart: Date = startOfWeek(today, { weekStartsOn: 1 });
@@ -45,11 +32,6 @@ const Calendar: FC = () => {
     current: isSameDay(date, today),
   }));
 
-  const getRandomColor = (colors: string[]): string => {
-    const randomIndex: number = Math.floor(Math.random() * colors.length);
-    return colors[randomIndex];
-  };
-
   const getTextColor = (backgroundColor: string): string => {
     const rgb: number = parseInt(backgroundColor.slice(1), 16);
     const r: number = (rgb >> 16) & 0xff;
@@ -59,20 +41,27 @@ const Calendar: FC = () => {
     return brightness < 128 ? 'text-white' : 'text-gray-800';
   };
 
+  const isOverlapping = (event1: CalendarEvent, event2: CalendarEvent): boolean => {
+    return (
+      event1.startColumnIndex === event2.startColumnIndex &&
+      ((event1.startRowIndex >= event2.startRowIndex &&
+        event1.startRowIndex < event2.endRowIndex) ||
+        (event2.startRowIndex >= event1.startRowIndex && event2.startRowIndex < event1.endRowIndex))
+    );
+  };
+
   const groupedEvents: Record<string, CalendarEvent[]> = {};
   selectedCourses.forEach((event) => {
-    const key = `${event.startColumnIndex}-${event.startRowIndex}-${event.endRowIndex}`;
-    if (!groupedEvents[key]) {
-      groupedEvents[key] = [];
+    const overlappingGroup = Object.values(groupedEvents).find((group) =>
+      group.some((groupedEvent) => isOverlapping(event, groupedEvent))
+    );
+
+    if (overlappingGroup) {
+      overlappingGroup.push(event);
+    } else {
+      const key = `${event.startColumnIndex}-${event.startRowIndex}-${event.endRowIndex}`;
+      groupedEvents[key] = [event];
     }
-    // Assigning random colors here
-    const primaryColor = getRandomColor(COLOR_PALETTE);
-    const textColor = getTextColor(primaryColor);
-    groupedEvents[key].push({
-      ...event,
-      color: primaryColor,
-      textColor: textColor,
-    });
   });
 
   const events: CalendarEvent[] = Object.values(groupedEvents).flatMap((eventGroup) => {
@@ -81,12 +70,17 @@ const Calendar: FC = () => {
       ...event,
       width,
       offsetLeft: index * width,
+      color: defaultColor,
+      textColor: getTextColor(defaultColor),
     }));
   });
-  console.log('Events with width:', events);
 
-  const handleSectionSelection = (event: CalendarEvent): void => {
-    setSelectedCourse(event);
+  useEffect(() => {
+    console.log('selected courses updated:', selectedCourses);
+  }, [selectedCourses]);
+
+  const handleClick = (event: CalendarEvent): void => {
+    useCalendarStore.getState().activateSection(event);
     console.log('boop:', event.section.class_meetings);
   };
 
@@ -110,7 +104,7 @@ const Calendar: FC = () => {
           startHour={START_HOUR}
           endHour={END_HOUR}
           events={events}
-          onEventClick={handleSectionSelection}
+          onEventClick={handleClick}
         />
       </div>
     </div>

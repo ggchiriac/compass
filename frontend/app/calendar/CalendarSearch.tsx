@@ -19,6 +19,7 @@ import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
 
 import CalendarSearchResults from './CalendarSearchResults';
+import SelectedCourses from './SelectedCourses';
 
 interface TermMap {
   [key: string]: string;
@@ -429,6 +430,7 @@ const CalendarSearch: FC = () => {
           </div>
         </div>
         <CalendarSearchResults courses={calendarSearchResults} />
+        <SelectedCourses />
       </div>
       {modalContent}
     </>
