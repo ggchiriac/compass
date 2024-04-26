@@ -1,3 +1,5 @@
+@use '../../components/Container/Container.module.scss' as container;
+
 // Variables
 $primary-color: #666;
 $font-size-base: 0.9rem;
@@ -31,9 +33,31 @@ $box-shadow-hover:
   }
 }
 
+.SearchContainer {
+  @extend .Container;
+  width: 30%;
+  padding: 1rem;
+
+  @include media-query(1024px) {
+    width: 40%;
+  }
+
+  @include media-query(768px) {
+    width: 100%;
+    height: auto;
+    padding: 0.5rem;
+  }
+
+  .ResultsWrapper {
+    flex-grow: 1;
+    overflow-y: auto;
+  }
+}
 // Semester pagination
 .carouselTab {
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 
   &:hover {
     background-color: rgba(0, 0, 0, 0.05);
@@ -170,6 +194,17 @@ $box-shadow-hover:
 
 // Media Queries
 @include media-query(768px) {
+  .SearchContainer {
+    width: 100%;
+    height: 50vh;
+    flex-direction: column;
+
+    .SearchWrapper,
+    .ResultsWrapper {
+      margin-bottom: 0;
+    }
+  }
+
   .calendar-card {
     padding: 8px;
     margin: 3px;

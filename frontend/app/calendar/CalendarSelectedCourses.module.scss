@@ -2,7 +2,7 @@
 
 .Container {
   height: 100%;
-  
+
   @media screen and (min-width: 768px) {
     height: 50%;
   }
@@ -14,7 +14,7 @@
   margin: 0;
   height: 100%;
   overflow-y: auto;
-  
+
   @media screen and (min-width: 768px) {
     height: 400px;
   }
@@ -27,8 +27,9 @@
   width: 100%;
   padding: 15px;
   background-image: linear-gradient(to bottom, var(--color_primary), var(--color_secondary));
-  box-shadow: 0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
-              0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15);
+  box-shadow:
+    0 0 0 calc(1px / var(--scale-x, 1)) rgba(63, 63, 68, 0.05),
+    0 1px calc(3px / var(--scale-x, 1)) 0 rgba(34, 33, 81, 0.15);
   outline: none;
   border-radius: calc(4px / var(--scale-x, 1));
   box-sizing: border-box;
@@ -57,7 +58,7 @@
   flex-direction: column;
   align-items: flex-start;
   padding: 10px 0;
-  
+
   @media screen and (min-width: 768px) {
     flex-direction: row;
     align-items: center;
@@ -66,7 +67,7 @@
   &__textContainer {
     flex-grow: 1;
     margin-bottom: 5px;
-    
+
     @media screen and (min-width: 768px) {
       margin-bottom: 0;
     }

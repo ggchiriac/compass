@@ -1002,12 +1002,26 @@ class FetchCalendarClasses(APIView):
             )
 
         sections_data = [self.serialize_section(section) for section in sections]
+
+        # Group sections by instructor
+        sections_by_instructor = {}
         for section_data in sections_data:
+            instructor_name = section_data['instructor']['name']
+            if instructor_name not in sections_by_instructor:
+                sections_by_instructor[instructor_name] = []
+            sections_by_instructor[instructor_name].append(section_data)
+
+        # Select the set corresponding to one of the instructors
+        selected_instructor = next(iter(sections_by_instructor.keys()))
+        selected_sections_data = sections_by_instructor[selected_instructor]
+
+        for section_data in selected_sections_data:
             print(f"ID: {section_data['id']}")
             print(f"Class Section: {section_data['class_section']}")
             print(f"Class Type: {section_data['class_type']}")
             print(f"Course ID: {section_data['course']['course_id']}")
             print(f"Course Title: {section_data['course']['title']}")
+            print(f"Instructor: {section_data['instructor']['name']}")
             for meeting in section_data['class_meetings']:
                 print(f"  Meeting ID: {meeting['id']}")
                 print(f"  Days: {meeting['days']}")
@@ -1015,7 +1029,8 @@ class FetchCalendarClasses(APIView):
                 print(f"  End Time: {meeting['end_time']}")
                 print(f"  Building Name: {meeting['building_name']}")
                 print(f"  Room: {meeting['room']}")
-        return Response(sections_data, status=status.HTTP_200_OK)
+
+        return Response(selected_sections_data, status=status.HTTP_200_OK)
 
     def get_unique_class_meetings(self, term, course_id):
         print(term)
@@ -1023,7 +1038,9 @@ class FetchCalendarClasses(APIView):
             term__term_code=term, course__course_id=course_id
         )
 
-        unique_sections = sections.select_related('course').prefetch_related(
+        unique_sections = sections.select_related(
+            'course', 'instructor'
+        ).prefetch_related(
             Prefetch(
                 'classmeeting_set',
                 queryset=ClassMeeting.objects.order_by('id'),
@@ -1045,6 +1062,9 @@ class FetchCalendarClasses(APIView):
             'course': {
                 'course_id': section.course.course_id,
                 'title': section.course.title,
+            },
+            'instructor': {
+                'name': str(section.instructor),
             },
             'class_meetings': class_meetings_data,
         }

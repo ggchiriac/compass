@@ -38,6 +38,7 @@
     "sass": "^1.71.1",
     "typescript": "5.3.3",
     "typescript-lru-cache": "^2.0.0",
+    "undici": "^6.11.1",
     "vercel": "^32.3.0",
     "webpack-bundle-analyzer": "^4.10.1",
     "zustand": "^4.4.7"

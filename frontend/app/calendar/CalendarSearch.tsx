@@ -19,7 +19,7 @@ import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
 
 import CalendarSearchResults from './CalendarSearchResults';
-import SelectedCourses from './SelectedCourses';
+import './CalendarSearch.scss';
 
 interface TermMap {
   [key: string]: string;
@@ -386,51 +386,46 @@ const CalendarSearch: FC = () => {
 
   return (
     <>
-      <div className='block w-full text-left pr-3'>
-        <label htmlFor='search' className='sr-only'>
-          Search courses
-        </label>
-        <div className='relative mt-2 rounded-lg shadow-sm'>
-          <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-            <MagnifyingGlassIcon className='h-5 w-5 text-gray-400' aria-hidden='true' />
-          </div>
-          <input
-            type='text'
-            name='search'
-            id='search'
-            className='block w-full py-1.5 pl-10 pr-3 text-gray-900 bg-white border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm'
-            placeholder='Search courses'
-            autoComplete='off'
-            onChange={handleInputChange}
-          />
-          <button
-            type='button'
-            className='absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md hover:bg-dnd-gray group'
-            onClick={handleSettingsChange}
-            aria-label='Adjust search settings'
-          >
-            <AdjustmentsHorizontalIcon
-              className='h-5 w-5 text-gray-400 group-hover:text-gray-500'
-              aria-hidden='true'
+      <div className='calendar-search'>
+        <div className='search-header'>
+          <div className='search-input-container'>
+            <div className='search-icon'>
+              <MagnifyingGlassIcon className='icon' aria-hidden='true' />
+            </div>
+            <input
+              type='text'
+              name='search'
+              id='search'
+              className='search-input'
+              placeholder='Search courses'
+              autoComplete='off'
+              onChange={handleInputChange}
             />
-          </button>
-        </div>
-        <div className='mt-3'>
-          <div className='text-sm font-medium text-gray-500'>Recent searches:</div>
-          <div className='flex overflow-x-auto py-2 space-x-2'>
-            {recentSearches.map((search, index) => (
-              <button
-                key={index}
-                className='bg-blue-100 hover:bg-blue-200 text-blue-800 font-medium py-0.5 px-2 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-300'
-                onClick={() => retrieveCachedSearch(search)}
-              >
-                {search}
-              </button>
-            ))}
+            <button
+              type='button'
+              className='search-settings-button'
+              onClick={handleSettingsChange}
+              aria-label='Adjust search settings'
+            >
+              <AdjustmentsHorizontalIcon className='icon' aria-hidden='true' />
+            </button>
+          </div>
+          <div className='recent-searches'>
+            <div className='recent-searches-label'>Recent searches:</div>
+            <div className='recent-searches-list'>
+              {recentSearches.map((search, index) => (
+                <button
+                  key={index}
+                  className='recent-search-item'
+                  onClick={() => retrieveCachedSearch(search)}
+                >
+                  {search}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         <CalendarSearchResults courses={calendarSearchResults} />
-        <SelectedCourses />
       </div>
       {modalContent}
     </>
