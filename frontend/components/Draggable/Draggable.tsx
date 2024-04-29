@@ -4,7 +4,7 @@ import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
 import classNames from 'classnames';
 
-import { Handle } from '../Item/components/Handle';
+import { Handle } from '@/components/Item/components/Handle';
 
 import { draggable, draggableHorizontal, draggableVertical } from './draggable-svg';
 import styles from './Draggable.module.scss';

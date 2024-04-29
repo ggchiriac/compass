@@ -44,4 +44,14 @@ urlpatterns = [
         views.FetchCalendarClasses.as_view(),
         name='fetch_calendar_classes',
     ),
+    path(
+        'fetch_calendar_configurations/',
+        views.FetchCalendarConfigurations.as_view(),
+        name='fetch_calendar_configurations',
+    ),
+    path(
+        'fetch_calendar_configuration/<int:pk>/',
+        views.FetchCalendarConfiguration.as_view(),
+        name='fetch_calendar_configuration',
+    ),
 ]

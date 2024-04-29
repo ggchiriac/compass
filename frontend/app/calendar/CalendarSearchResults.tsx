@@ -8,13 +8,16 @@ import CalendarSearchItem from './CalendarSearchItem';
 
 const CalendarSearchResults: FC<SearchResults> = ({ courses = [] }) => {
   return (
-    <div>
-      <Virtuoso
-        style={{ height: '400px' }}
-        data={courses}
-        itemContent={(_, course) => <CalendarSearchItem course={course} />}
-      />
-    </div>
+    <Virtuoso
+      style={{ height: '400px' }}
+      data={courses}
+      itemContent={(_, course) => (
+        // Padding between course cards
+        <div className='mb-4'>
+          <CalendarSearchItem course={course} />
+        </div>
+      )}
+    />
   );
 };
 

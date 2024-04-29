@@ -13,7 +13,7 @@ const SelectedCourseItem: FC<SelectedCourseItemProps> = ({ event }) => {
   const removeCourse = useCalendarStore((state) => state.removeCourse);
 
   const handleRemove = () => {
-    removeCourse(String(event.course.guid));
+    removeCourse(event.course.guid);
   };
 
   return (

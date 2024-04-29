@@ -6,15 +6,16 @@
   margin: 1vh 0.5vw;
   border-radius: 8px;
   background-color: #f6f6f6;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 1em;
   width: 24vw;
+  height: calc(45vh - 2vh);
   overflow: hidden;
 }
 
 .header {
   display: flex;
-  padding: 1.25rem;
+  padding: 1rem;
   align-items: center;
   justify-content: space-between;
   background-color: #ffffff;

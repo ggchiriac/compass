@@ -9,27 +9,38 @@ import {
   ListItemContent,
 } from '@mui/joy';
 
-import useFilterStore from '@/store/filterSlice';
+import { AcademicTerm } from '@/types';
 
-const FilterModal: FC = () => {
-  const {
-    terms,
-    termsInverse,
-    distributionAreas,
-    distributionAreasInverse,
-    levels,
-    gradingBases,
-    termFilter,
-    distributionFilter,
-    levelFilter,
-    gradingFilter,
-    setTermFilter,
-    setDistributionFilter,
-    setLevelFilter,
-    setGradingFilter,
-    setShowPopup,
-  } = useFilterStore();
+import { distributionAreas } from '@/utils/distributionAreas';
+import { grading } from '@/utils/grading';
+import { levels } from '@/utils/levels';
+import { terms, termsInverse } from '@/utils/terms';
 
+interface FilterModalProps {
+  currentTerm: AcademicTerm | null;
+  distributionFilter: string;
+  levelFilter: string[];
+  gradingFilter: string[];
+  setCurrentTerm: (term: AcademicTerm) => void;
+  setDistributionFilter: (distribution: string) => void;
+  setLevelFilter: (level: string[]) => void;
+  setGradingFilter: (grading: string[]) => void;
+  handleSave: () => void;
+  handleCancel: () => void;
+}
+
+const FilterModal: FC<FilterModalProps> = ({
+  currentTerm,
+  distributionFilter,
+  levelFilter,
+  gradingFilter,
+  setCurrentTerm,
+  setDistributionFilter,
+  setLevelFilter,
+  setGradingFilter,
+  handleSave,
+  handleCancel,
+}) => {
   const handleLevelFilterChange = (level: string) => {
     const updatedLevelFilter = levelFilter.includes(level)
       ? levelFilter.filter((l) => l !== level)
@@ -44,10 +55,6 @@ const FilterModal: FC = () => {
     setGradingFilter(updatedGradingFilter);
   };
 
-  const handleSave = () => {
-    setShowPopup(false);
-  };
-
   return (
     <div>
       <div className='grid grid-cols-1 gap-6'>
@@ -60,11 +67,12 @@ const FilterModal: FC = () => {
             options={Object.keys(terms)}
             placeholder='Semester'
             variant='soft'
-            value={termsInverse[termFilter]}
+            value={currentTerm ? termsInverse[currentTerm.term_code] : ''}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | null) => {
               event.stopPropagation();
-              setTermFilter(terms[newTermName ?? ''] ?? '');
+              const termCode = terms[newTermName ?? ''] ?? '';
+              setCurrentTerm({ term_code: termCode, suffix: newTermName || '' });
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -83,7 +91,7 @@ const FilterModal: FC = () => {
             options={Object.keys(distributionAreas)}
             placeholder='Distribution area'
             variant='soft'
-            value={distributionAreasInverse[distributionFilter]}
+            value={distributionAreas[distributionFilter] || ''}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newDistributionName: string | null) => {
               event.stopPropagation();
@@ -119,7 +127,7 @@ const FilterModal: FC = () => {
         <div>
           <FormLabel>Allowed grading</FormLabel>
           <div className='grid grid-cols-3'>
-            {gradingBases.map((grading) => (
+            {grading.map((grading) => (
               <div key={grading} className='flex items-center mb-2'>
                 <Checkbox
                   size='sm'
@@ -140,13 +148,7 @@ const FilterModal: FC = () => {
           <Button variant='soft' color='primary' onClick={handleSave} size='md'>
             Save
           </Button>
-          <Button
-            variant='soft'
-            color='neutral'
-            onClick={() => setShowPopup(false)}
-            sx={{ ml: 2 }}
-            size='md'
-          >
+          <Button variant='soft' color='neutral' onClick={handleCancel} sx={{ ml: 2 }} size='md'>
             Cancel
           </Button>
         </div>

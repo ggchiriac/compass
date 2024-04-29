@@ -2,10 +2,9 @@
 
 import { useEffect } from 'react';
 
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
 import useAuthStore from '@/store/authSlice';
-
-import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
 
 const Contact = () => {
   const { checkAuthentication } = useAuthStore();

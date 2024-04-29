@@ -17,6 +17,9 @@ import { Course, Filter } from '@/types';
 import { FilterModal } from '@/components/Modal';
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
+import { distributionAreas } from '@/utils/distributionAreas';
+import { grading } from '@/utils/grading';
+import { levels } from '@/utils/levels';
 
 import CalendarSearchResults from './CalendarSearchResults';
 import './CalendarSearch.scss';
@@ -24,40 +27,6 @@ import './CalendarSearch.scss';
 interface TermMap {
   [key: string]: string;
 }
-
-const terms: TermMap = {
-  'Fall 2024': '1252',
-  'Spring 2024': '1244',
-  'Fall 2023': '1242',
-  'Spring 2023': '1234',
-  'Fall 2022': '1232',
-  'Spring 2022': '1224',
-  'Fall 2021': '1222',
-  'Spring 2021': '1214',
-  'Fall 2020': '1212',
-};
-
-const distributionAreas: TermMap = {
-  'Social Analysis': 'SA',
-  'Science & Engineering - Lab': 'SEL',
-  'Science & Engineering - No Lab': 'SEN',
-  'Quant & Comp Reasoning': 'QCR',
-  'Literature and the Arts': 'LA',
-  'Historical Analysis': 'HA',
-  'Ethical Thought & Moral Values': 'EM',
-  'Epistemology & Cognition': 'EC',
-  'Culture & Difference': 'CD',
-};
-
-const levels: TermMap = {
-  '100': '1',
-  '200': '2',
-  '300': '3',
-  '400': '4',
-  '500': '5',
-};
-
-const gradingBases: string[] = ['A-F', 'P/D/F', 'Audit'];
 
 function buildQuery(searchQuery: string, filter: Filter): string {
   let queryString = `course=${encodeURIComponent(searchQuery)}`;
@@ -113,59 +82,38 @@ const CalendarSearch: FC = () => {
   }));
 
   const {
-    termFilter,
     distributionFilter,
     levelFilter,
     gradingFilter,
     showPopup,
-    setTermFilter,
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
     setFilters,
     setShowPopup,
+    fetchFilters,
+    saveFilters,
   } = useFilterStore();
 
+  const activeConfiguration = useCalendarStore((state) => state.activeConfiguration);
+
   useEffect(() => {
-    const storedFilters = localStorage.getItem('filter-settings');
-    if (storedFilters) {
-      const parsedFilters: Filter = JSON.parse(storedFilters);
-      setFilters({
-        termFilter: parsedFilters.termFilter || '',
-        distributionFilter: parsedFilters.distributionFilter || '',
-        levelFilter: parsedFilters.levelFilter || [],
-        gradingFilter: parsedFilters.gradingFilter || [],
-      });
+    fetchFilters(activeConfiguration);
+  }, [fetchFilters, activeConfiguration]);
+
+  useEffect(() => {
+    const filters = {
+      termFilter: useFilterStore.getState().termFilter,
+      distributionFilter,
+      levelFilter,
+      gradingFilter,
+    };
+    if (query) {
+      search(query, filters);
+    } else {
+      search('', filters);
     }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem(
-      'filter-settings',
-      JSON.stringify({
-        termFilter,
-        distributionFilter,
-        levelFilter,
-        gradingFilter,
-      })
-    );
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter]);
-
-  useEffect(() => {
-    const storedShowPopup = localStorage.getItem('show-popup');
-    if (storedShowPopup === 'true') {
-      setShowPopup(true);
-    }
-  }, [setShowPopup]);
-
-  useEffect(() => {
-    localStorage.setItem('show-popup', showPopup.toString());
-  }, [showPopup]);
-
-  // TODO: is this needed?
-  // useEffect(() => {
-  //   setCalendarSearchResults(calendarSearchResults);
-  // }, [calendarSearchResults, setCalendarSearchResults]);
+  }, [query, distributionFilter, levelFilter, gradingFilter]);
 
   const search = useCallback(
     async (searchQuery: string, filter: Filter): Promise<void> => {
@@ -198,20 +146,6 @@ const CalendarSearch: FC = () => {
     setCalendarSearchResults(searchCache.get(search) || []);
   }
 
-  useEffect(() => {
-    const filters = {
-      termFilter,
-      distributionFilter,
-      levelFilter,
-      gradingFilter,
-    };
-    if (query) {
-      search(query, filters);
-    } else {
-      search('', filters);
-    }
-  }, [query]);
-
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
@@ -224,15 +158,23 @@ const CalendarSearch: FC = () => {
 
   const handleSave = useCallback(() => {
     const filters = {
-      termFilter,
+      termFilter: useFilterStore.getState().termFilter,
       distributionFilter,
       levelFilter,
       gradingFilter,
     };
     setFilters(filters);
     setShowPopup(false);
-    localStorage.setItem('filter-settings', JSON.stringify(filters));
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
+    saveFilters(activeConfiguration);
+  }, [
+    distributionFilter,
+    levelFilter,
+    gradingFilter,
+    setFilters,
+    setShowPopup,
+    saveFilters,
+    activeConfiguration,
+  ]);
 
   const handleCancel = useCallback(() => {
     setShowPopup(false);
@@ -284,7 +226,6 @@ const CalendarSearch: FC = () => {
     isClient && showPopup ? (
       <FilterModal
         setShowPopup={setShowPopup}
-        setTermFilter={setTermFilter}
         setDistributionFilter={setDistributionFilter}
         setLevelFilter={setLevelFilter}
         setGradingFilter={setGradingFilter}
@@ -292,28 +233,6 @@ const CalendarSearch: FC = () => {
         handleCancel={handleCancel}
       >
         <div className='grid grid-cols-1 gap-6'>
-          <div>
-            <FormLabel>Semester</FormLabel>
-            <Autocomplete
-              multiple={false}
-              autoHighlight
-              options={Object.keys(terms)}
-              placeholder='Semester'
-              variant='soft'
-              value={termFilter ? invert(terms)[termFilter] : 'Fall 2024'}
-              isOptionEqualToValue={(option, value) => value === '' || option === value}
-              onChange={(event, newTermName: string | null) => {
-                event.stopPropagation();
-                setTermFilter(terms[newTermName ?? ''] ?? '');
-              }}
-              getOptionLabel={(option) => option.toString()}
-              renderOption={(props, option) => (
-                <AutocompleteOption {...props} key={option}>
-                  <ListItemContent>{option}</ListItemContent>
-                </AutocompleteOption>
-              )}
-            />
-          </div>
           <div>
             <FormLabel>Distribution area</FormLabel>
             <Autocomplete
@@ -356,7 +275,7 @@ const CalendarSearch: FC = () => {
           <div>
             <FormLabel>Allowed grading</FormLabel>
             <div className='grid grid-cols-3'>
-              {gradingBases.map((grading) => (
+              {grading.map((grading) => (
                 <div key={grading} className='flex items-center mb-2'>
                   <Checkbox
                     size='sm'
@@ -425,7 +344,9 @@ const CalendarSearch: FC = () => {
             </div>
           </div>
         </div>
-        <CalendarSearchResults courses={calendarSearchResults} />
+        <div className='search-results'>
+          <CalendarSearchResults courses={calendarSearchResults} />
+        </div>
       </div>
       {modalContent}
     </>

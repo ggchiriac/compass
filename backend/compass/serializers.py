@@ -1,5 +1,12 @@
 from rest_framework import serializers
-from .models import Course, Section, ClassMeeting
+from .models import (
+    Course,
+    Section,
+    ClassMeeting,
+    CalendarConfiguration,
+    CalendarSelection,
+    CalendarFilter,
+)
 
 
 class ClassMeetingSerializer(serializers.ModelSerializer):
@@ -83,6 +90,7 @@ class CalendarClassMeetingSerializer(serializers.ModelSerializer):
         )
 
 
+# May be deprecated due to new serializers below?
 class CalendarSectionSerializer(serializers.ModelSerializer):
     class_meetings = CalendarClassMeetingSerializer(
         source='classmeeting_set', many=True, read_only=True
@@ -97,3 +105,56 @@ class CalendarSectionSerializer(serializers.ModelSerializer):
             'instructor',
             'class_meetings',
         )
+
+
+class CalendarFilterSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CalendarFilter
+        fields = ('filter_type', 'filter_value')
+
+
+class CalendarSelectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CalendarSelection
+        fields = ('section', 'is_active')
+
+
+class CalendarConfigurationSerializer(serializers.ModelSerializer):
+    selections = CalendarSelectionSerializer(many=True, read_only=True)
+    filters = CalendarFilterSerializer(many=True, required=False)
+
+    class Meta:
+        model = CalendarConfiguration
+        fields = (
+            'id',
+            'user',
+            'term',
+            'name',
+            'index',
+            'selections',
+            'filters',
+            'created_at',
+            'updated_at',
+        )
+        read_only_fields = ('id', 'user', 'created_at', 'updated_at')
+
+    def create(self, validated_data):
+        print('Creating Calendar Configuration with validated data:', validated_data)
+        filters_data = validated_data.pop('filters', [])
+        configuration = CalendarConfiguration.objects.create(**validated_data)
+        for filter_data in filters_data:
+            print('Creating filter:', filter_data)
+            CalendarFilter.objects.create(configuration=configuration, **filter_data)
+        return configuration
+
+    def update(self, instance, validated_data):
+        print('Updating Calendar Configuration instance:', instance)
+        print('Validated data:', validated_data)
+        filters_data = validated_data.pop('filters', [])
+        print('Filters data:', filters_data)
+        instance = super().update(instance, validated_data)
+        instance.filters.all().delete()
+        for filter_data in filters_data:
+            print('Creating filter:', filter_data)
+            CalendarFilter.objects.create(configuration=instance, **filter_data)
+        return instance

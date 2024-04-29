@@ -4,9 +4,9 @@ import { SVGProps, useState, useEffect } from 'react';
 
 import Image from 'next/image';
 
-import Footer from '../../components/Footer';
-import Navbar from '../../components/Navbar';
-import useAuthStore from '../../store/authSlice';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import useAuthStore from '@/store/authSlice';
 
 const teamMembers = [
   {

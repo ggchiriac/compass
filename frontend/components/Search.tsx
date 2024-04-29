@@ -15,66 +15,12 @@ import { LRUCache } from 'typescript-lru-cache';
 import { Course, Filter } from '@/types';
 
 import useSearchStore from '@/store/searchSlice';
+import { distributionAreas, distributionAreasInverse } from '@/utils/distributionAreas';
+import { grading } from '@/utils/grading';
+import { levels } from '@/utils/levels';
+import { terms, termsInverse } from '@/utils/terms';
 
 import { FilterModal } from './Modal';
-
-const terms: { [key: string]: string } = {
-  'Fall 2024': '1252',
-  'Spring 2024': '1244',
-  'Fall 2023': '1242',
-  'Spring 2023': '1234',
-  'Fall 2022': '1232',
-  'Spring 2022': '1224',
-  'Fall 2021': '1222',
-  'Spring 2021': '1214',
-  'Fall 2020': '1212',
-};
-
-const termsInverse: { [key: string]: string } = {
-  '1252': 'Fall 2024',
-  '1242': 'Fall 2023',
-  '1232': 'Fall 2022',
-  '1222': 'Fall 2021',
-  '1212': 'Fall 2020',
-  '1244': 'Spring 2024',
-  '1234': 'Spring 2023',
-  '1224': 'Spring 2022',
-  '1214': 'Spring 2021',
-};
-
-const distributionAreas: { [key: string]: string } = {
-  'Social Analysis': 'SA',
-  'Science & Engineering w/Lab': 'SEL',
-  'Science & Engineering-No Lab': 'SEN',
-  'Quant & Comp Reasoning': 'QCR',
-  'Literature and the Arts': 'LA',
-  'Historical Analysis': 'HA',
-  'Ethical Thought & Moral Values': 'EM',
-  'Epistemology & Cognition': 'EC',
-  'Culture & Difference': 'CD',
-};
-
-const distributionAreasInverse: { [key: string]: string } = {
-  SA: 'Social Analysis',
-  SEL: 'Science & Engineering w/Lab',
-  SEN: 'Science & Engineering-No Lab',
-  QCR: 'Quant & Comp Reasoning',
-  LA: 'Literature and the Arts',
-  HA: 'Historical Analysis',
-  EM: 'Ethical Thought & Moral Values',
-  EC: 'Epistemology & Cognition',
-  CD: 'Culture & Difference',
-};
-
-const levels: { [key: string]: string } = {
-  '100': '1',
-  '200': '2',
-  '300': '3',
-  '400': '4',
-  '500': '5',
-};
-
-const gradingBases: string[] = ['A-F', 'P/D/F', 'Audit'];
 
 const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
@@ -313,7 +259,7 @@ const Search: FC = () => {
         <div>
           <FormLabel>Allowed grading</FormLabel>
           <div className='grid grid-cols-3'>
-            {gradingBases.map((grading) => (
+            {grading.map((grading) => (
               <div key={grading} className='flex items-center mb-2'>
                 <Checkbox
                   size='sm'

@@ -329,6 +329,74 @@ class UserCourses(models.Model):
         db_table = 'UserCourses'
 
 
+class CalendarConfiguration(models.Model):
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name='calendar_configurations',
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    term = models.ForeignKey(
+        AcademicTerm,
+        on_delete=models.CASCADE,
+        related_name='calendar_configurations',
+        db_index=True,
+    )
+    name = models.CharField(max_length=16, db_index=True, blank=True)
+    index = models.PositiveIntegerField(default=0, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'term', 'name')
+        ordering = ['index']
+        db_table = 'CalendarConfiguration'
+
+    def __str__(self):
+        return f'{self.user.username}: {self.term.suffix} - {self.name}'
+
+
+class CalendarSelection(models.Model):
+    configuration = models.ForeignKey(
+        CalendarConfiguration,
+        on_delete=models.CASCADE,
+        related_name='selections',
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    section = models.ForeignKey(Section, on_delete=models.CASCADE, db_index=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'CalendarSelection'
+        unique_together = ('configuration', 'section')
+
+
+class CalendarFilter(models.Model):
+    configuration = models.ForeignKey(
+        CalendarConfiguration,
+        on_delete=models.CASCADE,
+        related_name='filters',
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    filter_type = models.CharField(max_length=100, db_index=True, blank=True)
+    filter_value = models.CharField(max_length=100, db_index=True, blank=True)
+
+    class Meta:
+        db_table = 'CalendarFilter'
+        unique_together = ('configuration', 'filter_type')
+
+    def __str__(self):
+        return f'{self.configuration}: {self.filter_type}: {self.filter_value}'
+
+
 class CourseEvaluations(models.Model):
     course_guid = models.CharField(max_length=15, db_index=True, null=True)
     quality_of_course = models.FloatField(null=True)

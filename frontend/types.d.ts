@@ -40,7 +40,7 @@ export type ProfileProps = {
   onSave: (updatedProfile: Profile) => void;
 };
 
-interface SettingsModalProps {
+export type SettingsModalProps = {
   children?: ReactNode;
   setShowPopup?: (show: boolean) => void; // TODO: Should this be optional or required?
   setTermFilter?: (term: string) => void;
@@ -49,7 +49,7 @@ interface SettingsModalProps {
   setGradingFilter?: (grading: string[]) => void;
   handleCancel?: () => void;
   handleSave?: () => void;
-}
+};
 
 export type Filter = {
   termFilter: string;
@@ -121,6 +121,7 @@ export type MenuItemProps = {
   onClick: () => void;
 };
 
+// TODO: Super sus type
 export type Dictionary = {
   [key: string]: string | Dictionary;
 };
@@ -145,6 +146,11 @@ export type CalendarEvent = {
 };
 
 // Note: types from the API, fields in snake_case.
+
+export type AcademicTerm = {
+  term_code: string;
+  suffix: string;
+};
 
 export type Course = {
   // From model

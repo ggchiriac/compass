@@ -16,8 +16,9 @@ const END_HOUR: number = 21;
 const Calendar: FC = () => {
   const calendarElementRef = useRef<HTMLDivElement>(null);
   const { termFilter } = useFilterStore((state) => state);
-  const { selectedCourses } = useCalendarStore((state) => ({
+  const { selectedCourses, fetchCalendarState } = useCalendarStore((state) => ({
     selectedCourses: state.getSelectedCourses(termFilter).filter((course) => course.isActive),
+    fetchCalendarState: state.fetchCalendarState,
   }));
 
   const defaultColor: string = '#657786';
@@ -76,11 +77,15 @@ const Calendar: FC = () => {
   });
 
   useEffect(() => {
+    fetchCalendarState(termFilter);
+  }, [fetchCalendarState, termFilter]);
+
+  useEffect(() => {
     console.log('selected courses updated:', selectedCourses);
   }, [selectedCourses]);
 
   const handleClick = (event: CalendarEvent): void => {
-    useCalendarStore.getState().activateSection(event);
+    useCalendarStore.getState().activateSection(event, termFilter);
     console.log('boop:', event.section.class_meetings);
   };
 

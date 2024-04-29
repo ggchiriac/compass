@@ -4,12 +4,11 @@ import { useEffect, useState, FC } from 'react';
 
 import { rectSortingStrategy } from '@dnd-kit/sortable';
 
-import Footer from '../../components/Footer';
-// import LoadingComponent from '../../components/LoadingComponent';
-import Navbar from '../../components/Navbar';
-import SkeletonApp from '../../components/SkeletonApp';
-import useAuthStore from '../../store/authSlice';
-import UserState from '../../store/userSlice';
+import Footer from '@/components/Footer';
+import Navbar from '@/components/Navbar';
+import SkeletonApp from '@/components/SkeletonApp';
+import useAuthStore from '@/store/authSlice';
+import UserState from '@/store/userSlice';
 
 import { Canvas } from './Canvas';
 
