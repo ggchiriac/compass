@@ -98,10 +98,10 @@ $box-shadow-hover:
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border-radius: 6px;
+  border-radius: 15px;
   @include box-shadow($box-shadow-base);
-  padding: 4px;
-  margin: 2px;
+  padding: 8px;
+  margin: -1px;
   box-sizing: border-box;
   @include transition;
   overflow: hidden;
@@ -233,6 +233,7 @@ $box-shadow-hover:
 }
 
 .calendar-container {
+  position: relative;
   display: grid;
   grid-template-columns:
     [time-col-start] auto [time-col-end grid-start] repeat(var(--days-length), 1fr)

@@ -1,41 +1,63 @@
-import { FC, useMemo } from 'react';
+// CalendarTime.tsx
+import { FC, useEffect, useState } from 'react';
 
 interface CalendarTimeProps {
   startHour: number;
   endHour: number;
 }
 
-const formatHour = (hour: number): string => {
-  const formattedHour: number = hour % 12 || 12; // Handles the 12-hour format conversion
-  const period: string = hour < 12 ? 'AM' : 'PM';
-  return `${formattedHour}:00 ${period}`;
-};
-
 const CalendarTime: FC<CalendarTimeProps> = ({ startHour, endHour }) => {
-  const hoursArray = useMemo(
-    () =>
-      Array.from({ length: endHour - startHour + 1 }, (_, index) => formatHour(startHour + index)),
-    [startHour, endHour]
-  );
+  const [position, setPosition] = useState(0);
+
+  useEffect(() => {
+    const updatePosition = () => {
+      const now = new Date();
+
+      now.setHours(now.getHours() + 1);
+
+      const totalMinutes = now.getHours() * 60 + now.getMinutes();
+      const totalDayMinutes = (endHour - startHour) * 60;
+
+      const percentage = (totalMinutes - startHour * 60) / totalDayMinutes;
+
+      const adjustedPercentage = Math.max(0, Math.min(percentage, 1));
+      setPosition(adjustedPercentage * 100);
+    };
+
+    updatePosition();
+    const interval = setInterval(updatePosition, 60000); // Update every minute
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [startHour, endHour]);
 
   return (
-    <>
-      {hoursArray.map((hour, index) => (
-        <div
-          key={`time-${index}`}
-          className='calendar-time bg-white border-r border-gray-200 flex items-center justify-end pr-2 text-gray-400'
-          style={{
-            fontSize: '0.6rem',
-            gridRow: `${index * 6 + 1} / span 6`,
-            gridColumn: '1',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          {hour}
-        </div>
-      ))}
-    </>
+    <div
+      className='time-indicator'
+      style={{
+        position: 'absolute',
+        top: `${position}%`,
+        left: 'calc(10% + 1px)',
+        right: 0,
+        height: '2px',
+        backgroundColor: 'red',
+        zIndex: 1,
+      }}
+    >
+      <div
+        className='time-indicator-ball'
+        style={{
+          position: 'absolute',
+          left: '-6px',
+          top: '-4px',
+          width: '10px',
+          height: '10px',
+          borderRadius: '50%',
+          backgroundColor: 'red',
+        }}
+      />
+    </div>
   );
 };
 
