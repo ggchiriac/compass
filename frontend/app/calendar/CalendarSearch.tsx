@@ -24,8 +24,8 @@ import { levels } from '@/utils/levels';
 import CalendarSearchResults from './CalendarSearchResults';
 import './CalendarSearch.scss';
 
-interface TermMap {
-  [key: string]: string;
+function invert(obj: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [value, key]));
 }
 
 function buildQuery(searchQuery: string, filter: Filter): string {
@@ -51,10 +51,6 @@ const searchCache = new LRUCache<string, Course[]>({
   maxSize: 50,
   entryExpirationTimeInMS: 1000 * 60 * 60 * 24,
 });
-
-function invert(obj: TermMap): TermMap {
-  return Object.fromEntries(Object.entries(obj).map(([key, value]) => [value, key]));
-}
 
 const CalendarSearch: FC = () => {
   const [isClient, setIsClient] = useState<boolean>(false);
@@ -82,28 +78,23 @@ const CalendarSearch: FC = () => {
   }));
 
   const {
+    termFilter,
     distributionFilter,
     levelFilter,
     gradingFilter,
     showPopup,
+    setTermFilter,
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
     setFilters,
     setShowPopup,
-    fetchFilters,
-    saveFilters,
+    resetFilters,
   } = useFilterStore();
 
-  const activeConfiguration = useCalendarStore((state) => state.activeConfiguration);
-
   useEffect(() => {
-    fetchFilters(activeConfiguration);
-  }, [fetchFilters, activeConfiguration]);
-
-  useEffect(() => {
-    const filters = {
-      termFilter: useFilterStore.getState().termFilter,
+    const filters: Filter = {
+      termFilter,
       distributionFilter,
       levelFilter,
       gradingFilter,
@@ -113,7 +104,7 @@ const CalendarSearch: FC = () => {
     } else {
       search('', filters);
     }
-  }, [query, distributionFilter, levelFilter, gradingFilter]);
+  }, [query, termFilter, distributionFilter, levelFilter, gradingFilter]);
 
   const search = useCallback(
     async (searchQuery: string, filter: Filter): Promise<void> => {
@@ -157,24 +148,15 @@ const CalendarSearch: FC = () => {
   };
 
   const handleSave = useCallback(() => {
-    const filters = {
-      termFilter: useFilterStore.getState().termFilter,
+    const filters: Filter = {
+      termFilter,
       distributionFilter,
       levelFilter,
       gradingFilter,
     };
     setFilters(filters);
     setShowPopup(false);
-    saveFilters(activeConfiguration);
-  }, [
-    distributionFilter,
-    levelFilter,
-    gradingFilter,
-    setFilters,
-    setShowPopup,
-    saveFilters,
-    activeConfiguration,
-  ]);
+  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
 
   const handleCancel = useCallback(() => {
     setShowPopup(false);
@@ -221,7 +203,6 @@ const CalendarSearch: FC = () => {
       setGradingFilter([...gradingFilter, grading]);
     }
   };
-
   const modalContent =
     isClient && showPopup ? (
       <FilterModal

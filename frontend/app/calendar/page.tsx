@@ -3,7 +3,9 @@
 import { useEffect, useState, FC, useMemo } from 'react';
 
 import { Pane, Tablist, Tab, IconButton, ChevronLeftIcon, ChevronRightIcon } from 'evergreen-ui';
-import { debounce } from 'lodash';
+import { debounce } from 'lodash'; // TODO: Debounce useEffects?
+
+import { AcademicTerm } from '@/types';
 
 import BackgroundGradient from '@/components/BackgroundGradient';
 import Footer from '@/components/Footer';
@@ -11,6 +13,7 @@ import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import tabStyles from '@/components/TabbedMenu/TabbedMenu.module.scss';
 import useAuthStore from '@/store/authSlice';
+import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
 import UserState from '@/store/userSlice';
 
@@ -25,12 +28,9 @@ const CalendarUI: FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
+  const { terms, termsInverse, termFilter, setTermFilter } = useFilterStore((state) => state);
+
   const {
-    terms,
-    termFilter,
-    setTermFilter,
-    fetchFilters,
-    saveFilters,
     configurations,
     activeConfiguration,
     setActiveConfiguration,
@@ -38,50 +38,66 @@ const CalendarUI: FC = () => {
     createConfiguration,
     deleteConfiguration,
     renameConfiguration,
-  } = useFilterStore((state) => state);
-  const semesterList = Object.keys(terms);
-  const semestersPerPage = 5;
-  const totalPages = Math.ceil(semesterList.length / semestersPerPage);
+  } = useCalendarStore((state) => state);
 
-  const debouncedSaveFilters = useMemo(() => debounce(saveFilters, 500), [saveFilters]);
+  const semesterList = useMemo(() => Object.keys(terms), [terms]);
+  const semestersPerPage = 5;
+  const totalPages = useMemo(
+    () => Math.ceil(semesterList.length / semestersPerPage),
+    [semesterList]
+  );
 
   useEffect(() => {
-    const init = async () => {
+    const authenticate = async () => {
       await checkAuthentication();
-      await fetchConfigurations(termFilter);
-      setIsLoading(false);
+    };
+    authenticate();
+  }, [checkAuthentication]);
 
+  useEffect(() => {
+    const loadConfigurations = async () => {
+      await fetchConfigurations(); // Fetching configurations
+      setIsLoading(false); // Setting loading to false after fetching
       if (!termFilter) {
-        const latestTerm = terms[semesterList[semesterList.length - 1]];
+        // If no term is currently selected
+        const latestTerm = terms[semesterList[semesterList.length - 1]]; // Default to the latest term
         setTermFilter(latestTerm);
-        setCurrentPage(totalPages);
+        setCurrentPage(totalPages); // Set the current page to the last one
       } else {
+        // Find and set the current page based on the selected term
         const selectedTermIndex = semesterList.findIndex((term) => terms[term] === termFilter);
         const selectedPage = Math.ceil(
           (semesterList.length - selectedTermIndex) / semestersPerPage
         );
         setCurrentPage(selectedPage);
       }
-
-      if (activeConfiguration) {
-        await fetchFilters(activeConfiguration);
+      if (Object.keys(configurations).length > 0) {
+        const firstKey = parseInt(Object.keys(configurations)[0]); // Default to the first configuration
+        setActiveConfiguration(firstKey);
       }
     };
-
-    init();
-  }, [checkAuthentication, terms, setTermFilter, fetchConfigurations, activeConfiguration]);
+    loadConfigurations();
+  }, [
+    // Dependencies for the useEffect
+    termFilter,
+    terms,
+    setTermFilter,
+    fetchConfigurations,
+    setActiveConfiguration,
+    // configurations,
+    totalPages,
+    semesterList,
+  ]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     const selectedSemester =
       semesterList[semesterList.length - ((page - 1) * semestersPerPage + 1)];
-    setTermFilter(terms[selectedSemester]);
-    debouncedSaveFilters(activeConfiguration);
+    setTermFilter(selectedSemester);
   };
 
   const handleTermFilterChange = (semester: string) => {
-    setTermFilter(terms[semester]);
-    debouncedSaveFilters(activeConfiguration);
+    setTermFilter(semester);
   };
 
   const startIndex = (currentPage - 1) * semestersPerPage;
@@ -146,14 +162,17 @@ const CalendarUI: FC = () => {
               <ConfigurationSelector
                 configurations={configurations}
                 activeConfiguration={activeConfiguration}
-                onConfigurationChange={setActiveConfiguration}
-                onConfigurationCreate={async (name) => {
-                  console.log('Configuration Name:', name);
-                  await createConfiguration(name);
-                }}
-                onConfigurationDelete={deleteConfiguration}
-                onConfigurationRename={renameConfiguration}
-                getTermSuffix={(configId) => terms[configId]}
+                onConfigurationChange={(configurationId) => setActiveConfiguration(configurationId)}
+                onConfigurationCreate={(term: AcademicTerm, name: string) =>
+                  createConfiguration(term, name)
+                }
+                onConfigurationDelete={(configurationId: number) =>
+                  deleteConfiguration(configurationId)
+                }
+                onConfigurationRename={(configurationId: number, index: number, newName: string) =>
+                  renameConfiguration(configurationId, index, newName)
+                }
+                getTermSuffix={(termCode: string) => termsInverse[termCode]}
               />
             </Pane>
           </div>

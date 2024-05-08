@@ -3,10 +3,11 @@ import { FC, useEffect, useRef } from 'react';
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 
 import './Calendar.scss';
-import { CalendarEvent } from '@/types';
+import { AcademicTerm, CalendarEvent } from '@/types';
 
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
+import { terms } from '@/utils/terms';
 
 import CalendarBody from './CalendarBody';
 
@@ -15,17 +16,35 @@ const END_HOUR: number = 21;
 
 const Calendar: FC = () => {
   const calendarElementRef = useRef<HTMLDivElement>(null);
-  const { termFilter } = useFilterStore((state) => state);
-  const { selectedCourses, fetchCalendarState } = useCalendarStore((state) => ({
-    selectedCourses: state.getSelectedCourses(termFilter).filter((course) => course.isActive),
-    fetchCalendarState: state.fetchCalendarState,
-  }));
+  const defaultTerm = Object.keys(terms).reduce((latest, term) => {
+    return terms[term] > terms[latest] ? term : latest;
+  });
+
+  const { distributionFilter, levelFilter, gradingFilter } = useFilterStore();
+  const { activeConfiguration, getSelectedCourses, fetchCalendarState, activateSection } =
+    useCalendarStore();
+
+  const selectedCourses = getSelectedCourses(
+    activeConfiguration.term,
+    activeConfiguration.schedule
+  ).filter((course) => {
+    const { course: eventCourse, isActive } = course;
+    return (
+      isActive &&
+      (!distributionFilter || eventCourse.distribution_area_short === distributionFilter) &&
+      (levelFilter.length === 0 ||
+        levelFilter.includes(String(Math.floor(eventCourse.catalog_number / 100) * 100))) &&
+      (gradingFilter.length === 0 || gradingFilter.includes(eventCourse.grading_basis))
+    );
+  });
 
   const defaultColor: string = '#657786';
 
   const today: Date = new Date();
   const weekStart: Date = startOfWeek(today, { weekStartsOn: 1 });
-  const weekdays: Date[] = Array.from({ length: 5 }, (_, index) => addDays(weekStart, index));
+  const weekdays: Date[] = Array.from({ length: 5 }, (_, calendarIndex) =>
+    addDays(weekStart, calendarIndex)
+  );
 
   const formattedDays = weekdays.map((date) => ({
     name: format(date, 'EEEE'),
@@ -67,25 +86,48 @@ const Calendar: FC = () => {
 
   const events: CalendarEvent[] = Object.values(groupedEvents).flatMap((eventGroup) => {
     const width = 1 / eventGroup.length;
-    return eventGroup.map((event, index) => ({
+    return eventGroup.map((event, calendarIndex) => ({
       ...event,
       width,
-      offsetLeft: index * width,
+      offsetLeft: calendarIndex * width,
       color: defaultColor,
       textColor: getTextColor(defaultColor),
     }));
   });
 
   useEffect(() => {
-    fetchCalendarState(termFilter);
-  }, [fetchCalendarState, termFilter]);
+    const savedTerm = localStorage.getItem('activeTerm');
+    if (savedTerm) {
+      const term: AcademicTerm = JSON.parse(savedTerm);
+      fetchCalendarState(term);
+    } else {
+      const term: AcademicTerm = {
+        term_code: terms[defaultTerm],
+        suffix: defaultTerm,
+      };
+      fetchCalendarState(term);
+      localStorage.setItem('activeTerm', JSON.stringify(term));
+    }
+  }, [defaultTerm, fetchCalendarState]);
+
+  useEffect(() => {
+    const term: AcademicTerm = {
+      term_code: terms[defaultTerm],
+      suffix: defaultTerm,
+    };
+    fetchCalendarState(term);
+  }, [fetchCalendarState]);
+
+  useEffect(() => {
+    fetchCalendarState(activeConfiguration.term);
+  }, [fetchCalendarState, activeConfiguration]);
 
   useEffect(() => {
     console.log('selected courses updated:', selectedCourses);
   }, [selectedCourses]);
 
   const handleClick = (event: CalendarEvent): void => {
-    useCalendarStore.getState().activateSection(event, termFilter);
+    activateSection(activeConfiguration.term, activeConfiguration.schedule, event);
     console.log('boop:', event.section.class_meetings);
   };
 

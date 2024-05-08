@@ -44,14 +44,25 @@ urlpatterns = [
         views.FetchCalendarClasses.as_view(),
         name='fetch_calendar_classes',
     ),
+    # TODO: Eventually migrate all URLs to dashes instead of underscores
     path(
-        'fetch_calendar_configurations/',
-        views.FetchCalendarConfigurations.as_view(),
-        name='fetch_calendar_configurations',
+        'calendar-configurations/',
+        views.CalendarConfigurationsView.as_view(),
+        name='calendar-configurations',
     ),
     path(
-        'fetch_calendar_configuration/<int:pk>/',
-        views.FetchCalendarConfiguration.as_view(),
-        name='fetch_calendar_configuration',
+        'calendar-configuration/<int:configuration_id>/',
+        views.CalendarConfigurationView.as_view(),
+        name='calendar-configuration',
+    ),
+    path(
+        'semester-configuration/<int:configuration_id>/<str:term_code>/',
+        views.SemesterConfigurationView.as_view(),
+        name='semester-configuration',
+    ),
+    path(
+        'schedule-selection/<int:configuration_id>/<str:term_code>/<int:index>/',
+        views.ScheduleSelectionView.as_view(),
+        name='schedule-selection',
     ),
 ]

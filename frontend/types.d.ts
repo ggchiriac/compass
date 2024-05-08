@@ -202,3 +202,28 @@ export type ClassMeeting = {
   days: string;
   building_name: string;
 };
+
+export type ScheduleConfiguration = {
+  // One possible configuration of a student's schedule
+  id: number;
+
+  // Uniquely identifies up to five configurations
+  index: number;
+
+  // User-defined name for the schedule configuration
+  name: string;
+
+  // Array of events for a given schedule
+  courses: CalendarEvent[];
+};
+
+export type SemesterConfiguration = {
+  // Database pk
+  id: number;
+
+  // Academic term of the semester
+  term: AcademicTerm;
+
+  // Array of schedule configurations for the semester
+  schedule_configurations: ScheduleConfiguration[];
+};
