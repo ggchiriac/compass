@@ -3,6 +3,7 @@ import { FC, CSSProperties } from 'react';
 import { CalendarEvent } from '@/types';
 
 import './Calendar.scss';
+import { departmentColors } from '@/utils/departmentColors';
 
 interface CalendarCardProps {
   event: CalendarEvent;
@@ -12,6 +13,7 @@ interface CalendarCardProps {
   offsetLeft?: number;
   startIndex: number;
   endIndex: number;
+  dept: string;
 }
 
 const CalendarCard: FC<CalendarCardProps> = ({
@@ -21,6 +23,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
   offsetLeft = 0,
   startIndex,
   endIndex,
+  dept,
 }) => {
   const dayToStartColumnIndex: Record<string, number> = {
     M: 1,
@@ -28,6 +31,10 @@ const CalendarCard: FC<CalendarCardProps> = ({
     W: 3,
     Th: 4,
     F: 5,
+  };
+
+  const getGradientStyle = (dept: string) => {
+    return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
   };
 
   const getStartColumnIndexForDays = (meetingDays: string): number[] => {
@@ -51,7 +58,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
     <div
       className={`calendar-card ${event.textColor}`}
       style={{
-        backgroundColor: event.color,
+        background: getGradientStyle(dept),
         gridRow: `${startIndex} / ${endIndex}`,
         gridColumn: `${event.startColumnIndex + 1} / span 1`,
         width: `calc(100% * ${width})`,

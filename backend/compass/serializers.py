@@ -4,8 +4,8 @@ from .models import (
     Section,
     ClassMeeting,
     CalendarConfiguration,
-    CalendarSelection,
-    CalendarFilter,
+    ScheduleSelection,
+    SemesterConfiguration,
 )
 
 
@@ -107,54 +107,52 @@ class CalendarSectionSerializer(serializers.ModelSerializer):
         )
 
 
-class CalendarFilterSerializer(serializers.ModelSerializer):
+class ScheduleSelectionSerializer(serializers.ModelSerializer):
+    section_details = serializers.SerializerMethodField()
+
+    def get_section_details(self, obj):
+        return {
+            'id': obj.section.id,
+            'course': {
+                'guid': obj.section.course.guid,
+                'title': obj.section.course.title,
+                'catalog_number': obj.section.course.catalog_number,
+                'distribution_area_name': obj.section.course.distribution_area_name,
+                'distribution_area_short': obj.section.course.distribution_area_short,
+                'grading_basis': obj.section.course.grading_basis,
+            },
+            'section_number': obj.section.section_number,
+            'class_meetings': [
+                {
+                    'id': meeting.id,
+                    'days': meeting.days,
+                    'start_time': meeting.start_time,
+                    'end_time': meeting.end_time,
+                    'start_date': meeting.start_date,
+                    'end_date': meeting.end_date,
+                }
+                for meeting in obj.section.class_meetings.all()
+            ],
+        }
+
     class Meta:
-        model = CalendarFilter
-        fields = ('filter_type', 'filter_value')
+        model = ScheduleSelection
+        fields = ['id', 'section_details', 'index', 'name', 'is_active']
 
 
-class CalendarSelectionSerializer(serializers.ModelSerializer):
+class SemesterConfigurationSerializer(serializers.ModelSerializer):
+    schedule_selections = ScheduleSelectionSerializer(many=True, read_only=True)
+
     class Meta:
-        model = CalendarSelection
-        fields = ('section', 'is_active')
+        model = SemesterConfiguration
+        fields = ['id', 'term', 'schedule_selections']
 
 
 class CalendarConfigurationSerializer(serializers.ModelSerializer):
-    selections = CalendarSelectionSerializer(many=True, read_only=True)
-    filters = CalendarFilterSerializer(many=True, required=False)
+    semester_configurations = SemesterConfigurationSerializer(many=True, read_only=True)
 
     class Meta:
         model = CalendarConfiguration
-        fields = (
-            'id',
-            'user',
-            'term',
-            'name',
-            'index',
-            'selections',
-            'filters',
-            'created_at',
-            'updated_at',
-        )
-        read_only_fields = ('id', 'user', 'created_at', 'updated_at')
-
-    def create(self, validated_data):
-        print('Creating Calendar Configuration with validated data:', validated_data)
-        filters_data = validated_data.pop('filters', [])
-        configuration = CalendarConfiguration.objects.create(**validated_data)
-        for filter_data in filters_data:
-            print('Creating filter:', filter_data)
-            CalendarFilter.objects.create(configuration=configuration, **filter_data)
-        return configuration
-
-    def update(self, instance, validated_data):
-        print('Updating Calendar Configuration instance:', instance)
-        print('Validated data:', validated_data)
-        filters_data = validated_data.pop('filters', [])
-        print('Filters data:', filters_data)
-        instance = super().update(instance, validated_data)
-        instance.filters.all().delete()
-        for filter_data in filters_data:
-            print('Creating filter:', filter_data)
-            CalendarFilter.objects.create(configuration=instance, **filter_data)
-        return instance
+        fields = ['id', 'user', 'name', 'semester_configurations']
+        read_only_fields = ['id', 'user']
+        

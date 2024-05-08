@@ -1,43 +1,45 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 import { CalendarEvent, ClassMeeting, Course, Section } from '@/types';
 
-import { fetchCsrfToken } from '@/utils/csrf';
-
 interface CalendarStore {
   calendarSearchResults: Course[];
-  configurations: Record<string, CalendarEvent[]>;
-  activeConfiguration: string;
+  // selectedCourses: CalendarEvent[];
+  selectedCourses: Record<string, CalendarEvent[]>;
+
   recentSearches: string[];
+
   error: string | null;
   loading: boolean;
 
-  setCalendarSearchResults: (results: Course[]) => void;
-  addRecentSearch: (search: string) => void;
-  addCourse: (course: Course, configurationId: string) => Promise<void>;
-  removeCourse: (sectionId: string, configurationId: string) => void;
-  activateSection: (event: CalendarEvent, configurationId: string) => void;
+  setCalendarSearchResults: (results: Course[]) => void; // Sets search results
+
+  addRecentSearch: (search: string) => void; // Caches search to recent searches
+
+  addCourse: (course: Course) => Promise<void>; // Fetches course details and adds all candidate sections to selectedCourses
+  removeCourse: (sectionKey: string) => void; // Removes all instances of a course from selectedCourses and selectedSections
+
+  activateSection: (event: CalendarEvent) => void; // Activates a selected section
+
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
-  getSelectedCourses: (configurationId: string) => CalendarEvent[];
-  fetchCalendarState: (termCode: string) => Promise<void>;
-  saveCalendarState: (configurationId: string) => Promise<void>;
-  // setActiveConfiguration: (configurationId: string) => void;
-  // createConfiguration: (termCode: string, name: string) => Promise<void>;
-  // deleteConfiguration: (configurationId: string) => Promise<void>;
-  // renameConfiguration: (configurationId: string, newName: string) => Promise<void>;
+
+  // Getters
+  // getSelectedCourses: () => CalendarEvent[];
+  getSelectedCourses: (semester: string) => CalendarEvent[];
 }
 
 const startHour = 8;
 const dayToStartColumnIndex: Record<string, number> = {
-  M: 1,
-  T: 2,
-  W: 3,
-  Th: 4,
-  F: 5,
+  M: 1, // Monday
+  T: 2, // Tuesday
+  W: 3, // Wednesday
+  Th: 4, // Thursday
+  F: 5, // Friday
 };
 
-const headerRows = 2;
+const headerRows = 2; // Rows taken up by the header
 const calculateGridRow = (timeString: string) => {
   const [time, period] = timeString.split(' ');
   const [hour, minute] = time.split(':').map(Number);
@@ -49,7 +51,7 @@ const calculateGridRow = (timeString: string) => {
     adjustedHour = 0;
   }
 
-  const rowsPerHour = 6;
+  const rowsPerHour = 6; // 10-minute increments (60 minutes / 10 minutes)
   const minuteOffset = Math.floor(minute / 10);
 
   return (adjustedHour - startHour) * rowsPerHour + minuteOffset + headerRows;
@@ -60,236 +62,175 @@ const getStartColumnIndexForDays = (daysString: string): number[] => {
   return daysArray.map((day) => dayToStartColumnIndex[day.trim()] || 0);
 };
 
-const createCalendarEvents = (course: Course, sections: Section[]): CalendarEvent[] => {
-  return sections.flatMap((section: Section) =>
-    section.class_meetings.flatMap((classMeeting: ClassMeeting) => {
-      const startColumnIndices = getStartColumnIndexForDays(classMeeting.days);
-      return startColumnIndices.map((startColumnIndex) => ({
-        key: `guid: ${course.guid}, section id: ${section.id}, class meeting id: ${classMeeting.id}, column: ${startColumnIndex}`,
-        course: course,
-        section: section,
-        startTime: classMeeting.start_time,
-        endTime: classMeeting.end_time,
-        startColumnIndex,
-        startRowIndex: calculateGridRow(classMeeting.start_time),
-        endRowIndex: calculateGridRow(classMeeting.end_time),
-        isActive: true,
-      }));
-    })
-  );
-};
-const useCalendarStore = create<CalendarStore>((set, get) => ({
-  calendarSearchResults: [],
-  configurations: {},
-  activeConfiguration: '',
-  recentSearches: [],
-  error: null,
-  loading: false,
+const useCalendarStore = create<CalendarStore>()(
+  persist(
+    (set, get) => ({
+      calendarSearchResults: [],
+      // selectedCourses: [],
+      selectedCourses: {},
+      recentSearches: [],
+      error: null,
+      loading: false,
 
-  setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
+      setCalendarSearchResults: (results) => set({ calendarSearchResults: results }),
+      addRecentSearch: (search) =>
+        set((state) => ({ recentSearches: [...state.recentSearches, search] })),
+      setError: (error) => set({ error }),
+      setLoading: (loading) => set({ loading }),
 
-  addRecentSearch: (search) =>
-    set((state) => ({ recentSearches: [...state.recentSearches, search] })),
+      addCourse: async (course: Course) => {
+        // const selectedCourses = get().getSelectedCourses();
+        const term = course.guid.substring(0, 4);
+        const selectedCourses = get().getSelectedCourses(term);
 
-  setError: (error) => set({ error }),
-
-  setLoading: (loading) => set({ loading }),
-
-  addCourse: async (course: Course, configurationId: string) => {
-    const selectedCourses = get().getSelectedCourses(configurationId);
-
-    if (selectedCourses.some((event) => event.course.guid === course.guid)) {
-      return;
-    }
-
-    set({ loading: true, error: null });
-
-    try {
-      const term = course.guid.substring(0, 4);
-      const courseId = course.guid.substring(4);
-      const response = await fetch(
-        `${process.env.BACKEND}/fetch_calendar_classes/${term}/${courseId}`
-      );
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch course details');
-      }
-
-      const sections = await response.json();
-      const calendarEvents: CalendarEvent[] = createCalendarEvents(course, sections);
-
-      set((state) => ({
-        configurations: {
-          ...state.configurations,
-          [configurationId]: [...selectedCourses, ...calendarEvents],
-        },
-        loading: false,
-      }));
-
-      await get().saveCalendarState(configurationId);
-    } catch (error) {
-      console.error('Error adding course:', error);
-      set({ error: 'Failed to add course. Please try again.', loading: false });
-    }
-  },
-
-  activateSection: (clickedSection, configurationId) => {
-    set((state) => {
-      const selectedCourses = state.configurations[configurationId] || [];
-      const exceptions = ['Lecture', 'Seminar'];
-
-      if (exceptions.includes(clickedSection.section.class_type)) {
-        return { configurations: state.configurations };
-      }
-
-      const isActiveSingle =
-        selectedCourses.filter(
-          (section) =>
-            section.course.guid === clickedSection.course.guid &&
-            section.isActive &&
-            section.section.class_type === clickedSection.section.class_type
-        ).length === 1;
-
-      const updatedSections = selectedCourses.map((section) => {
-        if (section.course.guid !== clickedSection.course.guid) {
-          return section;
+        console.log('Attempting to add course:', course);
+        if (selectedCourses.some((event) => event.course.guid === course.guid)) {
+          console.log('Course already added:', course);
+          // TODO: Return a snackbar/toast or something nice if the course is already added
+          return;
         }
+        set({ loading: true, error: null });
 
-        if (isActiveSingle && clickedSection.isActive) {
-          return section.section.class_type === clickedSection.section.class_type
-            ? { ...section, isActive: true }
-            : section;
-        } else {
-          return section.section.class_type === clickedSection.section.class_type
-            ? { ...section, isActive: section.key === clickedSection.key }
-            : section;
+        try {
+          const term = course.guid.substring(0, 4);
+          const course_id = course.guid.substring(4);
+          console.log(`Fetching course details from backend for ${term}-${course_id}`);
+          const response = await fetch(
+            `${process.env.BACKEND}/fetch_calendar_classes/${term}/${course_id}`
+          );
+          if (!response.ok) {
+            throw new Error('Failed to fetch course details');
+          }
+
+          const sections = await response.json();
+          console.log('Fetched sections:', sections.length);
+
+          const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
+            section.class_meetings.flatMap((classMeeting: ClassMeeting) => {
+              const startColumnIndices = getStartColumnIndexForDays(classMeeting.days);
+              return startColumnIndices.map((startColumnIndex) => ({
+                key: `guid: ${course.guid}, section id: ${section.id}, class meeting id: ${classMeeting.id}, column: ${startColumnIndex}`,
+                course: course,
+                section: section,
+                startTime: classMeeting.start_time,
+                endTime: classMeeting.end_time,
+                startColumnIndex,
+                startRowIndex: calculateGridRow(classMeeting.start_time),
+                endRowIndex: calculateGridRow(classMeeting.end_time),
+                isActive: true,
+              }));
+            })
+          );
+
+          console.log('Prepared calendar events to add:', calendarEvents);
+          // set((state) => ({
+          //   selectedCourses: [...state.selectedCourses, ...calendarEvents],
+          //   loading: false,
+          // }));
+          set((state) => ({
+            selectedCourses: {
+              ...state.selectedCourses,
+              [term]: [...selectedCourses, ...calendarEvents],
+            },
+            loading: false,
+          }));
+          console.log('Course added successfully:', course.guid);
+          console.log(
+            "Initial sections' active states:",
+            calendarEvents.map((s) => s.isActive)
+          );
+        } catch (error) {
+          console.error('Error adding course:', error);
+          set({ error: 'Failed to add course. Please try again.', loading: false });
         }
-      });
+      },
+      activateSection: (clickedSection) => {
+        set((state) => {
+          const term = clickedSection.course.guid.substring(0, 4);
+          const selectedCourses = state.selectedCourses[term] || [];
+          const exceptions = ['Lecture', 'Seminar'];
 
-      return {
-        configurations: {
-          ...state.configurations,
-          [configurationId]: updatedSections,
-        },
-      };
-    });
+          // Determine if this is a special exception
+          const isException =
+            exceptions.includes(clickedSection.section.class_type) &&
+            !(
+              clickedSection.section.class_type === 'Seminar' &&
+              clickedSection.course.title.includes('Independent Work')
+            );
 
-    get().saveCalendarState(configurationId);
-  },
+          // If the clicked section is an exception, do nothing and return the existing state unchanged
+          if (isException) {
+            return { selectedCourses: state.selectedCourses };
+          }
 
-  removeCourse: (sectionId: string, configurationId: string) => {
-    set((state) => {
-      const updatedCourses = (state.configurations[configurationId] || []).filter(
-        (course) => String(course.section.id) !== sectionId
-      );
+          const isActiveSingle =
+            selectedCourses.filter(
+              (section) =>
+                section.course.guid === clickedSection.course.guid &&
+                section.isActive &&
+                section.section.class_type === clickedSection.section.class_type
+            ).length === 1;
 
-      return {
-        configurations: {
-          ...state.configurations,
-          [configurationId]: updatedCourses,
-        },
-      };
-    });
+          const updatedSections = selectedCourses.map((section) => {
+            if (section.course.guid !== clickedSection.course.guid) {
+              return section;
+            }
 
-    get().saveCalendarState(configurationId);
-  },
+            if (isActiveSingle && clickedSection.isActive) {
+              return section.section.class_type === clickedSection.section.class_type
+                ? { ...section, isActive: true }
+                : section;
+            } else {
+              return section.section.class_type === clickedSection.section.class_type
+                ? { ...section, isActive: section.key === clickedSection.key }
+                : section;
+            }
+          });
 
-  getSelectedCourses: (configurationId: string): CalendarEvent[] => {
-    configurationId = 'hi';
-    return get().configurations[configurationId] || [];
-  },
+          return {
+            selectedCourses: {
+              ...state.selectedCourses,
+              [term]: updatedSections,
+            },
+          };
+        });
+      },
 
-  fetchCalendarState: async (termCode: string) => {
-    console.log('fetchcalstate was just hit');
+      removeCourse: (sectionKey) => {
+        set((state) => {
+          const term = Object.keys(state.selectedCourses).find((semester) =>
+            state.selectedCourses[semester].some((course) => course.key === sectionKey)
+          );
 
-    set({ loading: true, error: null });
+          if (!term) {
+            return { selectedCourses: state.selectedCourses };
+          }
 
-    try {
-      const response = await fetch(
-        `${process.env.BACKEND}/fetch_calendar_configuration/?term=${termCode}`,
-        {
-          credentials: 'include',
-        }
-      );
+          const selectedCourses = state.selectedCourses[term];
+          const courseToRemove = selectedCourses.find((course) => course.key === sectionKey)?.course
+            .guid;
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch calendar configurations');
-      }
+          const updatedCourses = selectedCourses.filter(
+            (course) => course.course.guid !== courseToRemove
+          );
 
-      const configurations = await response.json();
+          return {
+            selectedCourses: {
+              ...state.selectedCourses,
+              [term]: updatedCourses,
+            },
+          };
+        });
+      },
 
-      const calendarConfigurations: Record<string, CalendarEvent[]> = {};
-
-      for (const configuration of configurations) {
-        const calendarEvents: CalendarEvent[] = [];
-
-        for (const selection of configuration.selections) {
-          const calendarEvent: CalendarEvent = createCalendarEvents(selection.section.course, [
-            selection.section,
-          ])[0];
-          calendarEvents.push({ ...calendarEvent, isActive: selection.is_active });
-        }
-
-        calendarConfigurations[configuration.id] = calendarEvents;
-      }
-
-      set({
-        configurations: calendarConfigurations,
-        loading: false,
-      });
-    } catch (error) {
-      console.error('Error fetching calendar configurations:', error);
-      set({ error: 'Failed to fetch calendar configurations. Please try again.', loading: false });
+      // Getters
+      getSelectedCourses: (semester) => get().selectedCourses[semester] || [],
+    }),
+    {
+      name: 'calendar-store',
+      partialize: (state) => ({ selectedCourses: state.selectedCourses }),
     }
-  },
-
-  saveCalendarState: async (configurationId: string) => {
-    console.log('savecalstate was just hit');
-
-    if (!configurationId) {
-      console.error('Invalid configurationId');
-      return;
-    }
-    console.log('Starting to save calendar state...', { configurationId });
-    set({ loading: true, error: null });
-
-    try {
-      const csrfToken = await fetchCsrfToken();
-      console.log('CSRF Token fetched:', { csrfToken });
-
-      const bodyData = {
-        selections: get().configurations[configurationId].map((event) => ({
-          section: event.section.id,
-          is_active: event.isActive,
-        })),
-      };
-      console.log('Prepared body data for PUT request:', { bodyData });
-
-      const response = await fetch(
-        `${process.env.BACKEND}/fetch_calendar_configuration/${configurationId}/`,
-        {
-          method: 'PUT',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrfToken,
-          },
-          body: JSON.stringify(bodyData),
-        }
-      );
-
-      console.log('Response status from saveCalendarState:', response.status);
-
-      if (!response.ok) {
-        throw new Error('Failed to save calendar configuration');
-      }
-
-      set({ loading: false });
-    } catch (error) {
-      console.error('Error saving calendar configuration:', error);
-      set({ error: 'Failed to save calendar configuration. Please try again.', loading: false });
-    }
-  },
-}));
+  )
+);
 
 export default useCalendarStore;

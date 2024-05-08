@@ -128,6 +128,7 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
             offsetLeft={event.offsetLeft}
             startIndex={event.startRowIndex}
             endIndex={event.endRowIndex}
+            dept={event.course.department_code}
           />
         ))}
       </div>

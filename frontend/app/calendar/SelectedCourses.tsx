@@ -3,6 +3,7 @@ import { FC, useMemo } from 'react';
 
 import { Virtuoso } from 'react-virtuoso';
 
+import tabStyles from '@/components/TabbedMenu/TabbedMenu.module.scss';
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
 
@@ -34,7 +35,9 @@ const SelectedCourses: FC = () => {
       </div>
       <div className={styles.content}>
         {uniqueCourses.length === 0 ? (
-          <p>No courses selected yet.</p>
+          <div className={`${tabStyles.tabContent}`}>
+            <div className='text-sm font-medium text-gray-500'>No courses selected.</div>
+          </div>
         ) : (
           <Virtuoso
             style={{ height: '400px' }}

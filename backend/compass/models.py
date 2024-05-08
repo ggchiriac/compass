@@ -338,63 +338,59 @@ class CalendarConfiguration(models.Model):
         blank=True,
         db_index=True,
     )
-    term = models.ForeignKey(
-        AcademicTerm,
-        on_delete=models.CASCADE,
-        related_name='calendar_configurations',
-        db_index=True,
-    )
-    name = models.CharField(max_length=16, db_index=True, blank=True)
-    index = models.PositiveIntegerField(default=0, blank=True)
+    name = models.CharField(max_length=100, db_index=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'term', 'name')
-        ordering = ['index']
+        unique_together = ('user', 'name')
         db_table = 'CalendarConfiguration'
 
     def __str__(self):
-        return f'{self.user.username}: {self.term.suffix} - {self.name}'
+        return f'{self.user.username}: {self.name}'
 
 
-class CalendarSelection(models.Model):
-    configuration = models.ForeignKey(
+class SemesterConfiguration(models.Model):
+    calendar_configuration = models.ForeignKey(
         CalendarConfiguration,
         on_delete=models.CASCADE,
-        related_name='selections',
-        null=True,
-        blank=True,
+        related_name='semester_configurations',
+        db_index=True,
+    )
+    term = models.ForeignKey(
+        AcademicTerm,
+        on_delete=models.CASCADE,
+        related_name='semester_configurations',
+        db_index=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('calendar_configuration', 'term')
+        db_table = 'SemesterConfiguration'
+
+    def __str__(self):
+        return f'{self.calendar_configuration}: {self.term.suffix}'
+
+
+class ScheduleSelection(models.Model):
+    semester_configuration = models.ForeignKey(
+        SemesterConfiguration,
+        on_delete=models.CASCADE,
+        related_name='schedule_selections',
         db_index=True,
     )
     section = models.ForeignKey(Section, on_delete=models.CASCADE, db_index=True)
+    index = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=100, db_index=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'CalendarSelection'
-        unique_together = ('configuration', 'section')
-
-
-class CalendarFilter(models.Model):
-    configuration = models.ForeignKey(
-        CalendarConfiguration,
-        on_delete=models.CASCADE,
-        related_name='filters',
-        null=True,
-        blank=True,
-        db_index=True,
-    )
-    filter_type = models.CharField(max_length=100, db_index=True, blank=True)
-    filter_value = models.CharField(max_length=100, db_index=True, blank=True)
-
-    class Meta:
-        db_table = 'CalendarFilter'
-        unique_together = ('configuration', 'filter_type')
-
-    def __str__(self):
-        return f'{self.configuration}: {self.filter_type}: {self.filter_value}'
+        db_table = 'ScheduleSelection'
+        unique_together = ('semester_configuration', 'section', 'index')
 
 
 class CourseEvaluations(models.Model):

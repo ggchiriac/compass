@@ -91,15 +91,7 @@ const CalendarSearch: FC = () => {
     setGradingFilter,
     setFilters,
     setShowPopup,
-    fetchFilters,
-    saveFilters,
   } = useFilterStore();
-
-  const activeConfiguration = useCalendarStore((state) => state.activeConfiguration);
-
-  useEffect(() => {
-    fetchFilters(activeConfiguration);
-  }, [fetchFilters, activeConfiguration]);
 
   useEffect(() => {
     const filters = {
@@ -165,16 +157,7 @@ const CalendarSearch: FC = () => {
     };
     setFilters(filters);
     setShowPopup(false);
-    saveFilters(activeConfiguration);
-  }, [
-    distributionFilter,
-    levelFilter,
-    gradingFilter,
-    setFilters,
-    setShowPopup,
-    saveFilters,
-    activeConfiguration,
-  ]);
+  }, [distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
 
   const handleCancel = useCallback(() => {
     setShowPopup(false);

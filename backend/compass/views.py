@@ -15,14 +15,13 @@ from django.db.models import Q
 from django.db.models.query import Prefetch
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.views.decorators.http import require_http_methods
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .models import (
-    AcademicTerm,
     ClassMeeting,
     Course,
     CustomUser,
@@ -32,8 +31,15 @@ from .models import (
     Section,
     UserCourses,
     CalendarConfiguration,
+    SemesterConfiguration,
 )
-from .serializers import CourseSerializer, CalendarConfigurationSerializer
+from .serializers import (
+    CourseSerializer,
+    CalendarConfigurationSerializer,
+    ScheduleSelectionSerializer,
+    SemesterConfigurationSerializer,
+)
+
 from data.check_reqs import (
     check_user,
     get_course_comments,
@@ -1084,119 +1090,161 @@ class FetchCalendarClasses(APIView):
         return class_meeting_data
 
 
-class FetchCalendarConfiguration(APIView):
-    def get_object(self, pk):
-        """
-        Retrieve a calendar configuration by its primary key (pk) for the authenticated user.
-
-        Args:
-        - pk: The primary key of the calendar configuration.
-
-        Returns:
-        - The calendar configuration instance.
-        - Raises a 404 error if the configuration is not found.
-        """
-        user = self.request.user
-        return get_object_or_404(CalendarConfiguration, user=user, pk=pk)
-
-    def get(self, request, pk):
-        """
-        Retrieve a specific calendar configuration by its primary key (pk).
-
-        Args:
-        - pk: The primary key of the calendar configuration.
-
-        Returns:
-        - The calendar configuration serialized as JSON.
-        """
-        calendar_configuration = self.get_object(pk)
-        serializer = CalendarConfigurationSerializer(calendar_configuration)
-        return Response(serializer.data)
-
-    def put(self, request, pk):
-        """
-        Update a specific calendar configuration by its primary key (pk).
-
-        Args:
-        - pk: The primary key of the calendar configuration.
-
-        Request Body:
-        - The updated calendar configuration data.
-
-        Returns:
-        - The updated calendar configuration serialized as JSON (status code 200).
-        - Error response if the request data is invalid (status code 400).
-        """
-        calendar_configuration = self.get_object(pk)
-        print('Calendar Configuration:', calendar_configuration)
-        print('Received PUT request data:', request.data)
-        serializer = CalendarConfigurationSerializer(
-            calendar_configuration, data=request.data
-        )
-        if serializer.is_valid():
-            print('Serializer is valid. Saving the configuration.')
-            serializer.save()
-            return Response(serializer.data)
-        print('Serializer errors:', serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, pk):
-        """
-        Delete a specific calendar configuration by its primary key (pk).
-
-        Args:
-        - pk: The primary key of the calendar configuration.
-
-        Returns:
-        - Empty response with status code 204 (No Content) on successful deletion.
-        """
-        calendar_configuration = self.get_object(pk)
-        print('Deleting Calendar Configuration:', calendar_configuration)
-        calendar_configuration.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-class FetchCalendarConfigurations(APIView):
+class CalendarConfigurationsView(APIView):
     def get(self, request):
-        """
-        Retrieve a list of calendar configurations for the authenticated user.
-
-        Query Parameters:
-        - term: Filter configurations by the specified term code (optional).
-
-        Returns:
-        - A list of calendar configurations serialized as JSON.
-        """
+        term_code = request.query_params.get('term_code')
         user = request.user
-        term = request.query_params.get('term')
-        queryset = CalendarConfiguration.objects.filter(user=user)
-        if term:
-            queryset = queryset.filter(term__term_code=term)
+
+        if term_code:
+            queryset = CalendarConfiguration.objects.filter(
+                user=user, semester_configurations__term__term_code=term_code
+            )
+        else:
+            queryset = CalendarConfiguration.objects.filter(user=user)
+
         serializer = CalendarConfigurationSerializer(queryset, many=True)
         return Response(serializer.data)
 
     def post(self, request):
-        """
-        Create a new calendar configuration for the authenticated user.
+        user = request.user
+        name = request.data.get('name', 'Default Schedule')
 
-        Request Body:
-        - term: The term code associated with the configuration (required).
-        - name: The name of the configuration (optional, defaults to "{term_suffix} Configuration").
+        try:
+            calendar_config, created = CalendarConfiguration.objects.get_or_create(
+                user=user, name=name, defaults={'user': user, 'name': name}
+            )
+            serializer = CalendarConfigurationSerializer(calendar_config)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except IntegrityError:
+            return Response(
+                {'detail': 'Calendar configuration with this name already exists.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response(
+                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-        Returns:
-        - The created calendar configuration serialized as JSON (status code 201).
-        - Error response if the request data is invalid (status code 400).
-        """
-        print('Received POST request data:', request.data)
-        term_code = request.data.get('term')
-        term, _ = AcademicTerm.objects.get_or_create(term_code=term_code)
-        configuration_name = request.data.get('name', f'{term.suffix} Configuration')
-        serializer = CalendarConfigurationSerializer(
-            data={'term': term.id, 'name': configuration_name}
+
+class CalendarConfigurationView(APIView):
+    def get(self, request, term_code):
+        user = request.user
+        try:
+            calendar_config = CalendarConfiguration.objects.get(
+                user=user,
+                semester_configurations__term__term_code=term_code,
+            )
+            serializer = CalendarConfigurationSerializer(calendar_config)
+            return Response(serializer.data)
+        except CalendarConfiguration.DoesNotExist:
+            return Response(
+                {'detail': 'Calendar configuration not found.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        except Exception as e:
+            return Response(
+                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def post(self, request):
+        user = request.user
+        name = request.data.get('name', 'Default Schedule')
+
+        try:
+            calendar_config, _ = CalendarConfiguration.objects.get_or_create(
+                user=user, name=name, defaults={'user': user, 'name': name}
+            )
+            serializer = CalendarConfigurationSerializer(calendar_config)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except IntegrityError:
+            return Response(
+                {'detail': 'Calendar configuration with this name already exists.'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except Exception as e:
+            return Response(
+                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class SemesterConfigurationView(APIView):
+    def get_object(self, request, configuration_id, term_code):
+        try:
+            return SemesterConfiguration.objects.get(
+                calendar_configuration_id=configuration_id,
+                calendar_configuration__user=request.user,
+                term__term_code=term_code,
+            )
+        except SemesterConfiguration.DoesNotExist:
+            return None
+
+    def get(self, request, configuration_id, term_code):
+        semester_configuration = self.get_object(request, configuration_id, term_code)
+        if semester_configuration:
+            serializer = SemesterConfigurationSerializer(semester_configuration)
+            return Response(serializer.data)
+        else:
+            return Response(
+                {'detail': 'Semester configuration not found.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    def put(self, request, configuration_id, term_code):
+        semester_configuration = self.get_object(request, configuration_id, term_code)
+        if semester_configuration:
+            serializer = SemesterConfigurationSerializer(
+                semester_configuration, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(
+                {'detail': 'Semester configuration not found.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+    def delete(self, request, configuration_id, term_code):
+        semester_configuration = self.get_object(request, configuration_id, term_code)
+        if semester_configuration:
+            semester_configuration.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response(
+                {'detail': 'Semester configuration not found.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+
+class ScheduleSelectionView(APIView):
+    def get_object(self, request, configuration_id, term_code, index):
+        try:
+            return ScheduleSelection.objects.get(
+                semester_configuration__calendar_configuration_id=configuration_id,
+                semester_configuration__calendar_configuration__user=request.user,
+                semester_configuration__term__term_code=term_code,
+                index=index,
+            )
+        except ScheduleSelection.DoesNotExist:
+            return None
+
+    def put(self, request, configuration_id, term_code, index):
+        schedule_selection = self.get_object(
+            request, configuration_id, term_code, index
         )
-        if serializer.is_valid():
-            print('Serializer is valid. Saving the configuration.')
-            serializer.save(user=request.user)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        print('Serializer errors:', serializer.errors)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if schedule_selection:
+            serializer = ScheduleSelectionSerializer(
+                schedule_selection, data=request.data, partial=True
+            )
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(
+                {'detail': 'Schedule selection not found.'},
+                status=status.HTTP_404_NOT_FOUND,
+            )

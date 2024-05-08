@@ -16,9 +16,8 @@ const END_HOUR: number = 21;
 const Calendar: FC = () => {
   const calendarElementRef = useRef<HTMLDivElement>(null);
   const { termFilter } = useFilterStore((state) => state);
-  const { selectedCourses, fetchCalendarState } = useCalendarStore((state) => ({
+  const { selectedCourses } = useCalendarStore((state) => ({
     selectedCourses: state.getSelectedCourses(termFilter).filter((course) => course.isActive),
-    fetchCalendarState: state.fetchCalendarState,
   }));
 
   const defaultColor: string = '#657786';
@@ -42,6 +41,15 @@ const Calendar: FC = () => {
     return brightness < 128 ? 'text-white' : 'text-gray-800';
   };
 
+  // Helper function to check if an event is valid
+  const isEventValid = (event: CalendarEvent): boolean => {
+    if (!event || !event.startRowIndex || !event.endRowIndex || !event.startColumnIndex) {
+      return false;
+    }
+    return true;
+  };
+
+  // Check if two events overlap
   const isOverlapping = (event1: CalendarEvent, event2: CalendarEvent): boolean => {
     return (
       event1.startColumnIndex === event2.startColumnIndex &&
@@ -51,8 +59,9 @@ const Calendar: FC = () => {
     );
   };
 
+  // Group overlapping events
   const groupedEvents: Record<string, CalendarEvent[]> = {};
-  selectedCourses.forEach((event) => {
+  selectedCourses.filter(isEventValid).forEach((event) => {
     const overlappingGroup = Object.values(groupedEvents).find((group) =>
       group.some((groupedEvent) => isOverlapping(event, groupedEvent))
     );
@@ -65,6 +74,7 @@ const Calendar: FC = () => {
     }
   });
 
+  // Flatten grouped events and calculate their display properties
   const events: CalendarEvent[] = Object.values(groupedEvents).flatMap((eventGroup) => {
     const width = 1 / eventGroup.length;
     return eventGroup.map((event, index) => ({
@@ -77,18 +87,15 @@ const Calendar: FC = () => {
   });
 
   useEffect(() => {
-    fetchCalendarState(termFilter);
-  }, [fetchCalendarState, termFilter]);
-
-  useEffect(() => {
-    console.log('selected courses updated:', selectedCourses);
+    console.log('Selected courses updated:', selectedCourses);
   }, [selectedCourses]);
 
   const handleClick = (event: CalendarEvent): void => {
-    useCalendarStore.getState().activateSection(event, termFilter);
-    console.log('boop:', event.section.class_meetings);
+    useCalendarStore.getState().activateSection(event);
+    console.log('Clicked event:', event.section.class_meetings);
   };
 
+  // Scroll to the current hour when the calendar is first rendered
   useEffect(() => {
     if (calendarElementRef.current) {
       const currentHour: number = new Date().getHours();
