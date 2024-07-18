@@ -314,12 +314,12 @@ const Search: FC = () => {
           />
           <button
             type='button'
-            className={`absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md ${areFiltersActive() ? 'bg-blue-500' : 'hover:bg-dnd-gray'} group`}
+            className={`absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md hover:bg-dnd-gray group`}
             onClick={handleAdjustmentsClick}
             aria-label='Adjust search settings'
           >
             <AdjustmentsHorizontalIcon
-              className={`h-5 w-5 ${areFiltersActive() ? 'text-white' : 'text-gray-400 group-hover:text-gray-500'}`}
+              className={`h-5 w-5 ${areFiltersActive() ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`}
               aria-hidden='true'
             />
           </button>

@@ -93,6 +93,10 @@ const CalendarSearch: FC = () => {
     setShowPopup,
   } = useFilterStore();
 
+  const areFiltersActive = useCallback(() => {
+    return useFilterStore.getState().termFilter !== '' || distributionFilter !== '' || levelFilter.length > 0 || gradingFilter.length > 0;
+  }, [useFilterStore.getState().termFilter, distributionFilter, levelFilter, gradingFilter]);
+
   useEffect(() => {
     const filters = {
       termFilter: useFilterStore.getState().termFilter,
@@ -309,7 +313,7 @@ const CalendarSearch: FC = () => {
               onClick={handleSettingsChange}
               aria-label='Adjust search settings'
             >
-              <AdjustmentsHorizontalIcon className='icon' aria-hidden='true' />
+              <AdjustmentsHorizontalIcon className={`h-5 w-5 ${areFiltersActive() ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} aria-hidden='true' />
             </button>
           </div>
           <div className='recent-searches'>
