@@ -415,9 +415,9 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
               variant='contained'
               style={{
                 margin: '5px',
-                backgroundColor: '#f7f7f7',
-                color: '#000',
-                opacity: 0.5,
+                backgroundColor: 'red',
+                color: 'white',
+                opacity: 0.9,
               }}
               onClick={() => handleClick(item['crosslistings'], value[1])}
             >
