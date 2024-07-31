@@ -401,6 +401,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                 margin: '5px',
                 backgroundColor: '#f7f7f7',
                 color: '#000',
+                background: 'rgb(205, 254, 194)'
               }}
               onClick={() => handleClick(item['crosslistings'], value[1])}
             >
@@ -416,8 +417,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
               style={{
                 margin: '5px',
                 backgroundColor: 'red',
-                color: 'white',
-                opacity: 0.9,
+                color: 'black',
+                background: 'repeating-linear-gradient(45deg, rgba(227, 138, 98, 0.6), rgba(227, 138, 98, 0.6) 10px, rgb(255, 120, 149) 10px, rgb(255, 120, 149) 15px)', // Striped background
               }}
               onClick={() => handleClick(item['crosslistings'], value[1])}
             >
