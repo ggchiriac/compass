@@ -91,6 +91,7 @@ const CalendarSearch: FC = () => {
     setGradingFilter,
     setFilters,
     setShowPopup,
+    resetFilters,
   } = useFilterStore();
 
   const areFiltersActive = useCallback(() => {
@@ -164,7 +165,7 @@ const CalendarSearch: FC = () => {
   }, [distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
 
   const handleCancel = useCallback(() => {
-    setShowPopup(false);
+    resetFilters();
   }, [setShowPopup]);
 
   useEffect(() => {

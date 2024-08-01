@@ -25,6 +25,7 @@ interface FilterState {
   }) => void;
   setShowPopup: (show: boolean) => void;
   resetFilters: () => void;
+  areFiltersEmpty: (filter) => boolean;
 }
 
 const useFilterStore = create<FilterState>()(
@@ -116,6 +117,11 @@ const useFilterStore = create<FilterState>()(
           levelFilter: [],
           gradingFilter: [],
         }),
+      areFiltersEmpty: (filter) =>  
+        filter.termFilter === '' &&
+        filter.distributionFilter === '' &&
+        filter.levelFilter.length === 0 &&
+        filter.gradingFilter.length === 0,
     }),
     {
       name: 'filter-settings',

@@ -15,6 +15,9 @@ import { LRUCache } from 'typescript-lru-cache';
 import { Course, Filter } from '@/types';
 
 import useSearchStore from '@/store/searchSlice';
+import useFilterStore from '@/store/filterSlice';
+
+
 import { distributionAreas, distributionAreasInverse } from '@/utils/distributionAreas';
 import { grading } from '@/utils/grading';
 import { levels } from '@/utils/levels';
@@ -39,15 +42,22 @@ const Search: FC = () => {
       setError: state.setError,
       setLoading: state.setLoading,
     }));
-  const { searchFilter, setSearchFilter } = useSearchStore();
+
+  const{
+    distributionFilter,
+    gradingFilter,
+    levelFilter,
+    termFilter,
+    resetFilters,
+    setDistributionFilter,
+    setGradingFilter,
+    setLevelFilter,
+    setTermFilter,
+    setFilters,
+  } = useFilterStore();
+  
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [termFilter, setTermFilter] = useState(searchFilter.termFilter || '');
-  const [distributionFilter, setDistributionFilter] = useState(
-    searchFilter.distributionFilter || ''
-  );
-  const [levelFilter, setLevelFilter] = useState(searchFilter.levelFilter || []);
-  const [gradingFilter, setGradingFilter] = useState(searchFilter.gradingFilter || []);
 
   const areFiltersActive = useCallback(() => {
     return termFilter !== '' || distributionFilter !== '' || levelFilter.length > 0 || gradingFilter.length > 0;
@@ -57,30 +67,33 @@ const Search: FC = () => {
     setSearchResults(searchResults);
   }, [searchResults, setSearchResults]);
 
+
+  function buildQuery(searchQuery: string, filter: Filter): string {
+    let queryString = `course=${encodeURIComponent(searchQuery)}`;
   
+    if (filter.termFilter) {
+      queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
+    }
+    if (filter.distributionFilter) {
+      queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
+    }
+    if (filter.levelFilter.length > 0) {
+      queryString += `&level=${filter.levelFilter.map(encodeURIComponent).join(',')}`;
+    }
+    if (filter.gradingFilter.length > 0) {
+      queryString += `&grading=${filter.gradingFilter.map(encodeURIComponent).join(',')}`;
+    }
+  
+    return queryString;
+  }
 
   const search = async (searchQuery: string, filter: Filter) => {
     setLoading(true);
     try {
-      let queryString = `course=${encodeURIComponent(searchQuery)}`;
-
-      if (filter.termFilter) {
-        queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
-      }
-
-      if (filter.distributionFilter) {
-        queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
-      }
-
-      if (filter.levelFilter.length > 0) {
-        queryString += `&level=${filter.levelFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
-
-      if (filter.gradingFilter.length > 0) {
-        queryString += `&grading=${filter.gradingFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
+      let queryString = buildQuery(searchQuery, filter);
 
       const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
+
       if (response.ok) {
         const data: { courses: Course[] } = await response.json();
         setSearchResults(data.courses);
@@ -88,6 +101,7 @@ const Search: FC = () => {
           addRecentSearch(searchQuery);
           searchCache.set(searchQuery, data.courses);
         }
+
       } else {
         setError(`Server returned ${response.status}: ${response.statusText}`);
       }
@@ -103,12 +117,21 @@ const Search: FC = () => {
   }
 
   useEffect(() => {
+
+    const filters = {
+      termFilter,
+      distributionFilter,
+      levelFilter,
+      gradingFilter,
+    };
+
+    
     if (query) {
-      search(query, searchFilter);
+      search(query, filters);
     } else {
-      search('', searchFilter);
+      search('', filters);
     }
-  }, [query, searchFilter]);
+  }, [query, termFilter, distributionFilter, levelFilter, gradingFilter]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
@@ -127,18 +150,13 @@ const Search: FC = () => {
       levelFilter,
       gradingFilter,
     };
-    setSearchFilter(filter);
+    setFilters(filter);
     setShowPopup(false);
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setSearchFilter, setShowPopup]);
+  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
 
   const handleCancel = useCallback(() => {
-    setTermFilter(searchFilter.termFilter);
-    setDistributionFilter(searchFilter.distributionFilter);
-    setLevelFilter(searchFilter.levelFilter);
-    setGradingFilter(searchFilter.gradingFilter);
-    setShowPopup(false);
+    resetFilters();
   }, [
-    searchFilter,
     setTermFilter,
     setDistributionFilter,
     setLevelFilter,
@@ -176,17 +194,17 @@ const Search: FC = () => {
 
   const handleLevelFilterChange = (level) => {
     if (levelFilter.includes(level)) {
-      setLevelFilter((levelFilter) => levelFilter.filter((item) => item !== level));
+      setLevelFilter(levelFilter.filter((item) => item !== level));
     } else {
-      setLevelFilter((levelFilter) => [...levelFilter, level]);
+      setLevelFilter([...levelFilter, level]);
     }
   };
 
   const handleGradingFilterChange = (grading) => {
     if (gradingFilter.includes(grading)) {
-      setGradingFilter((gradingFilter) => gradingFilter.filter((item) => item !== grading));
+      setGradingFilter(gradingFilter.filter((item) => item !== grading));
     } else {
-      setGradingFilter((gradingFilter) => [...gradingFilter, grading]);
+      setGradingFilter([...gradingFilter, grading]);
     }
   };
 

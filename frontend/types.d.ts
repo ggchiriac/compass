@@ -67,8 +67,6 @@ export type SearchStoreState = {
   setError: (error: string | null) => void;
   loading: boolean;
   setLoading: (loading: boolean) => void;
-  searchFilter: Filter;
-  setSearchFilter: (filter: Filter) => void;
 };
 
 export type CourseProps = {
