@@ -22,6 +22,7 @@ import { grading } from '@/utils/grading';
 import { levels } from '@/utils/levels';
 
 import CalendarSearchResults from './CalendarSearchResults';
+
 import './CalendarSearch.scss';
 
 interface TermMap {
@@ -63,6 +64,9 @@ const CalendarSearch: FC = () => {
     setIsClient(true);
   }, []);
 
+  const [localDistributionFilter, setLocalDistributionFilter] = useState<string>('');
+  const [localGradingFilter, setLocalGradingFilter] = useState<string[]>([]);
+  const [localLevelFilter, setLocalLevelFilter] = useState<string[]>([]);
   const [query, setQuery] = useState<string>('');
   const timerRef = useRef<number>();
   const {
@@ -89,35 +93,18 @@ const CalendarSearch: FC = () => {
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
-    setFilters,
     setShowPopup,
-    resetFilters,
   } = useFilterStore();
 
-  const areFiltersActive = useCallback(() => {
-    return useFilterStore.getState().termFilter !== '' || distributionFilter !== '' || levelFilter.length > 0 || gradingFilter.length > 0;
-  }, [useFilterStore.getState().termFilter, distributionFilter, levelFilter, gradingFilter]);
-
-  useEffect(() => {
-    const filters = {
-      termFilter: useFilterStore.getState().termFilter,
-      distributionFilter,
-      levelFilter,
-      gradingFilter,
-    };
-    if (query) {
-      search(query, filters);
-    } else {
-      search('', filters);
-    }
-  }, [query, distributionFilter, levelFilter, gradingFilter]);
+  const areFiltersActive = () => {
+    return distributionFilter !== '' || levelFilter.length > 0 || gradingFilter.length > 0;
+  };
 
   const search = useCallback(
     async (searchQuery: string, filter: Filter): Promise<void> => {
       setLoading(true);
       try {
         const queryString = buildQuery(searchQuery, filter);
-        console.log('query is', queryString);
         const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
 
         if (!response.ok) {
@@ -139,6 +126,20 @@ const CalendarSearch: FC = () => {
     [setLoading, setCalendarSearchResults, addRecentSearch, setError]
   );
 
+  useEffect(() => {
+    const filters = {
+      termFilter: useFilterStore.getState().termFilter,
+      distributionFilter,
+      levelFilter,
+      gradingFilter,
+    };
+    if (query) {
+      search(query, filters);
+    } else {
+      search('', filters);
+    }
+  }, [query, distributionFilter, levelFilter, gradingFilter, search]);
+
   function retrieveCachedSearch(search: string) {
     setCalendarSearchResults(searchCache.get(search) || []);
   }
@@ -154,18 +155,25 @@ const CalendarSearch: FC = () => {
   };
 
   const handleSave = useCallback(() => {
-    const filters = {
-      termFilter: useFilterStore.getState().termFilter,
-      distributionFilter,
-      levelFilter,
-      gradingFilter,
-    };
-    setFilters(filters);
+    setDistributionFilter(localDistributionFilter);
+    setLevelFilter(localLevelFilter);
+    setGradingFilter(localGradingFilter);
     setShowPopup(false);
-  }, [distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
+  }, [
+    localDistributionFilter,
+    localLevelFilter,
+    localGradingFilter,
+    setDistributionFilter,
+    setLevelFilter,
+    setGradingFilter,
+    setShowPopup,
+  ]);
 
   const handleCancel = useCallback(() => {
-    resetFilters();
+    setLocalLevelFilter(useFilterStore.getState().levelFilter);
+    setLocalGradingFilter(useFilterStore.getState().gradingFilter);
+    setLocalDistributionFilter(useFilterStore.getState().distributionFilter);
+    setShowPopup(false);
   }, [setShowPopup]);
 
   useEffect(() => {
@@ -194,19 +202,19 @@ const CalendarSearch: FC = () => {
     setShowPopup(true);
   };
 
-  const handleLevelFilterChange = (level) => {
-    if (levelFilter.includes(level)) {
-      setLevelFilter(levelFilter.filter((item) => item !== level));
+  const handleLocalLevelFilterChange = (level) => {
+    if (localLevelFilter.includes(level)) {
+      setLocalLevelFilter(localLevelFilter.filter((item) => item !== level));
     } else {
-      setLevelFilter([...levelFilter, level]);
+      setLocalLevelFilter([...localLevelFilter, level]);
     }
   };
 
-  const handleGradingFilterChange = (grading) => {
-    if (gradingFilter.includes(grading)) {
-      setGradingFilter(gradingFilter.filter((item) => item !== grading));
+  const handleLocalGradingFilterChange = (grading) => {
+    if (localGradingFilter.includes(grading)) {
+      setLocalGradingFilter(localGradingFilter.filter((item) => item !== grading));
     } else {
-      setGradingFilter([...gradingFilter, grading]);
+      setLocalGradingFilter([...localGradingFilter, grading]);
     }
   };
 
@@ -214,9 +222,9 @@ const CalendarSearch: FC = () => {
     isClient && showPopup ? (
       <FilterModal
         setShowPopup={setShowPopup}
-        setDistributionFilter={setDistributionFilter}
-        setLevelFilter={setLevelFilter}
-        setGradingFilter={setGradingFilter}
+        setDistributionFilter={setLocalDistributionFilter}
+        setLevelFilter={handleLocalLevelFilterChange}
+        setGradingFilter={handleLocalGradingFilterChange}
         handleSave={handleSave}
         handleCancel={handleCancel}
       >
@@ -229,11 +237,11 @@ const CalendarSearch: FC = () => {
               options={Object.keys(distributionAreas)}
               placeholder='Distribution area'
               variant='soft'
-              value={invert(distributionAreas)[distributionFilter]}
+              value={invert(distributionAreas)[localDistributionFilter]}
               isOptionEqualToValue={(option, value) => value === '' || option === value}
               onChange={(event, newDistributionName: string | null) => {
                 event.stopPropagation();
-                setDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
+                setLocalDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
               }}
               getOptionLabel={(option) => option.toString()}
               renderOption={(props, option) => (
@@ -252,8 +260,10 @@ const CalendarSearch: FC = () => {
                     size='sm'
                     id={`level-${level}`}
                     name='level'
-                    checked={levelFilter.includes(levels[level])}
-                    onChange={() => handleLevelFilterChange(levels[level])}
+                    checked={localLevelFilter.includes(levels[level])}
+                    onChange={() => {
+                      handleLocalLevelFilterChange(levels[level]);
+                    }}
                   />
                   <span className='ml-2 text-sm font-medium text-gray-800'>{level}</span>
                 </div>
@@ -269,8 +279,8 @@ const CalendarSearch: FC = () => {
                     size='sm'
                     id={`grading-${grading}`}
                     name='grading'
-                    checked={gradingFilter.includes(grading)}
-                    onChange={() => handleGradingFilterChange(grading)}
+                    checked={localGradingFilter.includes(grading)}
+                    onChange={() => handleLocalGradingFilterChange(grading)}
                   />
                   <span className='ml-2 text-sm font-medium text-gray-800'>{grading}</span>
                 </div>
@@ -314,7 +324,10 @@ const CalendarSearch: FC = () => {
               onClick={handleSettingsChange}
               aria-label='Adjust search settings'
             >
-              <AdjustmentsHorizontalIcon className={`h-5 w-5 ${areFiltersActive() ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`} aria-hidden='true' />
+              <AdjustmentsHorizontalIcon
+                className={`h-5 w-5 ${areFiltersActive() ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`}
+                aria-hidden='true'
+              />
             </button>
           </div>
           <div className='recent-searches'>

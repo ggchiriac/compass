@@ -14,10 +14,8 @@ import { LRUCache } from 'typescript-lru-cache';
 
 import { Course, Filter } from '@/types';
 
-import useSearchStore from '@/store/searchSlice';
 import useFilterStore from '@/store/filterSlice';
-
-
+import useSearchStore from '@/store/searchSlice';
 import { distributionAreas, distributionAreasInverse } from '@/utils/distributionAreas';
 import { grading } from '@/utils/grading';
 import { levels } from '@/utils/levels';
@@ -43,34 +41,39 @@ const Search: FC = () => {
       setLoading: state.setLoading,
     }));
 
-  const{
+  const {
     distributionFilter,
     gradingFilter,
     levelFilter,
     termFilter,
-    resetFilters,
     setDistributionFilter,
     setGradingFilter,
     setLevelFilter,
     setTermFilter,
-    setFilters,
   } = useFilterStore();
-  
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
 
-  const areFiltersActive = useCallback(() => {
-    return termFilter !== '' || distributionFilter !== '' || levelFilter.length > 0 || gradingFilter.length > 0;
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter]);
+  const [localDistributionFilter, setLocalDistributionFilter] = useState<string>('');
+  const [localGradingFilter, setLocalGradingFilter] = useState<string[]>([]);
+  const [localLevelFilter, setLocalLevelFilter] = useState<string[]>([]);
+  const [localTermFilter, setLocalTermFilter] = useState<string>('');
+
+  const areFiltersActive = () => {
+    return (
+      distributionFilter !== '' ||
+      levelFilter.length > 0 ||
+      gradingFilter.length > 0 ||
+      termFilter !== ''
+    );
+  };
 
   useEffect(() => {
     setSearchResults(searchResults);
   }, [searchResults, setSearchResults]);
 
-
   function buildQuery(searchQuery: string, filter: Filter): string {
     let queryString = `course=${encodeURIComponent(searchQuery)}`;
-  
     if (filter.termFilter) {
       queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
     }
@@ -83,55 +86,53 @@ const Search: FC = () => {
     if (filter.gradingFilter.length > 0) {
       queryString += `&grading=${filter.gradingFilter.map(encodeURIComponent).join(',')}`;
     }
-  
     return queryString;
   }
 
-  const search = async (searchQuery: string, filter: Filter) => {
-    setLoading(true);
-    try {
-      let queryString = buildQuery(searchQuery, filter);
+  const search = useCallback(
+    async (searchQuery: string, filter: Filter) => {
+      setLoading(true);
+      try {
+        const queryString = buildQuery(searchQuery, filter);
 
-      const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
+        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
 
-      if (response.ok) {
-        const data: { courses: Course[] } = await response.json();
-        setSearchResults(data.courses);
-        if (data.courses.length > 0) {
-          addRecentSearch(searchQuery);
-          searchCache.set(searchQuery, data.courses);
+        if (response.ok) {
+          const data: { courses: Course[] } = await response.json();
+          setSearchResults(data.courses);
+          if (data.courses.length > 0) {
+            addRecentSearch(searchQuery);
+            searchCache.set(searchQuery, data.courses);
+          }
+        } else {
+          setError(`Server returned ${response.status}: ${response.statusText}`);
         }
-
-      } else {
-        setError(`Server returned ${response.status}: ${response.statusText}`);
+      } catch (error) {
+        setError('There was an error fetching courses.');
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      setError('There was an error fetching courses.');
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [addRecentSearch, setError, setLoading, setSearchResults]
+  );
 
   function retrieveCachedSearch(search) {
     setSearchResults(searchCache.get(search) ?? []);
   }
 
   useEffect(() => {
-
     const filters = {
       termFilter,
       distributionFilter,
       levelFilter,
       gradingFilter,
     };
-
-    
     if (query) {
       search(query, filters);
     } else {
       search('', filters);
     }
-  }, [query, termFilter, distributionFilter, levelFilter, gradingFilter]);
+  }, [query, termFilter, distributionFilter, levelFilter, gradingFilter, search]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
@@ -144,26 +145,30 @@ const Search: FC = () => {
   };
 
   const handleSave = useCallback(() => {
-    const filter = {
-      termFilter,
-      distributionFilter,
-      levelFilter,
-      gradingFilter,
-    };
-    setFilters(filter);
+    setDistributionFilter(localDistributionFilter);
+    setLevelFilter(localLevelFilter);
+    setGradingFilter(localGradingFilter);
+    setTermFilter(localTermFilter);
     setShowPopup(false);
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setFilters, setShowPopup]);
-
-  const handleCancel = useCallback(() => {
-    resetFilters();
   }, [
-    setTermFilter,
+    localDistributionFilter,
+    localLevelFilter,
+    localGradingFilter,
+    localTermFilter,
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
     setShowPopup,
+    setTermFilter,
   ]);
 
+  const handleCancel = useCallback(() => {
+    setLocalLevelFilter(useFilterStore.getState().levelFilter);
+    setLocalTermFilter(useFilterStore.getState().termFilter);
+    setLocalGradingFilter(useFilterStore.getState().gradingFilter);
+    setLocalDistributionFilter(useFilterStore.getState().distributionFilter);
+    setShowPopup(false);
+  }, [setShowPopup]);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Enter') {
@@ -192,29 +197,29 @@ const Search: FC = () => {
     setShowPopup(true);
   };
 
-  const handleLevelFilterChange = (level) => {
-    if (levelFilter.includes(level)) {
-      setLevelFilter(levelFilter.filter((item) => item !== level));
+  const handleLocalLevelFilterChange = (level) => {
+    if (localLevelFilter.includes(level)) {
+      setLocalLevelFilter(localLevelFilter.filter((item) => item !== level));
     } else {
-      setLevelFilter([...levelFilter, level]);
+      setLocalLevelFilter([...localLevelFilter, level]);
     }
   };
 
-  const handleGradingFilterChange = (grading) => {
-    if (gradingFilter.includes(grading)) {
-      setGradingFilter(gradingFilter.filter((item) => item !== grading));
+  const handleLocalGradingFilterChange = (grading) => {
+    if (localGradingFilter.includes(grading)) {
+      setLocalGradingFilter(localGradingFilter.filter((item) => item !== grading));
     } else {
-      setGradingFilter([...gradingFilter, grading]);
+      setLocalGradingFilter([...localGradingFilter, grading]);
     }
   };
 
   const modalContent = showPopup ? (
     <FilterModal
       setShowPopup={setShowPopup}
-      setTermFilter={setTermFilter}
-      setDistributionFilter={setDistributionFilter}
-      setLevelFilter={setLevelFilter}
-      setGradingFilter={setGradingFilter}
+      setTermFilter={setLocalTermFilter}
+      setDistributionFilter={setLocalDistributionFilter}
+      setLevelFilter={setLocalLevelFilter}
+      setGradingFilter={setLocalGradingFilter}
       handleSave={handleSave}
       handleCancel={handleCancel}
     >
@@ -227,11 +232,11 @@ const Search: FC = () => {
             options={Object.keys(terms)}
             placeholder='Semester'
             variant='soft'
-            value={termsInverse[termFilter]}
+            value={termsInverse[localTermFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | null) => {
               event.stopPropagation();
-              setTermFilter(terms[newTermName ?? ''] ?? '');
+              setLocalTermFilter(terms[newTermName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -249,11 +254,11 @@ const Search: FC = () => {
             options={Object.keys(distributionAreas)}
             placeholder='Distribution area'
             variant='soft'
-            value={distributionAreasInverse[distributionFilter]}
+            value={distributionAreasInverse[localDistributionFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newDistributionName: string | null) => {
               event.stopPropagation();
-              setDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
+              setLocalDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -272,8 +277,8 @@ const Search: FC = () => {
                   size='sm'
                   id={`level-${level}`}
                   name='level'
-                  checked={levelFilter.includes(levels[level])}
-                  onChange={() => handleLevelFilterChange(levels[level])}
+                  checked={localLevelFilter.includes(levels[level])}
+                  onChange={() => handleLocalLevelFilterChange(levels[level])}
                 />
                 <span className='ml-2 text-sm font-medium text-gray-800'>{level}</span>
               </div>
@@ -289,8 +294,8 @@ const Search: FC = () => {
                   size='sm'
                   id={`grading-${grading}`}
                   name='grading'
-                  checked={gradingFilter.includes(grading)}
-                  onChange={() => handleGradingFilterChange(grading)}
+                  checked={localGradingFilter.includes(grading)}
+                  onChange={() => handleLocalGradingFilterChange(grading)}
                 />
                 <span className='ml-2 text-sm font-medium text-gray-800'>{grading}</span>
               </div>
