@@ -52,7 +52,6 @@ const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
   const handleConfigurationCreate = async () => {
     const termSuffix = getTermSuffix(activeConfiguration);
     setConfigurationName('');
-    console.log('Term Suffix:', termSuffix);
     await onConfigurationCreate(termSuffix);
   };
 
