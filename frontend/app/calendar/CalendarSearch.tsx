@@ -94,6 +94,7 @@ const CalendarSearch: FC = () => {
     setLevelFilter,
     setGradingFilter,
     setShowPopup,
+    resetFilters,
   } = useFilterStore();
 
   const areFiltersActive = () => {
@@ -125,6 +126,10 @@ const CalendarSearch: FC = () => {
     },
     [setLoading, setCalendarSearchResults, addRecentSearch, setError]
   );
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
 
   useEffect(() => {
     const filters = {

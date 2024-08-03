@@ -95,7 +95,6 @@ const useFilterStore = create<FilterState>()(
       gradingFilter: [],
       showPopup: false,
       setTermFilter: (term) => {
-        console.log('Setting termFilter:', term);
         set({ termFilter: term });
       },
       setDistributionFilter: (distribution) => set({ distributionFilter: distribution }),
@@ -117,7 +116,7 @@ const useFilterStore = create<FilterState>()(
           levelFilter: [],
           gradingFilter: [],
         }),
-      areFiltersEmpty: (filter) =>  
+      areFiltersEmpty: (filter) =>
         filter.termFilter === '' &&
         filter.distributionFilter === '' &&
         filter.levelFilter.length === 0 &&

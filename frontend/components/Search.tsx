@@ -50,6 +50,7 @@ const Search: FC = () => {
     setGradingFilter,
     setLevelFilter,
     setTermFilter,
+    resetFilters,
   } = useFilterStore();
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
@@ -67,6 +68,10 @@ const Search: FC = () => {
       termFilter !== ''
     );
   };
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
 
   useEffect(() => {
     setSearchResults(searchResults);
