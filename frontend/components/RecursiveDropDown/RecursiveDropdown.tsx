@@ -418,7 +418,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
                 margin: '5px',
                 backgroundColor: 'red',
                 color: 'black',
-                opacity: '0.6',
+                opacity: '0.5',
                 background:
                   'repeating-linear-gradient(45deg, rgba(235, 199, 108, 0.3), rgba(235, 199, 108, 0.3) 10px, rgba(255, 153, 0, 0.5) 10px, rgba(255, 153, 0, 0.5) 14px)', // Striped background
               }}
