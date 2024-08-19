@@ -17,7 +17,7 @@ contacts:
   email: kytaylor@princeton.edu
 req_list:
 - name: Core Survey
-  max_counted: 2
+  max_counted: 1
   min_needed: 2
   explanation: Students must complete two AAS core survey courses from the list below.
     The core survey courses orient students to African American Studies, and prepare
@@ -35,42 +35,37 @@ req_list:
   max_common_with_major: 1
   pdfs_allowed: 0
   req_list:
-  - name: Pre-20th Century Black Diaspora Art
-    max_counted: 1
-    min_needed: 0
+  - name: African American Art
+    max_counted: 2
+    min_needed: 1
     explanation:
     course_list:
     - AAS 244
-  - name: 20th Century African American Art
-    max_counted: 1
-    min_needed: 0
-    explanation:
-    course_list:
     - AAS 245
   - name: African American Literature to 1910
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     explanation:
     course_list:
     - AAS 253
     - AAS 353
   - name: African American Literature since the Harlem Renaissance
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     explanation:
     course_list:
     - AAS 254
     - AAS 359
   - name: African American History to 1863
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     explanation:
     course_list:
     - AAS 267
     - AAS 366
   - name: African American History Since Emancipation
     max_counted: 1
-    min_needed: 0
+    min_needed: 1
     explanation:
     course_list:
     - AAS 268
@@ -237,7 +232,7 @@ req_list:
     - SPA 365
   - name: Non-GRE Courses
     max_counted: 2
-    min_needed: 0
+    min_needed: 1
     explanation:
     course_list:
     - AAS 235
