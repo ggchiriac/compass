@@ -11,12 +11,12 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.contrib.auth import login
 from django.db import IntegrityError, transaction
-from django.db.models import Q
-from django.db.models.query import Prefetch
+from django.db.models import Q, Prefetch, QuerySet
 from django.http import JsonResponse, HttpResponseServerError
 from django.middleware.csrf import get_token
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
+from itertools import groupby
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -31,12 +31,14 @@ from .models import (
     Section,
     UserCourses,
     CalendarConfiguration,
+    ScheduleSelection,
     SemesterConfiguration,
 )
 from .serializers import (
     CourseSerializer,
     CalendarConfigurationSerializer,
     ScheduleSelectionSerializer,
+    SectionSerializer,
     SemesterConfigurationSerializer,
 )
 
@@ -52,7 +54,6 @@ from data.req_lib import ReqLib
 logger = logging.getLogger(__name__)
 
 UNDECLARED = {'code': 'Undeclared', 'name': 'Undeclared'}
-
 
 # --------------------------------- ERROR HANDLING ------------------------------------#
 
@@ -520,100 +521,102 @@ class SearchCourses(APIView):
     """
 
     def get(self, request, *args, **kwargs):
-        query = request.GET.get('course', None)
-        term = request.GET.get('term', None)
-        distribution = request.GET.get('distribution', None)
-        levels = request.GET.get('level')
-        grading_options = request.GET.get('grading')
+        query = request.query_params.get('course')
+        term = request.query_params.get('term')
+        distribution = request.query_params.get('distribution')
+        levels = request.query_params.get('level')
+        grading_options = request.query_params.get('grading')
 
-        if query:
-            init_time = time.time()
-            # process queries
-            trimmed_query = sub(r'\s', '', query)
-            if DEPT_NUM_SUFFIX_REGEX.match(trimmed_query):
-                result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
-                dept = result[0]
-                num = result[1]
-                code = dept + ' ' + num
-            elif DEPT_NUM_REGEX.match(trimmed_query):
-                result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
-                dept = result[0]
-                num = result[1]
-                code = dept + ' ' + num
-            elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
-                trimmed_query
-            ):
-                dept = ''
-                num = trimmed_query
-                code = num
-            elif DEPT_ONLY_REGEX.match(trimmed_query):
-                dept = trimmed_query
-                num = ''
-                code = dept
-            else:
-                return JsonResponse({'courses': []})
+        if not query:
+            return Response({'courses': []})
 
-            query_conditions = Q()
+        init_time = time.time()
 
-            if term:
-                query_conditions &= Q(guid__startswith=term)
+        # Process query
+        trimmed_query = sub(r'\s', '', query)
+        dept, num, code = self.parse_query(trimmed_query)
 
-            if distribution:
-                query_conditions &= Q(distribution_area_short__icontains=distribution)
+        # Build query conditions
+        query_conditions = self.build_query_conditions(
+            term, distribution, levels, grading_options
+        )
 
-            if levels:
-                levels = levels.split(',')
-                level_query = Q()
-                for level in levels:
-                    level_query |= Q(catalog_number__startswith=level)
-                query_conditions &= level_query
+        try:
+            # Try exact match first
+            exact_match_course = self.get_exact_match(dept, num, query_conditions)
+            if exact_match_course:
+                serialized_course = CourseSerializer(exact_match_course, many=True)
+                return Response({'courses': serialized_course.data})
 
-            if grading_options:
-                grading_options = grading_options.split(',')
-                grading_filters = []
-                for grading in grading_options:
-                    grading_filters += GRADING_OPTIONS[grading]
-                grading_query = Q()
-                for grading in grading_filters:
-                    grading_query |= Q(grading_basis__iexact=grading)
-                query_conditions &= grading_query
+            # If no exact match, do broader search
+            courses = self.get_broader_match(code, query_conditions)
+            if courses:
+                serialized_courses = CourseSerializer(courses, many=True)
+                sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
+                print(f'Search time: {time.time() - init_time}')
+                return Response({'courses': sorted_data})
 
-            try:
-                filtered_query = query_conditions
-                filtered_query &= Q(department__code__iexact=dept)
-                filtered_query &= Q(catalog_number__iexact=num)
-                exact_match_course = (
-                    Course.objects.select_related('department')
-                    .filter(filtered_query)
-                    .order_by('course_id', '-guid')
-                    .distinct('course_id')
-                )
-                if exact_match_course:
-                    # If an exact match is found, return only that course
-                    serialized_course = CourseSerializer(exact_match_course, many=True)
-                    return JsonResponse({'courses': serialized_course.data})
-                else:
-                    filtered_query = query_conditions
-                    filtered_query &= Q(crosslistings__icontains=code)
-                    courses = (
-                        Course.objects.select_related('department')
-                        .filter(filtered_query)
-                        .order_by('course_id', '-guid')
-                        .distinct('course_id')
-                    )
-                    if courses:
-                        serialized_courses = CourseSerializer(courses, many=True)
-                        sorted_data = sorted(
-                            serialized_courses.data, key=make_sort_key(dept)
-                        )
-                        print(f'Search time: {time.time() - init_time}')
-                        return JsonResponse({'courses': sorted_data})
-                    return JsonResponse({'courses': []})
-            except Exception as e:
-                logger.error(f'An error occurred while searching for courses: {e}')
-                return JsonResponse({'error': 'Internal Server Error'}, status=500)
+            return Response({'courses': []})
+
+        except Exception as e:
+            return Response(
+                {'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    def parse_query(self, query):
+        if DEPT_NUM_SUFFIX_REGEX.match(query) or DEPT_NUM_REGEX.match(query):
+            result = split(
+                r'(\d+[a-zA-Z]?)' if DEPT_NUM_SUFFIX_REGEX.match(query) else r'(\d+)',
+                query,
+                maxsplit=1,
+            )
+            dept, num = result[0], result[1]
+            code = f'{dept} {num}'
+        elif NUM_ONLY_REGEX.match(query) or NUM_SUFFIX_ONLY_REGEX.match(query):
+            dept, num, code = '', query, query
+        elif DEPT_ONLY_REGEX.match(query):
+            dept, num, code = query, '', query
         else:
-            return JsonResponse({'courses': []})
+            dept, num, code = '', '', ''
+        return dept, num, code
+
+    def build_query_conditions(self, term, distribution, levels, grading_options):
+        conditions = Q()
+        if term:
+            conditions &= Q(guid__startswith=term)
+        if distribution:
+            conditions &= Q(distribution_area_short__icontains=distribution)
+        if levels:
+            level_query = Q()
+            for level in levels.split(','):
+                level_query |= Q(catalog_number__startswith=level)
+            conditions &= level_query
+        if grading_options:
+            grading_query = Q()
+            for grading in grading_options.split(','):
+                grading_query |= Q(grading_basis__iexact=grading)
+            conditions &= grading_query
+        return conditions
+
+    def get_exact_match(self, dept, num, conditions):
+        return (
+            Course.objects.select_related('department')
+            .filter(
+                conditions
+                & Q(department__code__iexact=dept)
+                & Q(catalog_number__iexact=num)
+            )
+            .order_by('course_id', '-guid')
+            .distinct('course_id')
+        )
+
+    def get_broader_match(self, code, conditions):
+        return (
+            Course.objects.select_related('department')
+            .filter(conditions & Q(crosslistings__icontains=code))
+            .order_by('course_id', '-guid')
+            .distinct('course_id')
+        )
 
 
 class GetUserCourses(APIView):
@@ -990,47 +993,100 @@ def requirement_info(request):
 
 class FetchCalendarClasses(APIView):
     """
-    A function to retrieve unique class meetings based on the provided term and course ID.
-
-    Parameters:
-        request: The request object.
-        term: The term to search for.
-        course_id: The course ID to search for.
-
-    Returns:
-        Response: A response object with the unique class meetings serialized.
+    API view to fetch unique class meetings based on the provided term and course ID.
     """
 
-    def get(self, request, term, course_id):
-        sections = self.get_unique_class_meetings(term, course_id)
-        print('term', term)
-        if not sections:
+    def get(self, request, term: str, course_id: str) -> Response:
+        """
+        Handle GET request to fetch class meetings.
+
+        Args:
+            request: The HTTP request object.
+            term (str): The term code.
+            course_id (str): The course ID.
+
+        Returns:
+            Response: A response containing the selected sections data or an error message.
+        """
+        sections = self.get_class_meetings(term, course_id)
+        if not sections.exists():
             return Response(
                 {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
             )
 
-        sections_data = [self.serialize_section(section) for section in sections]
+        serializer = SectionSerializer(sections, many=True)
+        sections = serializer.data
 
-        # Group sections by instructor
-        sections_by_instructor = {}
-        for section_data in sections_data:
-            instructor_name = section_data['instructor']['name']
-            if instructor_name not in sections_by_instructor:
-                sections_by_instructor[instructor_name] = []
-            sections_by_instructor[instructor_name].append(section_data)
+        sections_by_instructor = self.group_by_instructor(sections)
 
-        # Select the set corresponding to one of the instructors
-        selected_instructor = next(iter(sections_by_instructor.keys()))
-        selected_sections_data = sections_by_instructor[selected_instructor]
+        selected_instructor = next(iter(sections_by_instructor.keys()), None)
+        if not selected_instructor:
+            return Response(
+                {'error': 'No instructors found'}, status=status.HTTP_404_NOT_FOUND
+            )
 
-        for section_data in selected_sections_data:
-            print(f"ID: {section_data['id']}")
-            print(f"Class Section: {section_data['class_section']}")
-            print(f"Class Type: {section_data['class_type']}")
-            print(f"Course ID: {section_data['course']['course_id']}")
-            print(f"Course Title: {section_data['course']['title']}")
-            print(f"Instructor: {section_data['instructor']['name']}")
-            for meeting in section_data['class_meetings']:
+        selected_sections = sections_by_instructor[selected_instructor]
+        self.log_sections(selected_sections)
+
+        return Response(selected_sections, status=status.HTTP_200_OK)
+
+    def get_class_meetings(self, term: str, course_id: str) -> QuerySet:
+        """
+        Get unique class meetings based on the provided term and course ID.
+
+        Args:
+            term (str): The term code.
+            course_id (str): The course ID.
+
+        Returns:
+            QuerySet: A queryset of Section objects with related data prefetched.
+        """
+        return (
+            Section.objects.filter(term__term_code=term, course__course_id=course_id)
+            .select_related('course', 'instructor')
+            .prefetch_related(
+                Prefetch(
+                    'classmeeting_set', queryset=ClassMeeting.objects.order_by('id')
+                )
+            )
+        )
+
+    @staticmethod
+    def group_by_instructor(sections: list[dict]) -> dict[str, list[dict]]:
+        """
+        Group sections by instructor.
+
+        Args:
+            sections (list[dict]): A list of serialized section data.
+
+        Returns:
+            dict[str, list[dict]]: A dictionary where keys are instructor names and values are lists of sections.
+        """
+        return {
+            k: list(v)
+            for k, v in groupby(
+                sorted(sections, key=lambda x: x['instructor_name'] or ''),
+                key=lambda x: x['instructor_name'] or '',
+            )
+        }
+
+    # TODO: This should be used only in DEBUG mode.
+    @staticmethod
+    def log_sections(sections: list[dict]) -> None:
+        """
+        Log the sections data for debugging purposes.
+
+        Args:
+            sections (list[dict]): A list of serialized section data.
+        """
+        for section in sections:
+            print(f"ID: {section['id']}")
+            print(f"Class Section: {section['class_section']}")
+            print(f"Class Type: {section['class_type']}")
+            print(f"Course ID: {section['course_id']}")
+            print(f"Course Title: {section['course_title']}")
+            print(f"Instructor: {section['instructor_name']}")
+            for meeting in section['class_meetings']:
                 print(f"  Meeting ID: {meeting['id']}")
                 print(f"  Days: {meeting['days']}")
                 print(f"  Start Time: {meeting['start_time']}")
@@ -1038,74 +1094,44 @@ class FetchCalendarClasses(APIView):
                 print(f"  Building Name: {meeting['building_name']}")
                 print(f"  Room: {meeting['room']}")
 
-        return Response(selected_sections_data, status=status.HTTP_200_OK)
-
-    def get_unique_class_meetings(self, term, course_id):
-        print(term)
-        sections = Section.objects.filter(
-            term__term_code=term, course__course_id=course_id
-        )
-
-        unique_sections = sections.select_related(
-            'course', 'instructor'
-        ).prefetch_related(
-            Prefetch(
-                'classmeeting_set',
-                queryset=ClassMeeting.objects.order_by('id'),
-                to_attr='unique_class_meetings',
-            )
-        )
-        return unique_sections
-
-    def serialize_section(self, section):
-        class_meetings_data = [
-            self.serialize_class_meeting(meeting)
-            for meeting in getattr(section, 'unique_class_meetings', [])
-        ]
-
-        section_data = {
-            'id': section.id,
-            'class_section': section.class_section,
-            'class_type': section.class_type,
-            'course': {
-                'course_id': section.course.course_id,
-                'title': section.course.title,
-            },
-            'instructor': {
-                'name': str(section.instructor),
-            },
-            'class_meetings': class_meetings_data,
-        }
-        return section_data
-
-    def serialize_class_meeting(self, meeting):
-        class_meeting_data = {
-            'id': meeting.id,
-            'days': meeting.days,
-            'start_time': meeting.start_time.strftime('%H:%M'),
-            'end_time': meeting.end_time.strftime('%H:%M'),
-            'building_name': meeting.building_name,
-            'room': meeting.room,
-        }
-        return class_meeting_data
-
 
 class CalendarConfigurationsView(APIView):
-    def get(self, request):
+    """
+    API view to handle calendar configurations.
+    """
+
+    def get(self, request) -> Response:
+        """
+        Handle GET request to fetch calendar configurations.
+
+        Args:
+            request: The HTTP request object.
+
+        Returns:
+            Response: A response containing the serialized calendar configurations.
+        """
         term_code = request.query_params.get('term_code')
         user = request.user
 
+        queryset = CalendarConfiguration.objects.filter(user=user)
         if term_code:
-            queryset = CalendarConfiguration.objects.filter(
-                user=user, semester_configurations__term__term_code=term_code
+            queryset = queryset.filter(
+                semester_configurations__term__term_code=term_code
             )
-        else:
-            queryset = CalendarConfiguration.objects.filter(user=user)
 
         serializer = CalendarConfigurationSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    def post(self, request):
+    def post(self, request) -> Response:
+        """
+        Handle POST request to create a new calendar configuration.
+
+        Args:
+            request: The HTTP request object.
+
+        Returns:
+            Response: A response containing the created calendar configuration or an error message.
+        """
         user = request.user
         name = request.data.get('name', 'Default Schedule')
 
@@ -1114,137 +1140,171 @@ class CalendarConfigurationsView(APIView):
                 user=user, name=name, defaults={'user': user, 'name': name}
             )
             serializer = CalendarConfigurationSerializer(calendar_config)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            status_code = status.HTTP_201_CREATED if created else status.HTTP_200_OK
+            return Response(serializer.data, status=status_code)
         except IntegrityError:
             return Response(
                 {'detail': 'Calendar configuration with this name already exists.'},
                 status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            return Response(
-                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
 class CalendarConfigurationView(APIView):
-    def get(self, request, term_code):
-        user = request.user
-        try:
-            calendar_config = CalendarConfiguration.objects.get(
-                user=user,
-                semester_configurations__term__term_code=term_code,
-            )
-            serializer = CalendarConfigurationSerializer(calendar_config)
-            return Response(serializer.data)
-        except CalendarConfiguration.DoesNotExist:
-            return Response(
-                {'detail': 'Calendar configuration not found.'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
-        except Exception as e:
-            return Response(
-                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+    """
+    API view to handle individual calendar configurations.
+    """
 
-    def post(self, request):
-        user = request.user
-        name = request.data.get('name', 'Default Schedule')
+    def get(self, request, term_code: str) -> Response:
+        """
+        Handle GET request to fetch a specific calendar configuration.
 
-        try:
-            calendar_config, _ = CalendarConfiguration.objects.get_or_create(
-                user=user, name=name, defaults={'user': user, 'name': name}
-            )
-            serializer = CalendarConfigurationSerializer(calendar_config)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        except IntegrityError:
-            return Response(
-                {'detail': 'Calendar configuration with this name already exists.'},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        except Exception as e:
-            return Response(
-                {'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+        Args:
+            request: The HTTP request object.
+            term_code (str): The term code.
+
+        Returns:
+            Response: A response containing the serialized calendar configuration.
+        """
+        user = request.user
+        calendar_config = get_object_or_404(
+            CalendarConfiguration,
+            user=user,
+            semester_configurations__term__term_code=term_code,
+        )
+        serializer = CalendarConfigurationSerializer(calendar_config)
+        return Response(serializer.data)
 
 
 class SemesterConfigurationView(APIView):
-    def get_object(self, request, configuration_id, term_code):
-        try:
-            return SemesterConfiguration.objects.get(
-                calendar_configuration_id=configuration_id,
-                calendar_configuration__user=request.user,
-                term__term_code=term_code,
-            )
-        except SemesterConfiguration.DoesNotExist:
-            return None
+    """
+    API view to handle semester configurations.
+    """
 
-    def get(self, request, configuration_id, term_code):
+    def get_object(
+        self, request, configuration_id: int, term_code: str
+    ) -> SemesterConfiguration:
+        """
+        Get the semester configuration object.
+
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+
+        Returns:
+            SemesterConfiguration: The semester configuration object.
+        """
+        return get_object_or_404(
+            SemesterConfiguration,
+            calendar_configuration_id=configuration_id,
+            calendar_configuration__user=request.user,
+            term__term_code=term_code,
+        )
+
+    def get(self, request, configuration_id: int, term_code: str) -> Response:
+        """
+        Handle GET request to fetch a specific semester configuration.
+
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+
+        Returns:
+            Response: A response containing the serialized semester configuration.
+        """
         semester_configuration = self.get_object(request, configuration_id, term_code)
-        if semester_configuration:
-            serializer = SemesterConfigurationSerializer(semester_configuration)
+        serializer = SemesterConfigurationSerializer(semester_configuration)
+        return Response(serializer.data)
+
+    def put(self, request, configuration_id: int, term_code: str) -> Response:
+        """
+        Handle PUT request to update a specific semester configuration.
+
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+
+        Returns:
+            Response: A response containing the updated semester configuration or error messages.
+        """
+        semester_configuration = self.get_object(request, configuration_id, term_code)
+        serializer = SemesterConfigurationSerializer(
+            semester_configuration, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data)
-        else:
-            return Response(
-                {'detail': 'Semester configuration not found.'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, configuration_id, term_code):
-        semester_configuration = self.get_object(request, configuration_id, term_code)
-        if semester_configuration:
-            serializer = SemesterConfigurationSerializer(
-                semester_configuration, data=request.data, partial=True
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(
-                {'detail': 'Semester configuration not found.'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+    def delete(self, request, configuration_id: int, term_code: str) -> Response:
+        """
+        Handle DELETE request to remove a specific semester configuration.
 
-    def delete(self, request, configuration_id, term_code):
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+
+        Returns:
+            Response: An empty response with a 204 status code.
+        """
         semester_configuration = self.get_object(request, configuration_id, term_code)
-        if semester_configuration:
-            semester_configuration.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response(
-                {'detail': 'Semester configuration not found.'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        semester_configuration.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ScheduleSelectionView(APIView):
-    def get_object(self, request, configuration_id, term_code, index):
-        try:
-            return ScheduleSelection.objects.get(
-                semester_configuration__calendar_configuration_id=configuration_id,
-                semester_configuration__calendar_configuration__user=request.user,
-                semester_configuration__term__term_code=term_code,
-                index=index,
-            )
-        except ScheduleSelection.DoesNotExist:
-            return None
+    """
+    API view to handle schedule selections.
+    """
 
-    def put(self, request, configuration_id, term_code, index):
+    def get_object(
+        self, request, configuration_id: int, term_code: str, index: int
+    ) -> ScheduleSelection:
+        """
+        Get the schedule selection object.
+
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+            index (int): The schedule selection index.
+
+        Returns:
+            ScheduleSelection: The schedule selection object.
+        """
+        return get_object_or_404(
+            ScheduleSelection,
+            semester_configuration__calendar_configuration_id=configuration_id,
+            semester_configuration__calendar_configuration__user=request.user,
+            semester_configuration__term__term_code=term_code,
+            index=index,
+        )
+
+    def put(
+        self, request, configuration_id: int, term_code: str, index: int
+    ) -> Response:
+        """
+        Handle PUT request to update a specific schedule selection.
+
+        Args:
+            request: The HTTP request object.
+            configuration_id (int): The calendar configuration ID.
+            term_code (str): The term code.
+            index (int): The schedule selection index.
+
+        Returns:
+            Response: A response containing the updated schedule selection or error messages.
+        """
         schedule_selection = self.get_object(
             request, configuration_id, term_code, index
         )
-        if schedule_selection:
-            serializer = ScheduleSelectionSerializer(
-                schedule_selection, data=request.data, partial=True
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(
-                {'detail': 'Schedule selection not found.'},
-                status=status.HTTP_404_NOT_FOUND,
-            )
+        serializer = ScheduleSelectionSerializer(
+            schedule_selection, data=request.data, partial=True
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

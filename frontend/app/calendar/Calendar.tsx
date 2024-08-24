@@ -10,9 +10,6 @@ import useFilterStore from '@/store/filterSlice';
 
 import CalendarBody from './CalendarBody';
 
-const START_HOUR: number = 9;
-const END_HOUR: number = 21;
-
 const Calendar: FC = () => {
   const calendarElementRef = useRef<HTMLDivElement>(null);
   const { termFilter } = useFilterStore((state) => state);
@@ -104,12 +101,11 @@ const Calendar: FC = () => {
 
   return (
     <div>
+      {/* TODO: Make the background color of calendar-main match CalendarBody */}
       <div className='calendar-main'>
         <CalendarBody
           calendarRef={calendarElementRef}
           days={formattedDays.map((day) => day.name)}
-          startHour={START_HOUR}
-          endHour={END_HOUR}
           events={events}
           onEventClick={handleClick}
         />

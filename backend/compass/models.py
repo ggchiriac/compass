@@ -1,3 +1,10 @@
+"""
+Django model definitions for hoagieplan.
+
+Refer to the documentation here:
+https://docs.djangoproject.com/en/5.0/topics/db/models/
+"""
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -9,7 +16,7 @@ DEGREE_TYPE_CHOICES = (
     ('BSE', 'Bachelor of Science in Engineering'),
 )
 
-# Mapping from semester number to semester name
+# Semester number -> Semester name
 TIMELINE_CHOICES = (
     (1, 'freshman fall'),
     (2, 'freshman spring'),
@@ -76,7 +83,7 @@ class Minor(models.Model):
     class Meta:
         db_table = 'Minor'
 
-
+# TODO: This model is deprecated and should be removed.
 class Certificate(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=150, db_index=True, null=True)
@@ -87,8 +94,6 @@ class Certificate(models.Model):
     apply_by_semester = models.IntegerField(default=8)
     max_counted = models.IntegerField(db_index=True, null=True)
     min_needed = models.IntegerField(db_index=True, default=1)
-    # to help with phasing out certificates
-    # filter out for new users, keep for existing users pursuing it
     active_until = models.DateField(null=True, blank=True)
 
     class Meta:

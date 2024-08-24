@@ -44,4 +44,25 @@ urlpatterns = [
         views.FetchCalendarClasses.as_view(),
         name='fetch_calendar_classes',
     ),
+    # New Calendar Configuration endpoints
+    path(
+        'calendar-configurations/',
+        views.CalendarConfigurationsView.as_view(),
+        name='calendar_configurations',
+    ),
+    path(
+        'calendar-configurations/<str:term_code>/',
+        views.CalendarConfigurationView.as_view(),
+        name='calendar_configuration',
+    ),
+    path(
+        'semester-configurations/<int:configuration_id>/<str:term_code>/',
+        views.SemesterConfigurationView.as_view(),
+        name='semester_configuration',
+    ),
+    path(
+        'schedule-selections/<int:configuration_id>/<str:term_code>/<int:index>/',
+        views.ScheduleSelectionView.as_view(),
+        name='schedule_selection',
+    ),
 ]

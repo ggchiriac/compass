@@ -200,3 +200,26 @@ export type ClassMeeting = {
   days: string;
   building_name: string;
 };
+
+export type CalendarConfiguration = {
+  id: number;
+  user: User;
+  name: string;
+  semester_configurations: SemesterConfiguration[];
+};
+
+export type SemesterConfiguration = {
+  id: number;
+  calendar_configuration: CalendarConfiguration;
+  term: AcademicTerm;
+  schedule_selections: ScheduleSelection[];
+};
+
+export type ScheduleSelection = {
+  id: number;
+  semester_configuration: SemesterConfiguration;
+  section: Section;
+  index: number;
+  name: string;
+  is_active: boolean;
+};

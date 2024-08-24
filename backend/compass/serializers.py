@@ -13,6 +13,7 @@ class ClassMeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = ClassMeeting
         fields = (
+            'id',
             'meeting_number',
             'start_time',
             'end_time',
@@ -23,13 +24,17 @@ class ClassMeetingSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
-    # Nested ClassMeetingSerializer to include meeting details in the section data
-    class_meetings = ClassMeetingSerializer(many=True, read_only=True)
-    instructor_name = serializers.CharField(source='instructor.name', read_only=True)
+    class_meetings = ClassMeetingSerializer(many=True, source='classmeeting_set')
+    instructor_name = serializers.CharField(
+        source='instructor.full_name', read_only=True
+    )
+    course_title = serializers.CharField(source='course.title', read_only=True)
+    course_id = serializers.CharField(source='course.course_id', read_only=True)
 
     class Meta:
         model = Section
         fields = (
+            'id',
             'class_number',
             'class_type',
             'class_section',
@@ -40,11 +45,12 @@ class SectionSerializer(serializers.ModelSerializer):
             'status',
             'enrollment',
             'class_meetings',
+            'course_title',
+            'course_id',
         )
 
 
 class CourseSerializer(serializers.ModelSerializer):
-    # Nested SectionSerializer to include section details in the course data
     sections = SectionSerializer(many=True, read_only=True)
     department_code = serializers.CharField(source='department.code', read_only=True)
 
@@ -72,72 +78,12 @@ class CourseSerializer(serializers.ModelSerializer):
         )
 
 
-# Calendar (temporary serializer)
-class CalendarClassMeetingSerializer(serializers.ModelSerializer):
-    start_time = serializers.TimeField(format='%H:%M')
-    end_time = serializers.TimeField(format='%H:%M')
-
-    class Meta:
-        model = ClassMeeting
-        fields = (
-            'section_id',
-            'meeting_number',
-            'start_time',
-            'end_time',
-            'days',
-            'room',
-            'building_name',
-        )
-
-
-# May be deprecated due to new serializers below?
-class CalendarSectionSerializer(serializers.ModelSerializer):
-    class_meetings = CalendarClassMeetingSerializer(
-        source='classmeeting_set', many=True, read_only=True
-    )
-
-    class Meta:
-        model = Section
-        fields = (
-            'class_number',
-            'class_section',
-            'class_type',
-            'instructor',
-            'class_meetings',
-        )
-
-
 class ScheduleSelectionSerializer(serializers.ModelSerializer):
-    section_details = serializers.SerializerMethodField()
-
-    def get_section_details(self, obj):
-        return {
-            'id': obj.section.id,
-            'course': {
-                'guid': obj.section.course.guid,
-                'title': obj.section.course.title,
-                'catalog_number': obj.section.course.catalog_number,
-                'distribution_area_name': obj.section.course.distribution_area_name,
-                'distribution_area_short': obj.section.course.distribution_area_short,
-                'grading_basis': obj.section.course.grading_basis,
-            },
-            'section_number': obj.section.section_number,
-            'class_meetings': [
-                {
-                    'id': meeting.id,
-                    'days': meeting.days,
-                    'start_time': meeting.start_time,
-                    'end_time': meeting.end_time,
-                    'start_date': meeting.start_date,
-                    'end_date': meeting.end_date,
-                }
-                for meeting in obj.section.class_meetings.all()
-            ],
-        }
+    section = SectionSerializer(read_only=True)
 
     class Meta:
         model = ScheduleSelection
-        fields = ['id', 'section_details', 'index', 'name', 'is_active']
+        fields = ['id', 'section', 'index', 'name', 'is_active']
 
 
 class SemesterConfigurationSerializer(serializers.ModelSerializer):
@@ -155,4 +101,3 @@ class CalendarConfigurationSerializer(serializers.ModelSerializer):
         model = CalendarConfiguration
         fields = ['id', 'user', 'name', 'semester_configurations']
         read_only_fields = ['id', 'user']
-        

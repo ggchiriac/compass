@@ -9,20 +9,11 @@ import CalendarGrid from './CalendarGrid';
 interface CalendarBodyProps {
   calendarRef: RefObject<HTMLDivElement>;
   days: string[];
-  startHour: number;
-  endHour: number;
   events: CalendarEvent[];
   onEventClick: (event: CalendarEvent) => void;
 }
 
-const CalendarBody: FC<CalendarBodyProps> = ({
-  calendarRef,
-  days,
-  startHour,
-  endHour,
-  events,
-  onEventClick,
-}) => {
+const CalendarBody: FC<CalendarBodyProps> = ({ calendarRef, days, events, onEventClick }) => {
   const today: Date = new Date();
   const weekStart: Date = startOfWeek(today, { weekStartsOn: 1 });
   const weekdays: Date[] = Array.from({ length: days.length }, (_, index) =>
@@ -46,8 +37,6 @@ const CalendarBody: FC<CalendarBodyProps> = ({
           <div className='col-start-1 col-end-[-1] row-start-1 row-end-[-1]'>
             <CalendarGrid
               days={formattedDays.map((day) => day.name)}
-              startHour={startHour}
-              endHour={endHour}
               events={events}
               onEventClick={onEventClick}
             />
