@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { AuthState } from '../types';
+import { AuthState } from '@/types';
 
 const useAuthStore = create<AuthState>((set) => ({
   user: undefined,
@@ -8,6 +8,7 @@ const useAuthStore = create<AuthState>((set) => ({
   setIsAuthenticated: (isAuthenticated: boolean) => set({ isAuthenticated }),
   checkAuthentication: async () => {
     try {
+      console.log('Checking authentication...');
       const response = await fetch(`${process.env.BACKEND}/cas?action=authenticate`, {
         credentials: 'include',
       });
@@ -19,11 +20,13 @@ const useAuthStore = create<AuthState>((set) => ({
       }
 
       const data = await response.json();
+      console.log('Authentication response:', data);
 
       set({
         isAuthenticated: data.authenticated,
         user: data.authenticated ? data.user : undefined,
       });
+      console.log('Authentication status:', data.authenticated);
     } catch (error) {
       console.error('Error checking authentication:', error);
       set({ isAuthenticated: false, user: undefined });

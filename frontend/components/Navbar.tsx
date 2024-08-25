@@ -4,8 +4,8 @@ import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import Image from 'next/image';
 
-import useAuthStore from '../store/authSlice';
-import useMobileMenuStore from '../store/mobileMenuSlice';
+import useAuthStore from '@/store/authSlice';
+import useMobileMenuStore from '@/store/mobileMenuSlice';
 
 import DropdownMenu from './DropdownMenu';
 import { Login } from './Login';

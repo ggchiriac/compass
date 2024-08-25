@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { MobileMenuState } from '../types';
+import { MobileMenuState } from '@/types';
 
 const useMobileMenuStore = create<MobileMenuState>((set) => ({
   mobileMenuOpen: false,

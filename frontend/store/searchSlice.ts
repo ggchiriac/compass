@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import { SearchStoreState } from '../types';
+import { SearchStoreState } from '@/types';
 
 const useSearchStore = create<SearchStoreState>((set) => ({
   searchResults: [],

@@ -7,7 +7,7 @@ import { rectSortingStrategy } from '@dnd-kit/sortable';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
-import useAuthStore from '@/store/authSlice';
+import useAuthStore from '@/store/authSlice'; // TODO: INTEGRATE NEW AUTH
 import UserState from '@/store/userSlice';
 
 import { Canvas } from './Canvas';

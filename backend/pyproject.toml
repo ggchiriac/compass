@@ -55,6 +55,7 @@ beautifulsoup4 = "^4.12.3"
 selenium = "^4.22.0"
 webdriver-manager = "^4.0.1"
 thefuzz = "^0.22.1"
+colorama = "^0.4.6"
 
 [tool.poetry.dev-dependencies]
 # See `ruff help` for more on Ruff's top-level commands.
@@ -87,8 +88,7 @@ exclude = [
     "venv",
 ]
 
-# Same as Black.
-line-length = 88
+line-length = 119
 indent-width = 4
 
 # Assuming Python 3.9+.

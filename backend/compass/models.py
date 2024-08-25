@@ -2,7 +2,7 @@
 Django model definitions for hoagieplan.
 
 Refer to the documentation here:
-https://docs.djangoproject.com/en/5.0/topics/db/models/
+https://docs.djangoproject.com/en/5.1/topics/db/models/
 """
 
 from django.contrib.auth.models import AbstractUser
@@ -124,6 +124,7 @@ class AcademicTerm(models.Model):
 
     class Meta:
         db_table = 'AcademicTerm'
+        ordering = ['start_date']
 
     def __str__(self):
         return self.term_code
@@ -344,12 +345,14 @@ class CalendarConfiguration(models.Model):
         db_index=True,
     )
     name = models.CharField(max_length=100, db_index=True, blank=True)
+    index = models.IntegerField(null=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'name')
         db_table = 'CalendarConfiguration'
+        unique_together = ['user', 'name']
+        ordering = ['name']
 
     def __str__(self):
         return f'{self.user.username}: {self.name}'
@@ -372,8 +375,9 @@ class SemesterConfiguration(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('calendar_configuration', 'term')
         db_table = 'SemesterConfiguration'
+        unique_together = ['calendar_configuration', 'term']
+        ordering = ['term__start_date']
 
     def __str__(self):
         return f'{self.calendar_configuration}: {self.term.suffix}'
@@ -395,7 +399,8 @@ class ScheduleSelection(models.Model):
 
     class Meta:
         db_table = 'ScheduleSelection'
-        unique_together = ('semester_configuration', 'section', 'index')
+        unique_together = ['semester_configuration', 'section', 'index']
+        ordering = ['index']
 
 
 class CourseEvaluations(models.Model):

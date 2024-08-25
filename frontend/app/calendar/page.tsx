@@ -10,6 +10,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Button,
+  toaster,
 } from 'evergreen-ui';
 
 import BackgroundGradient from '@/components/BackgroundGradient';
@@ -27,7 +28,7 @@ import CalendarSearch from './CalendarSearch';
 import SelectedCourses from './SelectedCourses';
 
 const CalendarUI: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState(2);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
@@ -36,18 +37,38 @@ const CalendarUI: FC = () => {
   const semestersPerPage = 5;
   const totalPages = Math.ceil(semesterList.length / semestersPerPage);
 
-  // Mock data for configurations (replace with actual data fetching logic)
-  const [configurations, setConfigurations] = useState([
-    { id: '1', name: 'Config 1' },
-    { id: '2', name: 'Config 2' },
-    { id: '3', name: 'Config 3' },
-    { id: '4', name: 'Config 4' },
-    { id: '5', name: 'Config 5' },
-  ]);
-  const [activeConfiguration, setActiveConfiguration] = useState('1');
+  const [configurations, setConfigurations] = useState([]);
+  const [activeConfiguration, setActiveConfiguration] = useState(null);
+
+  // const fetchConfigurations = async () => {
+  //   try {
+  //     const response = await fetch(`${process.env.BACKEND}/calendar-configurations/`);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch calendar configurations');
+  //     }
+  //     const data = await response.json();
+  //     setConfigurations(data);
+  //     if (data.length > 0 && !activeConfiguration) {
+  //       setActiveConfiguration(data[0].id);
+  //     }
+  //   } catch (error) {
+  //     toaster.danger('Error fetching configurations');
+  //   }
+  // };
 
   useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
+    const initializeApp = async () => {
+      try {
+        await checkAuthentication();
+        // await fetchConfigurations(); // TODO: Things may break when this is uncommented
+      } catch (error) {
+        toaster.danger('Error initializing the application');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeApp();
   }, [checkAuthentication]);
 
   const handlePageChange = (page: number) => {
@@ -142,10 +163,10 @@ const CalendarUI: FC = () => {
                 <ConfigurationSelector
                   configurations={configurations}
                   activeConfiguration={activeConfiguration}
-                  onConfigurationChange={handleConfigurationChange}
-                  onConfigurationCreate={handleConfigurationCreate}
-                  onConfigurationDelete={handleConfigurationDelete}
-                  onConfigurationRename={handleConfigurationRename}
+                  onChangeConfiguration={handleConfigurationChange}
+                  onCreateConfiguration={handleConfigurationCreate}
+                  onDeleteConfiguration={handleConfigurationDelete}
+                  onRenameConfiguration={handleConfigurationRename}
                   getTermSuffix={getTermSuffix}
                 />
                 <div className='flex space-x-2'>
@@ -154,11 +175,7 @@ const CalendarUI: FC = () => {
                   <Button>Export</Button>
                 </div>
               </div>
-              {!isLoading && userProfile && userProfile.netId !== '' ? (
-                <Calendar />
-              ) : (
-                <SkeletonApp />
-              )}
+              {!loading && userProfile && userProfile.netId !== '' ? <Calendar /> : <SkeletonApp />}
             </div>
           </main>
         </div>

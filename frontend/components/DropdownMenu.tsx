@@ -3,9 +3,9 @@ import { Fragment, useState, useEffect, FC } from 'react';
 import { Menu, Transition } from '@headlessui/react';
 import clssx from 'clsx';
 
-import { MenuItemProps } from '../types';
+import { MenuItemProps } from '@/types';
 
-import useUserSlice from '../store/userSlice';
+import useUserSlice from '@/store/userSlice';
 
 import { Logout } from './Logout';
 import SettingsModal from './Modal';
