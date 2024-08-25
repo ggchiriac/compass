@@ -63,3 +63,14 @@ req_list:
     - POR 3**
     - POR 4**
     - POR 5**
+- name: Independent Work
+  max_counted: 0
+  min_needed: 0
+  explanation: "During their senior year, students are required to submit
+  a paper on a designated topic. The paper must be written in Portuguese;
+  be at least 6,000 words in length; and be an extension of a paper written
+  for one of the courses taken towards the certificate. Advisers are not
+  assigned. One additional upper-division POR course (above the 100-level)
+  may be substituted for the independent work."
+  double_counting_allowed: false
+  no_req:
