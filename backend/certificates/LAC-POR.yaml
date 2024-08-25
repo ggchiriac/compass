@@ -3,11 +3,21 @@ type: Certificate
 name: Portuguese Language and Culture
 code: LAC-POR
 degree:
-description: The Program in Language and Culture, administered through the individual
-  language and literature departments, allows concentrators in any discipline to earn
-  a certificate in language and culture. Certificates can be earned in the departments
-  of classics, East Asian studies, French and Italian, German, Near Eastern studies,
-  Slavic languages and literatures, and Spanish and Portuguese languages and cultures.
+description: "The program is open to all undergraduates in all departments.
+Ordinarily, students majoring in language and literature departments, including
+comparative literature, will be eligible for the certificate in language and culture
+provided that: (a) the linguistic base for the language and culture certificate is
+different from the linguistic base of the major; and (b) the work required for the
+language and culture certificate does not duplicate the requirements of the major.
+
+Students pursuing area studies certificates may earn the certificate in language
+and culture provided that (a) the courses they elect to satisfy the requirements
+of the area studies program are different from those they elect to satisfy the
+requirements of the language and culture certificate program (in agreement with
+the Program in Latin American Studies, one course can be used towards both a
+certificate in Spanish or Portuguese and a certificate in Latin American Studies;
+and (b) they submit a piece of independent work in addition to the independent work
+that satisfies the requirements of each area studies program."
 urls:
 - https://spo.princeton.edu/undergraduate/certificate
 contacts:
