@@ -1,6 +1,6 @@
 import { FC } from 'react';
 
-import useAuthStore from '../store/authSlice';
+import useAuthStore from '@/store/authSlice';
 
 export const Login: FC = () => {
   const login = useAuthStore((state) => state.login);

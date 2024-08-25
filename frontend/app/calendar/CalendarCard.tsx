@@ -42,6 +42,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
       }}
       onClick={onSectionClick}
     >
+      {/* Keep this commented out for now */}
       {/* <div className='card-header'></div>
       <div className='card-body'>
         {relevantMeetings.map((classMeeting, index) => (

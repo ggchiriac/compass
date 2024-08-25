@@ -64,7 +64,7 @@ const navigation = [
 
 const About = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { checkAuthentication } = useAuthStore();
+  const { checkAuthentication } = useAuthStore(); // TODO: INTEGRATE NEW AUTH
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);

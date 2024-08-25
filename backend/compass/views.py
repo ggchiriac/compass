@@ -3,23 +3,26 @@ import time
 from datetime import datetime
 from re import IGNORECASE, compile, search, split, sub
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote
 from urllib.request import urlopen
 
 import ujson as json
+from .tests import Logger
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.contrib.auth import login
+from django.views import View
 from django.db import IntegrityError, transaction
 from django.db.models import Q, Prefetch, QuerySet
-from django.http import JsonResponse, HttpResponseServerError
+from django.http import JsonResponse, HttpRequest, HttpResponseRedirect, HttpResponseServerError
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods
 from itertools import groupby
 from rest_framework import status
-from rest_framework.response import Response
+from rest_framework.response import Response  # TODO: Standardize on JsonResponse vs Response
 from rest_framework.views import APIView
+from typing import Optional
 
 from .models import (
     ClassMeeting,
@@ -64,7 +67,7 @@ class UserProfileNotFoundError(Exception):
     """
 
     def __init__(self, message: str, user_id: str = None):
-        super().__init__(message)
+        super(UserProfileNotFoundError).__init__(message)
         self.user_id = user_id
         self.message = message
 
@@ -78,32 +81,16 @@ class UserProfileUpdateError(Exception):
     """
 
     def __init__(self, message: str, user_id: str = None, errors: dict = None):
-        super().__init__(message)
+        super(UserProfileUpdateError).__init__(message)
         self.user_id = user_id
         self.errors = errors
         self.message = message
 
     def __str__(self):
         error_details = (
-            ', '.join(f'{key}: {value}' for key, value in self.errors.items())
-            if self.errors
-            else 'No details'
+            ', '.join(f'{key}: {value}' for key, value in self.errors.items()) if self.errors else 'No details'
         )
         return f'UserProfileUpdateError: {self.message} for user_id={self.user_id}. Errors: {error_details}'
-
-
-class CASAuthenticationException(Exception):
-    """
-    Exception raised when there is a failure in the CAS authentication process.
-    """
-
-    def __init__(self, message: str, details: str = None):
-        super().__init__(message)
-        self.details = details
-        self.message = message
-
-    def __str__(self):
-        return f'CASAuthenticationException: {self.message}. Details: {self.details if self.details else "No additional details provided."}'
 
 
 # ------------------------------------ PROFILE ----------------------------------------#
@@ -128,24 +115,13 @@ def fetch_user_info(net_id):
         logger.error(f'Failed to create or retrieve user {net_id}: {e}')
         raise ValidationError(f'Database integrity error for user {net_id}') from e
 
-    major = (
-        {'code': user_inst.major.code, 'name': user_inst.major.name}
-        if user_inst.major
-        else 'UNDECLARED'
-    )
+    major = {'code': user_inst.major.code, 'name': user_inst.major.name} if user_inst.major else 'UNDECLARED'
 
-    minors = [
-        {'code': minor.code, 'name': minor.name} for minor in user_inst.minors.all()
-    ]
+    minors = [{'code': minor.code, 'name': minor.name} for minor in user_inst.minors.all()]
 
     try:
         # Check if any of the required attributes are not set
-        if (
-            not user_inst.email
-            or not user_inst.first_name
-            or not user_inst.last_name
-            or not user_inst.class_year
-        ):
+        if not user_inst.email or not user_inst.first_name or not user_inst.last_name or not user_inst.class_year:
             # Fetch the student profile
             student_profile = req_lib.getJSON(f'{configs.USERS_FULL}?uid={net_id}')
             profile = student_profile[0]
@@ -153,19 +129,13 @@ def fetch_user_info(net_id):
             # Extract and update the class year if not already set
             class_year_match = search(r'Class of (\d{4})', profile['dn'])
             class_year = int(class_year_match.group(1)) if class_year_match else None
-            user_inst.class_year = (
-                class_year if not user_inst.class_year else user_inst.class_year
-            )
+            user_inst.class_year = class_year if not user_inst.class_year else user_inst.class_year
 
             # Extract and update the first name and last name if not already set
             full_name = profile['displayname'].split(' ')
             first_name, last_name = full_name[0], ' '.join(full_name[1:])
-            user_inst.first_name = (
-                first_name if not user_inst.first_name else user_inst.first_name
-            )
-            user_inst.last_name = (
-                last_name if not user_inst.last_name else user_inst.last_name
-            )
+            user_inst.first_name = first_name if not user_inst.first_name else user_inst.first_name
+            user_inst.last_name = last_name if not user_inst.last_name else user_inst.last_name
 
             # Update the email if not already set
             user_inst.email = profile.get('mail', user_inst.email)
@@ -188,9 +158,7 @@ def fetch_user_info(net_id):
     except (KeyError, IndexError) as e:
         # Log and raise an error if there is a problem with processing profile data
         logger.error(f'Error processing external profile data for {net_id}: {e}')
-        raise UserProfileNotFoundError(
-            'Failed to update user profile from external source'
-        ) from e
+        raise UserProfileNotFoundError('Failed to update user profile from external source') from e
 
 
 def profile(request):
@@ -241,17 +209,11 @@ def update_profile(request):
         try:
             user_inst.major = Major.objects.get(code=updated_major_code)
         except Major.DoesNotExist:
-            return JsonResponse(
-                {'error': f'Major not found for code: {updated_major_code}'}, status=404
-            )
+            return JsonResponse({'error': f'Major not found for code: {updated_major_code}'}, status=404)
 
         # Update minors
         try:
-            minor_objects = [
-                Minor.objects.get(code=minor['code'])
-                for minor in updated_minors
-                if 'code' in minor
-            ]
+            minor_objects = [Minor.objects.get(code=minor['code']) for minor in updated_minors if 'code' in minor]
         except Minor.DoesNotExist:
             return JsonResponse({'error': 'One or more minors not found'}, status=404)
 
@@ -316,26 +278,18 @@ class CASAuthBackend:
                         f'Validation Warning: Received {len(response_lines)} lines from CAS, expected 2. URL: {validation_url}'
                     )
                     return None
-                first_line, second_line = map(
-                    str.strip, map(bytes.decode, response_lines)
-                )
+                first_line, second_line = map(str.strip, map(bytes.decode, response_lines))
                 if first_line.startswith('yes'):
                     logger.info(f'Successful validation for ticket: {ticket}')
                     return second_line
                 else:
-                    logger.info(
-                        f'Failed validation for ticket: {ticket}. Response: {first_line}'
-                    )
+                    logger.info(f'Failed validation for ticket: {ticket}. Response: {first_line}')
                     return None
         except (HTTPError, URLError) as e:
-            logger.error(
-                f'Network Error during CAS validation: {e}. URL: {validation_url}'
-            )
+            logger.error(f'Network Error during CAS validation: {e}. URL: {validation_url}')
             return None
         except Exception as e:
-            logger.error(
-                f'Unexpected error during CAS validation: {e}. URL: {validation_url}'
-            )
+            logger.error(f'Unexpected error during CAS validation: {e}. URL: {validation_url}')
             return None
 
     def authenticate(self, request):
@@ -357,9 +311,7 @@ class CASAuthBackend:
             net_id = self._validate(ticket, service_url)
             logger.debug(f'net_id: {net_id}')
             if net_id:
-                user, created = CustomUser.objects.get_or_create(
-                    net_id=net_id, defaults={'role': 'student'}
-                )
+                user, created = CustomUser.objects.get_or_create(net_id=net_id, defaults={'role': 'student'})
                 logger.debug(f'user: {user}')
                 logger.debug(f'created: {created}')
                 if created:
@@ -435,17 +387,11 @@ class CAS(APIView):
         """
         logger.debug('CAS.login called')
         try:
-            logger.info(
-                f'Incoming GET request: {request.GET}, Session: {request.session}'
-            )
-            logger.info(
-                f"Received login request from {request.META.get('REMOTE_ADDR')}"
-            )
+            logger.info(f'Incoming GET request: {request.GET}, Session: {request.session}')
+            logger.info(f"Received login request from {request.META.get('REMOTE_ADDR')}")
 
             logger.debug(f'request.user: {request.user}')
-            logger.debug(
-                f'request.user.is_authenticated: {request.user.is_authenticated}'
-            )
+            logger.debug(f'request.user.is_authenticated: {request.user.is_authenticated}')
             if request.user.is_authenticated:
                 return redirect(settings.DASHBOARD)
 
@@ -465,9 +411,7 @@ class CAS(APIView):
                 return redirect(login_url)
         except Exception as e:
             logger.error(f'Exception in login view: {e}')
-            return JsonResponse(
-                {'error': 'An error occurred during login.'}, status=500
-            )
+            return JsonResponse({'error': 'An error occurred during login.'}, status=500)
 
     def logout(self, request):
         """
@@ -537,9 +481,7 @@ class SearchCourses(APIView):
         dept, num, code = self.parse_query(trimmed_query)
 
         # Build query conditions
-        query_conditions = self.build_query_conditions(
-            term, distribution, levels, grading_options
-        )
+        query_conditions = self.build_query_conditions(term, distribution, levels, grading_options)
 
         try:
             # Try exact match first
@@ -559,9 +501,7 @@ class SearchCourses(APIView):
             return Response({'courses': []})
 
         except Exception as e:
-            return Response(
-                {'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def parse_query(self, query):
         if DEPT_NUM_SUFFIX_REGEX.match(query) or DEPT_NUM_REGEX.match(query):
@@ -601,11 +541,7 @@ class SearchCourses(APIView):
     def get_exact_match(self, dept, num, conditions):
         return (
             Course.objects.select_related('department')
-            .filter(
-                conditions
-                & Q(department__code__iexact=dept)
-                & Q(catalog_number__iexact=num)
-            )
+            .filter(conditions & Q(department__code__iexact=dept) & Q(catalog_number__iexact=num))
             .order_by('course_id', '-guid')
             .distinct('course_id')
         )
@@ -632,9 +568,7 @@ class GetUserCourses(APIView):
         if net_id:
             try:
                 for semester in range(1, 9):
-                    user_courses = Course.objects.filter(
-                        usercourses__user=user_inst, usercourses__semester=semester
-                    )
+                    user_courses = Course.objects.filter(usercourses__user=user_inst, usercourses__semester=semester)
                     serialized_courses = CourseSerializer(user_courses, many=True)
                     user_course_dict[semester] = serialized_courses.data
 
@@ -696,9 +630,7 @@ def update_courses(request):
         logger.error(f'An internal error occurred: {e}', exc_info=True)
 
         # Return a generic error message to the user
-        return JsonResponse(
-            {'status': 'error', 'message': 'An internal error has occurred!'}
-        )
+        return JsonResponse({'status': 'error', 'message': 'An internal error has occurred!'})
 
 
 def update_user(request):
@@ -708,23 +640,19 @@ def update_user(request):
         if (class_year > 2030) or (class_year < 2023):
             raise ValueError('Class year out of range')
 
-        net_id = request.user.net_id
+        net_id = request.user.net_id  # TODO: Change this to user.username?
         user_inst = CustomUser.objects.get(net_id=net_id)
         user_inst.class_year = class_year
         user_inst.save()
 
-        return JsonResponse(
-            {'status': 'success', 'message': 'Class year updated successfully.'}
-        )
+        return JsonResponse({'status': 'success', 'message': 'Class year updated successfully.'})
 
     except Exception as e:
         # Log the detailed error internally
         logger.error(f'An internal error occurred: {e}', exc_info=True)
 
         # Return a generic error message to the user
-        return JsonResponse(
-            {'status': 'error', 'message': 'An internal error has occurred!'}
-        )
+        return JsonResponse({'status': 'error', 'message': 'An internal error has occurred!'})
 
 
 # ----------------------------- CHECK REQUIREMENTS -----------------------------------#
@@ -810,9 +738,7 @@ def manually_settle(request):
     net_id = request.session['net_id']
     user_inst = CustomUser.objects.get(net_id=net_id)
     course_inst = (
-        Course.objects.select_related('department')
-        .filter(crosslistings__iexact=crosslistings)
-        .order_by('-guid')[0]
+        Course.objects.select_related('department').filter(crosslistings__iexact=crosslistings).order_by('-guid')[0]
     )
 
     user_course_inst = UserCourses.objects.get(user_id=user_inst.id, course=course_inst)
@@ -846,9 +772,7 @@ def mark_satisfied(request):
             user_inst.requirements.remove(req_inst)
             action = 'Unmarked satisfied'
         else:
-            return JsonResponse(
-                {'error': 'Requirement not found in user requirements.'}
-            )
+            return JsonResponse({'error': 'Requirement not found in user requirements.'})
 
     return JsonResponse({'Manually satisfied': req_id, 'action': action})
 
@@ -916,9 +840,7 @@ def requirement_info(request):
                 .distinct('course_id')
             )
         else:
-            excluded_course_ids = req_inst.excluded_course_list.values_list(
-                'course_id', flat=True
-            ).distinct()
+            excluded_course_ids = req_inst.excluded_course_list.values_list('course_id', flat=True).distinct()
             course_list = (
                 req_inst.course_list.exclude(course_id__in=excluded_course_ids)
                 .order_by('course_id', '-guid')
@@ -927,9 +849,7 @@ def requirement_info(request):
 
         if course_list:
             serialized_course_list = CourseSerializer(course_list, many=True)
-            sorted_course_list = sorted(
-                serialized_course_list.data, key=lambda course: course['crosslistings']
-            )
+            sorted_course_list = sorted(serialized_course_list.data, key=lambda course: course['crosslistings'])
 
         if req_inst.dept_list:
             sorted_dept_list = sorted(json.loads(req_inst.dept_list))
@@ -953,9 +873,7 @@ def requirement_info(request):
                 .distinct('course_id')
             )
             if dept_sample_list:
-                serialized_dept_sample_list = CourseSerializer(
-                    dept_sample_list, many=True
-                )
+                serialized_dept_sample_list = CourseSerializer(dept_sample_list, many=True)
                 sorted_dept_sample_list = sorted(
                     serialized_dept_sample_list.data,
                     key=lambda course: course['crosslistings'],
@@ -1010,9 +928,7 @@ class FetchCalendarClasses(APIView):
         """
         sections = self.get_class_meetings(term, course_id)
         if not sections.exists():
-            return Response(
-                {'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = SectionSerializer(sections, many=True)
         sections = serializer.data
@@ -1021,9 +937,7 @@ class FetchCalendarClasses(APIView):
 
         selected_instructor = next(iter(sections_by_instructor.keys()), None)
         if not selected_instructor:
-            return Response(
-                {'error': 'No instructors found'}, status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({'error': 'No instructors found'}, status=status.HTTP_404_NOT_FOUND)
 
         selected_sections = sections_by_instructor[selected_instructor]
         self.log_sections(selected_sections)
@@ -1044,11 +958,7 @@ class FetchCalendarClasses(APIView):
         return (
             Section.objects.filter(term__term_code=term, course__course_id=course_id)
             .select_related('course', 'instructor')
-            .prefetch_related(
-                Prefetch(
-                    'classmeeting_set', queryset=ClassMeeting.objects.order_by('id')
-                )
-            )
+            .prefetch_related(Prefetch('classmeeting_set', queryset=ClassMeeting.objects.order_by('id')))
         )
 
     @staticmethod
@@ -1103,6 +1013,7 @@ class CalendarConfigurationsView(APIView):
     def get(self, request) -> Response:
         """
         Handle GET request to fetch calendar configurations.
+        A calendar configuration is one possible set of courses for the user.
 
         Args:
             request: The HTTP request object.
@@ -1110,14 +1021,13 @@ class CalendarConfigurationsView(APIView):
         Returns:
             Response: A response containing the serialized calendar configurations.
         """
+        net_id = request.user
+        logging.info(f'ballsack: {net_id}')
+        user_inst = CustomUser.objects.get(net_id=net_id)
         term_code = request.query_params.get('term_code')
-        user = request.user
-
-        queryset = CalendarConfiguration.objects.filter(user=user)
+        queryset = CalendarConfiguration.objects.filter(user=user_inst.id)
         if term_code:
-            queryset = queryset.filter(
-                semester_configurations__term__term_code=term_code
-            )
+            queryset = queryset.filter(semester_configurations__term__term_code=term_code)
 
         serializer = CalendarConfigurationSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -1151,7 +1061,7 @@ class CalendarConfigurationsView(APIView):
 
 class CalendarConfigurationView(APIView):
     """
-    API view to handle individual calendar configurations.
+    API view to handle a SINGLE calendar configuration.
     """
 
     def get(self, request, term_code: str) -> Response:
@@ -1174,32 +1084,44 @@ class CalendarConfigurationView(APIView):
         serializer = CalendarConfigurationSerializer(calendar_config)
         return Response(serializer.data)
 
+    def put(self, request, term_code: str) -> Response:
+        """
+        Handle PUT request to update a specific calendar configuration.
+        """
+        user = request.user
+        calendar_config = get_object_or_404(
+            CalendarConfiguration,
+            user=user,
+            semester_configurations__term__term_code=term_code,
+        )
+        serializer = CalendarConfigurationSerializer(
+            calendar_config,
+            data=request.data,
+            partial=True,
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, term_code: str) -> Response:
+        """
+        Handle DELETE request to remove a specific calendar configuration.
+        """
+        user = request.user
+        calendar_config = get_object_or_404(
+            CalendarConfiguration,
+            user=user,
+            semester_configurations__term__term_code=term_code,
+        )
+        calendar_config.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 
 class SemesterConfigurationView(APIView):
     """
     API view to handle semester configurations.
     """
-
-    def get_object(
-        self, request, configuration_id: int, term_code: str
-    ) -> SemesterConfiguration:
-        """
-        Get the semester configuration object.
-
-        Args:
-            request: The HTTP request object.
-            configuration_id (int): The calendar configuration ID.
-            term_code (str): The term code.
-
-        Returns:
-            SemesterConfiguration: The semester configuration object.
-        """
-        return get_object_or_404(
-            SemesterConfiguration,
-            calendar_configuration_id=configuration_id,
-            calendar_configuration__user=request.user,
-            term__term_code=term_code,
-        )
 
     def get(self, request, configuration_id: int, term_code: str) -> Response:
         """
@@ -1213,8 +1135,13 @@ class SemesterConfigurationView(APIView):
         Returns:
             Response: A response containing the serialized semester configuration.
         """
-        semester_configuration = self.get_object(request, configuration_id, term_code)
-        serializer = SemesterConfigurationSerializer(semester_configuration)
+        semester_config = get_object_or_404(
+            SemesterConfiguration,
+            calendar_configuration_id=configuration_id,
+            calendar_configuration__user=request.user,
+            term__term_code=term_code,
+        )
+        serializer = SemesterConfigurationSerializer(semester_config)
         return Response(serializer.data)
 
     def put(self, request, configuration_id: int, term_code: str) -> Response:
@@ -1229,10 +1156,13 @@ class SemesterConfigurationView(APIView):
         Returns:
             Response: A response containing the updated semester configuration or error messages.
         """
-        semester_configuration = self.get_object(request, configuration_id, term_code)
-        serializer = SemesterConfigurationSerializer(
-            semester_configuration, data=request.data, partial=True
+        semester_config = get_object_or_404(
+            SemesterConfiguration,
+            calendar_configuration_id=configuration_id,
+            calendar_configuration__user=request.user,
+            term__term_code=term_code,
         )
+        serializer = SemesterConfigurationSerializer(semester_config, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -1250,61 +1180,62 @@ class SemesterConfigurationView(APIView):
         Returns:
             Response: An empty response with a 204 status code.
         """
-        semester_configuration = self.get_object(request, configuration_id, term_code)
-        semester_configuration.delete()
+        semester_config = get_object_or_404(
+            SemesterConfiguration,
+            calendar_configuration_id=configuration_id,
+            calendar_configuration__user=request.user,
+            term__term_code=term_code,
+        )
+        semester_config.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ScheduleSelectionView(APIView):
     """
-    API view to handle schedule selections.
+    API view to handle schedule selections on a semesterly basis.
     """
 
-    def get_object(
-        self, request, configuration_id: int, term_code: str, index: int
-    ) -> ScheduleSelection:
+    def get(self, request, configuration_id: int, term_code: str, index: int) -> Response:
         """
-        Get the schedule selection object.
-
-        Args:
-            request: The HTTP request object.
-            configuration_id (int): The calendar configuration ID.
-            term_code (str): The term code.
-            index (int): The schedule selection index.
-
-        Returns:
-            ScheduleSelection: The schedule selection object.
+        Handle GET request to fetch a specific schedule selection.
         """
-        return get_object_or_404(
+        schedule = get_object_or_404(
             ScheduleSelection,
             semester_configuration__calendar_configuration_id=configuration_id,
             semester_configuration__calendar_configuration__user=request.user,
             semester_configuration__term__term_code=term_code,
             index=index,
         )
+        serializer = ScheduleSelectionSerializer(schedule)
+        return Response(serializer.data)
 
-    def put(
-        self, request, configuration_id: int, term_code: str, index: int
-    ) -> Response:
+    def put(self, request, configuration_id: int, term_code: str, index: int) -> Response:
         """
         Handle PUT request to update a specific schedule selection.
-
-        Args:
-            request: The HTTP request object.
-            configuration_id (int): The calendar configuration ID.
-            term_code (str): The term code.
-            index (int): The schedule selection index.
-
-        Returns:
-            Response: A response containing the updated schedule selection or error messages.
         """
-        schedule_selection = self.get_object(
-            request, configuration_id, term_code, index
+        schedule = get_object_or_404(
+            ScheduleSelection,
+            semester_configuration__calendar_configuration_id=configuration_id,
+            semester_configuration__calendar_configuration__user=request.user,
+            semester_configuration__term__term_code=term_code,
+            index=index,
         )
-        serializer = ScheduleSelectionSerializer(
-            schedule_selection, data=request.data, partial=True
-        )
+        serializer = ScheduleSelectionSerializer(schedule, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, configuration_id: int, term_code: str, index: int) -> Response:
+        """
+        Handle DELETE request to remove a specific schedule selection.
+        """
+        schedule = get_object_or_404(
+            ScheduleSelection,
+            semester_configuration__calendar_configuration_id=configuration_id,
+            semester_configuration__calendar_configuration__user=request.user,
+            semester_configuration__term__term_code=term_code,
+            index=index,
+        )
+        schedule.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

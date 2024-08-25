@@ -25,16 +25,17 @@ export const getRowIndex = (time: string): number => {
   return (hours - START_HOUR) * 2 + Math.floor(minutes / 30);
 };
 
-export const processEvents = (events: CalendarEvent[]): CalendarEvent[] => {
-  return events.flatMap((event) => {
-    return event.days.split('').map((day) => ({
-      ...event,
-      startColumnIndex: getDayIndex(day),
-      startRowIndex: getRowIndex(event.startTime),
-      endRowIndex: getRowIndex(event.endTime),
-    }));
-  });
-};
+// TODO: To be added back in
+// export const processEvents = (events: CalendarEvent[]): CalendarEvent[] => {
+//   return events.flatMap((event) => {
+//     return event.days.split('').map((day) => ({
+//       ...event,
+//       startColumnIndex: getDayIndex(day),
+//       startRowIndex: getRowIndex(event.startTime),
+//       endRowIndex: getRowIndex(event.endTime),
+//     }));
+//   });
+// };
 
 export const groupAndFlattenEvents = (
   events: CalendarEvent[],

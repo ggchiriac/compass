@@ -1,4 +1,3 @@
-// termUtils.ts
 export const terms: { [key: string]: string } = {
   'Fall 2020': '1212',
   'Spring 2021': '1214',

@@ -1,5 +1,15 @@
+// TODO: This does not need to be a Zustand store since we can manage local states
+// and "global" (intra-page) states with useState.
+
+// Leaving it as an artifact of early HoagiePlan for now, but this should be ticketed soon. --Windsor
+
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+
+import { distributionAreas, distributionAreasInverse } from '@/utils/distributionAreas';
+import { grading } from '@/utils/grading';
+import { levels } from '@/utils/levels';
+import { terms, termsInverse } from '@/utils/terms';
 
 interface FilterState {
   terms: { [key: string]: string };
@@ -7,7 +17,7 @@ interface FilterState {
   distributionAreas: { [key: string]: string };
   distributionAreasInverse: { [key: string]: string };
   levels: { [key: string]: string };
-  gradingBases: string[];
+  grading: string[];
   termFilter: string;
   distributionFilter: string;
   levelFilter: string[];
@@ -25,102 +35,47 @@ interface FilterState {
   }) => void;
   setShowPopup: (show: boolean) => void;
   resetFilters: () => void;
-  areFiltersEmpty: (filter) => boolean;
+  areFiltersEmpty: () => boolean;
 }
 
 const useFilterStore = create<FilterState>()(
   persist(
-    (set) => ({
-      terms: {
-        'Fall 2024': '1252',
-        'Spring 2024': '1244',
-        'Fall 2023': '1242',
-        'Spring 2023': '1234',
-        'Fall 2022': '1232',
-        'Spring 2022': '1224',
-        'Fall 2021': '1222',
-        'Spring 2021': '1214',
-        'Fall 2020': '1212',
-      },
-
-      termsInverse: {
-        '1252': 'Fall 2024',
-        '1242': 'Fall 2023',
-        '1232': 'Fall 2022',
-        '1222': 'Fall 2021',
-        '1212': 'Fall 2020',
-        '1244': 'Spring 2024',
-        '1234': 'Spring 2023',
-        '1224': 'Spring 2022',
-        '1214': 'Spring 2021',
-      },
-
-      distributionAreas: {
-        'Social Analysis': 'SA',
-        'Science & Engineering - Lab': 'SEL',
-        'Science & Engineering - No Lab': 'SEN',
-        'Quant & Comp Reasoning': 'QCR',
-        'Literature and the Arts': 'LA',
-        'Historical Analysis': 'HA',
-        'Ethical Thought & Moral Values': 'EM',
-        'Epistemology & Cognition': 'EC',
-        'Culture & Difference': 'CD',
-      },
-
-      distributionAreasInverse: {
-        SA: 'Social Analysis',
-        SEL: 'Science & Engineering - Lab',
-        SEN: 'Science & Engineering - No Lab',
-        QCR: 'Quant & Comp Reasoning',
-        LA: 'Literature and the Arts',
-        HA: 'Historical Analysis',
-        EM: 'Ethical Thought & Moral Values',
-        EC: 'Epistemology & Cognition',
-        CD: 'Culture & Difference',
-      },
-
-      levels: {
-        '100': '1',
-        '200': '2',
-        '300': '3',
-        '400': '4',
-        '500': '5',
-      },
-
-      gradingBases: ['A-F', 'P/D/F', 'Audit'],
+    (set, get) => ({
+      terms,
+      termsInverse,
+      distributionAreas,
+      distributionAreasInverse,
+      levels,
+      grading,
 
       termFilter: '',
       distributionFilter: '',
       levelFilter: [],
       gradingFilter: [],
       showPopup: false,
-      setTermFilter: (term) => {
-        set({ termFilter: term });
-      },
+      setTermFilter: (term) => set({ termFilter: term }),
       setDistributionFilter: (distribution) => set({ distributionFilter: distribution }),
       setLevelFilter: (level) => set({ levelFilter: level }),
       setGradingFilter: (grading) => set({ gradingFilter: grading }),
-      setFilters: (filter) =>
-        set({
-          termFilter: filter.termFilter,
-          distributionFilter: filter.distributionFilter,
-          levelFilter: filter.levelFilter,
-          gradingFilter: filter.gradingFilter,
-        }),
+      setFilters: (filter) => set(filter),
       setShowPopup: (show) => set({ showPopup: show }),
-      // TODO: Do we need a reset filters function?
-      resetFilters: () =>
+      resetFilters: () => {
         set({
           termFilter: '',
           distributionFilter: '',
           levelFilter: [],
           gradingFilter: [],
-        }),
-      areFiltersEmpty: (filter) =>
-        filter.termFilter === '' &&
-        filter.distributionFilter === '' &&
-        filter.levelFilter.length === 0 &&
-        filter.gradingFilter.length === 0,
+        });
+      },
+      areFiltersEmpty: () => {
+        const { termFilter, distributionFilter, levelFilter, gradingFilter } = get();
+        return (
+          termFilter === '' &&
+          distributionFilter === '' &&
+          levelFilter.length === 0 &&
+          gradingFilter.length === 0
+        );
+      },
     }),
     {
       name: 'filter-settings',

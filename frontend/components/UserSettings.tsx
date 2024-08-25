@@ -244,7 +244,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
             placeholder='Select your major'
             variant='soft'
             value={major}
-            // inputValue={major.code === undeclared.code ? '' : major.code}
+            // inputValue={major.code === undeclared.code ? '' : major.code} TODO
             isOptionEqualToValue={(option, value) => option.code === value.code}
             onChange={(event, newMajor: MajorMinorType) => {
               event.stopPropagation();

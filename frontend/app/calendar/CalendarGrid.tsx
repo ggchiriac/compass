@@ -3,7 +3,6 @@ import { FC, memo } from 'react';
 import { CalendarEvent } from '@/types';
 
 import CalendarCard from './CalendarCard';
-import CalendarTime from './CalendarTime';
 
 const START_HOUR: number = 9;
 const END_HOUR: number = 21;
@@ -50,7 +49,6 @@ const CalendarGrid: FC<CalendarGridProps> = memo(({ days, events, onEventClick }
       ></div>
 
       {/* Day labels */}
-      {/* TODO: Add the colored circle back to denote the current day. */}
       {days.map((day, index) => (
         <div
           key={`day-label-${index}`}
@@ -100,7 +98,7 @@ const CalendarGrid: FC<CalendarGridProps> = memo(({ days, events, onEventClick }
             gridRow: `${rowIndex + headerRows}`,
             gridColumn: '2 / -1',
             borderColor: calendarColors.gridBorder,
-            visibility: (rowIndex + 1) % 6 !== 0 ? 'hidden' : 'visible',
+            visibility: (rowIndex + 1) % 3 !== 0 ? 'hidden' : 'visible',
             borderBottomRightRadius: rowIndex === totalRows - 1 ? '10px' : '0',
           }}
         />
@@ -132,7 +130,6 @@ const CalendarGrid: FC<CalendarGridProps> = memo(({ days, events, onEventClick }
           dept={event.course.department_code}
         />
       ))}
-      <CalendarTime startHour={START_HOUR} endHour={END_HOUR} />
     </div>
   );
 });

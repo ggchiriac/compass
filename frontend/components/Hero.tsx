@@ -4,7 +4,7 @@ import useAuthStore from '@/store/authSlice';
 
 export default function Hero() {
   const { login } = useAuthStore((state) => ({
-    login: state.login,
+    login: state.login, // TODO: INTEGRATE NEW AUTH
   }));
   const handleDashboardClick = (e: MouseEvent<HTMLAnchorElement>) => {
     // TODO: Change this to a proper route guard instead of onclick event

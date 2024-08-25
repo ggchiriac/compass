@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar';
 import useAuthStore from '@/store/authSlice';
 
 const Contact = () => {
-  const { checkAuthentication } = useAuthStore();
+  const { checkAuthentication } = useAuthStore(); // TODO: INTEGRATE NEW AUTH
 
   useEffect(() => {
     checkAuthentication();

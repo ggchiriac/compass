@@ -24,11 +24,6 @@ import { levels } from '@/utils/levels';
 import CalendarSearchResults from './CalendarSearchResults';
 
 import './CalendarSearch.scss';
-
-interface TermMap {
-  [key: string]: string;
-}
-
 function buildQuery(searchQuery: string, filter: Filter): string {
   let queryString = `course=${encodeURIComponent(searchQuery)}`;
 
@@ -53,7 +48,7 @@ const searchCache = new LRUCache<string, Course[]>({
   entryExpirationTimeInMS: 1000 * 60 * 60 * 24,
 });
 
-function invert(obj: TermMap): TermMap {
+function invert(obj: Record<string, string>): Record<string, string> {
   return Object.fromEntries(Object.entries(obj).map(([key, value]) => [value, key]));
 }
 
@@ -93,8 +88,8 @@ const CalendarSearch: FC = () => {
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
+    // resetFilters,
     setShowPopup,
-    resetFilters,
   } = useFilterStore();
 
   const areFiltersActive = () => {
@@ -126,10 +121,6 @@ const CalendarSearch: FC = () => {
     },
     [setLoading, setCalendarSearchResults, addRecentSearch, setError]
   );
-
-  useEffect(() => {
-    resetFilters();
-  }, [resetFilters]);
 
   useEffect(() => {
     const filters = {
@@ -294,6 +285,12 @@ const CalendarSearch: FC = () => {
           </div>
         </div>
         <footer className='mt-auto text-right'>
+          {/* Tricky part is to re-render the parent (to uncheck the checkboxes) when we reset the filters */}
+          {/* <div className='mt-4'>
+            <Button variant='soft' color='danger' size='sm' onClick={resetFilters}>
+              Reset Filters
+            </Button>
+          </div> */}
           <div className='mt-5 text-right'>
             <Button variant='soft' color='primary' onClick={handleSave} size='md'>
               Save

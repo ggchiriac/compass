@@ -1,4 +1,3 @@
-// CalendarTime.tsx
 import { FC, useEffect, useState } from 'react';
 
 interface CalendarTimeProps {
@@ -6,31 +5,57 @@ interface CalendarTimeProps {
   endHour: number;
 }
 
+/**
+ * Calculates the percentage of the day that has passed by the given time.
+ * @param currentTime - The current time (assumed to be in EST).
+ * @param startHour - The start hour of the day (e.g., 8 for 8:00 AM).
+ * @param endHour - The end hour of the day (e.g., 21 for 9:00 PM).
+ * @returns The percentage of the day that has passed.
+ */
+const calculatePercentageOfDay = (
+  currentTime: Date,
+  startHour: number,
+  endHour: number
+): number => {
+  const startMinutes = startHour * 60;
+  const endMinutes = endHour * 60;
+  const totalDayMinutes = endMinutes - startMinutes;
+
+  const currentMinutes = currentTime.getHours() * 60 + currentTime.getMinutes();
+  const minutesSinceStart = currentMinutes - startMinutes;
+
+  return (minutesSinceStart / totalDayMinutes) * 100;
+};
+
 const CalendarTime: FC<CalendarTimeProps> = ({ startHour, endHour }) => {
-  const [position, setPosition] = useState(0);
+  const [position, setPosition] = useState<number | null>(null);
 
   useEffect(() => {
     const updatePosition = () => {
       const now = new Date();
 
-      now.setHours(now.getHours() + 1);
+      // Convert the time to EST timezone
+      const estTime = new Date(now.toLocaleString('en-US', { timeZone: 'America/New_York' }));
 
-      const totalMinutes = now.getHours() * 60 + now.getMinutes();
-      const totalDayMinutes = (endHour - startHour) * 60;
+      const estHours = estTime.getHours();
+      if (estHours < startHour || estHours >= endHour) {
+        setPosition(null);
+        return;
+      }
 
-      const percentage = (totalMinutes - startHour * 60) / totalDayMinutes;
-
-      const adjustedPercentage = Math.max(0, Math.min(percentage, 1));
-      setPosition(adjustedPercentage * 100);
+      const percentage = calculatePercentageOfDay(estTime, startHour, endHour);
+      setPosition(Math.max(0, Math.min(percentage, 100)));
     };
 
     updatePosition();
     const interval = setInterval(updatePosition, 60000); // Update every minute
 
-    return () => {
-      clearInterval(interval);
-    };
+    return () => clearInterval(interval);
   }, [startHour, endHour]);
+
+  if (position === null) {
+    return null;
+  } // Don't render the indicator if outside specified range
 
   return (
     <div

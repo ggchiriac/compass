@@ -29,6 +29,6 @@
       "@/utils/*": ["utils/*"],
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "postcss.config.js,", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "postcss.config.js,", ".next/types/**/*.ts", "tailwind.config.ts"],
   "exclude": ["node_modules"]
 }

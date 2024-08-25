@@ -16,20 +16,20 @@ import {
 interface ConfigurationSelectorProps {
   configurations: Array<{ id: string; name: string }>;
   activeConfiguration: string;
-  onConfigurationChange: (configurationId: string) => void;
-  onConfigurationCreate: (name: string) => Promise<void>;
-  onConfigurationDelete: (configurationId: string) => Promise<void>;
-  onConfigurationRename: (configurationId: string, newName: string) => void;
+  onChangeConfiguration: (configurationId: string) => void;
+  onCreateConfiguration: (name: string) => Promise<void>;
+  onDeleteConfiguration: (configurationId: string) => Promise<void>;
+  onRenameConfiguration: (configurationId: string, newName: string) => void;
   getTermSuffix: (configurationId: string) => string;
 }
 
 const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
   configurations,
   activeConfiguration,
-  onConfigurationChange,
-  onConfigurationCreate,
-  onConfigurationDelete,
-  onConfigurationRename,
+  onChangeConfiguration,
+  onCreateConfiguration,
+  onDeleteConfiguration,
+  onRenameConfiguration,
   getTermSuffix,
 }) => {
   const [editingConfiguration, setEditingConfiguration] = useState('');
@@ -38,29 +38,29 @@ const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
   const configurationsPerPage = 5;
   const totalPages = Math.ceil(configurations.length / configurationsPerPage);
 
-  const handleConfigurationClick = (configurationId: string) => {
-    onConfigurationChange(configurationId);
+  const handleClickConfiguration = (configurationId: string) => {
+    onChangeConfiguration(configurationId);
     setEditingConfiguration('');
   };
 
-  const handleConfigurationRename = (configurationId: string) => {
-    onConfigurationRename(configurationId, configurationName);
+  const handleRenameConfiguration = (configurationId: string) => {
+    onRenameConfiguration(configurationId, configurationName);
     setEditingConfiguration('');
     setConfigurationName('');
   };
 
-  const handleConfigurationCreate = async () => {
+  const handleCreateConfiguration = async () => {
     const termSuffix = getTermSuffix(activeConfiguration);
     setConfigurationName('');
-    await onConfigurationCreate(termSuffix);
+    await onCreateConfiguration(termSuffix);
   };
 
-  const handleConfigurationDelete = async (configurationId: string) => {
+  const handleDeleteConfiguration = async (configurationId: string) => {
     const confirmDelete = window.confirm(
       'Are you sure you want to delete this configuration? This action cannot be undone.'
     );
     if (confirmDelete) {
-      await onConfigurationDelete(configurationId);
+      await onDeleteConfiguration(configurationId);
     }
   };
 
@@ -83,7 +83,7 @@ const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
           <Tab
             key={configuration.id}
             isSelected={activeConfiguration === configuration.id}
-            onSelect={() => handleConfigurationClick(configuration.id)}
+            onSelect={() => handleClickConfiguration(configuration.id)}
             marginRight={8}
             paddingX={12}
             paddingY={8}
@@ -94,10 +94,10 @@ const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setConfigurationName(e.target.value)
                 }
-                onBlur={() => handleConfigurationRename(configuration.id)}
+                onBlur={() => handleRenameConfiguration(configuration.id)}
                 onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
                   if (e.key === 'Enter') {
-                    handleConfigurationRename(configuration.id);
+                    handleRenameConfiguration(configuration.id);
                   }
                 }}
                 maxLength={20}
@@ -127,14 +127,14 @@ const ConfigurationSelector: FC<ConfigurationSelectorProps> = ({
         marginLeft={8}
       />
 
-      <IconButton icon={PlusIcon} appearance='minimal' onClick={handleConfigurationCreate} />
+      <IconButton icon={PlusIcon} appearance='minimal' onClick={handleCreateConfiguration} />
 
       {activeConfiguration && (
         <IconButton
           icon={TrashIcon}
           appearance='minimal'
           intent='danger'
-          onClick={() => handleConfigurationDelete(activeConfiguration)}
+          onClick={() => handleDeleteConfiguration(activeConfiguration)}
         />
       )}
     </Pane>

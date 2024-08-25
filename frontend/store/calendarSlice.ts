@@ -3,9 +3,9 @@ import { persist } from 'zustand/middleware';
 
 import {
   CalendarEvent,
-  ClassMeeting,
+  // ClassMeeting,
   Course,
-  Section,
+  // Section,
   CalendarConfiguration,
   SemesterConfiguration,
   ScheduleSelection,
@@ -125,7 +125,6 @@ const useCalendarStore = create<CalendarStore>()(
         const selectedCourses = get().getSelectedCourses(term);
 
         if (selectedCourses.some((event) => event.course.guid === course.guid)) {
-          console.log('Course already added:', course);
           return;
         }
         set({ loading: true, error: null });
@@ -166,7 +165,6 @@ const useCalendarStore = create<CalendarStore>()(
             loading: false,
           }));
 
-          console.log('Course added successfully:', course.guid);
         } catch (error) {
           console.error('Error adding course:', error);
           set({ error: 'Failed to add course. Please try again.', loading: false });

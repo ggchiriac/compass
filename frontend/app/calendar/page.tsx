@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, FC, useMemo } from 'react';
+import { useEffect, useState, FC } from 'react';
 
 import {
   Pane,
@@ -10,6 +10,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   Button,
+  toaster,
 } from 'evergreen-ui';
 
 import BackgroundGradient from '@/components/BackgroundGradient';
@@ -19,6 +20,7 @@ import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
 import useFilterStore from '@/store/filterSlice';
 import UserState from '@/store/userSlice';
+import { terms } from '@/utils/terms';
 
 import './Calendar.scss';
 import Calendar from './Calendar';
@@ -27,28 +29,58 @@ import CalendarSearch from './CalendarSearch';
 import SelectedCourses from './SelectedCourses';
 
 const CalendarUI: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const userProfile = UserState((state) => state.profile);
+  const [loading, setLoading] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState(2);
   const { checkAuthentication } = useAuthStore((state) => state);
-  const userProfile = UserState((state) => state.profile);
-  const { terms, termFilter, setTermFilter } = useFilterStore((state) => state);
-  const semesterList = useMemo(() => Object.keys(terms).reverse(), [terms]);
+  const { termFilter, setTermFilter } = useFilterStore((state) => state);
+  const semesterList = Object.keys(terms);
+  const latestTerm = Object.keys(terms).reduce((latest, term) =>
+    terms[term] > terms[latest] ? term : latest
+  );
+
   const semestersPerPage = 5;
   const totalPages = Math.ceil(semesterList.length / semestersPerPage);
 
-  // Mock data for configurations (replace with actual data fetching logic)
-  const [configurations, setConfigurations] = useState([
-    { id: '1', name: 'Config 1' },
-    { id: '2', name: 'Config 2' },
-    { id: '3', name: 'Config 3' },
-    { id: '4', name: 'Config 4' },
-    { id: '5', name: 'Config 5' },
-  ]);
-  const [activeConfiguration, setActiveConfiguration] = useState('1');
+  const [configurations, setConfigurations] = useState([]);
+  const [activeConfiguration, setActiveConfiguration] = useState(null);
+
+  // const fetchConfigurations = async () => {
+  //   try {
+  //     const response = await fetch(`${process.env.BACKEND}/calendar-configurations/`);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch calendar configurations');
+  //     }
+  //     const data = await response.json();
+  //     setConfigurations(data);
+  //     if (data.length > 0 && !activeConfiguration) {
+  //       setActiveConfiguration(data[0].id);
+  //     }
+  //   } catch (error) {
+  //     toaster.danger('Error fetching configurations');
+  //   }
+  // };
 
   useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
+    const initializeApp = async () => {
+      try {
+        await checkAuthentication();
+        // await fetchConfigurations(); // TODO: Things may break when this is uncommented
+      } catch (error) {
+        toaster.danger('Error initializing the application');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeApp();
   }, [checkAuthentication]);
+
+  useEffect(() => {
+    if (!termFilter) {
+      setTermFilter(terms[latestTerm]);
+    }
+  }, [latestTerm, setTermFilter, termFilter]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
@@ -112,7 +144,7 @@ const CalendarUI: FC = () => {
                     {displayedSemesters.map((semester) => (
                       <Tab
                         key={semester}
-                        isSelected={termFilter === terms[semester]}
+                        isSelected={termFilter === terms[semester] || semester === latestTerm}
                         onSelect={() => setTermFilter(terms[semester])}
                         marginX={4}
                         paddingX={8}
@@ -142,10 +174,10 @@ const CalendarUI: FC = () => {
                 <ConfigurationSelector
                   configurations={configurations}
                   activeConfiguration={activeConfiguration}
-                  onConfigurationChange={handleConfigurationChange}
-                  onConfigurationCreate={handleConfigurationCreate}
-                  onConfigurationDelete={handleConfigurationDelete}
-                  onConfigurationRename={handleConfigurationRename}
+                  onChangeConfiguration={handleConfigurationChange}
+                  onCreateConfiguration={handleConfigurationCreate}
+                  onDeleteConfiguration={handleConfigurationDelete}
+                  onRenameConfiguration={handleConfigurationRename}
                   getTermSuffix={getTermSuffix}
                 />
                 <div className='flex space-x-2'>
@@ -154,11 +186,7 @@ const CalendarUI: FC = () => {
                   <Button>Export</Button>
                 </div>
               </div>
-              {!isLoading && userProfile && userProfile.netId !== '' ? (
-                <Calendar />
-              ) : (
-                <SkeletonApp />
-              )}
+              {!loading && userProfile && userProfile.netId !== '' ? <Calendar /> : <SkeletonApp />}
             </div>
           </main>
         </div>
