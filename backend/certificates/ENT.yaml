@@ -13,35 +13,118 @@ description: 'Entrepreneurship is driving enormous social and economic changes t
   faculty members, and others who share an interest and commitment to learning from
   and contributing to these areas.'
 urls:
-- https://ua.princeton.edu/academic-units/program-entrepreneurship
+- https://ua.princeton.edu/fields-study/certificate-programs/entrepreneurship
 contacts:
-- type: Director
-  name: Margaret R. Martonosi
-  email: mrm@princeton.edu
+- type: Assistant Director, Academic Affairs
+  name: Victoria Dorman
+  email: vdorman@princeton.edu
 req_list:
-- name: Introductory Courses
+- name: Courses
   max_counted: 1
-  min_needed: 2
-  explanation: 'Two common introductory courses: EGR 200/ENT 201 and EGR 201/ENT 200.'
+  min_needed: 5
+  explanation: Courses (intellectual foundation)
   double_counting_allowed: false
-  completed_by_semester: 8
-  course_list:
-  - EGR 201
-  - EGR 200
-- name: Two Core Courses
-  max_counted: 1
-  min_needed: 2
-  explanation: 'Two core courses: must be chosen from a list, which may be updated
-    each year by the Executive Committee'
+  req_list:
+  - name: Introductory Courses
+    max_counted: 2
+    min_needed: 2
+    explanation:
+    course_list:
+    - EGR 200
+    - EGR 201
+  - name: Core Courses
+    max_counted: 2
+    min_needed: 2
+    explanation: Must be chosen from a list, which may be updated each year
+    by the Executive Committee.
+    course_list:
+    - ANT 300
+    - ANT 302
+    - ART 106
+    - COS 448
+    - EGR 219
+    - EGR 301
+    - EGR 361
+    - EGR 383
+    - EGR 395
+    - EGR 487
+    - EGR 491
+    - EGR 495
+    - EGR 497
+    - EGR 498
+    - HIS 379
+  - name: Breadth Courses
+    max_counted: 1
+    min_needed: 1
+    explanation: The following list of possible breadth courses is illustrative only.
+    Each student may suggest other courses outside of this list, subject to approval
+    by the program director. 
+    course_list:
+    - ANT 301
+    - ECO 317
+    - ECO 385
+    - HIS 481
+    - VIS 214
+    - VIS 439
+    - POL 349
+    - POL 377
+    - PSY 311
+    - PSY 420
+    - NEU 425
+    - SOC 346
+    - SPI 340
+- name: Entrepreneurship Workshop
+  max_counted: 0
+  min_needed: 0
+  explanation: Workshops (without academic course credits) are offered on practical
+  skills involved in the entrepreneurship process, organized as supplements to
+  credit-bearing courses and offered currently at the E-Hub. These are short-term
+  one-off or sessional workshops, normally 3-12 hours in duration, and students
+  will be required to complete at least one of their choice.
   double_counting_allowed: false
-  completed_by_semester: 8
-  course_list:
-  - ANT 300
-  - COS 448
-  - EGR 395
-  - EGR 491
-  - EGR 497
-  - EGR 488
-  - EGR 475
-  - HIS 379
-  - SOC 345
+  no_req:
+- name: Practicum
+  max_counted: 0
+  min_needed: 0
+  explanation: "Entrepreneurs, however smart they are and whatever ventures they pursue, are, above all, doers. They apply their ideas and learning to try to create value for their customers, investors, colleagues, themselves and, hopefully, our society. They challenge the status quo.
+
+  This practicum is intended to give students the opportunity to fulfill their version of that endeavor — a significant firsthand practical experience in seeing what it takes to become a successful entrepreneur in whatever context is most meaningful to them. 
+
+  It is not intended as a theoretical undertaking but a hands-on exposure to the reality of the entrepreneurial odyssey, whether that unfolds in a Silicon Valley–type high-tech setting or a rural village or underserved urban community someplace. Accordingly, the practicum should expose students to key elements of that odyssey, such as customer discovery, design thinking, solution prototyping, team assembly or market validation — efforts that test and refine hypotheses about what’s required to create a financially viable, worthwhile venture.
+
+  OPTIONS: There are five primary options for the practicum, each designed with the above objectives in mind. Any of these can provide the experiential foundation for the required paper and presentation:
+
+  Entrepreneurial Engagement
+  Startup Launch
+  Solution Development
+  Frontline Insights
+  Wild Card
+  Students should consult the program website(Link is external) for more information about each of the five options.
+
+  A junior paper, senior thesis or other form of independent coursework does not by itself satisfy the practicum requirement. However, these efforts may facilitate students’ work to design a related experience and analytical agenda that does.
+
+  Juniors will explain their proposed practicum in the form of a poster presentation at the Keller Center’s Colloquium in the spring semester.
+
+  Seniors have two final deliverables for their practicum:
+
+  a 10-page paper (due two weeks before the colloquium); and
+  a five-minute formal oral presentation to a group of reviewers at the colloquium itself.
+  Students can expect detailed feedback on their pass-fail “stand and deliver” summary from at least one Keller Center faculty member in addition to their adviser."
+  double_counting_allowed: false
+  no_req:
+- name: Colloquium
+  max_counted: 0
+  min_needed: 0
+  explanation: "Students are required to present their practicum, or a combination of their academic work and practicum, at least twice before graduation.
+
+  The required sequence is:
+
+  April/May of junior year: Practicum proposal presented as a poster at the certificate’s annual colloquium.
+
+  April of senior year: Written analysis presented to evaluation committee no less than two weeks before annual colloquium.
+
+  April/May of senior year: Oral presentation of practicum at the certificate's annual colloquium.
+
+  This social event also serves to foster community and conversation among the certificate students. The mentorship of faculty in certain practicing opportunities and of alumni in others will also help to build a greater sense of interaction across the Princeton community of people with entrepreneurial interests."
+  double_counting_allowed: false
+  no_req:
