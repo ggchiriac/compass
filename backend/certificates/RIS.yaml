@@ -239,4 +239,13 @@ req_list:
     explanation:
     course_list:
     - MUS 248
-  
+- name: Independent Work
+  max_counted: 0
+  min_needed: 0
+  explanation: A one-term senior independent work project or two-term senior
+  thesis whose topic is relevant to robotics and intelligent systems must be
+  completed and presented to the program committee. Junior independent work
+  projects do not fulfill the certificate requirement. A minimum grade of
+  B- for the project or thesis is required to qualify for the certificate.
+  double_counting_allowed: false
+  no_req:
