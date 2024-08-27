@@ -164,7 +164,6 @@ const useCalendarStore = create<CalendarStore>()(
             },
             loading: false,
           }));
-
         } catch (error) {
           console.error('Error adding course:', error);
           set({ error: 'Failed to add course. Please try again.', loading: false });
