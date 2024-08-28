@@ -53,7 +53,7 @@ req_list:
   no_req:
 - name: Professional Education Sequence
   max_counted: 1
-  min_needed: 1
+  min_needed: 4
   explanation: Students must take the core course GEO 255/AST 255/EEB 255/CHM 255.
   This course will qualify for departmental credit if the student submits a 25-page
   term paper on astrobiology, with the emphasis in that department's discipline.
