@@ -1,9 +1,8 @@
 'use client';
 
-import { CSSProperties, ReactElement, useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useRef, useState } from 'react';
 
 import {
-  CancelDrop,
   closestCenter,
   pointerWithin,
   rectIntersection,
@@ -37,6 +36,7 @@ import { createPortal } from 'react-dom';
 
 import { Course, Profile } from '@/types';
 
+import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearchItem.module.scss';
 import Search from '@/components/Search';
 import { TabbedMenu } from '@/components/TabbedMenu';
 import useSearchStore from '@/store/searchSlice';
@@ -164,7 +164,6 @@ function DroppableContainer({
 
 // THIS IS WHERE YOU EDIT THE DND DROP ANIMATION
 const dropAnimation: DropAnimation = {
-  // TODO: Lowkey, this is where we can render the course card differently -> full title to DEPT CATNUM
   sideEffects: defaultDropAnimationSideEffects({
     styles: {
       active: {
@@ -179,7 +178,6 @@ type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
 type Props = {
   user: Profile;
   adjustScale?: boolean;
-  cancelDrop?: CancelDrop;
   columns?: number;
 
   // TODO: Consider removing since we populate semester bins based on classyear
@@ -202,7 +200,6 @@ type Props = {
   items?: Items;
   handle?: boolean;
   onRemove?(courseId: string): void;
-  renderItem?(): ReactElement;
 
   strategy?: SortingStrategy;
   modifiers?: Modifiers;
@@ -218,14 +215,12 @@ const defaultClassYear = new Date().getFullYear();
 export function Canvas({
   user,
   adjustScale = false,
-  cancelDrop,
   columns = 2,
   handle = true,
   containerStyle,
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
   minimal = false,
-  renderItem,
   strategy = verticalListSortingStrategy,
   // vertical = false,
   scrollable,
@@ -239,7 +234,7 @@ export function Canvas({
   const semesterWidth = '22.5vw';
   const requirementsWidth = '26vw';
   const courseWidth = '10.5vw';
-  const extendedCourseWidth = '22.5vw';
+  const extendedCourseWidth = '22.0vw';
 
   const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
 
@@ -282,11 +277,11 @@ export function Canvas({
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
       prevItems[`Fall ${year}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+        (course) => `${course.course_id}|${course.crosslistings}|${course.title}`
       );
       semester += 1;
       prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+        (course) => `${course.course_id}|${course.crosslistings}|${course.title}`
       );
       semester += 1;
     }
@@ -365,7 +360,12 @@ export function Canvas({
     checkRequirements();
   }, [classYear]);
 
-  const searchResults = useSearchStore((state) => state.searchResults);
+  const staticSearchResults = useSearchStore((state) => state.searchResults);
+  const [searchResults, setSearchResults] = useState(staticSearchResults);
+
+  useEffect(() => {
+    setSearchResults(staticSearchResults);
+  }, [staticSearchResults]);
 
   useEffect(() => {
     setItems((prevItems) => {
@@ -383,9 +383,10 @@ export function Canvas({
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+            (course) =>
+              !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}|${course.title}`)
           )
-          .map((course) => `${course.course_id}|${course.crosslistings}`),
+          .map((course) => `${course.course_id}|${course.crosslistings}|${course.title}`),
       };
     });
   }, [searchResults]);
@@ -596,13 +597,13 @@ export function Canvas({
           setActiveContainerId(null);
           setOverContainerId(null);
         }}
-        cancelDrop={cancelDrop}
+        cancelDrop={() => overContainerId === SEARCH_RESULTS_ID}
         onDragCancel={onDragCancel}
       >
         <SortableContext items={[...containers, PLACEHOLDER_ID]}>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             {/* Left Section for Search Results */}
-            {containers.includes('Search Results') && (
+            {containers.includes(SEARCH_RESULTS_ID) && (
               <div
                 style={{
                   display: 'flex',
@@ -613,30 +614,51 @@ export function Canvas({
                 {/* issue here with resizing + with requirements dropdowns*/}
                 {/* Try to get this to fixed height*/}
                 <DroppableContainer
-                  key='Search Results'
-                  id='Search Results'
+                  key={SEARCH_RESULTS_ID}
+                  id={SEARCH_RESULTS_ID}
                   label={<Search />}
                   columns={1}
-                  items={items['Search Results']}
+                  items={items[SEARCH_RESULTS_ID]}
                   scrollable={scrollable}
                   style={containerStyle}
                   height={searchGridHeight}
                 >
-                  <SortableContext items={items['Search Results']} strategy={strategy}>
-                    {items['Search Results'].map((value, index) => (
-                      <SortableItem
-                        disabled={isSortingContainer}
-                        key={index}
-                        id={value}
-                        index={index}
-                        handle={handle}
-                        style={getItemStyles}
-                        wrapperStyle={searchWrapperStyle}
-                        renderItem={renderItem} // This render function should render with full name
-                        containerId='Search Results'
-                        getIndex={getIndex}
-                      />
-                    ))}
+                  <SortableContext items={items[SEARCH_RESULTS_ID]} strategy={strategy}>
+                    {staticSearchResults.map((course, index) => {
+                      const courseId = `${course.course_id}|${course.crosslistings}|${course.title}`;
+                      return (
+                        <div className={dashboardItemStyles.card} key={index}>
+                          <div className={dashboardItemStyles.content}>
+                            <div className={dashboardItemStyles.title}>{course.title}</div>
+                            {items[SEARCH_RESULTS_ID].includes(courseId) ? (
+                              <SortableItem
+                                disabled={isSortingContainer}
+                                key={index}
+                                id={courseId}
+                                index={index}
+                                handle={handle}
+                                style={getItemStyles}
+                                wrapperStyle={searchWrapperStyle}
+                                containerId={SEARCH_RESULTS_ID}
+                                getIndex={getIndex}
+                              />
+                            ) : (
+                              <SortableItem
+                                disabled={true}
+                                key={index}
+                                id={courseId + 'disabled'}
+                                index={index}
+                                handle={handle}
+                                style={getItemStyles}
+                                wrapperStyle={searchWrapperStyle}
+                                containerId={SEARCH_RESULTS_ID}
+                                getIndex={getIndex}
+                              />
+                            )}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </SortableContext>
                 </DroppableContainer>
               </div>
@@ -684,7 +706,6 @@ export function Canvas({
                             style={getItemStyles}
                             wrapperStyle={wrapperStyle}
                             onRemove={() => handleRemove(course, containerId)}
-                            renderItem={renderItem}
                             containerId={containerId}
                             getIndex={getIndex}
                           />
@@ -758,7 +779,6 @@ export function Canvas({
         color_primary={getPrimaryColor(id)}
         color_secondary={getSecondaryColor(id)}
         wrapperStyle={dynamicWrapperStyle}
-        renderItem={renderItem}
         dragOverlay
       />
     );
@@ -781,9 +801,10 @@ export function Canvas({
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+            (course) =>
+              !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}|${course.title}`)
           )
-          .map((course) => `${course.course_id}|${course.crosslistings}`),
+          .map((course) => `${course.course_id}|${course.crosslistings}|${course.title}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
@@ -838,8 +859,6 @@ type SortableItemProps = {
 
   onRemove?(): void;
 
-  renderItem?(): ReactElement;
-
   wrapperStyle({ index }: { index: number }): CSSProperties;
 };
 
@@ -849,7 +868,6 @@ function SortableItem({
   index,
   handle,
   onRemove,
-  renderItem,
   style,
   containerId,
   getIndex,
@@ -873,6 +891,7 @@ function SortableItem({
 
   return (
     <Item
+      disabled={disabled}
       ref={disabled ? undefined : setNodeRef}
       value={id}
       dragging={isDragging}
@@ -895,7 +914,6 @@ function SortableItem({
       transform={transform}
       fadeIn={mountedWhileDragging}
       listeners={listeners}
-      renderItem={renderItem}
       onRemove={onRemove}
     />
   );

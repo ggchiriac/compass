@@ -99,8 +99,7 @@
 }
 
 .Item.disabled {
-  color: #999;
-  background-color: #f1f1f1;
+  opacity: 0.5;
 }
 
 .Item.disabled:focus {
