@@ -281,11 +281,11 @@ export function Canvas({
     let semester = 1;
     for (let year = startYear; year < classYear; ++year) {
       prevItems[`Fall ${year}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}|${course.title}`
+        (course) => `${course.course_id}|${course.crosslistings}`
       );
       semester += 1;
       prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
-        (course) => `${course.course_id}|${course.crosslistings}|${course.title}`
+        (course) => `${course.course_id}|${course.crosslistings}`
       );
       semester += 1;
     }
@@ -387,10 +387,9 @@ export function Canvas({
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}|${course.title}`)
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
           )
-          .map((course) => `${course.course_id}|${course.crosslistings}|${course.title}`),
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
       };
     });
   }, [searchResults]);
@@ -617,7 +616,7 @@ export function Canvas({
                     strategy={staticRectSortingStrategy}
                   >
                     {staticSearchResults.map((course, index) => {
-                      const courseId = `${course.course_id}|${course.crosslistings}|${course.title}`;
+                      const courseId = `${course.course_id}|${course.crosslistings}`;
                       return (
                         <div className={dashboardItemStyles.card} key={index}>
                           <div className={dashboardItemStyles.content}>
@@ -638,7 +637,7 @@ export function Canvas({
                               <SortableItem
                                 disabled={true}
                                 key={index}
-                                id={courseId + 'disabled'}
+                                id={courseId + '|disabled'}
                                 index={index}
                                 handle={handle}
                                 style={getItemStyles}
@@ -796,10 +795,9 @@ export function Canvas({
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) =>
-              !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}|${course.title}`)
+            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
           )
-          .map((course) => `${course.course_id}|${course.crosslistings}|${course.title}`),
+          .map((course) => `${course.course_id}|${course.crosslistings}`),
         [containerId]: items[containerId].filter((course) => course !== value.toString()),
       };
       return updatedCourses;
