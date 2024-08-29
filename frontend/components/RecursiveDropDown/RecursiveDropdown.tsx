@@ -60,7 +60,7 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   isRestrictions,
 }) => {
   if (manuallySatisfied) {
-    return <CheckCircleOutlineIcon style={{ color: 'gray', marginLeft: '10px' }} />;
+    return <CheckCircleOutlineIcon style={{ color: '#9ca3af', marginLeft: '10px' }} />;
   }
   if (isRestrictions) {
     return <InfoOutlinedIcon style={{ color: 'blue', marginLeft: '10px' }} />;
