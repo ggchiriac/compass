@@ -15,7 +15,6 @@ import {
   MouseSensor,
   TouchSensor,
   Modifiers,
-  // TODO: Should probably delete this: useDroppable,
   UniqueIdentifier,
   useSensors,
   useSensor,
@@ -28,8 +27,6 @@ import {
   SortableContext,
   useSortable,
   defaultAnimateLayoutChanges,
-  verticalListSortingStrategy,
-  SortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { createPortal } from 'react-dom';
@@ -76,6 +73,28 @@ const SECONDARY_COLOR_LIST: string[] = [
   '#cac1be',
   '#c398c1',
 ];
+
+// Heights are relative to viewport height
+const containerGridHeight = '87vh';
+const searchGridHeight = '85vh';
+
+// Widths are relative to viewport width.
+// Search width is 24vw, inherited from Container.module.scss
+const semesterWidth = '22.5vw';
+const requirementsWidth = '26vw';
+const courseWidth = '10.5vw';
+const extendedCourseWidth = '22.0vw';
+
+const staticRectSortingStrategy = (_ref: any) => {
+  return {
+    x: 0,
+    y: 0,
+    scaleX: 1,
+    scaleY: 1,
+  };
+};
+
+const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
 
 function simpleHash(str: string) {
   if (str.length !== 3) {
@@ -164,6 +183,7 @@ function DroppableContainer({
 
 // THIS IS WHERE YOU EDIT THE DND DROP ANIMATION
 const dropAnimation: DropAnimation = {
+  duration: 200,
   sideEffects: defaultDropAnimationSideEffects({
     styles: {
       active: {
@@ -201,7 +221,6 @@ type Props = {
   handle?: boolean;
   onRemove?(courseId: string): void;
 
-  strategy?: SortingStrategy;
   modifiers?: Modifiers;
   minimal?: boolean;
   scrollable?: boolean;
@@ -221,23 +240,8 @@ export function Canvas({
   coordinateGetter = multipleContainersCoordinateGetter,
   getItemStyles = () => ({}),
   minimal = false,
-  strategy = verticalListSortingStrategy,
-  // vertical = false,
   scrollable,
 }: Props) {
-  // Heights are relative to viewport height
-  const containerGridHeight = '87vh';
-  const searchGridHeight = '85vh';
-
-  // Widths are relative to viewport width.
-  // Search width is 24vw, inherited from Container.module.scss
-  const semesterWidth = '22.5vw';
-  const requirementsWidth = '26vw';
-  const courseWidth = '10.5vw';
-  const extendedCourseWidth = '22.0vw';
-
-  const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
-
   // This limits the width of the course cards
   const wrapperStyle = () => ({
     width: courseWidth,
@@ -411,15 +415,6 @@ export function Canvas({
    */
   const collisionDetectionStrategy: CollisionDetection = useCallback(
     (args) => {
-      if (activeId && activeId in items) {
-        return closestCenter({
-          ...args,
-          droppableContainers: args.droppableContainers.filter(
-            (container) => container.id in items
-          ),
-        });
-      }
-
       // Start by finding any intersecting droppable
       const pointerIntersections = pointerWithin(args);
       const intersections =
@@ -540,19 +535,13 @@ export function Canvas({
           if (activeContainer !== overContainer) {
             setItems((items) => {
               const activeItems = items[activeContainer];
-              const overItems = items[overContainer];
               const activeIndex = activeItems.indexOf(active.id);
-              const newIndex: number = overItems.length + 1;
               recentlyMovedToNewContainer.current = true;
 
               return {
                 ...items,
                 [activeContainer]: items[activeContainer].filter((item) => item !== active.id),
-                [overContainer]: [
-                  ...items[overContainer].slice(0, newIndex),
-                  items[activeContainer][activeIndex],
-                  ...items[overContainer].slice(newIndex, items[overContainer].length),
-                ],
+                [overContainer]: [...items[overContainer], items[activeContainer][activeIndex]],
               };
             });
           }
@@ -623,7 +612,10 @@ export function Canvas({
                   style={containerStyle}
                   height={searchGridHeight}
                 >
-                  <SortableContext items={items[SEARCH_RESULTS_ID]} strategy={strategy}>
+                  <SortableContext
+                    items={items[SEARCH_RESULTS_ID]}
+                    strategy={staticRectSortingStrategy}
+                  >
                     {staticSearchResults.map((course, index) => {
                       const courseId = `${course.course_id}|${course.crosslistings}|${course.title}`;
                       return (
@@ -695,7 +687,10 @@ export function Canvas({
                       unstyled={minimal}
                       height={`calc(${containerGridHeight} / 4)`}
                     >
-                      <SortableContext items={items[containerId]} strategy={strategy}>
+                      <SortableContext
+                        items={items[containerId]}
+                        strategy={staticRectSortingStrategy}
+                      >
                         {items[containerId].map((course, index) => (
                           <SortableItem
                             disabled={isSortingContainer}
@@ -747,13 +742,13 @@ export function Canvas({
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     // Determine the current overlay width based on overContainerId
     const currentOverlayWidth =
-      overContainerId === SEARCH_RESULTS_ID ? extendedCourseWidth : courseWidth;
+      activeContainerId === SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
+        ? extendedCourseWidth
+        : courseWidth;
     const currentOverlayLeft =
       activeContainerId === SEARCH_RESULTS_ID && overContainerId !== SEARCH_RESULTS_ID
         ? `calc(${extendedCourseWidth} - ${courseWidth})`
-        : activeContainerId !== SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
-          ? `calc(${courseWidth} - ${extendedCourseWidth})`
-          : '0vw';
+        : '0vw';
 
     // Modify the wrapperStyle function or directly adjust the style here to use the determined width
     const dynamicWrapperStyle = {

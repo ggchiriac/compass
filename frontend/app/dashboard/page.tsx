@@ -2,8 +2,6 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import { rectSortingStrategy } from '@dnd-kit/sortable';
-
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
@@ -39,7 +37,7 @@ const Dashboard: FC = () => {
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded pt-0.5vh pb-0.5vh pl-0.5vw pr-0.5vw'>
           {!isLoading && userProfile && userProfile.netId !== '' ? (
-            <Canvas user={userProfile} columns={2} strategy={rectSortingStrategy} />
+            <Canvas user={userProfile} columns={2} />
           ) : (
             <div>
               <SkeletonApp />
