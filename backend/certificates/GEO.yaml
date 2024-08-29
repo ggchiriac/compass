@@ -137,8 +137,11 @@ req_list:
   - GEO 3**
   - GEO 4**
 - name: Independent Work
-  max_counted: 0
-  min_needed: 0
-  explanation: A two-semester senior thesis on a geological engineering topic approved by the program committee.
+  max_counted: 1
+  min_needed: 1
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
+    A two-semester senior thesis on a geological engineering topic approved by the program committee.
   double_counting_allowed: false
   no_req:

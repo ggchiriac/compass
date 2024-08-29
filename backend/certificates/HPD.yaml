@@ -47,7 +47,7 @@ req_list:
   req_list:
   - name: History Courses
     max_counted: 2
-    min_needed: 2
+    min_needed: 1
     explanation:
     course_list:
     - HIS ***
@@ -55,17 +55,18 @@ req_list:
     - EAS ***
   - name: Politics Courses
     max_counted: 2
-    min_needed: 2
+    min_needed: 1
     explanation:
     course_list:
     - SPI ***
     - POL ***
 - name: Internship
-  max_counted: 0
-  min_needed: 0
-  explanation: An internship, usually during a summer, with a suitable government
+  max_counted: 1
+  min_needed: 1
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
+    An internship, usually during a summer, with a suitable government
     agency or nongovernmental organization (NGO), domestic or international.  An internship
     could include research in think tanks as well as activities described as people
     to people diplomacy.
-  double_counting_allowed: false
-  no_req:

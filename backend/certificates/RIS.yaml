@@ -240,8 +240,8 @@ req_list:
     course_list:
     - MUS 248
 - name: Independent Work
-  max_counted: 0
-  min_needed: 0
+  max_counted: 1
+  min_needed: 1
   explanation: A one-term senior independent work project or two-term senior
   thesis whose topic is relevant to robotics and intelligent systems must be
   completed and presented to the program committee. Junior independent work

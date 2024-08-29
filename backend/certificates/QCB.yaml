@@ -43,14 +43,14 @@ req_list:
     - name: Foundation in Biology
       max_counted: 1
       min_needed: 1
-      explanation: The following courses or approved equivalent
+      explanation: One from the following courses or approved equivalent
       course_list:
       - MOL 214
       - EEB 211
     - name: Foundation in Math or Statistics
       max_counted: 1
       min_needed: 1
-      explanation: The following courses or approved equivalent
+      explanation: One from the following courses or approved equivalent
       course_list:
       - MAT 2**
       - MAT 3**
@@ -102,9 +102,7 @@ req_list:
     - QCB 490
     - QCB 515
 - name: Independent Work
-  max_counted: 0
-  min_needed: 0
+  max_counted: 1
+  min_needed: 1
   explanation: Junior and senior independent work must show adequate quantitative and
   computational biology content and expand upon the existing field.
-  double_counting_allowed: false
-  no_req:

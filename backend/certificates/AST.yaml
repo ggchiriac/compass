@@ -3,7 +3,8 @@ type: Certificate
 name: Planets and Life
 code: AST
 degree:
-description: Unraveling the origins of life on Earth and determining whether life
+description: |-
+Unraveling the origins of life on Earth and determining whether life
 exists beyond Earth will likely be two of the most significant scientific discoveries
 in the 21st century. The Program in Planets and Life is an interdepartmental,
 multidisciplinary plan of study designed for students interested in these two
@@ -12,7 +13,7 @@ astrophysical, chemical, biological and geological principles and engineering
 challenges that will guide our search for life in extreme environments on Earth
 and on other planets and satellites in the solar system and among neighboring
 planetary systems. Research on and teaching of these topics are typically performed
-under the rubric of astrobiology.
+under the rubric of astrobiology.<br><br>
 
 The program will equip participating students with the skills they will require to
 assume leadership roles in discovering the origins of terrestrial and extraterrestrial
@@ -98,8 +99,8 @@ req_list:
   - MAE 342
   - MAE 345
 - name: Independent Work
-  max_counted: 0
-  min_needed: 0
+  max_counted: 1
+  min_needed: 1
   explanation: To qualify for the certificate, A.B. students must (a) write at least one 
   of the junior papers on an astrobiology topic and, as part of the senior thesis,
   (b) devote a chapter to an astrobiology topic — both of them subject to approval by
@@ -110,5 +111,4 @@ req_list:
   senior independent work will be presented at a special Planets and Life Symposium at
   the end of senior year. Juniors are also encouraged to participate in this yearly
   Planets and Life Symposium.
-  double_counting_allowed: false
   no_req:

@@ -19,16 +19,18 @@ req_list:
 - name: Core Survey
   max_counted: 1
   min_needed: 2
-  explanation: Students must complete two AAS core survey courses from the list below.
+  explanation: |-
+    Students must complete two AAS core survey courses from the list below.
     The core survey courses orient students to African American Studies, and prepare
     certificate students for independent work by grounding them in the field. 
     Students sometimes ask to fulfill the core survey requirement with a substitute
     course, as courses across campus and in other universities have overlapping content,
     but the Department of African American Studies has designed the survey courses as
     cornerstones of the undergraduate program, and therefore there are no replacements
-    or exemptions from the core survey course requirement. Please note that the Department
-    cannot offer all six survey courses each year; availability varies, and usually the
-    Department offers at least four core survey courses per year. To be eligible for
+    or exemptions from the core survey course requirement. <br><br>
+    
+    Please note that the Department cannot offer all six survey courses each year; availability varies, 
+    and usually the Department offers at least four core survey courses per year. To be eligible for
     Department funding, certificate students must complete both core survey courses by the
     end of their junior year.
   double_counting_allowed: false
