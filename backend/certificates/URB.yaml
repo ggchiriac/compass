@@ -338,17 +338,19 @@ req_list:
     - MAE 228
     - VIS 325
 - name: Independent Work
-  max_counted: 0
-  min_needed: 0
-  explanation: While urban studies students' senior theses or projects
-  are directed in their home departments, their work must contain an
-  urban component, approved by the program director. A faculty member
-  from the student's home department serves as the primary adviser and
-  first reader. An urban studies adviser may be selected from the
-  program's associated faculty list(Link is external) to provide additional
-  consultation and layer of expertise as students write and think about potentially
-  urban-related careers. The thesis title and abstract must be sent to the
-  program director for final approval.
-  double_counting_allowed: false
+  max_counted: 1
+  min_needed: 1
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
+    While urban studies students' senior theses or projects
+    are directed in their home departments, their work must contain an
+    urban component, approved by the program director. A faculty member
+    from the student's home department serves as the primary adviser and
+    first reader. An urban studies adviser may be selected from the
+    program's associated faculty list(Link is external) to provide additional
+    consultation and layer of expertise as students write and think about potentially
+    urban-related careers. The thesis title and abstract must be sent to the
+    program director for final approval.
   no_req:
 
