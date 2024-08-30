@@ -101,14 +101,17 @@ req_list:
 - name: Independent Work
   max_counted: 1
   min_needed: 1
-  explanation: To qualify for the certificate, A.B. students must (a) write at least one 
-  of the junior papers on an astrobiology topic and, as part of the senior thesis,
-  (b) devote a chapter to an astrobiology topic — both of them subject to approval by
-  the program director in consultation with executive committee members. Engineering
-  students must devote one chapter of their senior independent work to an astrobiology
-  topic — again subject to approval by the program chairperson in consultation with
-  executive committee members. The relevant content of the student's senior thesis or
-  senior independent work will be presented at a special Planets and Life Symposium at
-  the end of senior year. Juniors are also encouraged to participate in this yearly
-  Planets and Life Symposium.
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+    
+    To qualify for the certificate, A.B. students must (a) write at least one 
+    of the junior papers on an astrobiology topic and, as part of the senior thesis,
+    (b) devote a chapter to an astrobiology topic — both of them subject to approval by
+    the program director in consultation with executive committee members. Engineering
+    students must devote one chapter of their senior independent work to an astrobiology
+    topic — again subject to approval by the program chairperson in consultation with
+    executive committee members. The relevant content of the student's senior thesis or
+    senior independent work will be presented at a special Planets and Life Symposium at
+    the end of senior year. Juniors are also encouraged to participate in this yearly
+    Planets and Life Symposium.
   no_req:

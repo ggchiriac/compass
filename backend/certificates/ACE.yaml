@@ -91,7 +91,7 @@ req_list:
       - name: Materials
         max_counted: 3
         min_needed: 1
-        explanation: Either MSE 301 OR MAE 324 can count.
+        explanation: Either MSE 301 OR MAE 324 can count, but not both.
         course_list:
         - MSE 301
         - MAE 324
@@ -170,7 +170,7 @@ req_list:
       - name: Materials
         max_counted: 1
         min_needed: 1
-        explanation: Either MSE 301 OR MAE 324 can count.
+        explanation: Either MSE 301 OR MAE 324 can count, but not both.
         course_list:
         - MSE 301
         - MAE 324

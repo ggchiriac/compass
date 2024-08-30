@@ -104,5 +104,9 @@ req_list:
 - name: Independent Work
   max_counted: 1
   min_needed: 1
-  explanation: Junior and senior independent work must show adequate quantitative and
-  computational biology content and expand upon the existing field.
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+    
+    Junior and senior independent work must show adequate quantitative and
+    computational biology content and expand upon the existing field.
+  no_req:

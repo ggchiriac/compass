@@ -134,6 +134,8 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
     A senior thesis or project must be completed and submitted to the program
     director (oqds@princeton.edu) that demonstrates a command of some portion of the core
     disciplines of uncertainty analysis and/or optimization. Students in engineering departments
@@ -150,3 +152,4 @@ req_list:
     and hard-science theses (laboratory-based theses) that do not have a significant modeling
     or data-analysis component (for example, collecting observations and computing basic
     statistics is not sufficient).
+  no_req:
