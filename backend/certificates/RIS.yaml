@@ -40,7 +40,7 @@ req_list:
   - name: Computing course
     max_counted: 1
     min_needed: 1
-    explanation: COS 126, ECE 115 or an equivalent computing course.
+    explanation: COS 126, ECE 115, or an equivalent computing course.
     double_counting_allowed: false
     pdfs_allowed: 0
     completed_by_semester: 6
@@ -50,17 +50,84 @@ req_list:
   - name: Science Requirement 
     max_counted: 1
     min_needed: 1
-    explanation: The A.B. science and engineering distributional requirement or the B.S.E. first year science requirement.
+    explanation: The A.B. science and engineering distributional requirement
+    or the B.S.E. first year science requirement.
     double_counting_allowed: false
-    pdfs_allowed: 0
-    completed_by_semester: 6
-    no_req: # TODO: Is this referring to CHM and PHY reqs?
+    req_list:
+    - name: A.B. Science and Engineering Requirement
+      max_counted: 1
+      min_needed: 2
+      explanation: |-
+        At least one course must be a science and engineering course with
+        laboratory (SEL). Students may elect a second laboratory science course,
+        or a nonlaboratory science course (SEN).
+      req_list:
+      - name: Science and Engineering with Lab
+        max_counted: 2
+        min_needed: 1
+        explanation: Science and Engineering with Lab (SEL)
+        dist_req:
+        - STL
+        - SEL
+      - name: Science and Engineering without Lab
+        max_counted: 1
+        min_needed: 1
+        explanation: Science and Engineering without Lab (SEN)
+        dist_req:
+        - STN
+        - SEN
+    - name: B.S.E. Science Requirements
+      max_counted: 1
+      min_needed: 1
+      explanation: Students must take one Physics, one Chemistry, and one
+        Computer Science course. Alternativaly, students can take the 
+        Integrated Science Sequence.
+      req_list:
+      - name: Regular Sequence
+        max_counted: 1
+        min_needed: ALL
+        req_list:
+        - name: Physics
+          max_counted: 1
+          min_needed: 2          
+          req_list:
+          - name: Mechanics
+            max_counted: 1
+            min_needed: 1
+            course_list:
+            - PHY 103
+            - PHY 105
+            - EGR 191
+            - EGR 151
+          - name: Electromagnetism
+            max_counted: 1
+            min_needed: 1
+            course_list:
+            - PHY 104
+            - PHY 106
+            - EGR 193
+            - EGR 153
+        - name: Chemistry
+          max_counted: 1
+          min_needed: 1
+          course_list:
+          - CHM 201
+          - CHM 201A
+          - CHM 203
+          - CHM 207
+          - MOL 214
+      - name: Integrated Science Curriculum
+        max_counted: 2
+        min_needed: 1
+        course_list:
+        - ISC 231
+        - ISC 232
+        - ISC 233
+        - ISC 234
 - name: Control Systems
   max_counted: 1
   min_needed: 1
   explanation: Control Systems
-  double_counting_allowed: false
-  pdfs_allowed: 0
   course_list:
   - MAE 345
   - ECE 346
@@ -70,8 +137,6 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: Laboratory
-  double_counting_allowed: false
-  pdfs_allowed: 0
   course_list:
   - ECE 206
   - ECE 302
@@ -82,8 +147,6 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: Cognition, Language, and Decision Making
-  double_counting_allowed: false
-  pdfs_allowed: 0
   course_list:
   - MUS 248
   - NEU 201
@@ -102,8 +165,6 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: Three Courses, Maximum of Two from any Department
-  double_counting_allowed: false
-  pdfs_allowed: 0
   req_list:
   - name: ARC
     max_counted: 2
@@ -242,10 +303,12 @@ req_list:
 - name: Independent Work
   max_counted: 1
   min_needed: 1
-  explanation: A one-term senior independent work project or two-term senior
-  thesis whose topic is relevant to robotics and intelligent systems must be
-  completed and presented to the program committee. Junior independent work
-  projects do not fulfill the certificate requirement. A minimum grade of
-  B- for the project or thesis is required to qualify for the certificate.
-  double_counting_allowed: false
+  explanation: |-
+    <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+
+    A one-term senior independent work project or two-term senior
+    thesis whose topic is relevant to robotics and intelligent systems must be
+    completed and presented to the program committee. Junior independent work
+    projects do not fulfill the certificate requirement. A minimum grade of
+    B- for the project or thesis is required to qualify for the certificate.
   no_req:
