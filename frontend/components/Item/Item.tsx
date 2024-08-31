@@ -1,4 +1,4 @@
-import { CSSProperties, memo, forwardRef, ReactElement, ReactNode, Ref, useEffect } from 'react';
+import { CSSProperties, memo, forwardRef, ReactNode, useEffect } from 'react';
 
 import type { DraggableSyntheticListeners } from '@dnd-kit/core';
 import type { Transform } from '@dnd-kit/utilities';
@@ -28,19 +28,6 @@ export type Props = {
   wrapperStyle?: CSSProperties;
   value: ReactNode; // Note: This should be the text that appears on the course card
   onRemove?(): void;
-  renderItem?(args: {
-    dragOverlay: boolean;
-    dragging: boolean;
-    sorting: boolean;
-    index: number | undefined;
-    fadeIn: boolean;
-    listeners: DraggableSyntheticListeners;
-    ref: Ref<HTMLElement>;
-    style: CSSProperties | undefined;
-    transform: Props['transform'];
-    transition: Props['transition'];
-    value: Props['value'];
-  }): ReactElement;
 };
 
 export const Item = memo(
@@ -59,7 +46,6 @@ export const Item = memo(
         index,
         listeners,
         onRemove,
-        renderItem,
         sorting,
         style,
         transition,
@@ -81,21 +67,7 @@ export const Item = memo(
         };
       }, [dragOverlay]);
 
-      return renderItem ? (
-        renderItem({
-          dragOverlay: Boolean(dragOverlay),
-          dragging: Boolean(dragging),
-          sorting: Boolean(sorting),
-          index,
-          fadeIn: Boolean(fadeIn),
-          listeners,
-          ref,
-          style,
-          transform,
-          transition,
-          value,
-        })
-      ) : (
+      return (
         <li
           className={classNames(
             styles.Wrapper,
@@ -130,21 +102,29 @@ export const Item = memo(
             )}
             style={style}
             data-cypress='draggable-item'
-            {...(!handle ? listeners : undefined)}
+            {...(!handle && !disabled ? listeners : undefined)}
             {...props}
-            tabIndex={!handle ? 0 : undefined}
+            tabIndex={disabled ? -1 : !handle ? 0 : undefined}
           >
             {/* Text Container for InfoComponent */}
             <div className={styles.TextContainer}>
-              <InfoComponent value={value?.toString().split('|')[1] ?? ''} />
+              {!disabled ? (
+                <InfoComponent value={value?.toString().split('|')[1] ?? ''} />
+              ) : (
+                value?.toString().split('|')[1] ?? ''
+              )}
             </div>
 
-            {handle ? <Handle {...handleProps} {...listeners} className={styles.Handle} /> : null}
+            {!disabled && handle ? (
+              <Handle {...handleProps} {...listeners} className={styles.Handle} />
+            ) : null}
 
             {/* Actions Container for the Remove button */}
-            <span className={styles.Actions}>
-              <Remove className={styles.Remove} onClick={onRemove} />
-            </span>
+            {!disabled ? (
+              <span className={styles.Actions}>
+                <Remove className={styles.Remove} onClick={onRemove} />
+              </span>
+            ) : null}
           </div>
         </li>
       );

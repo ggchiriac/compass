@@ -60,7 +60,7 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
   isRestrictions,
 }) => {
   if (manuallySatisfied) {
-    return <CheckCircleOutlineIcon style={{ color: 'gray', marginLeft: '10px' }} />;
+    return <CheckCircleOutlineIcon style={{ color: '#9ca3af', marginLeft: '10px' }} />;
   }
   if (isRestrictions) {
     return <InfoOutlinedIcon style={{ color: 'blue', marginLeft: '10px' }} />;
@@ -399,8 +399,8 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
               disabled={!item['manually_settled']}
               style={{
                 margin: '5px',
-                backgroundColor: '#f7f7f7',
-                color: '#000',
+                color: '#4b5563',
+                background: 'linear-gradient(to bottom, #c6e8ac, #d9f2c7)',
               }}
               onClick={() => handleClick(item['crosslistings'], value[1])}
             >
@@ -408,16 +408,17 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
             </Button>
           ));
         } else if (key === 'unsettled') {
-          // Render as normal buttons
+          // Render as warning buttons
           return value[0].map((item, index) => (
             <Button
               key={index}
               variant='contained'
               style={{
                 margin: '5px',
-                backgroundColor: '#f7f7f7',
-                color: '#000',
-                opacity: 0.5,
+                color: '#030712',
+                opacity: '0.5',
+                background:
+                  'repeating-linear-gradient(45deg, #e6ccb3, #e6ccb3 10px, #e6ae7c 10px, #e6ae7c 14px)', // Striped background
               }}
               onClick={() => handleClick(item['crosslistings'], value[1])}
             >

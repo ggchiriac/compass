@@ -25,34 +25,9 @@ const CalendarCard: FC<CalendarCardProps> = ({
   endIndex,
   dept,
 }) => {
-  const dayToStartColumnIndex: Record<string, number> = {
-    M: 1,
-    T: 2,
-    W: 3,
-    Th: 4,
-    F: 5,
-  };
-
   const getGradientStyle = (dept: string) => {
     return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
   };
-
-  const getStartColumnIndexForDays = (meetingDays: string): number[] => {
-    console.log(`Mapping meeting days: ${meetingDays}`);
-    const days = meetingDays.split(',');
-    const indices = days.map((day) => dayToStartColumnIndex[day.trim()]);
-    console.log(`Column indices for days ${meetingDays}:`, indices);
-    return indices;
-  };
-
-  const relevantMeetings = event.section.class_meetings.filter((meeting) =>
-    getStartColumnIndexForDays(meeting.days).includes(event.startColumnIndex)
-  );
-
-  console.log(
-    `Relevant meetings found for event starting at row ${event.startRowIndex}:`,
-    relevantMeetings
-  );
 
   return (
     <div

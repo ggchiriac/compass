@@ -14,6 +14,7 @@ import { LRUCache } from 'typescript-lru-cache';
 
 import { Course, Filter } from '@/types';
 
+import useFilterStore from '@/store/filterSlice';
 import useSearchStore from '@/store/searchSlice';
 import { distributionAreas, distributionAreasInverse } from '@/utils/distributionAreas';
 import { grading } from '@/utils/grading';
@@ -39,70 +40,104 @@ const Search: FC = () => {
       setError: state.setError,
       setLoading: state.setLoading,
     }));
-  const { searchFilter, setSearchFilter } = useSearchStore();
+
+  const {
+    distributionFilter,
+    gradingFilter,
+    levelFilter,
+    termFilter,
+    setDistributionFilter,
+    setGradingFilter,
+    setLevelFilter,
+    setTermFilter,
+    resetFilters,
+  } = useFilterStore();
 
   const [showPopup, setShowPopup] = useState<boolean>(false);
-  const [termFilter, setTermFilter] = useState(searchFilter.termFilter || '');
-  const [distributionFilter, setDistributionFilter] = useState(
-    searchFilter.distributionFilter || ''
-  );
-  const [levelFilter, setLevelFilter] = useState(searchFilter.levelFilter || []);
-  const [gradingFilter, setGradingFilter] = useState(searchFilter.gradingFilter || []);
+
+  const [localDistributionFilter, setLocalDistributionFilter] = useState<string>('');
+  const [localGradingFilter, setLocalGradingFilter] = useState<string[]>([]);
+  const [localLevelFilter, setLocalLevelFilter] = useState<string[]>([]);
+  const [localTermFilter, setLocalTermFilter] = useState<string>('');
+
+  const areFiltersActive = () => {
+    return (
+      distributionFilter !== '' ||
+      levelFilter.length > 0 ||
+      gradingFilter.length > 0 ||
+      termFilter !== ''
+    );
+  };
+
+  useEffect(() => {
+    resetFilters();
+  }, [resetFilters]);
 
   useEffect(() => {
     setSearchResults(searchResults);
   }, [searchResults, setSearchResults]);
 
-  const search = async (searchQuery: string, filter: Filter) => {
-    setLoading(true);
-    try {
-      let queryString = `course=${encodeURIComponent(searchQuery)}`;
-
-      if (filter.termFilter) {
-        queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
-      }
-
-      if (filter.distributionFilter) {
-        queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
-      }
-
-      if (filter.levelFilter.length > 0) {
-        queryString += `&level=${filter.levelFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
-
-      if (filter.gradingFilter.length > 0) {
-        queryString += `&grading=${filter.gradingFilter.map((item) => encodeURIComponent(item)).join(',')}`;
-      }
-
-      const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
-      if (response.ok) {
-        const data: { courses: Course[] } = await response.json();
-        setSearchResults(data.courses);
-        if (data.courses.length > 0) {
-          addRecentSearch(searchQuery);
-          searchCache.set(searchQuery, data.courses);
-        }
-      } else {
-        setError(`Server returned ${response.status}: ${response.statusText}`);
-      }
-    } catch (error) {
-      setError('There was an error fetching courses.');
-    } finally {
-      setLoading(false);
+  function buildQuery(searchQuery: string, filter: Filter): string {
+    let queryString = `course=${encodeURIComponent(searchQuery)}`;
+    if (filter.termFilter) {
+      queryString += `&term=${encodeURIComponent(filter.termFilter)}`;
     }
-  };
+    if (filter.distributionFilter) {
+      queryString += `&distribution=${encodeURIComponent(filter.distributionFilter)}`;
+    }
+    if (filter.levelFilter.length > 0) {
+      queryString += `&level=${filter.levelFilter.map(encodeURIComponent).join(',')}`;
+    }
+    if (filter.gradingFilter.length > 0) {
+      queryString += `&grading=${filter.gradingFilter.map(encodeURIComponent).join(',')}`;
+    }
+    return queryString;
+  }
+
+  const search = useCallback(
+    async (searchQuery: string, filter: Filter) => {
+      setLoading(true);
+      try {
+        const queryString = buildQuery(searchQuery, filter);
+
+        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
+
+        if (response.ok) {
+          const data: { courses: Course[] } = await response.json();
+          setSearchResults(data.courses);
+          if (data.courses.length > 0) {
+            addRecentSearch(searchQuery);
+            searchCache.set(searchQuery, data.courses);
+          }
+        } else {
+          setError(`Server returned ${response.status}: ${response.statusText}`);
+        }
+      } catch (error) {
+        setError('There was an error fetching courses.');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [addRecentSearch, setError, setLoading, setSearchResults]
+  );
 
   function retrieveCachedSearch(search) {
     setSearchResults(searchCache.get(search) ?? []);
   }
 
   useEffect(() => {
+    const filters = {
+      termFilter,
+      distributionFilter,
+      levelFilter,
+      gradingFilter,
+    };
     if (query) {
-      search(query, searchFilter);
+      search(query, filters);
     } else {
-      search('', searchFilter);
+      search('', filters);
     }
-  }, [query, searchFilter]);
+  }, [query, termFilter, distributionFilter, levelFilter, gradingFilter, search]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     if (timerRef.current) {
@@ -115,31 +150,30 @@ const Search: FC = () => {
   };
 
   const handleSave = useCallback(() => {
-    const filter = {
-      termFilter,
-      distributionFilter,
-      levelFilter,
-      gradingFilter,
-    };
-    setSearchFilter(filter);
-    setShowPopup(false);
-  }, [termFilter, distributionFilter, levelFilter, gradingFilter, setSearchFilter, setShowPopup]);
-
-  const handleCancel = useCallback(() => {
-    setTermFilter(searchFilter.termFilter);
-    setDistributionFilter(searchFilter.distributionFilter);
-    setLevelFilter(searchFilter.levelFilter);
-    setGradingFilter(searchFilter.gradingFilter);
+    setDistributionFilter(localDistributionFilter);
+    setLevelFilter(localLevelFilter);
+    setGradingFilter(localGradingFilter);
+    setTermFilter(localTermFilter);
     setShowPopup(false);
   }, [
-    searchFilter,
-    setTermFilter,
+    localDistributionFilter,
+    localLevelFilter,
+    localGradingFilter,
+    localTermFilter,
     setDistributionFilter,
     setLevelFilter,
     setGradingFilter,
     setShowPopup,
+    setTermFilter,
   ]);
 
+  const handleCancel = useCallback(() => {
+    setLocalLevelFilter(useFilterStore.getState().levelFilter);
+    setLocalTermFilter(useFilterStore.getState().termFilter);
+    setLocalGradingFilter(useFilterStore.getState().gradingFilter);
+    setLocalDistributionFilter(useFilterStore.getState().distributionFilter);
+    setShowPopup(false);
+  }, [setShowPopup]);
   useEffect(() => {
     const handleKeyDown = (event) => {
       if (event.key === 'Enter') {
@@ -168,29 +202,29 @@ const Search: FC = () => {
     setShowPopup(true);
   };
 
-  const handleLevelFilterChange = (level) => {
-    if (levelFilter.includes(level)) {
-      setLevelFilter((levelFilter) => levelFilter.filter((item) => item !== level));
+  const handleLocalLevelFilterChange = (level) => {
+    if (localLevelFilter.includes(level)) {
+      setLocalLevelFilter(localLevelFilter.filter((item) => item !== level));
     } else {
-      setLevelFilter((levelFilter) => [...levelFilter, level]);
+      setLocalLevelFilter([...localLevelFilter, level]);
     }
   };
 
-  const handleGradingFilterChange = (grading) => {
-    if (gradingFilter.includes(grading)) {
-      setGradingFilter((gradingFilter) => gradingFilter.filter((item) => item !== grading));
+  const handleLocalGradingFilterChange = (grading) => {
+    if (localGradingFilter.includes(grading)) {
+      setLocalGradingFilter(localGradingFilter.filter((item) => item !== grading));
     } else {
-      setGradingFilter((gradingFilter) => [...gradingFilter, grading]);
+      setLocalGradingFilter([...localGradingFilter, grading]);
     }
   };
 
   const modalContent = showPopup ? (
     <FilterModal
       setShowPopup={setShowPopup}
-      setTermFilter={setTermFilter}
-      setDistributionFilter={setDistributionFilter}
-      setLevelFilter={setLevelFilter}
-      setGradingFilter={setGradingFilter}
+      setTermFilter={setLocalTermFilter}
+      setDistributionFilter={setLocalDistributionFilter}
+      setLevelFilter={setLocalLevelFilter}
+      setGradingFilter={setLocalGradingFilter}
       handleSave={handleSave}
       handleCancel={handleCancel}
     >
@@ -203,11 +237,11 @@ const Search: FC = () => {
             options={Object.keys(terms)}
             placeholder='Semester'
             variant='soft'
-            value={termsInverse[termFilter]}
+            value={termsInverse[localTermFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newTermName: string | null) => {
               event.stopPropagation();
-              setTermFilter(terms[newTermName ?? ''] ?? '');
+              setLocalTermFilter(terms[newTermName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -225,11 +259,11 @@ const Search: FC = () => {
             options={Object.keys(distributionAreas)}
             placeholder='Distribution area'
             variant='soft'
-            value={distributionAreasInverse[distributionFilter]}
+            value={distributionAreasInverse[localDistributionFilter]}
             isOptionEqualToValue={(option, value) => value === '' || option === value}
             onChange={(event, newDistributionName: string | null) => {
               event.stopPropagation();
-              setDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
+              setLocalDistributionFilter(distributionAreas[newDistributionName ?? ''] ?? '');
             }}
             getOptionLabel={(option) => option.toString()}
             renderOption={(props, option) => (
@@ -248,8 +282,8 @@ const Search: FC = () => {
                   size='sm'
                   id={`level-${level}`}
                   name='level'
-                  checked={levelFilter.includes(levels[level])}
-                  onChange={() => handleLevelFilterChange(levels[level])}
+                  checked={localLevelFilter.includes(levels[level])}
+                  onChange={() => handleLocalLevelFilterChange(levels[level])}
                 />
                 <span className='ml-2 text-sm font-medium text-gray-800'>{level}</span>
               </div>
@@ -265,8 +299,8 @@ const Search: FC = () => {
                   size='sm'
                   id={`grading-${grading}`}
                   name='grading'
-                  checked={gradingFilter.includes(grading)}
-                  onChange={() => handleGradingFilterChange(grading)}
+                  checked={localGradingFilter.includes(grading)}
+                  onChange={() => handleLocalGradingFilterChange(grading)}
                 />
                 <span className='ml-2 text-sm font-medium text-gray-800'>{grading}</span>
               </div>
@@ -308,12 +342,12 @@ const Search: FC = () => {
           />
           <button
             type='button'
-            className='absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md hover:bg-dnd-gray group'
+            className={`absolute inset-y-1 right-2 flex items-center justify-center px-1 rounded-md hover:bg-dnd-gray group`}
             onClick={handleAdjustmentsClick}
             aria-label='Adjust search settings'
           >
             <AdjustmentsHorizontalIcon
-              className='h-5 w-5 text-gray-400 group-hover:text-gray-500'
+              className={`h-5 w-5 ${areFiltersActive() ? 'text-blue-500' : 'text-gray-400 group-hover:text-gray-500'}`}
               aria-hidden='true'
             />
           </button>

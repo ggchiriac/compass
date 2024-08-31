@@ -24,13 +24,6 @@ const useSearchStore = create<SearchStoreState>((set) => ({
   },
   setError: (error) => set({ error }),
   setLoading: (loading) => set({ loading }),
-  searchFilter: {
-    termFilter: '',
-    distributionFilter: '',
-    levelFilter: [],
-    gradingFilter: [],
-  },
-  setSearchFilter: (filter) => set(() => ({ searchFilter: filter })),
 }));
 
 export default useSearchStore;

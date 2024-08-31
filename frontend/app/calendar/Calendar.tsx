@@ -86,13 +86,8 @@ const Calendar: FC = () => {
     }));
   });
 
-  useEffect(() => {
-    console.log('Selected courses updated:', selectedCourses);
-  }, [selectedCourses]);
-
   const handleClick = (event: CalendarEvent): void => {
     useCalendarStore.getState().activateSection(event);
-    console.log('Clicked event:', event.section.class_meetings);
   };
 
   // Scroll to the current hour when the calendar is first rendered

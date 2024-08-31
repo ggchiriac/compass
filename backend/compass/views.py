@@ -534,22 +534,22 @@ class SearchCourses(APIView):
                 result = split(r'(\d+[a-zA-Z])', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + ' ' + num
+                search_key = dept + ' ' + num
             elif DEPT_NUM_REGEX.match(trimmed_query):
                 result = split(r'(\d+)', string=trimmed_query, maxsplit=1)
                 dept = result[0]
                 num = result[1]
-                code = dept + ' ' + num
+                search_key = dept + ' ' + num
             elif NUM_ONLY_REGEX.match(trimmed_query) or NUM_SUFFIX_ONLY_REGEX.match(
                 trimmed_query
             ):
                 dept = ''
                 num = trimmed_query
-                code = num
-            elif DEPT_ONLY_REGEX.match(trimmed_query):
+                search_key = num
+            elif len(trimmed_query) > 0:
                 dept = trimmed_query
                 num = ''
-                code = dept
+                search_key = dept
             else:
                 return JsonResponse({'courses': []})
 
@@ -594,7 +594,10 @@ class SearchCourses(APIView):
                     return JsonResponse({'courses': serialized_course.data})
                 else:
                     filtered_query = query_conditions
-                    filtered_query &= Q(crosslistings__icontains=code)
+                    if len(search_key) > 3:
+                        filtered_query &= (Q(crosslistings__icontains=search_key) | Q(title__icontains=query))
+                    else:
+                        filtered_query &= Q(crosslistings__icontains=search_key)
                     courses = (
                         Course.objects.select_related('department')
                         .filter(filtered_query)

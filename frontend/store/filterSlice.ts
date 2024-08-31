@@ -25,6 +25,7 @@ interface FilterState {
   }) => void;
   setShowPopup: (show: boolean) => void;
   resetFilters: () => void;
+  areFiltersEmpty: (filter) => boolean;
 }
 
 const useFilterStore = create<FilterState>()(
@@ -94,7 +95,6 @@ const useFilterStore = create<FilterState>()(
       gradingFilter: [],
       showPopup: false,
       setTermFilter: (term) => {
-        console.log('Setting termFilter:', term);
         set({ termFilter: term });
       },
       setDistributionFilter: (distribution) => set({ distributionFilter: distribution }),
@@ -116,6 +116,11 @@ const useFilterStore = create<FilterState>()(
           levelFilter: [],
           gradingFilter: [],
         }),
+      areFiltersEmpty: (filter) =>
+        filter.termFilter === '' &&
+        filter.distributionFilter === '' &&
+        filter.levelFilter.length === 0 &&
+        filter.gradingFilter.length === 0,
     }),
     {
       name: 'filter-settings',
