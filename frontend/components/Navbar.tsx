@@ -2,10 +2,17 @@ import { memo, MouseEvent, FC } from 'react';
 
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
+import IconButton from '@mui/material/IconButton';
 import Image from 'next/image';
+
+import { useModalStore } from '@/store/modalstore';
 
 import useAuthStore from '../store/authSlice';
 import useMobileMenuStore from '../store/mobileMenuSlice';
+
+import CalendarTutorial from './CalendarTutorial/calendartutorial';
+import DashboardTutorial from './DashboardTutorial/dashboardtutorial';
 
 import DropdownMenu from './DropdownMenu';
 import { Login } from './Login';
@@ -28,6 +35,8 @@ const Navbar: FC = () => {
     e.preventDefault();
     login();
   };
+
+  const { isOpen, currentPage, openModal, closeModal } = useModalStore();
 
   const renderUserMenu = () => (isAuthenticated ? <DropdownMenu /> : <Login />);
 
@@ -72,8 +81,23 @@ const Navbar: FC = () => {
             )
           )}
         </div>
-        <div className='hidden lg:flex lg:flex-1 lg:justify-end'>{renderUserMenu()}</div>
+        <div className='hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4'>
+          {(currentPage === 'dashboard' || currentPage === 'calendar') && (
+            <IconButton onClick={openModal}>
+              <HelpOutlinedIcon style={{ color: 'white' }} fontSize='large' />
+            </IconButton>
+          )}
+          {renderUserMenu()}</div>
       </nav>
+
+      {isOpen && currentPage === 'dashboard' && (
+        <DashboardTutorial isOpen={isOpen} onClose={closeModal} />
+      )}
+
+      {isOpen && currentPage === 'calendar' && (
+        <CalendarTutorial isOpen={isOpen} onClose={closeModal} />
+      )}
+
       <Dialog as='div' className='lg:hidden' open={mobileMenuOpen} onClose={setMobileMenuOpen}>
         <div className='fixed inset-0 z-50' />
         <Dialog.Panel className='fixed inset-y-0 right-0 z-50 w-full overflow-y-auto bg-gray-900 px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-white/10'>

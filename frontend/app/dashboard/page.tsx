@@ -6,6 +6,7 @@ import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
+import { useModalStore } from '@/store/modalstore';
 import UserState from '@/store/userSlice';
 
 import { Canvas } from './Canvas';
@@ -17,6 +18,10 @@ const Dashboard: FC = () => {
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
+
+  useEffect(() => {
+    useModalStore.setState({ currentPage: 'dashboard' });
+  });
 
   return (
     <>

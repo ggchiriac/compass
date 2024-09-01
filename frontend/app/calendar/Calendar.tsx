@@ -7,6 +7,7 @@ import { CalendarEvent } from '@/types';
 
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
+import { useModalStore } from '@/store/modalstore';
 
 import CalendarBody from './CalendarBody';
 
@@ -101,6 +102,10 @@ const Calendar: FC = () => {
       calendarElementRef.current.scrollTop = scrollPosition;
     }
   }, []);
+
+  useEffect(() => {
+    useModalStore.getState().setCurrentPage('calendar');
+  });
 
   return (
     <div>
