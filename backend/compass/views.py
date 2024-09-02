@@ -877,8 +877,9 @@ def check_requirements(request):
 
     this_major = user_info['major']['code']
     these_minors = [minor['code'] for minor in user_info['minors']]
+    these_certificates = [certificate['code'] for certificate in user_info['certificates']]
 
-    req_dict = check_user(user_info['netId'], user_info['major'], user_info['minors'])
+    req_dict = check_user(user_info['netId'], user_info['major'], user_info['minors'], user_info['certificates'])
 
     # Rewrite req_dict so that it is stratified by requirements being met
     formatted_dict = {}
@@ -889,6 +890,8 @@ def check_requirements(request):
     formatted_dict[this_major] = req_dict[this_major]
     for minor in these_minors:
         formatted_dict[minor] = req_dict['Minors'][minor]
+    for certificate in these_certificates:
+        formatted_dict[certificate] = req_dict['Certificates'][certificate]
     formatted_dict = transform_data(formatted_dict)
 
     def pretty_print(data, indent=0):
