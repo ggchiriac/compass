@@ -311,6 +311,7 @@ export function Canvas({
   // Assuming 'user' is of type User
   const userMajorCode = user.major?.code;
   const userMinors = user.minors ?? [];
+  const userCertificates = user.certificates ?? [];
 
   // Structure to hold degree requirements
   const degreeRequirements: Dictionary = { General: '' };
@@ -325,6 +326,14 @@ export function Canvas({
     const minorCode = minor.code;
     if (minorCode && typeof minorCode === 'string') {
       degreeRequirements[minorCode] = academicPlan[minorCode] ?? {};
+    }
+  });
+
+  // Iterate over certificates and add them to degree requirements if their code is a string
+  userCertificates.forEach((certificate) => {
+    const certificateCode = certificate.code;
+    if (certificateCode && typeof certificateCode === 'string') {
+      degreeRequirements[certificateCode] = academicPlan[certificateCode] ?? {};
     }
   });
 
