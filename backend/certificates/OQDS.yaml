@@ -57,9 +57,9 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: Three elective courses on applications to quantitative decision making.
-  Students may choose to take more than one course from category (1) or (2) and
-  count the additional course(s) toward category (3) as long as they take at least
-  one course from category (3).
+    Students may choose to take more than one course from category (1) or (2) and
+    count the additional course(s) toward category (3) as long as they take at least
+    one course from category (3).
   req_list:
   - name: Category 3
     max_counted: 3

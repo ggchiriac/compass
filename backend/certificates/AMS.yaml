@@ -4,11 +4,11 @@ name: American Studies
 code: AMS
 degree:
 description: This interdisciplinary plan of study prepares students to make intellectual
-connections in the world through the experiences and place of America in current and
-historical times. Combining a wide range of fields, and grounded in the histories
-and experiences of diverse peoples and cultures that make up the United States of
-America, the program explores different conceptual framings of America and the role
-of the United States in global, local and transnational relationships.
+  connections in the world through the experiences and place of America in current and
+  historical times. Combining a wide range of fields, and grounded in the histories
+  and experiences of diverse peoples and cultures that make up the United States of
+  America, the program explores different conceptual framings of America and the role
+  of the United States in global, local and transnational relationships.
 urls:
 - https://effroncenter.princeton.edu/areas-study/american-studies
 contacts:
@@ -25,7 +25,7 @@ req_list:
     and film, and draw from the diverse fields of literature, history, political science,
     art history, economics, law, cultural studies, and the history of science.  The
     course attends to how knowledge about America has and continues to be produced,
-      disseminated, and consumed, emphasizing the cognitive processes associated with
+    disseminated, and consumed, emphasizing the cognitive processes associated with
     the invention and delineation of America.
   double_counting_allowed: false
   max_common_with_major: 0
@@ -36,9 +36,9 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: Three courses in American studies (AMS), either originating in the program
-  or cross-listed, and preferably representing disciplinary breadth in the social sciences,
-  arts, and humanities. No more than one course taken in fulfillment of a student's
-  concentration may be counted toward the certificate.
+    or cross-listed, and preferably representing disciplinary breadth in the social sciences,
+    arts, and humanities. No more than one course taken in fulfillment of a student's
+    concentration may be counted toward the certificate.
   double_counting_allowed: false
   max_common_with_major: 1
   pdfs_allowed: 0

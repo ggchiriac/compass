@@ -76,8 +76,8 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: Students must take three additional elective courses in AAS, cross-listed
-  by AAS, or from our approved cognates list, and at least one of these must be in the
-  Global Race and Ethnicity subfield.
+    by AAS, or from our approved cognates list, and at least one of these must be in the
+    Global Race and Ethnicity subfield.
   double_counting_allowed: false
   max_common_with_major: 0
   pdfs_allowed: 0

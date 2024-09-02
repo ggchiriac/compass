@@ -4,10 +4,10 @@ name: Quantitative and Computational Biology
 code: QCB
 degree:
 description: The Program in Quantitative and Computational Biology is offered
-by the Lewis-Sigler Institute for Integrative Genomics and its affiliated
-departments. The program is designed to instruct students in the theory and
-practice of using big data sets to achieve a quantitative understanding of
-complex biological processes. 
+  by the Lewis-Sigler Institute for Integrative Genomics and its affiliated
+  departments. The program is designed to instruct students in the theory and
+  practice of using big data sets to achieve a quantitative understanding of
+  complex biological processes. 
 urls:
 - https://ua.princeton.edu/fields-study/certificate-programs/quantitative-and-computational-biology
 contacts:
@@ -19,8 +19,8 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: Students must take the core course GEO 255/AST 255/EEB 255/CHM 255.
-  This course will qualify for departmental credit if the student submits a 25-page
-  term paper on astrobiology, with the emphasis in that department's discipline.
+    This course will qualify for departmental credit if the student submits a 25-page
+    term paper on astrobiology, with the emphasis in that department's discipline.
   req_list:
   - name: Integrated Science Curriculum
     max_counted: 1
@@ -61,9 +61,9 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: From the two lists of approved electives below, students must complete at
-  least one from each list. Students may be permitted to take a graduate-level course
-  not listed below to fulfill the elective requirement, but only with permission of the
-  program director. 
+    least one from each list. Students may be permitted to take a graduate-level course
+    not listed below to fulfill the elective requirement, but only with permission of the
+    program director. 
   req_list:
   - name: Computational Methods and Quantitative Modeling
     max_counted: 1

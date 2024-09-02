@@ -62,7 +62,7 @@ req_list:
       max_counted: 3
       min_needed: 1
       explanation: Courses are selected from a list of electives either following a field
-      of expertise or building a unique interdisciplinary set approved by advisor.
+        of expertise or building a unique interdisciplinary set approved by advisor.
       req_list:
       - name: Structures
         max_counted: 3
@@ -110,7 +110,7 @@ req_list:
       max_counted: 3
       min_needed: 1
       explanation: Courses are selected from a list of electives either following a field
-      of expertise or building a unique interdisciplinary set approved by advisor.
+        of expertise or building a unique interdisciplinary set approved by advisor.
       course_list:
       - ARC 204
       - ARC 205
@@ -142,7 +142,7 @@ req_list:
       max_counted: 3
       min_needed: 1
       explanation: Courses are selected from a list of electives either following a field
-      of expertise or building a unique interdisciplinary set approved by advisor.
+        of expertise or building a unique interdisciplinary set approved by advisor.
       req_list:
       - name: Environment Electives
         max_counted: 3
