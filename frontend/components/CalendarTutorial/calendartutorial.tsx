@@ -36,11 +36,31 @@ const pages = [
 ];
 
 const photos = [
-  <img src='/welcome.png' alt='Description' key={0} style={{ width: '80%', height: 'auto' }} />,
-  <img src='/settings.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img
+    src='/calendar_main.png'
+    alt='Description'
+    key={0}
+    style={{ width: '80%', height: 'auto' }}
+  />,
+  <img
+    src='/calendar_profile.png'
+    alt='Description'
+    key={0}
+    style={{ width: '65%', height: 'auto' }}
+  />,
   <img src='/semester.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
-  <img src='/search.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
-  <img src='/filters.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img
+    src='/calendar_search.png'
+    alt='Description'
+    key={0}
+    style={{ width: '65%', height: 'auto' }}
+  />,
+  <img
+    src='/calendar_filters.png'
+    alt='Description'
+    key={0}
+    style={{ width: '65%', height: 'auto' }}
+  />,
   <img src='/course_add.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
   <img
     src='/course_remove.png'
