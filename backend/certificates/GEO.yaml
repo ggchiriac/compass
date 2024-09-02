@@ -4,13 +4,13 @@ name: Geological Engineering
 code: GEO
 degree:
 description: Depending upon the selection of electives, the program
-prepares students for graduate study or practice in geology, geochemistry,
-geophysics, oceanography, water resources, engineering and environmental
-geology, and civil and environmental engineering. The program is a
-cooperative effort of the Department of Civil and Environmental Engineering
-and the Department of Geosciences, and the program committee is drawn from
-those departments. The student may be a candidate for either the B.S.E. or
-the A.B. degree.
+  prepares students for graduate study or practice in geology, geochemistry,
+  geophysics, oceanography, water resources, engineering and environmental
+  geology, and civil and environmental engineering. The program is a
+  cooperative effort of the Department of Civil and Environmental Engineering
+  and the Department of Geosciences, and the program committee is drawn from
+  those departments. The student may be a candidate for either the B.S.E. or
+  the A.B. degree.
 urls:
 - https://ua.princeton.edu/fields-study/certificate-programs/geological-engineering
 contacts:
@@ -126,10 +126,10 @@ req_list:
   max_counted: 1
   min_needed: 4
   explanation: Four program-approved courses at or above the 300 level
-  that constitute a coherent sequence (for additional details, see the geosciences
-  and civil and environmental engineering department descriptions). At least
-  two of these courses must be from a department different from that in which
-  the student is majoring.
+    that constitute a coherent sequence (for additional details, see the geosciences
+    and civil and environmental engineering department descriptions). At least
+    two of these courses must be from a department different from that in which
+    the student is majoring.
   pdfs_allowed: false
   course_list:
   - CEE 3**

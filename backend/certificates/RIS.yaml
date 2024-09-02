@@ -51,7 +51,7 @@ req_list:
     max_counted: 1
     min_needed: 1
     explanation: The A.B. science and engineering distributional requirement
-    or the B.S.E. first year science requirement.
+      or the B.S.E. first year science requirement.
     double_counting_allowed: false
     req_list:
     - name: A.B. Science and Engineering Requirement

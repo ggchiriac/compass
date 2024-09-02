@@ -4,24 +4,24 @@ name: Planets and Life
 code: AST
 degree:
 description: |-
-Unraveling the origins of life on Earth and determining whether life
-exists beyond Earth will likely be two of the most significant scientific discoveries
-in the 21st century. The Program in Planets and Life is an interdepartmental,
-multidisciplinary plan of study designed for students interested in these two
-questions. The goal is to provide students with an understanding of the fundamental
-astrophysical, chemical, biological and geological principles and engineering
-challenges that will guide our search for life in extreme environments on Earth
-and on other planets and satellites in the solar system and among neighboring
-planetary systems. Research on and teaching of these topics are typically performed
-under the rubric of astrobiology.<br><br>
+  Unraveling the origins of life on Earth and determining whether life
+  exists beyond Earth will likely be two of the most significant scientific discoveries
+  in the 21st century. The Program in Planets and Life is an interdepartmental,
+  multidisciplinary plan of study designed for students interested in these two
+  questions. The goal is to provide students with an understanding of the fundamental
+  astrophysical, chemical, biological and geological principles and engineering
+  challenges that will guide our search for life in extreme environments on Earth
+  and on other planets and satellites in the solar system and among neighboring
+  planetary systems. Research on and teaching of these topics are typically performed
+  under the rubric of astrobiology.<br><br>
 
-The program will equip participating students with the skills they will require to
-assume leadership roles in discovering the origins of terrestrial and extraterrestrial
-life over the next decades. The cooperating departments from which the Program in
-Planets and Life draws faculty and other resources include astrophysics, chemistry,
-ecology and evolutionary biology, geosciences, mechanical and aerospace engineering,
-and operations research and financial engineering, as well as the Princeton School of
-Public and International Affairs.
+  The program will equip participating students with the skills they will require to
+  assume leadership roles in discovering the origins of terrestrial and extraterrestrial
+  life over the next decades. The cooperating departments from which the Program in
+  Planets and Life draws faculty and other resources include astrophysics, chemistry,
+  ecology and evolutionary biology, geosciences, mechanical and aerospace engineering,
+  and operations research and financial engineering, as well as the Princeton School of
+  Public and International Affairs.
 urls:
 - https://ua.princeton.edu/fields-study/certificate-programs/planets-and-life
 - https://astrobiology.princeton.edu/
@@ -34,18 +34,18 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: Students must take the core course GEO 255/AST 255/EEB 255/CHM 255.
-  This course will qualify for departmental credit if the student submits a 25-page
-  term paper on astrobiology, with the emphasis in that department's discipline.
+    This course will qualify for departmental credit if the student submits a 25-page
+    term paper on astrobiology, with the emphasis in that department's discipline.
   course_list:
   - GEO 255
 - name: Cognate Courses
   max_counted: 1
   min_needed: 4
   explanation: Students must take an additional four cognate courses. Only two
-  of the cognate courses can be in the student's major or be requirements of
-  their majors (though exceptions can be considered on a case-by-case basis).
-  The cognate courses must be approved by the program chairperson, and students
-  are encouraged to discuss their choices in the early stages of their planning.
+    of the cognate courses can be in the student's major or be requirements of
+    their majors (though exceptions can be considered on a case-by-case basis).
+    The cognate courses must be approved by the program chairperson, and students
+    are encouraged to discuss their choices in the early stages of their planning.
   course_list:
   - AST 204
   - AST 205

@@ -21,13 +21,13 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: Students must take URB 201 Introduction to Urban Studies, or with
-  approval of the director, an urban-focused elective such as URB 388.
-  Students must also take a design studio course, either ARC 205 or ARC 204.
-  Students planning to major in architecture or CEE are directed to ARC 204.
-  Note that studio courses are limited in size; students are encouraged to fulfill
-  the studio course requirement as soon as their schedule permits. The core courses
-  are designed to be accessible to all majors. To satisfy the core course
-  requirements, students must pass both required courses with a grade of B or above. 
+    approval of the director, an urban-focused elective such as URB 388.
+    Students must also take a design studio course, either ARC 205 or ARC 204.
+    Students planning to major in architecture or CEE are directed to ARC 204.
+    Note that studio courses are limited in size; students are encouraged to fulfill
+    the studio course requirement as soon as their schedule permits. The core courses
+    are designed to be accessible to all majors. To satisfy the core course
+    requirements, students must pass both required courses with a grade of B or above. 
   double_counting_allowed: false
   pdfs_allowed: 0
   req_list:
@@ -49,13 +49,13 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: "In addition to the two core courses, students must complete
-  three electives: one from social sciences; one from the humanities; and one
-  from engineering or the natural sciences. A list of approved electives is
-  posted on the website. Elective courses may vary from year to year and
-  students should consult the registrar listing for "URB" designated courses.
-  Courses not on the approved list may be used as electives with the approval
-  of the program director. However, each selected course must contain substantial
-  urban content to fulfill the requirements of the certificate program."
+    three electives: one from social sciences; one from the humanities; and one
+    from engineering or the natural sciences. A list of approved electives is
+    posted on the website. Elective courses may vary from year to year and
+    students should consult the registrar listing for URB designated courses.
+    Courses not on the approved list may be used as electives with the approval
+    of the program director. However, each selected course must contain substantial
+    urban content to fulfill the requirements of the certificate program."
   double_counting_allowed: false
   pdfs_allowed: 0
   req_list:
