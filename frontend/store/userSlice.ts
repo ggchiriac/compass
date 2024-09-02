@@ -10,6 +10,7 @@ const useUserSlice = create<UserState>((set) => ({
     lastName: '',
     major: undefined,
     minors: [],
+    certificates: [],
     classYear: undefined,
     netId: '',
     universityId: '',

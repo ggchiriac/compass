@@ -19,6 +19,7 @@ from compass.models import (
     Degree,
     Major,
     Minor,
+    Certificate,
     CustomUser,
     UserCourses,
     Requirement,
@@ -77,7 +78,7 @@ def ensure_list(x):
 
 
 @cumulative_time
-def check_user(net_id, major, minors):
+def check_user(net_id, major, minors, certificates):
     output = {}
 
     user_inst = CustomUser.objects.get(net_id=net_id)
@@ -113,6 +114,13 @@ def check_user(net_id, major, minors):
         output['Minors'][minor] = {}
         formatted_req = check_requirements(user_inst, 'Minor', minor, user_courses)
         output['Minors'][minor]['requirements'] = formatted_req
+    
+    output['Certificates'] = {}
+    for certificate in certificates:
+        certificate = certificate['code']
+        output['Certificates'][certificate] = {}
+        formatted_req = check_requirements(user_inst, 'Certificate', certificate, user_courses)
+        output['Certificates'][certificate]['requirements'] = formatted_req
 
     # print(f"create_courses: {create_courses.total_time} seconds")
     # print(f"check_requirements: {check_requirements.total_time} seconds")
@@ -325,6 +333,17 @@ def prefetch_req_inst(table, code):
         ).get(code=code)
     elif table == 'Minor':
         req_inst = Minor.objects.prefetch_related(
+            Prefetch(
+                'req_list',
+                queryset=Requirement.objects.prefetch_related(
+                    Prefetch('req_list', queryset=Requirement.objects.all()),
+                    'course_list',
+                    'excluded_course_list',
+                ),
+            )
+        ).get(code=code)
+    elif table == 'Certificate':
+        req_inst = Certificate.objects.prefetch_related(
             Prefetch(
                 'req_list',
                 queryset=Requirement.objects.prefetch_related(

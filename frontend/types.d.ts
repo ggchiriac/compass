@@ -26,6 +26,7 @@ export type Profile = {
   classYear: number;
   major: MajorMinorType;
   minors?: MajorMinorType[];
+  certificates?: MajorMinorType[];
   netId: string;
   universityId: string;
   email: string;

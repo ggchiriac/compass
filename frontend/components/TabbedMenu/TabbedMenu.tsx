@@ -12,6 +12,7 @@ interface TabbedMenuProps {
 }
 
 const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirements }) => {
+  // console.log(tabsData);
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   useEffect(() => {
