@@ -2,7 +2,7 @@ import { memo, MouseEvent, FC } from 'react';
 
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
-import HelpOutlinedIcon from '@mui/icons-material/HelpOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import IconButton from '@mui/material/IconButton';
 import Image from 'next/image';
 
@@ -84,10 +84,11 @@ const Navbar: FC = () => {
         <div className='hidden lg:flex lg:flex-1 lg:justify-end lg:items-center lg:gap-x-4'>
           {(currentPage === 'dashboard' || currentPage === 'calendar') && (
             <IconButton onClick={openModal}>
-              <HelpOutlinedIcon style={{ color: 'white' }} fontSize='large' />
+              <HelpOutlineOutlinedIcon style={{ color: 'white' }} fontSize='medium' />
             </IconButton>
           )}
-          {renderUserMenu()}</div>
+          {renderUserMenu()}
+        </div>
       </nav>
 
       {isOpen && currentPage === 'dashboard' && (
