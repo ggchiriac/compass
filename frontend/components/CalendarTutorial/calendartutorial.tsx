@@ -26,7 +26,7 @@ const headers = [
 
 const pages = [
   'This tutorial will run you through the functionality that will allow you to plan your weekly schedule for a specific semester.',
-  'Click on the login dropdown in the top right of the screen to access your account settings. These settings allow you to change your name, major, class year, and minors.',
+  'Click on the login dropdown in the top right of the screen to access your account settings. These settings allow you to change your name, major, minors, certificates, and class year.',
   'To select a semester, click on the desired semester on top of the calender. This will bring up any selected courses for that semester.',
   'To search for courses, click on the search bar at the top of the screen. You can search for courses by department, course number, or course title.',
   'You can filter your course search by using the search filters. These filters allow you to search for courses by distribution area, levels, semesters, and grading options.',

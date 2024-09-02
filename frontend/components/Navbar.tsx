@@ -44,7 +44,8 @@ const Navbar: FC = () => {
       userProfile &&
       userProfile.major &&
       userProfile.major.code === 'Undeclared' &&
-      userProfile.minors.length === 0
+      userProfile.minors.length === 0 &&
+      userProfile.certificates.length === 0
     ) {
       openModal();
     }

@@ -28,7 +28,7 @@ const headers = [
 
 const pages = [
   'This tutorial will run you through the functionality that will allow you to plan your 4-year academic schedule.',
-  'Click on the login dropdown in the top right of the screen to access your account settings. These settings allow you to change your name, major, class year, and minors.',
+  'Click on the login dropdown in the top right of the screen to access your account settings. These settings allow you to change your name, major, minors, certificates, and class year.',
   'To search for courses, click on the search bar at the top of the screen. You can search for courses by department, course number, or course title.',
   'You can view course details including course description, reviews, and further information by clicking on the course card. This will display the course details.',
   'You can filter your course search by using the search filters. These filters allow you to search for courses by distribution area, levels, semesters, and grading options.',

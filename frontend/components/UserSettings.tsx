@@ -143,7 +143,10 @@ const certificateOptions = [
   { code: 'LAC-CLA', name: 'Language and Culture: Classics - Open to Class of 25 only' },
   { code: 'LAC-POR', name: 'Portuguese Language and Culture - Open to Class of 25 only' },
   { code: 'LAC-SPA', name: 'Spanish Language and Culture - Open to Class of 25 only' },
-  { code: 'OQDS', name: 'Optimization and Quantitative Decision Science - Open to all class years' },
+  {
+    code: 'OQDS',
+    name: 'Optimization and Quantitative Decision Science - Open to all class years',
+  },
   { code: 'QCB', name: 'Quantitative and Computational Biology - Open to all class years' },
   { code: 'RIS', name: 'Robotics and Intelligent Systems - Open to Class of 25 only' },
   { code: 'TAS-E', name: 'Technology and Society - Energy Track - Open to all class years' },
@@ -176,9 +179,9 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   };
 
   const handleCertificatesChange = (_, newCertificates: MajorMinorType[]) => {
-    const uniqueCertificates = Array.from(new Set(newCertificates.map((certificate) => certificate.code))).map((code) =>
-      newCertificates.find((certificate) => certificate.code === code)
-    );
+    const uniqueCertificates = Array.from(
+      new Set(newCertificates.map((certificate) => certificate.code))
+    ).map((code) => newCertificates.find((certificate) => certificate.code === code));
     if (uniqueCertificates.length > 3) {
       setOpenSnackbar(true);
     } else {
@@ -323,7 +326,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
           />
         </div>
         <div>
-          <FormLabel>Certificates(s)</FormLabel>
+          <FormLabel>Certificate(s)</FormLabel>
           <Autocomplete
             multiple={true}
             autoHighlight
