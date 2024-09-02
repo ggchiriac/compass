@@ -11,6 +11,7 @@
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   padding: 20px;
+  overflow: auto;
 }
 
 
@@ -44,11 +45,10 @@
   font-size: 24px;
   font-weight: bold;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .pageContent {
-  margin-bottom: 20px;
   font-size: 16px;
   color: #333;
   min-height: 90px;
@@ -58,7 +58,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 10px;
   margin-bottom: 20px;
 }
 
@@ -76,6 +75,7 @@
 .pagination {
   display: flex;
   align-items: center;
+  flex-shrink: 0; /* Prevent buttons from shrinking */
   
 span {
   margin: 0 10px;

@@ -7,7 +7,7 @@ import { CalendarEvent } from '@/types';
 
 import useCalendarStore from '@/store/calendarSlice';
 import useFilterStore from '@/store/filterSlice';
-import { useModalStore } from '@/store/modalstore';
+import { useModalStore } from '@/store/modalSlice';
 
 import CalendarBody from './CalendarBody';
 

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 
 import { Button as JoyButton } from '@mui/joy';
@@ -35,7 +36,7 @@ const pages = [
 ];
 
 const photos = [
-  <img src='/welcome.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/welcome.png' alt='Description' key={0} style={{ width: '80%', height: 'auto' }} />,
   <img src='/settings.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
   <img src='/semester.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
   <img src='/search.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,

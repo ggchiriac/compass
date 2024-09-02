@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { useState } from 'react';
 
 import { Button as JoyButton } from '@mui/joy';
@@ -39,36 +40,36 @@ const pages = [
 ];
 
 const photos = [
-  <img src='/welcome.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
-  <img src='/settings.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
-  <img src='/search.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/welcome.png' alt='Description' key={0} style={{ width: '80%', height: 'auto' }} />,
+  <img src='/settings.png' alt='Description' key={1} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/search.png' alt='Description' key={2} style={{ width: '65%', height: 'auto' }} />,
   <img
     src='/course_detail.png'
     alt='Description'
-    key={0}
+    key={3}
     style={{ width: '65%', height: 'auto' }}
   />,
-  <img src='/filters.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
-  <img src='/drag.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/filters.png' alt='Description' key={4} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/drag.png' alt='Description' key={5} style={{ width: '65%', height: 'auto' }} />,
   <img
     src='/requirement_confirm.png'
     alt='Description'
-    key={0}
+    key={6}
     style={{ width: '65%', height: 'auto' }}
   />,
   <img
     src='/requirement_detail.png'
     alt='Description'
-    key={0}
+    key={7}
     style={{ width: '65%', height: 'auto' }}
   />,
   <img
     src='/requirement_search.png'
     alt='Description'
-    key={0}
+    key={8}
     style={{ width: '65%', height: 'auto' }}
   />,
-  <img src='/satisfy.png' alt='Description' key={0} style={{ width: '65%', height: 'auto' }} />,
+  <img src='/satisfy.png' alt='Description' key={9} style={{ width: '65%', height: 'auto' }} />,
 ];
 
 const DashboardTutorial: React.FC<DashboardTutorial> = ({ isOpen, onClose }) => {

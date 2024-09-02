@@ -1,4 +1,4 @@
-import { memo, MouseEvent, FC } from 'react';
+import { memo, MouseEvent, FC, useEffect } from 'react';
 
 import { Dialog } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
@@ -6,7 +6,8 @@ import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import IconButton from '@mui/material/IconButton';
 import Image from 'next/image';
 
-import { useModalStore } from '@/store/modalstore';
+import { useModalStore } from '@/store/modalSlice';
+import UserState from '@/store/userSlice';
 
 import useAuthStore from '../store/authSlice';
 import useMobileMenuStore from '../store/mobileMenuSlice';
@@ -29,6 +30,7 @@ const Navbar: FC = () => {
     isAuthenticated: state.isAuthenticated,
     login: state.login,
   }));
+  const userProfile = UserState((state) => state.profile);
   const { mobileMenuOpen, setMobileMenuOpen } = useMobileMenuStore();
 
   const handleDashboardClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -37,6 +39,16 @@ const Navbar: FC = () => {
   };
 
   const { isOpen, currentPage, openModal, closeModal } = useModalStore();
+  useEffect(() => {
+    if (
+      userProfile &&
+      userProfile.major &&
+      userProfile.major.code === 'Undeclared' &&
+      userProfile.minors.length === 0
+    ) {
+      openModal();
+    }
+  }, [openModal, userProfile, userProfile.major, userProfile.minors]);
 
   const renderUserMenu = () => (isAuthenticated ? <DropdownMenu /> : <Login />);
 

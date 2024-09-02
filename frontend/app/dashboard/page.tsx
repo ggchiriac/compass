@@ -6,7 +6,7 @@ import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
 import useAuthStore from '@/store/authSlice';
-import { useModalStore } from '@/store/modalstore';
+import { useModalStore } from '@/store/modalSlice';
 import UserState from '@/store/userSlice';
 
 import { Canvas } from './Canvas';

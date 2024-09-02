@@ -5,7 +5,7 @@ import { useEffect } from 'react';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import useAuthStore from '@/store/authSlice';
-import { useModalStore } from '@/store/modalstore';
+import { useModalStore } from '@/store/modalSlice';
 
 const Contact = () => {
   const { checkAuthentication } = useAuthStore();
