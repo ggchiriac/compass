@@ -24,6 +24,7 @@ const useAuthStore = create<AuthState>((set) => ({
 
       set({
         isAuthenticated: data.authenticated,
+        // Create a field isFirstTimeAuthenticated in data and set a var isFirstTimeAuthenticated here
         user: data.authenticated ? data.user : undefined,
       });
       console.log('Authentication status:', data.authenticated);

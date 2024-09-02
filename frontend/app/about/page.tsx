@@ -7,6 +7,7 @@ import Image from 'next/image';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import useAuthStore from '@/store/authSlice';
+import { useModalStore } from '@/store/modalSlice';
 
 const teamMembers = [
   {
@@ -68,6 +69,10 @@ const About = () => {
   useEffect(() => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
+
+  useEffect(() => {
+    useModalStore.setState({ currentPage: 'about' });
+  });
 
   if (isLoading) {
     return (

@@ -32,4 +32,17 @@ export const FilterModal: FC<SettingsModalProps> = ({ children }) => {
   );
 };
 
+export const TutorialModal: FC<SettingsModalProps> = ({ children }) => {
+  return createPortal(
+    <>
+      {/* TODO: Need an equivalent fade out animation when 'Close' is pressed */}
+      <div className='modal-backdrop fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 z-50'></div>
+      <div className='modal-entrance fixed inset-0 flex justify-center items-center z-50'>
+        {children}
+      </div>
+    </>,
+    document.body
+  );
+};
+
 export default Modal;
