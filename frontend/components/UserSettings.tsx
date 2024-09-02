@@ -131,6 +131,27 @@ const minorOptions = [
   { code: 'VPL', name: 'Values and Public Life' },
 ];
 
+const certificateOptions = [
+  { code: 'AAS', name: 'African American Studies - Open to Class of 25 only' },
+  { code: 'ACE', name: 'Architecture and Engineering - Open to all class years' },
+  { code: 'AMS', name: 'American Studies - Open to all class years' },
+  { code: 'AST', name: 'Planets and Life - Open to all class years' },
+  { code: 'ENT', name: 'Entrepreneurship - Open to all class years' },
+  { code: 'GEO', name: 'Geological Engineering - Open to all class years' },
+  { code: 'GER', name: 'German - Open to all class years' },
+  { code: 'HPD', name: 'History and the Practice of Diplomacy - Open to all class years' },
+  { code: 'LAC-CLA', name: 'Language and Culture: Classics - Open to Class of 25 only' },
+  { code: 'LAC-POR', name: 'Portuguese Language and Culture - Open to Class of 25 only' },
+  { code: 'LAC-SPA', name: 'Spanish Language and Culture - Open to Class of 25 only' },
+  { code: 'OQDS', name: 'Optimization and Quantitative Decision Science - Open to all class years' },
+  { code: 'QCB', name: 'Quantitative and Computational Biology - Open to all class years' },
+  { code: 'RIS', name: 'Robotics and Intelligent Systems - Open to Class of 25 only' },
+  { code: 'TAS-E', name: 'Technology and Society - Energy Track - Open to all class years' },
+  { code: 'TAS-IT', name: 'Technology and Society - IT Track - Open to all class years' },
+  { code: 'TPP', name: 'Teacher Preparation - Open to all class years' },
+  { code: 'URB', name: 'Urban Studies - Open to all class years' },
+];
+
 const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   const { updateProfile } = useUserSlice((state) => state);
   const [firstName, setFirstName] = useState<string>(profile.firstName);
@@ -138,6 +159,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   const [classYear, setClassYear] = useState(profile.classYear || defaultClassYear);
   const [major, setMajor] = useState<MajorMinorType>(profile.major ?? undeclared);
   const [minors, setMinors] = useState<MajorMinorType[]>(profile.minors || []);
+  const [certificates, setCertificates] = useState<MajorMinorType[]>(profile.certificates || []);
   // const [timeFormat24h, setTimeFormat24h] = useState<boolean>(profile.timeFormat24h);
   // const [themeDarkMode, setThemeDarkMode] = useState<boolean>(profile.themeDarkMode);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
@@ -153,6 +175,17 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
     }
   };
 
+  const handleCertificatesChange = (_, newCertificates: MajorMinorType[]) => {
+    const uniqueCertificates = Array.from(new Set(newCertificates.map((certificate) => certificate.code))).map((code) =>
+      newCertificates.find((certificate) => certificate.code === code)
+    );
+    if (uniqueCertificates.length > 3) {
+      setOpenSnackbar(true);
+    } else {
+      setCertificates(uniqueCertificates);
+    }
+  };
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
@@ -165,6 +198,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       lastName: lastName,
       major: major ?? undeclared,
       minors: minors,
+      certificates: certificates,
       classYear: classYear,
     };
     const csrfToken = await fetchCsrfToken();
@@ -184,7 +218,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       updateProfile(profile);
       onSave(profile);
     });
-  }, [updateProfile, firstName, lastName, major, minors, classYear, onSave]);
+  }, [updateProfile, firstName, lastName, major, minors, certificates, classYear, onSave]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -276,6 +310,33 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
             onChange={(event, newMinors: MajorMinorType[]) => {
               event.stopPropagation();
               handleMinorsChange(event, newMinors);
+            }}
+            getOptionLabel={(option: MajorMinorType) => option.code}
+            renderOption={(props, option) => (
+              <AutocompleteOption {...props} key={option.name}>
+                <ListItemContent>
+                  {option.code}
+                  <Typography level='body-sm'>{option.name}</Typography>
+                </ListItemContent>
+              </AutocompleteOption>
+            )}
+          />
+        </div>
+        <div>
+          <FormLabel>Certificates(s)</FormLabel>
+          <Autocomplete
+            multiple={true}
+            autoHighlight
+            options={certificateOptions}
+            placeholder={'Select your certificate(s)'}
+            variant='soft'
+            value={certificates}
+            isOptionEqualToValue={(option, value) =>
+              value === undefined || option.code === value.code
+            }
+            onChange={(event, newCertificates: MajorMinorType[]) => {
+              event.stopPropagation();
+              handleCertificatesChange(event, newCertificates);
             }}
             getOptionLabel={(option: MajorMinorType) => option.code}
             renderOption={(props, option) => (

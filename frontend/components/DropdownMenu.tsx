@@ -69,6 +69,7 @@ const DropdownMenu: FC = () => {
         lastName: data.lastName,
         major: data?.major,
         minors: data?.minors,
+        certificates: data?.certificates,
         classYear: data.classYear,
         netId: data.netId,
         universityId: '',

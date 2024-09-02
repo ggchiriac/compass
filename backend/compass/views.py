@@ -27,6 +27,7 @@ from .models import (
     CustomUser,
     Major,
     Minor,
+    Certificate,
     Requirement,
     Section,
     UserCourses,
@@ -137,6 +138,10 @@ def fetch_user_info(net_id):
         {'code': minor.code, 'name': minor.name} for minor in user_inst.minors.all()
     ]
 
+    certificates = [
+        {'code': certificate.code, 'name': certificate.name} for certificate in user_inst.certificates.all()
+    ]
+
     try:
         # Check if any of the required attributes are not set
         if (
@@ -181,6 +186,7 @@ def fetch_user_info(net_id):
             'classYear': user_inst.class_year,
             'major': major,
             'minors': minors,
+            'certificates': certificates,
         }
         return return_data
 
@@ -217,6 +223,7 @@ def update_profile(request):
     updated_last_name = data.get('lastName', '')
     updated_major_code = data.get('major', {}).get('code', UNDECLARED['code'])
     updated_minors = data.get('minors', [])
+    updated_certificates = data.get('certificates', [])
     updated_class_year = data.get('classYear', None)
 
     # Fetch the user's profile
@@ -253,8 +260,20 @@ def update_profile(request):
             ]
         except Minor.DoesNotExist:
             return JsonResponse({'error': 'One or more minors not found'}, status=404)
-
+        
         user_inst.minors.set(minor_objects)
+
+        # Update certificates
+        try:
+            certificate_objects = [
+                Certificate.objects.get(code=certificate['code'])
+                for certificate in updated_certificates
+                if 'code' in certificate
+            ]
+        except Certificate.DoesNotExist:
+            return JsonResponse({'error': 'One or more certificatess not found'}, status=404)
+        
+        user_inst.certificates.set(certificate_objects)
 
         # Save the updated user profile
         user_inst.save()
