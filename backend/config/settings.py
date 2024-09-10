@@ -124,28 +124,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-default_db_url = 'postgresql://'
-if DEBUG:
-    default_db_url += f"{os.getenv('TEST_DB_USER')}:{os.getenv('TEST_DB_PASSWORD')}@"
-    default_db_url += f"{os.getenv('TEST_DB_HOST', 'localhost')}:{os.getenv('TEST_DB_PORT', '5432')}/"
-    default_db_url += os.getenv('TEST_DB_NAME')
-else:
-    default_db_url += f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
-    default_db_url += f"{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/"
-    default_db_url += os.getenv('DB_NAME')
 
-DATABASES = {
-    'default': dj_database_url.config(
-        default=default_db_url,
-        conn_max_age=0,
-        conn_health_checks=True,
-        ssl_require=not DEBUG,  # Enable SSL in production, disable in debug mode
-    )
-}
-
-# Add OPTIONS to the database configuration
-DATABASES['default']['OPTIONS'] = {'pool': True} # Requires Django 5.1+
-
+# Select the appropriate database URL based on DEBUG setting
+os.environ['DATABASE_URL'] = os.getenv('TEST_DATABASE_URL') if DEBUG else os.getenv('DATABASE_URL')
+DATABASES = {'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))}
+DATABASES['default']['OPTIONS'] = {'pool': True}  # Requires Django 5.1+
+DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
 AUTH_USER_MODEL = 'compass.CustomUser'
 

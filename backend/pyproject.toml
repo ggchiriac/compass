@@ -52,7 +52,7 @@ dependencies = [
     "pre-commit",
     "gunicorn",
     "whitenoise",
-    "django-heroku",
+    # "django-heroku", pip install this separately after running `uv sync`
     "tqdm",
     "bs4",
     "beautifulsoup4",
