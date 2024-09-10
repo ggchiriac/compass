@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import django_heroku
 import dj_database_url
 import os
+
 from urllib.parse import urljoin
 from pathlib import Path
 from dotenv import load_dotenv
@@ -30,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production! Toggle in .env
-DEBUG = os.getenv('DEBUG') == 'True'
+DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -53,9 +54,9 @@ INSTALLED_APPS = [
 SESSION_COOKIE_SAMESITE = os.getenv('SESSION_COOKIE_SAMESITE')
 CSRF_COOKIE_SAMESITE = os.getenv('CSRF_COOKIE_SAMESITE')
 
-SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT') == 'True'
-SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE') == 'True'
-CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE') == 'True'
+SECURE_SSL_REDIRECT = os.getenv('SECURE_SSL_REDIRECT', 'false').lower() == 'true'
+SESSION_COOKIE_SECURE = os.getenv('SESSION_COOKIE_SECURE', 'false').lower() == 'true'
+CSRF_COOKIE_SECURE = os.getenv('CSRF_COOKIE_SECURE', 'false').lower() == 'true'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -123,8 +124,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-DATABASES = {'default': dj_database_url.config(default=os.getenv('DATABASE_URL'))}
-CONN_MAX_AGE = None
+default = os.getenv('TEST_DATABASE_URI') if DEBUG else os.getenv('PROD_DATABASE_URI')
+CONN_MAX_AGE = 0
+CONN_HEALTH_CHECKS = True
+DATABASES = {
+    'default': dj_database_url.config(
+        default=default,
+        conn_max_age=CONN_MAX_AGE,
+        conn_health_checks=CONN_HEALTH_CHECKS,
+    )
+}
 
 AUTH_USER_MODEL = 'compass.CustomUser'
 
@@ -172,4 +181,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Configure Django App for Heroku.
 django_heroku.settings(locals())
-del DATABASES['default']['OPTIONS']['sslmode']
