@@ -1,66 +1,86 @@
-[tool.poetry]
+# Build system configuration
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+# Project metadata
+[project]
 name = "hoagieplan-backend"
 version = "1.1"
 description = "Dependency manager for the hoagieplan backend"
-authors = ["hoagie.io"]
+authors = [{ name = "Hoagie Club", email = "hoagie@princeton.edu" }]
 license = "MIT"
-homepage = "https://plan.hoagio.io"
-repository = "https://github.com/ggchiriac/compass"
+requires-python = ">=3.10"
 keywords = ["django", "backend", "student", "planner", "app", "hoagieplan"]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-aniso8601 = "^9.0.1"
-asgiref = "^3.7.2"
-build = "^1.0.3"
-certifi = "^2023.7.22"
-charset-normalizer = "^3.3.2"
-dj-database-url = "^2.1.0"
-django = "^4.2.7"
-django-cors-headers = "^4.3.0"
-djangorestframework = "^3.14.0"
-idna = "^3.4"
-lxml = "^4.9.3"
-numpy = "^1.26.2"
-packaging = "^23.2"
-pandas = "^2.1.1"
-promise = "^2.3"
-psycopg2-binary = "^2.9.9"
-psycopg2-pool = "^1.1"
-pydeps = "^1.12.17"
-pyproject-hooks = "^1.0.0"
-python-cas = "^1.6.0"
-python-dateutil = "^2.8.2"
-python-dotenv = "^1.0.0"
-pytz = "^2023.3.post1"
-pyyaml = "^6.0.1"
-requests = "^2.31.0"
-ruff = "^0.1.5"
-six = "^1.16.0"
-sqlparse = "^0.4.4"
-stdlib-list = "^0.9.0"
-terminaltables = "^3.1.10"
-typing-extensions = "^4.8.0"
-tzdata = "^2023.3"
-ujson = "^5.8.0"
-urllib3 = "^2.0.6"
-pre-commit = "^3.5.0"
-poetry-plugin-export = "^1.6.0"
-gunicorn = "^21.2.0"
-whitenoise = "^6.6.0"
-django-heroku = "^0.3.1"
-tqdm = "^4.66.1"
-bs4 = "^0.0.1"
-beautifulsoup4 = "^4.12.2"
-selenium = "^4.16.0"
-webdriver-manager = "^4.0.1"
-thefuzz = "^0.22.1"
+# Main dependencies
+dependencies = [
+    "django>=5.1",
+    "aniso8601",
+    "asgiref",
+    "build",
+    "certifi",
+    "charset-normalizer",
+    "dj-database-url",
+    "django-cors-headers",
+    "djangorestframework",
+    "idna",
+    "lxml",
+    "numpy",
+    "packaging",
+    "pandas",
+    "promise",
+    "psycopg2-binary",
+    "psycopg2-pool",
+    "pydeps",
+    "pyproject-hooks",
+    "python-cas",
+    "python-dateutil",
+    "python-dotenv",
+    "pytz",
+    "pyyaml",
+    "requests",
+    "ruff",
+    "six",
+    "sqlparse",
+    "stdlib-list",
+    "terminaltables",
+    "typing-extensions",
+    "tzdata",
+    "ujson",
+    "urllib3",
+    "pre-commit",
+    "gunicorn",
+    "whitenoise",
+    "django-heroku",
+    "tqdm",
+    "bs4",
+    "beautifulsoup4",
+    "selenium",
+    "webdriver-manager",
+    "thefuzz",
+    "psycopg[pool]>=3.2.1",
+]
 
-[tool.poetry.dev-dependencies]
-# See `ruff help` for more on Ruff's top-level commands.
-ruff = "^0.1.7"
-pre-commit = "^3.5.0"
+# Optional dependencies for development
+[project.optional-dependencies]
+dev = ["ruff", "pre-commit"]
 
+# Project URLs
+[project.urls]
+Repository = "https://github.com/hoagieclub/plan"
+# Documentation = "https://docs.astral.sh/uv" TODO: Write up docs on Mintlify
+
+# Hatch build configuration for Django project
+# This tells Hatch how to handle the project during build and installation
+[tool.hatch.build]
+artifacts = ["*.py", "*/"]
+exclude = ["tests/"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
+
+# Ruff configuration (a Python linter and formatter)
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [
@@ -87,12 +107,11 @@ exclude = [
     "venv",
 ]
 
-# Same as Black.
-line-length = 88
+line-length = 119
 indent-width = 4
 
-# Assuming Python 3.9+.
-target-version = "py39"
+# Assuming Python 3.10+.
+target-version = "py310"
 
 [tool.ruff.lint]
 # Enable Pyflakes (`F`) and a subset of the pycodestyle (`E`)  codes by default.
@@ -107,11 +126,11 @@ unfixable = []
 
 # This is the (only) correct way to style strings (all my homies hate PEP 8)
 [tool.ruff.lint.flake8-quotes]
-docstring-quotes = "double"  # Enforce double quotes for docstrings
-inline-quotes = "single"     # Enforce single quotes for inline strings
+docstring-quotes = "double" # Enforce double quotes for docstrings
+inline-quotes = "single"    # Enforce single quotes for inline strings
 
 [tool.ruff.format]
-quote-style = "single"       # Default to single quotes for auto-formatting
+quote-style = "single" # Default to single quotes for auto-formatting
 
 # Like Black, indent with spaces, rather than tabs.
 indent-style = "space"
@@ -121,8 +140,3 @@ skip-magic-trailing-comma = false
 
 # Like Black, automatically detect the appropriate line ending.
 line-ending = "auto"
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
