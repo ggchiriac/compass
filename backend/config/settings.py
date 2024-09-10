@@ -7,9 +7,10 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/topics/settings/
 
 For the full list of settings and their values, see
-https://docs.djangoproject.com/en/5.1/ref/settings/
+https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
+import dj_database_url
 import django_heroku
 import os
 
@@ -24,13 +25,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
+# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production! Toggle in .env
-DEBUG = os.getenv('DEBUG', 'false').lower() == 'true'
+DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
@@ -123,43 +124,33 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+default_db_url = 'postgresql://'
 if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('TEST_DB_NAME'),
-            'USER': os.getenv('TEST_DB_USER'),
-            'PASSWORD': os.getenv('TEST_DB_PASSWORD'),
-            'HOST': os.getenv('TEST_DB_HOST', 'localhost'),
-            'PORT': os.getenv('TEST_DB_PORT', '5432'),
-            'OPTIONS': {
-                'pool': True,
-            },
-            'CONN_MAX_AGE': 0,
-            'CONN_HEALTH_CHECKS': True,
-        }
-    }
+    default_db_url += f"{os.getenv('TEST_DB_USER')}:{os.getenv('TEST_DB_PASSWORD')}@"
+    default_db_url += f"{os.getenv('TEST_DB_HOST', 'localhost')}:{os.getenv('TEST_DB_PORT', '5432')}/"
+    default_db_url += os.getenv('TEST_DB_NAME')
 else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('DB_NAME'),
-            'USER': os.getenv('DB_USER'),
-            'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': os.getenv('DB_HOST', 'localhost'),
-            'PORT': os.getenv('DB_PORT', '5432'),
-            'OPTIONS': {
-                'pool': True,
-            },
-            'CONN_MAX_AGE': 0,
-            'CONN_HEALTH_CHECKS': True,
-        }
-    }
+    default_db_url += f"{os.getenv('DB_USER')}:{os.getenv('DB_PASSWORD')}@"
+    default_db_url += f"{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/"
+    default_db_url += os.getenv('DB_NAME')
+
+DATABASES = {
+    'default': dj_database_url.config(
+        default=default_db_url,
+        conn_max_age=0,
+        conn_health_checks=True,
+        ssl_require=not DEBUG,  # Enable SSL in production, disable in debug mode
+    )
+}
+
+# Add OPTIONS to the database configuration
+DATABASES['default']['OPTIONS'] = {'pool': True} # Requires Django 5.1+
+
 
 AUTH_USER_MODEL = 'compass.CustomUser'
 
 # Password validation
-# https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
+# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -178,7 +169,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/5.1/topics/i18n/
+# https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -190,13 +181,13 @@ USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.1/howto/static-files/
+# https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Default primary key field type
-# https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
+# https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
