@@ -128,7 +128,6 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Select the appropriate database URL based on DEBUG setting
 os.environ['DATABASE_URL'] = os.getenv('TEST_DATABASE_URL') if DEBUG else os.getenv('DATABASE_URL')
 DATABASES = {'default': dj_database_url.config(default=os.getenv('DATABASE_URL'), ssl_require=False)}
-DATABASES['default']['OPTIONS'] = {'pool': True}  # Requires Django 5.1+
 DATABASES['default']['CONN_HEALTH_CHECKS'] = True
 
 AUTH_USER_MODEL = 'compass.CustomUser'
