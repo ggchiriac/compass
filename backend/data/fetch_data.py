@@ -45,7 +45,7 @@ def fetch_data(subject, term, req_lib):
     print(f'Fetched {len(course_ids)} course IDs from {subject}.')
 
     # Parallel fetching of course details
-    with ThreadPoolExecutor(max_workers=1) as executor:
+    with ThreadPoolExecutor(max_workers=16) as executor:
         futures = [
             executor.submit(fetch_course_detail, course_id, term, req_lib)
             for course_id in course_ids
