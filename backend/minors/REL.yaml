@@ -27,7 +27,7 @@ req_list:
       At least four of these courses must be offered by the Department of Religion. One course may be 
       offered elsewhere in the University, as long as it is approved as suitably relevant by the DUS. 
       Courses cross-listed with REL may be considered pre-approved.
-    double_counting_allowed: false
+    double_counting_allowed: true
     pdfs_allowed: 1
     course_list:
     - REL ***
