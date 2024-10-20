@@ -40,6 +40,7 @@ req_list:
   - name: Four total courses
     min_needed: 4
     max_counted: 1
+    double_counting_allowed: true
     course_list:
     - ECS ***
     - EPS ***
@@ -48,11 +49,13 @@ req_list:
   - name: ECS Course
     min_needed: 1
     max_counted: 1
+    double_counting_allowed: true
     course_list:
     - ECS ***
   - name: EPS Course
     min_needed: 1
     max_counted: 1
+    double_counting_allowed: true
     course_list:
     - EPS ***
 - name: Thesis Colloquium
