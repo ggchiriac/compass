@@ -28,24 +28,44 @@ req_list:
       mathematics, introductory physics (including mechanics), and 
       intoductory computer science.
     req_list:
-    - name: Multivariable Calculus
+    - name: Mathematics
       max_counted: 1
       min_needed: 2
       explanation:
-      course_list:
-      - MAT 201
-      - MAT 202
-      - MAT 203
-      - MAT 204
+      req_list:
+      - name: Multivariable Calculus
+        max_counted: 1
+        min_needed: 1
+        explanation:
+        course_list:
+        - MAT 201
+        - MAT 203
+      - name: Linear Algebra
+        max_counted: 1
+        min_needed: 1
+        explanation:
+        course_list:
+        - MAT 202
+        - MAT 204
     - name: Introductory Physics
       max_counted: 1
       min_needed: 2
       explanation:
-      course_list:
-      - PHY 103
-      - PHY 104
-      - PHY 105
-      - PHY 106
+      req_list:
+      - name: Mechanics
+        max_counted: 1
+        min_needed: 1
+        explanation:
+        course_list:
+        - PHY 103
+        - PHY 105
+      - name: Electricity and Magnetism
+        max_counted: 1
+        min_needed: 1
+        explanation:
+        course_list:
+        - PHY 104
+        - PHY 106
     - name: Introductory Computer Science
       max_counted: 1
       min_needed: 1
@@ -54,10 +74,6 @@ req_list:
       - COS 126
       - ECE 115
   - name: Core
-    min_needed: 2
-    max_counted: 1
-    explanation: 
-    max_common_with_major: 0
     course_list:
     - MAE 345 / COS 346 / ECE 345 
     - ECE 346 / COS 347 / MAE 346 
@@ -70,11 +86,15 @@ req_list:
   - name: Electives
     min_needed: 3
     max_counted: 1
-    explanation: Any of the courses in the “core” list may be counted as 
-      electives if a student takes more than two courses from that list. 
-      Additional accepted courses are listed below.
-    max_common_with_major: 0
     course_list:
+    - MAE 345 / COS 346 / ECE 345 
+    - ECE 346 / COS 347 / MAE 346 
+    - ARC 380 
+    - CEE 374 / STC 374 
+    - ECE 302 
+    - MAE 322 
+    - MAE 412 
+    - MAE 416 / EEB 416
     - ARC 374
     - CBE 430 / MAE 430 / MSE 430 
     - CEE 345 / MAE 327 / MSE 345 / STC 345 
@@ -102,16 +122,22 @@ req_list:
     - SPI 370 / POL 308 / CHV 301 
   - name: Seminar Attendance
     max_counted: 1
-    min_needed: 5
-    explanation: Students are required to attend a minimum of five seminars
+    min_needed: 1
+    explanation: |-
+      <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+      Students are required to attend a minimum of five seminars
       in the Princeton Robotics Seminar series during their course of 
       study, and to fill out an online attendance sheet.
+    no_req:
   - name: Senior Independent Work
     max_counted: 1
     min_needed: 1
-    explanation: A one-term senior independent work project or two-term 
+    explanation: |-
+      <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+      A one-term senior independent work project or two-term 
       senior thesis whose topic is relevant to robotics must be 
       completed and approved by the director through the online 
       portal.  Junior independent work projects do not fulfill the 
       minor requirement. A minimum grade of B– for the project or 
       thesis is required to qualify for the minor.
+    no_req:
