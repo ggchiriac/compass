@@ -74,6 +74,9 @@ req_list:
       - COS 126
       - ECE 115
   - name: Core
+    min_needed: 2
+    max_counted: 1
+    explanation: 
     course_list:
     - MAE 345 / COS 346 / ECE 345 
     - ECE 346 / COS 347 / MAE 346 
@@ -86,6 +89,9 @@ req_list:
   - name: Electives
     min_needed: 3
     max_counted: 1
+    explanation: Any of the courses in the “core” list may be counted as 
+      electives if a student takes more than two courses from that list. 
+      Additional accepted courses are listed below.
     course_list:
     - MAE 345 / COS 346 / ECE 345 
     - ECE 346 / COS 347 / MAE 346 
