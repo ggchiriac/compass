@@ -32,6 +32,11 @@ const CalendarUI: FC = () => {
     checkAuthentication().then(() => setIsLoading(false));
   }, [checkAuthentication]);
 
+  useEffect(() => {
+    const currentSemester = Object.values(terms)[0];
+    setTermFilter(currentSemester);
+  }, []);
+
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
