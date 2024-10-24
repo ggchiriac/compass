@@ -48,80 +48,57 @@ req_list:
                 max_counted: 1
                 min_needed: 3
                 course_list:
-                  - REL 202
                   - REL 230
-                  - REL 234
-                  - REL 244
-                  - REL 246
                   - REL 251
                   - REL 252
-                  - REL 348
                   - REL 350
                   - REL 352
                   - REL 353
-                  - REL 411
               - name: Religion in America
                 max_counted: 1
                 min_needed: 3
                 course_list:
-                  - REL 255
-                  - REL 257
                   - REL 258
-                  - REL 271
                   - REL 319
                   - REL 357
                   - REL 358
                   - REL 360
                   - REL 367
-                  - REL 372
-                  - REL 383
               - name: Philosophical and Ethical Approaches to Religion
                 max_counted: 1
                 min_needed: 3
                 course_list:
-                  - REL 211
                   - REL 242
                   - REL 261
-                  - REL 264
-                  - REL 303
                   - REL 311
                   - REL 312
-                  - REL 314
                   - REL 317
                   - REL 346
                   - REL 347
-                  - REL 361
                   - REL 363
                   - REL 364
-                  - REL 365
               - name: Islam
                 max_counted: 1
                 min_needed: 3
                 course_list:
                   - REL 235
                   - REL 236
-                  - REL 239
                   - REL 240
                   - REL 328
-                  - REL 332
                   - REL 334
                   - REL 335
                   - REL 336
                   - REL 338
-                  - REL 415
               - name: Religions of Asia
                 max_counted: 1
                 min_needed: 3
                 course_list:
-                  - REL 210
                   - REL 225
                   - REL 226
                   - REL 228
                   - REL 229
                   - REL 322
-                  - REL 324
                   - REL 326
-                  - REL 382
           - name: Traditions Stream
             max_counted: 1
             min_needed: 4
