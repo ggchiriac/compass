@@ -24,14 +24,12 @@ req_list:
   max_counted: 1
   min_needed: 1
   explanation: MOL214 or equivalent
-  double_counting_allowed: true
   course_list: 
   - MOL 214
 - name: Computing
   max_counted: 1
   min_needed: 1
   explanation: COS126 or equivalent
-  double_counted_allowed: true
   course_list: 
   - COS 126
   - ECE 115
