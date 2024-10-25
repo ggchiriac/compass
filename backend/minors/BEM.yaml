@@ -3,7 +3,8 @@ type: Minor
 name: Bioengineering
 code: BEM
 degree: 
-description:  Drawing on Princeton's strengths in bioengineering, 
+description:  |-
+Drawing on Princeton's strengths in bioengineering, 
 both within the Omenn-Darling Bioengineering Institute and across 
 the broader campus, the Bioengineering Minor will provide rigorous 
 classroom and research experiences, enabling our students to gain 
@@ -19,38 +20,32 @@ contacts:
   name: Jessica Varela
   email: jvarela@princeton.edu
 req_list: 
-- name: Prerequisites
+- name: Molecular Biology
   max_counted: 1
-  min_needed: 2
-  explanation: |-
-    Students wishing to declare a Minor in Bioengineering must have taken 
-    a foundational course in Molecular Biology (MOL214 or equivalent) as 
-    well as one foundational course in computing (COS126 or equivalent).
-  pdfs_allowed: 0
-  completed_by_semester: 2
-  req_list:
-  - name: Molecular Biology
-    max_counted: 1
-    min_needed: 1
-    explanation: MOL214 or equivalent
-    double_counting_allowed: true
-    course_list: 
-    - MOL 214
-  - name: Computing
-    max_counted: 1
-    min_needed: 1
-    explanation: COS126 or equivalent
-    double_counted_allowed: true
-    course_list: 
-    - COS 126
+  min_needed: 1
+  explanation: MOL214 or equivalent
+  double_counting_allowed: true
+  course_list: 
+  - MOL 214
+- name: Computing
+  max_counted: 1
+  min_needed: 1
+  explanation: COS126 or equivalent
+  double_counted_allowed: true
+  course_list: 
+  - COS 126
+  - ECE 115
 - name: Bioengineering Content
   max_counted: 1
   min_needed: 3
-  explanation: Three courses with bioengineering content, selected from the
+  explanation: |-
+  Three courses with bioengineering content, selected from the
   list established for the Engineering Biology Certificate. These courses 
   should provide a coherent training in an area of bioengineering, such as 
   biotechnology, molecular or cellular engineering, neuroengineering, or 
-  systems biology. 
+  systems biology. One of these courses must be from outside the student's 
+  department of concentration, and at least one of these courses must not count as 
+  a departmental. 
   course_list: 
   - CBE 262
   - CBE 411
@@ -87,19 +82,14 @@ req_list:
   - QCB 311
   - QCB 408
   - QCB 455
-- name: Restrictions
-  max_counted: 0
-  min_needed: 1
-  explanation: |-
-  One of these courses must be from outside the student's department of 
-  concentration, and at least one of these courses must not count as 
-  a departmental. 
 - name: Advanced Life Science Course
   max_counted: 1
   min_needed: 1
-  explanation: One advanced life science course, selected from the approved 
+  explanation: |-
+  One advanced life science course, selected from the approved 
   list. This course should provide additional insight into complex living 
   systems and complement the bioengineering courses chosen by the student.
+  Up to 2 courses can be double counted with a student's major.
   course_list: 
   - ANT 405
   - CEE 471
@@ -117,15 +107,12 @@ req_list:
   - NEU 202
   - NEU 422
   - WWS 354
-- name: Restrictions
-  max_counted: 0
-  min_needed: 1
-  explanation: |-
-  Up to 2 courses can be double counted with a student's major
 - name: Ethical Aspects
   max_counted: 1
   min_needed: 1
-  description: To promote thinking about the ethical aspects of 
+  description: |-
+  <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+  To promote thinking about the ethical aspects of 
   bioengineering and its effects on society, students are required to 
   attend the Omenn-Darling Bioethics Lecture once during their Princeton 
   career and write a short (1-2 page single spaced) reflection on what was 
@@ -134,13 +121,17 @@ req_list:
   March; the reflection is due by April 1st of the same year in which the 
   lecture was held. A recording will be made available for students who 
   are unable to attend the lecture in person.
+  no_req:
 - name: Bioengineering research
   max_counted: 1
   min_needed: 1
-  description: Students are required to complete at least one semester or 
+  description: |-
+  <i>Editor's Note: Students do not enroll in any numbered course for this requirement, so hoagieplan does not check it.</i><br><br>
+  Students are required to complete at least one semester or 
   summer of Bioengineering research in an appropriate area of engineering 
   biology. This research requirement can be a component of the student's 
   senior thesis or senior independent research, or be satisfied by either 
   of the two Bioengineering summer research programs recently established 
   at Princeton the Bioengineering Summer Undergraduate Research Experience
   (BE-SURE) and the iGEM Synthetic Biology research project.
+  no_req:
