@@ -2,7 +2,7 @@ import { FC, CSSProperties } from 'react';
 
 import { CalendarEvent } from '@/types';
 
-import './Calendar.scss';
+import './Calendar.css';
 import { departmentColors } from '@/utils/departmentColors';
 
 interface CalendarCardProps {

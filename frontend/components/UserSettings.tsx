@@ -15,21 +15,6 @@ import { MajorMinorType, ProfileProps } from '@/types';
 
 import useUserSlice from '@/store/userSlice';
 
-async function fetchCsrfToken() {
-  try {
-    const response = await fetch(`${process.env.BACKEND}/csrf`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.csrfToken ? String(data.csrfToken) : '';
-  } catch (error) {
-    return 'Error fetching CSRF token!';
-  }
-}
-
 function generateClassYears() {
   const currentYear = new Date().getFullYear();
   const classYears = [
@@ -204,14 +189,12 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       certificates: certificates,
       classYear: classYear,
     };
-    const csrfToken = await fetchCsrfToken();
 
-    fetch(`${process.env.BACKEND}/update_profile/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_profile/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify(profile),
     }).then((response) => {
@@ -362,8 +345,8 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
             '.MuiSnackbar-root': {
               borderRadius: '16px', // Roundedness
             },
-            backgroundColor: '#0F1E2F', // Compass Blue
-            color: '#f6f6f6', // Compass Gray
+            backgroundColor: '#0F1E2F', // Hoagie Plan Blue
+            color: '#f6f6f6', // Hoagie Plan Gray
           }}
         >
           <div className='text-center'>

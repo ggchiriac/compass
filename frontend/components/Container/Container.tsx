@@ -2,7 +2,7 @@ import { CSSProperties, forwardRef, HTMLAttributes, ReactNode, Ref, RefCallback 
 
 import classNames from 'classnames';
 
-import styles from './Container.module.scss';
+import styles from './Container.module.css';
 
 export type ContainerProps = {
   children: ReactNode;

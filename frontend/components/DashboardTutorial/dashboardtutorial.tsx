@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 
 import { TutorialModal } from '../Modal';
 
-import styles from './dashboardtutorial.module.scss';
+import styles from './DashboardTutorial.module.css';
 
 interface DashboardTutorial {
   isOpen: boolean;

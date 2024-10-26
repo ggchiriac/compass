@@ -1,12 +1,7 @@
 'use client';
 
 import { SVGProps, useState, useEffect } from 'react';
-
 import Image from 'next/image';
-
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
-import useAuthStore from '@/store/authSlice';
 import { useModalStore } from '@/store/modalSlice';
 
 const teamMembers = [
@@ -65,62 +60,15 @@ const navigation = [
 
 const About = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { checkAuthentication } = useAuthStore();
-  useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
-  }, [checkAuthentication]);
 
   useEffect(() => {
     useModalStore.setState({ currentPage: 'about' });
   });
 
-  if (isLoading) {
-    return (
-      <>
-        <Navbar />
-        <div className='flex flex-col min-h-screen pt-10 rounded-xl '>
-          <div className='relative isolate pt-14'>
-            <div className='flex flex-col min-h-screen pt-24'>
-              {/* Background Gradient Effect */}
-              <div
-                className='absolute inset-x-0 -top-40 z-0 transform-gpu overflow-hidden blur-3xl sm:-top-80'
-                aria-hidden='true'
-              >
-                <div
-                  className='relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]'
-                  style={{
-                    clipPath:
-                      'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </>
-    );
-  }
-
   return (
     <>
-      <Navbar />
       <div className='flex flex-col min-h-screen pt-10 rounded-xl overflow-x-hidden'>
-        <div className='relative isolate pt-14'>
-          {/* Background Gradient Effect */}
-          <div
-            className='absolute inset-x-0 -top-40 -z-10 transform-gpu overflow-hidden blur-3xl sm:-top-80'
-            aria-hidden='true'
-          >
-            <div
-              className='relative left-[calc(50%-11rem)] aspect-[1155/678] w-[36.125rem] -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-20 sm:left-[calc(50%-30rem)] sm:w-[72.1875rem]'
-              style={{
-                clipPath:
-                  'polygon(74.1% 44.1%, 100% 61.6%, 97.5% 26.9%, 85.5% 0.1%, 80.7% 2%, 72.5% 32.5%, 60.2% 62.4%, 52.4% 68.1%, 47.5% 58.3%, 45.2% 34.5%, 27.5% 76.7%, 0.1% 64.9%, 17.9% 100%, 27.6% 76.8%, 76.1% 97.7%, 74.1% 44.1%)',
-              }}
-            />
-          </div>
-
+        <div className='relative pt-14'>
           {/* Team Members Section */}
           <div className='py-12 sm:py-16 lg:pb-20'>
             <div className='mx-auto max-w-7xl'>
@@ -166,45 +114,11 @@ const About = () => {
                     </div>
                   ))}
                 </div>
-                {/* Second Row - 3 members */}
-                {/* <div className='mt-8 flex gap-8'>
-                  {teamMembers.slice(2).map((member, index) => (
-                    <div key={member.name} className='mx-auto bg-white p-6 rounded-lg shadow-sm w-[300px]'>
-                      <div className='h-[240px] w-[240px] mx-auto overflow-hidden rounded-lg'>
-                        <Image
-                          src={`/member${index + 3}.jpg`}
-                          alt={member.name}
-                          width={240}
-                          height={240}
-                        />
-                      </div>
-                      <h3 className='mt-6 text-2xl font-semibold'>{member.name}</h3>
-                      <div className='flow-root'>
-                        <p className='float-left text-2xl'>{member.gradYear}</p>{' '}
-                        <p className='float-right'>
-                          {navigation.map((item) => (
-                            <a
-                              key={item.name}
-                              href={member.link}
-                              className='text-gray-400 hover:text-gray-500'
-                              target='_blank'
-                              rel='noopener noreferrer'
-                            >
-                              <span className='sr-only'>{item.name}</span>
-                              <item.icon className='h-6 w-6' aria-hidden='true' />
-                            </a>
-                          ))}
-                        </p>
-                      </div>
-                    </div>
-                  ))} */}
-                {/* </div> */}
               </div>
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </>
   );
 };

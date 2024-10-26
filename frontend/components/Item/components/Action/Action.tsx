@@ -2,7 +2,7 @@ import { CSSProperties, forwardRef, HTMLAttributes } from 'react';
 
 import classNames from 'classnames';
 
-import styles from './Action.module.scss';
+import styles from './Action.module.css';
 
 export type ActionProps = HTMLAttributes<HTMLButtonElement> & {
   active?: {

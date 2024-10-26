@@ -8,7 +8,7 @@ import LoadingComponent from '../LoadingComponent';
 import SettingsModal from '../Modal';
 import ReviewMenu from '../ReviewMenu';
 
-import styles from './InfoComponent.module.scss';
+import styles from './InfoComponent.module.css';
 
 interface InfoComponentProps {
   value: string;
@@ -22,7 +22,7 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
 
   useEffect(() => {
     if (showPopup && value) {
-      const url = new URL(`${process.env.BACKEND}/course_details/`);
+      const url = new URL(`${process.env.NEXT_PUBLIC_BACKEND}/course_details/`);
       url.searchParams.append('crosslistings', value);
 
       fetch(url.toString(), {

@@ -2,7 +2,7 @@ import { CSSProperties, ReactNode } from 'react';
 
 import classNames from 'classnames';
 
-import styles from './Wrapper.module.scss';
+import styles from './Wrapper.module.css';
 
 type Props = {
   children: ReactNode;

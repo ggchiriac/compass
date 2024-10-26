@@ -53,11 +53,9 @@ const DropdownMenu: FC = () => {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const response = await fetch(`${process.env.BACKEND}/profile`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/profile`, {
         method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
       });
       const data = await response.json();

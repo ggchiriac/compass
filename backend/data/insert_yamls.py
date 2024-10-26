@@ -7,12 +7,14 @@ import logging
 from pathlib import Path
 from datetime import date
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
+logger = logging.getLogger(__name__)
+
 sys.path.append(str(Path('../').resolve()))
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 import constants
-from compass.models import (
+from hoagieplan.models import (
     Course,
     Department,
     Degree,

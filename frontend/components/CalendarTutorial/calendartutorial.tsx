@@ -6,7 +6,7 @@ import { createPortal } from 'react-dom';
 
 import { TutorialModal } from '../Modal';
 
-import styles from './calendartutorial.module.scss';
+import styles from './CalendarTutorial.module.css';
 
 interface Calendartutorial {
   isOpen: boolean;

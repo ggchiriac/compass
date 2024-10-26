@@ -2,7 +2,7 @@ import { FC, useEffect, useRef } from 'react';
 
 import { format, startOfWeek, addDays, isSameDay } from 'date-fns';
 
-import './Calendar.scss';
+import './Calendar.css';
 import { CalendarEvent } from '@/types';
 
 import useCalendarStore from '@/store/calendarSlice';

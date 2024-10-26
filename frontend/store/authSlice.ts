@@ -9,7 +9,7 @@ const useAuthStore = create<AuthState>((set) => ({
   checkAuthentication: async () => {
     try {
       console.log('Checking authentication...');
-      const response = await fetch(`${process.env.BACKEND}/cas?action=authenticate`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/cas?action=authenticate`, {
         credentials: 'include',
       });
 
@@ -34,10 +34,10 @@ const useAuthStore = create<AuthState>((set) => ({
     }
   },
   login: () => {
-    window.location.href = `${process.env.BACKEND}/cas?action=login`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND}/cas?action=login`;
   },
   logout: () => {
-    window.location.href = `${process.env.BACKEND}/cas?action=logout`;
+    window.location.href = `${process.env.NEXT_PUBLIC_BACKEND}/cas?action=logout`;
   },
 }));
 

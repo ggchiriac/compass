@@ -18,7 +18,7 @@ import useSearchStore from '@/store/searchSlice';
 import LoadingComponent from '../LoadingComponent';
 import SettingsModal from '../Modal';
 
-import styles from '../InfoComponent/InfoComponent.module.scss';
+import styles from '../InfoComponent/InfoComponent.module.css';
 
 interface Dictionary {
   [key: string]: any;
@@ -27,7 +27,7 @@ interface Dictionary {
 interface DropdownProps {
   data: Dictionary;
   csrfToken: string;
-  checkRequirements: any;
+  categorizeRequirements: any;
 }
 
 interface SatisfactionStatusProps {
@@ -101,7 +101,7 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 };
 
 // Dropdown component with refined styling
-const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => {
+const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }) => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [markedSatisfied, setMarkedSatisfied] = useState<boolean>(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
@@ -127,7 +127,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
 
   const handleExplanationClick = (event, reqId) => {
     setIsLoading(true);
-    const url = new URL(`${process.env.BACKEND}/requirement_info/`);
+    const url = new URL(`${process.env.NEXT_PUBLIC_BACKEND}/requirement_info/`);
     url.searchParams.append('reqId', reqId);
 
     fetch(url.toString(), {
@@ -183,7 +183,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     if (explanation === null) {
       return;
     }
-    fetch(`${process.env.BACKEND}/mark_satisfied/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/mark_satisfied/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -194,14 +194,14 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     }).then((response) => response.json());
 
     setMarkedSatisfied(true);
-    checkRequirements();
+    categorizeRequirements();
   };
 
   const handleUnmarkSatisfied = () => {
     if (explanation === null) {
       return;
     }
-    fetch(`${process.env.BACKEND}/mark_satisfied/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/mark_satisfied/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -215,7 +215,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
     }).then((response) => response.json());
 
     setMarkedSatisfied(false);
-    checkRequirements();
+    categorizeRequirements();
   };
 
   useEffect(() => {
@@ -363,7 +363,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
   ) : null;
 
   const handleClick = (crosslistings, reqId) => {
-    fetch(`${process.env.BACKEND}/manually_settle/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/manually_settle/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -373,7 +373,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
       body: JSON.stringify({ crosslistings: crosslistings, reqId: reqId }),
     }).then((response) => response.json());
 
-    checkRequirements();
+    categorizeRequirements();
   };
 
   const renderContent = (data: Dictionary) => {
@@ -506,15 +506,21 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, checkRequirements }) => 
 interface RecursiveDropdownProps {
   dictionary: Dictionary;
   csrfToken: string;
-  checkRequirements: any;
+  categorizeRequirements: any;
 }
 
 const RecursiveDropdown: FC<RecursiveDropdownProps> = ({
   dictionary,
   csrfToken,
-  checkRequirements,
+  categorizeRequirements,
 }) => {
-  return <Dropdown data={dictionary} csrfToken={csrfToken} checkRequirements={checkRequirements} />;
+  return (
+    <Dropdown
+      data={dictionary}
+      csrfToken={csrfToken}
+      categorizeRequirements={categorizeRequirements}
+    />
+  );
 };
 
 export default RecursiveDropdown;

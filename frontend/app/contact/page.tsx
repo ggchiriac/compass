@@ -48,7 +48,7 @@ const Contact = () => {
                 {/* Email Section */}
                 <div className='mt-8'>
                   <h2 className='text-2xl font-semibold'>Email Us</h2>
-                  <a href='mailto:cos-compass@princeton.edu' className='text-blue-600 mt-2 block'>
+                  <a href='mailto:hoagie@princeton.edu' className='text-blue-600 mt-2 block'>
                     hoagie@princeton.edu
                   </a>
                 </div>

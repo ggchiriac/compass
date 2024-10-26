@@ -100,7 +100,7 @@ const Search: FC = () => {
       try {
         const queryString = buildQuery(searchQuery, filter);
 
-        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/search/?${queryString}`);
 
         if (response.ok) {
           const data: { courses: Course[] } = await response.json();

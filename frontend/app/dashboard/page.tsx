@@ -2,30 +2,20 @@
 
 import { useEffect, useState, FC } from 'react';
 
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
+import { useUser } from '@auth0/nextjs-auth0/client';
 import SkeletonApp from '@/components/SkeletonApp';
-import useAuthStore from '@/store/authSlice';
 import { useModalStore } from '@/store/modalSlice';
-import UserState from '@/store/userSlice';
-
-import { Canvas } from './Canvas';
+import { Canvas } from '@/app/dashboard/Canvas';
 
 const Dashboard: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { checkAuthentication } = useAuthStore((state) => state);
-  const userProfile = UserState((state) => state.profile);
-  useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
-  }, [checkAuthentication]);
-
+  const { user, error, isLoading } = useUser();
+  
   useEffect(() => {
     useModalStore.setState({ currentPage: 'dashboard' });
   });
 
   return (
     <>
-      <Navbar />
       <div className='flex flex-col min-h-screen pt-24'>
         {/* Background Gradient Effect */}
         <div
@@ -41,8 +31,8 @@ const Dashboard: FC = () => {
           />
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded pt-0.5vh pb-0.5vh pl-0.5vw pr-0.5vw'>
-          {!isLoading && userProfile && userProfile.netId !== '' ? (
-            <Canvas user={userProfile} columns={2} />
+          {!isLoading && user && user.nickname !== '' ? (
+            <Canvas user={user} columns={2} />
           ) : (
             <div>
               <SkeletonApp />
@@ -50,7 +40,6 @@ const Dashboard: FC = () => {
           )}
         </main>
       </div>
-      <Footer />
     </>
   );
 };

@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 import classNames from 'classnames';
 
-import styles from './FloatingControls.module.scss';
+import styles from './FloatingControls.module.css';
 
 export type FloatingControlsProps = {
   children: ReactNode;

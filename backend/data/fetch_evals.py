@@ -1,5 +1,5 @@
 import csv
-import ujson as json
+import json
 import os
 import sys
 import time
@@ -19,7 +19,7 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 import django
 
 django.setup()
-from compass.models import Course
+from hoagieplan.models import Course
 
 load_dotenv()
 

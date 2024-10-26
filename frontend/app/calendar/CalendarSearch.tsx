@@ -23,7 +23,7 @@ import { levels } from '@/utils/levels';
 
 import CalendarSearchResults from './CalendarSearchResults';
 
-import './CalendarSearch.scss';
+import './CalendarSearch.css';
 
 interface TermMap {
   [key: string]: string;
@@ -106,7 +106,7 @@ const CalendarSearch: FC = () => {
       setLoading(true);
       try {
         const queryString = buildQuery(searchQuery, filter);
-        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/search/?${queryString}`);
 
         if (!response.ok) {
           throw new Error(`Server returned ${response.status}: ${response.statusText}`);

@@ -33,10 +33,10 @@ const config: Config = {
         'night-text': '#E0E0E0', // Soft White for text
       },
       textColor: {
-        'compass-blue': '#0F1E2F',
-        'compass-gray': '#F6F6F6',
-        'compass-black': '#2C2C2C',
-        'compass-purple': '#663399',
+        'hoagieplan-blue': '#0F1E2F',
+        'hoagieplan-gray': '#F6F6F6',
+        'hoagieplan-black': '#2C2C2C',
+        'hoagieplan-purple': '#663399',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
@@ -47,7 +47,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [require('daisyui'), require('evergreen-ui'), require('@tailwindcss/forms')],
+  plugins: [require('evergreen-ui'), require('@tailwindcss/forms')],
 };
 
 export default config;

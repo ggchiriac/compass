@@ -33,7 +33,7 @@ import { createPortal } from 'react-dom';
 
 import { Course, Profile } from '@/types';
 
-import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearchItem.module.scss';
+import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearchItem.module.css';
 import Search from '@/components/Search';
 import { TabbedMenu } from '@/components/TabbedMenu';
 import useSearchStore from '@/store/searchSlice';
@@ -108,31 +108,6 @@ function simpleHash(str: string) {
   return sum % 11;
 }
 
-async function fetchCsrfToken() {
-  try {
-    const response = await fetch(`${process.env.BACKEND}/csrf`, {
-      credentials: 'include',
-    });
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    const data = await response.json();
-    return data.csrfToken ? String(data.csrfToken) : '';
-  } catch (error) {
-    return 'Error fetching CSRF token!';
-  }
-}
-let csrfToken: string;
-
-if (typeof window === 'undefined') {
-  // Server-side or during pre-rendering/build time
-  csrfToken = '';
-} else {
-  // Client-side
-  (async () => {
-    csrfToken = await fetchCsrfToken();
-  })();
-}
 
 const animateLayoutChanges: AnimateLayoutChanges = (args) =>
   defaultAnimateLayoutChanges({ ...args, wasDragging: true });
@@ -309,9 +284,10 @@ export function Canvas({
   const [academicPlan, setAcademicPlan] = useState<Dictionary>(initialRequirements);
 
   // Assuming 'user' is of type User
-  const userMajorCode = user.major?.code;
-  const userMinors = user.minors ?? [];
-  const userCertificates = user.certificates ?? [];
+  // TODO: Make this dynamic later
+  const userMajorCode = 'COS-BSE'
+  const userMinors = [];
+  const userCertificates = [];
 
   // Structure to hold degree requirements
   const degreeRequirements: Dictionary = { General: '' };
@@ -339,7 +315,7 @@ export function Canvas({
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch(`${process.env.BACKEND}/fetch_courses/`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/fetch_courses/`, {
         method: 'GET',
         credentials: 'include',
       });
@@ -350,8 +326,8 @@ export function Canvas({
     }
   };
 
-  const checkRequirements = () => {
-    fetch(`${process.env.BACKEND}/check_requirements/`, {
+  const categorizeRequirements = () => {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/categorize_requirements/`, {
       method: 'GET',
       credentials: 'include',
     })
@@ -370,7 +346,7 @@ export function Canvas({
         }));
       }
     });
-    checkRequirements();
+    categorizeRequirements();
   }, [classYear]);
 
   const staticSearchResults = useSearchStore((state) => state.searchResults);
@@ -573,20 +549,18 @@ export function Canvas({
 
           if (overContainerId) {
             if (activeContainerId !== overContainerId) {
-              const csrfToken = await fetchCsrfToken();
-              fetch(`${process.env.BACKEND}/update_courses/`, {
+              fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_courses/`, {
                 method: 'POST',
                 credentials: 'include',
                 headers: {
                   'Content-Type': 'application/json',
-                  'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({
                   crosslistings: active.id.toString().split('|')[1],
                   semesterId: overContainerId,
                 }),
               }).then((response) => response.json());
-              checkRequirements();
+              categorizeRequirements();
             }
           }
 
@@ -730,8 +704,7 @@ export function Canvas({
             >
               <TabbedMenu
                 tabsData={academicPlan}
-                csrfToken={csrfToken}
-                checkRequirements={checkRequirements}
+                categorizeRequirements={categorizeRequirements}
               />
             </div>
           </div>
@@ -812,12 +785,11 @@ export function Canvas({
       return updatedCourses;
     });
 
-    fetch(`${process.env.BACKEND}/update_courses/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_courses/`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
         crosslistings: value.toString().split('|')[1],
@@ -825,7 +797,7 @@ export function Canvas({
       }),
     }).then((response) => {
       response.json();
-      checkRequirements();
+      categorizeRequirements();
     });
   }
 }

@@ -3,7 +3,7 @@ import { FC, CSSProperties } from 'react';
 
 import { CalendarEvent } from '@/types';
 
-import styles from '@/components/Item/Item.module.scss';
+import styles from '@/components/Item/Item.module.css';
 import useCalendarStore from '@/store/calendarSlice';
 import { departmentColors } from '@/utils/departmentColors';
 

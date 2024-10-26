@@ -15,7 +15,7 @@ import django
 
 django.setup()
 from django.db import transaction
-from compass.models import (
+from hoagieplan.models import (
     Department,
     AcademicTerm,
     Course,
@@ -29,7 +29,8 @@ from compass.models import (
 # -------------------------------------------------------------------------------------#
 
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s')
+logger = logging.getLogger(__name__)
 
 CLASS_YEAR_ENROLLMENT_PATTERN = re.compile(r'Year (\d+): (\d+) students')
 

@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { InfoComponent } from '../InfoComponent';
 
 import { Handle, Remove } from './components';
-import styles from './Item.module.scss';
+import styles from './Item.module.css';
 
 export type Props = {
   dragOverlay?: boolean;

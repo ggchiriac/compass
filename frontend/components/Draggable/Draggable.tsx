@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import { Handle } from '@/components/Item/components/Handle';
 
 import { draggable, draggableHorizontal, draggableVertical } from './draggable-svg';
-import styles from './Draggable.module.scss';
+import styles from './Draggable.module.css';
 
 export enum Axis {
   All,

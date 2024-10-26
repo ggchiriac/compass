@@ -1,6 +1,6 @@
 import csv
+import json
 import os
-import ujson as json
 import sys
 from tqdm import tqdm
 from pathlib import Path
@@ -13,7 +13,7 @@ import django
 django.setup()
 from django.db import transaction
 
-from compass.models import CourseEvaluations, CourseComments
+from hoagieplan.models import CourseEvaluations, CourseComments
 
 evals = './evals.csv'
 

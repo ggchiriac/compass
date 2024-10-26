@@ -8,12 +8,12 @@ import BackgroundGradient from '@/components/BackgroundGradient';
 import Footer from '@/components/Footer';
 import Navbar from '@/components/Navbar';
 import SkeletonApp from '@/components/SkeletonApp';
-import tabStyles from '@/components/TabbedMenu/TabbedMenu.module.scss';
+import tabStyles from '@/components/TabbedMenu/TabbedMenu.module.css';
 import useAuthStore from '@/store/authSlice';
 import useFilterStore from '@/store/filterSlice';
 import UserState from '@/store/userSlice';
 
-import './Calendar.scss';
+import './Calendar.css';
 import Calendar from './Calendar';
 import CalendarSearch from './CalendarSearch';
 import SelectedCourses from './SelectedCourses';

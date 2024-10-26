@@ -1,9 +1,28 @@
 import { useEffect } from 'react';
-
 import { create } from 'zustand';
+import { UserState, Claims, Profile } from '@/types';
 
-import { UserState } from '../types';
+// Function to extract profile information from Auth0 user session
+function getProfileFromUser(user: Claims): Profile {
+  const [firstName, lastName] = user.name.split(' ');
 
+  return {
+    firstName,
+    lastName,
+    netId: user.nickname, // Assuming `nickname` is the NetID
+    email: user.sub.split('|').pop() || '', // Extract email from `sub` (after the last pipe symbol)
+    department: 'COS', // Placeholder, adjust as needed
+    timeFormat24h: false, // Assuming default 12-hour format
+    themeDarkMode: false, // Assuming default light mode
+    major: undefined,
+    minors: [],
+    certificates: [],
+    classYear: undefined,
+    universityId: '',
+  };
+}
+
+// Create Zustand store
 const useUserSlice = create<UserState>((set) => ({
   profile: {
     firstName: '',
@@ -19,35 +38,20 @@ const useUserSlice = create<UserState>((set) => ({
     themeDarkMode: false,
     timeFormat24h: false,
   },
-  updateProfile: (updates) => set((state) => ({ profile: { ...state.profile, ...updates } })),
+  updateProfile: (updates: Partial<Profile>) =>
+    set((state) => ({ profile: { ...state.profile, ...updates } })),
 }));
 
-// Custom hook for fetching user data
-// TODO: This is not used anywhere yet
-export const useFetchUserProfile = () => {
+// Custom hook to fetch user profile and update Zustand store
+export const useFetchUserProfile = (user: Claims | null) => {
   const updateStore = useUserSlice((state) => state.updateProfile);
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      const response = await fetch(`${process.env.BACKEND}/profile`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-      const data = await response.json();
-      updateStore({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        netId: data.netId,
-        major: data.major,
-        minors: data.minors,
-        classYear: data.classYear,
-        timeFormat24h: data.timeFormat24h,
-        themeDarkMode: data.themeDarkMode,
-      });
-    };
-
-    fetchProfile();
-  }, [updateStore]);
+    if (user) {
+      const profile = getProfileFromUser(user);
+      updateStore(profile); // Update the store with the user profile
+    }
+  }, [user, updateStore]);
 };
+
 export default useUserSlice;

@@ -1,6 +1,6 @@
 from typing import Dict, Any
+import json
 import requests
-import ujson as json
 from .configs.configs import Configs
 
 
