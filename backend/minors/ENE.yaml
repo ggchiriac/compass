@@ -24,10 +24,7 @@ req_list:
   max_counted: 1
   completed_by_semester: 6
   explanation: |-
-    One of the following core courses is required as a prerequisite: ECS 301 or EPS 302. Students who are 
-    unable to take either ECS 301 or EPS 302 may petition the directors for other courses that offer an 
-    introduction to the study of Europe from a similarly interdisciplinary point, such as HUM 216-217, 
-    HUM 218-219, or HIS 212/EPS 212.
+    Students take one of the following core courses in their sophomore or junior year:
   course_list:
   - MAE 228
   - ENE 202
@@ -36,176 +33,167 @@ req_list:
   max_counted: 1
   pdfs_allowed: 1
   max_common_with_major: 2
+  double_counting_allowed: true
   explanation: |-
     Students must take four additional courses related to energy systems, technology, and policy. Students 
     may choose from a list of approved electives that is reviewed each year by the Minor director. The list 
     is organized by the six research foci of the Andlinger Center so that students can gain depth of knowledge 
     in a particular area of sustainable energy, but students are free to choose any four courses from this list 
     following these guidelines. 
-  req_list:
-  - name: Four Courses
-    min_needed: 4
-    max_counted: 1
-    explanation: |-
-      Upon enrollment in the Minor, students will meet with the director or program manager 
-      to plan a coherent set of electives that complements their major and interests. One study abroad course may be 
-      taken as an elective with prior Program approval. Students may petition the Program for a course to be approved 
-      as an elective prior to the start of the semester. Elective petitions will not be accepted after the start of the 
-      semester or after the course has been completed.
-    course_list:
-    - ARC 203
-    - ARC 311
-    - ART 250
-    - CBE 430
-    - CEE 207
-    - CEE 401
-    - CEE 477
-    - ENE 202
-    - ENE 267
-    - MAE 418
-    - AST 309
-    - CBE 335
-    - CBE 341
-    - ECE 481
-    - ECE 547C
-    - ECE 557
-    - ENE 273
-    - ENE 373
-    - ENE 431
-    - MAE 328
-    - MAE 423
-    - MAE 427
-    - MAE 568
-    - CBE 421
-    - CBE 441
-    - CEE 305
-    - ENE 318
-    - ENE 422
-    - MAE 335
-    - MAE 426
-    - MAE 531
-    - NES 362
-    - NES 366
-    - CBE 225
-    - CEE 311
-    - CEE 471
-    - CEE 564
-    - ENE 321
-    - ENE 419
-    - ANT 214
-    - CBE 218
-    - CBE 260
-    - CEE 334
-    - COS 126
-    - EGR 491
-    - EGR 495
-    - ENE 372
-    - ENE 449
-    - ENE 475
-    - ENV 327
-    - ENV 343
-    - ENV 377
-    - ENV 531
-    - LAO 383
-    - LAS 312
-    - MAE 573
-    - ORF 455
-    - PHY 115A
-    - PHY 115B
-    - POL 351
-    - SOC 357
-    - SPI 306
-    - SPI 350
-    - SPI 406
-    - STC 349
-    - URB 201
-    - AOS 527
-    - CEE 306
-    - CEE 474
-    - EEB 417A
-    - ENE 308
-    - ENE 449
-    - ENV 302
-    - ENV 367
-    - ENV 380
-    - GEO 102A
-    - GEO 203
-    - GEO 363
-    - GEO 425
-    - GEO 427
-    - HIS 394
-  - name: Advanced courses
-    min_needed: 2
-    max_counted: 4
-    double_counting_allowed: true
-    explanation: |-
-      Two of the four electives must be at the 300-level or above.
-    course_list:
-    - ARC 311
-    - CBE 430
-    - CEE 401
-    - CEE 477
-    - MAE 418
-    - AST 309
-    - CBE 335
-    - CBE 341
-    - ECE 481
-    - ECE 547C
-    - ECE 557
-    - ENE 373
-    - ENE 431
-    - MAE 328
-    - MAE 423
-    - MAE 427
-    - MAE 568
-    - CBE 421
-    - CBE 441
-    - CEE 305
-    - ENE 318
-    - ENE 422
-    - MAE 335
-    - MAE 426
-    - MAE 531
-    - NES 362
-    - NES 366
-    - CEE 311
-    - CEE 471
-    - CEE 564
-    - ENE 321
-    - ENE 419
-    - CEE 334
-    - EGR 491
-    - EGR 495
-    - ENE 372
-    - ENE 449
-    - ENE 475
-    - ENV 327
-    - ENV 343
-    - ENV 377
-    - ENV 531
-    - LAO 383
-    - LAS 312
-    - MAE 573
-    - ORF 455
-    - POL 351
-    - SOC 357
-    - SPI 306
-    - SPI 350
-    - SPI 406
-    - STC 349
-    - AOS 527
-    - CEE 306
-    - CEE 474
-    - EEB 417A
-    - ENE 308
-    - ENE 449
-    - ENV 302
-    - ENV 367
-    - ENV 380
-    - GEO 363
-    - GEO 425
-    - GEO 427
-    - HIS 394
+  course_list:
+  - ARC 203
+  - ARC 311
+  - ART 250
+  - CBE 430
+  - CEE 207
+  - CEE 401
+  - CEE 477
+  - ENE 202
+  - ENE 267
+  - MAE 418
+  - AST 309
+  - CBE 335
+  - CBE 341
+  - ECE 481
+  - ECE 547C
+  - ECE 557
+  - ENE 273
+  - ENE 373
+  - ENE 431
+  - MAE 328
+  - MAE 423
+  - MAE 427
+  - MAE 568
+  - CBE 421
+  - CBE 441
+  - CEE 305
+  - ENE 318
+  - ENE 422
+  - MAE 335
+  - MAE 426
+  - MAE 531
+  - NES 362
+  - NES 366
+  - CBE 225
+  - CEE 311
+  - CEE 471
+  - CEE 564
+  - ENE 321
+  - ENE 419
+  - ANT 214
+  - CBE 218
+  - CBE 260
+  - CEE 334
+  - COS 126
+  - EGR 491
+  - EGR 495
+  - ENE 372
+  - ENE 449
+  - ENE 475
+  - ENV 327
+  - ENV 343
+  - ENV 377
+  - ENV 531
+  - LAO 383
+  - LAS 312
+  - MAE 573
+  - ORF 455
+  - PHY 115A
+  - PHY 115B
+  - POL 351
+  - SOC 357
+  - SPI 306
+  - SPI 350
+  - SPI 406
+  - STC 349
+  - URB 201
+  - AOS 527
+  - CEE 306
+  - CEE 474
+  - EEB 417A
+  - ENE 308
+  - ENE 449
+  - ENV 302
+  - ENV 367
+  - ENV 380
+  - GEO 102A
+  - GEO 203
+  - GEO 363
+  - GEO 425
+  - GEO 427
+  - HIS 394
+- name: Advanced courses
+  min_needed: 2
+  max_counted: 4
+  double_counting_allowed: true
+  explanation: |-
+    Two of the four electives must be at the 300-level or above.
+  course_list:
+  - ARC 311
+  - CBE 430
+  - CEE 401
+  - CEE 477
+  - MAE 418
+  - AST 309
+  - CBE 335
+  - CBE 341
+  - ECE 481
+  - ECE 547C
+  - ECE 557
+  - ENE 373
+  - ENE 431
+  - MAE 328
+  - MAE 423
+  - MAE 427
+  - MAE 568
+  - CBE 421
+  - CBE 441
+  - CEE 305
+  - ENE 318
+  - ENE 422
+  - MAE 335
+  - MAE 426
+  - MAE 531
+  - NES 362
+  - NES 366
+  - CEE 311
+  - CEE 471
+  - CEE 564
+  - ENE 321
+  - ENE 419
+  - CEE 334
+  - EGR 491
+  - EGR 495
+  - ENE 372
+  - ENE 449
+  - ENE 475
+  - ENV 327
+  - ENV 343
+  - ENV 377
+  - ENV 531
+  - LAO 383
+  - LAS 312
+  - MAE 573
+  - ORF 455
+  - POL 351
+  - SOC 357
+  - SPI 306
+  - SPI 350
+  - SPI 406
+  - STC 349
+  - AOS 527
+  - CEE 306
+  - CEE 474
+  - EEB 417A
+  - ENE 308
+  - ENE 449
+  - ENV 302
+  - ENV 367
+  - ENV 380
+  - GEO 363
+  - GEO 425
+  - GEO 427
+  - HIS 394
 - name: Seminar Requirement
   max_counted: 1
   min_needed: 1
