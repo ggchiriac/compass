@@ -124,7 +124,7 @@ req_list:
   - HIS 394
 - name: Advanced courses
   min_needed: 2
-  max_counted: 4
+  max_counted: 1
   double_counting_allowed: true
   explanation: |-
     Two of the four electives must be at the 300-level or above.
