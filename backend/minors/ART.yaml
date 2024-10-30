@@ -48,40 +48,45 @@ contacts:
   name: Basile Baudez
   email: bbaudez@princeton.edu
 req_list: 
-- name: Distribution Requirements
+- name: Requirements
   max_counted: 1
-  min_needed: 5
+  min_needed: 7
   explanation: Minors may consult with Art & Archaeology’s Director of 
   Undergraduate Studies about their course planning, but are not required 
   to do so. Five ART courses; none to be taken P/D/F.
-  double_counting_allowed: false
+  double_counting_allowed: true
   max_common_with_major: 1
   pdfs_allowed: 0
-  dept_list:
-  - ART
   req_list:
   - name: Introductory
-    max_counted: 5
+    max_counted: 1
     min_needed: 1
     explanation: All minors must take ART100, the Department’s introductory course
     course_list: 
     - ART100
   - name: 200 level
-    max_counted: 5
+    max_counted: 1
     min_needed: 1
     explanation: One of the five courses must be at 200-level
     course_list: 
     - ART 2*
   - name: 400 level
-    max_counted: 5
+    max_counted: 1
     min_needed: 1
     explanation: One of the five courses must be at 400-level
     course_list: 
-    - ART 3*
-- name: Restrictions
-  max_counted: 0
+    - ART 4*
+  - name: 5 courses
+    max_counted: 1
+    min_needed: 5
+    explanation: Five ART courses; none to be taken pass/D/fail.
+    dept_list: 
+    - ART
+- name: Ancient 
+  max_counted: 1
   min_needed: 1
   explanation: |-
+    <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
     Minors must take one course in each of the department’s three 
     distribution areas: Ancient (Group 1), Medieval and Early Modern 
     (Group 2), Modern (Group 3). This distribution requirement may be met 
@@ -89,11 +94,33 @@ req_list:
     designations are included in the Registrar’s course listings, and will 
     also be communicated to students through a department announcement when 
     course registration opens.
-
-    With the exception of cross-listed courses taught by core Art & 
-    Archaeology faculty, no cross-lists or cognates will count toward 
-    the minor (i.e., unless taught by core faculty, all courses must carry 
-    ART as the first or only subject code).
+  no_req:
+- name: Medieval and Early Modern 
+  max_counted: 1
+  min_needed: 1
+  explanation: |-
+    <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
+    Minors must take one course in each of the department’s three 
+    distribution areas: Ancient (Group 1), Medieval and Early Modern 
+    (Group 2), Modern (Group 3). This distribution requirement may be met 
+    through courses at any level, and in any geographic area. Group 
+    designations are included in the Registrar’s course listings, and will 
+    also be communicated to students through a department announcement when 
+    course registration opens.
+  no_req:
+  - name: Modern 
+  max_counted: 1
+  min_needed: 1
+  explanation: |-
+    <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
+    Minors must take one course in each of the department’s three 
+    distribution areas: Ancient (Group 1), Medieval and Early Modern 
+    (Group 2), Modern (Group 3). This distribution requirement may be met 
+    through courses at any level, and in any geographic area. Group 
+    designations are included in the Registrar’s course listings, and will 
+    also be communicated to students through a department announcement when 
+    course registration opens.
+  no_req:
 
 
 
