@@ -15,7 +15,7 @@ description: The Department of Art and Archaeology studies artwork and
   connections among a wide array of historical evidence. They practice 
   techniques for analyzing and interpreting the visual and material world 
   by actively engaging primary sources—often through the direct study of 
-  original works in Princeton’s collections and local museums.
+  original works in Princeton’s collections and local museums.<br><br>
 
   Art historians pursue their work in many different ways, and the research 
   questions of the field take varied forms. The fundamental methods of the 
@@ -29,7 +29,7 @@ description: The Department of Art and Archaeology studies artwork and
   particular period, community or region. Art historians frequently collaborate 
   with scholars in the sciences as they study the material composition of 
   artworks, and the field is conducive to technology-based projects and methods 
-  (such as imaging technologies and data visualization).
+  (such as imaging technologies and data visualization).<br><br>
 
   "The field is by nature interdisciplinary:" it draws on the ideas, information, 
   theories and resources of diverse branches of knowledge, as art historians 
@@ -50,7 +50,7 @@ contacts:
 req_list: 
 - name: Requirements
   max_counted: 1
-  min_needed: 7
+  min_needed: 4
   explanation: Minors may consult with Art & Archaeology’s Director of 
   Undergraduate Studies about their course planning, but are not required 
   to do so. Five ART courses; none to be taken P/D/F.
@@ -61,9 +61,9 @@ req_list:
   - name: Introductory
     max_counted: 1
     min_needed: 1
-    explanation: All minors must take ART100, the Department’s introductory course
+    explanation: All minors must take ART 100, the Department’s introductory course
     course_list: 
-    - ART100
+    - ART 100
   - name: 200 level
     max_counted: 1
     min_needed: 1
@@ -82,9 +82,9 @@ req_list:
     explanation: Five ART courses; none to be taken pass/D/fail.
     dept_list: 
     - ART
-- name: Ancient 
+- name: Distribution Areas 
   max_counted: 1
-  min_needed: 1
+  min_needed: 3
   explanation: |-
     <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
     Minors must take one course in each of the department’s three 
@@ -95,33 +95,4 @@ req_list:
     also be communicated to students through a department announcement when 
     course registration opens.
   no_req:
-- name: Medieval and Early Modern 
-  max_counted: 1
-  min_needed: 1
-  explanation: |-
-    <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
-    Minors must take one course in each of the department’s three 
-    distribution areas: Ancient (Group 1), Medieval and Early Modern 
-    (Group 2), Modern (Group 3). This distribution requirement may be met 
-    through courses at any level, and in any geographic area. Group 
-    designations are included in the Registrar’s course listings, and will 
-    also be communicated to students through a department announcement when 
-    course registration opens.
-  no_req:
-  - name: Modern 
-  max_counted: 1
-  min_needed: 1
-  explanation: |-
-    <i>Editor's Note: There is no official listing/encoding of the three distribution areas, so hoagieplan does not check it.</i><br><br>
-    Minors must take one course in each of the department’s three 
-    distribution areas: Ancient (Group 1), Medieval and Early Modern 
-    (Group 2), Modern (Group 3). This distribution requirement may be met 
-    through courses at any level, and in any geographic area. Group 
-    designations are included in the Registrar’s course listings, and will 
-    also be communicated to students through a department announcement when 
-    course registration opens.
-  no_req:
-
-
-
 
