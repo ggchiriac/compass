@@ -112,4 +112,4 @@ build-backend = "hatchling.build"
 packages = ["."]
 
 [tool.uv.workspace]
-members = ["hoagie-plan"]
+members = ["hoagie-plan", "uv-env"]
