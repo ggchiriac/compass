@@ -28,7 +28,7 @@ req_list:
   requirement.
   double_counting_allowed: false
   max_common_with_major: 1 
-  pdfs_allowed: 1 # only one can count towards the minor
+  pdfs_allowed: 1
   course_list:
   - AAS 244
   - AAS 245
@@ -36,19 +36,23 @@ req_list:
   - AAS 254
   - AAS 267
   - AAS 268
+  - AAS 353
+  - AAS 359
+  - AAS 359
+  - AAS 366
+  - AAS 367
 - name: Electives
   max_counted: 1
   min_needed: 3
   explanation: Students must take three additional courses in AAS, cross-listed 
   by AAS, or from our approved cognates list (which may be accessed on the 
-  department’s website), for a total of five courses. At least one of these 
-  five courses must be situated in the Global Race and Ethnicity (GRE) 
-  subfield.
+  department’s website). At least one of these courses must be situated 
+  in the Global Race and Ethnicity (GRE) subfield.
   max_common_with_major: 1
   req_list:
   - name: AAS courses and cognates
-    max_counted: 1
-    min_needed: 3
+    max_counted: 3
+    min_needed: 1
     explanation: Courses in AAS, cross-listed by AAS, 
     or from the department's approved cognates list
     double_counting_allowed: false
@@ -124,9 +128,9 @@ req_list:
     - VIS 424
 
   - name: Global Race and Ethnicity (GRE) subfield
-    max_counted: 0
+    max_counted: 3
     min_needed: 1
-    explanation: 
+    explanation:
     double_counting_allowed: false
     max_common_with_major: 1
     pdfs_allowed: 1
@@ -501,9 +505,21 @@ req_list:
     - VIS 234
     - AAS 234
   - name: Restrictions
-  max_counted: 0
-  min_needed: 0
+  max_counted: 1
+  min_needed: 1
   explanation: |-
+    <i>Editor's Note: Only one PDF can be counted towards the minor.</i><br><br>
+
+    While urban studies students' senior theses or projects
+    are directed in their home departments, their work must contain an
+    urban component, approved by the program director. A faculty member
+    from the student's home department serves as the primary adviser and
+    first reader. An urban studies adviser may be selected from the
+    program's associated faculty list to provide additional
+    consultation and layer of expertise as students write and think about potentially
+    urban-related careers. The thesis title and abstract must be sent to the
+    program director for final approval.
+
     Students may count one course taken for their major toward the minor if the course 
     is cross-listed with AAS or has been approved as a cognate by the AAS Director of 
     Undergraduate Studies before the course is taken. The PDF option counts toward the minor
@@ -513,3 +529,10 @@ req_list:
     Students must receive passing grades in all five courses in order 
     to complete the program of study for the minor.
 
+    Students who have completed the program of study by graduation will compose a 
+    700-word essay describing how the AAS minor has informed their independent 
+    work in the major. The reflection may touch on the Junior Paper, the Senior Thesis, 
+    or both. The reflection essay will be due during reading period of the graduating
+    semester. The AAS Curriculum Committee, which is chaired by the Director of 
+    Undergraduate Studies, will review and assess the essays, thereby approving 
+    the completion of the program of study.
