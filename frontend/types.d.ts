@@ -64,6 +64,7 @@ export type SearchStoreState = {
   setSearchResults: (results: Course[]) => void;
   recentSearches: string[];
   addRecentSearch: (query: string) => void;
+  clearRecentSearches: () => void;
   error: string | null;
   setError: (error: string | null) => void;
   loading: boolean;

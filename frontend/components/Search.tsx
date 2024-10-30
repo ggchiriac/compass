@@ -31,12 +31,13 @@ const searchCache = new LRUCache<string, Course[]>({
 const Search: FC = () => {
   const [query, setQuery] = useState<string>('');
   const timerRef = useRef<number>();
-  const { setSearchResults, searchResults, addRecentSearch, recentSearches, setError, setLoading } =
+  const { setSearchResults, searchResults, addRecentSearch, recentSearches, clearRecentSearches, setError, setLoading } =
     useSearchStore((state) => ({
       setSearchResults: state.setSearchResults,
       searchResults: state.searchResults,
       addRecentSearch: state.addRecentSearch,
       recentSearches: state.recentSearches,
+      clearRecentSearches: state.clearRecentSearches,
       setError: state.setError,
       setLoading: state.setLoading,
     }));
@@ -354,7 +355,7 @@ const Search: FC = () => {
         </div>
         <div className='mt-3'>
           <div className='text-sm font-medium text-gray-500'>Recent searches:</div>
-          <div className='flex overflow-x-auto py-2 space-x-2'>
+          <div className='flex overflow-x-auto py-2 space-x-2 flex-basis:100px'>
             {recentSearches.map((search, index) => (
               <button
                 key={index}
@@ -364,6 +365,9 @@ const Search: FC = () => {
                 {search}
               </button>
             ))}
+          </div>
+          <div className='overflow-x-auto py-2 space-x-2'>
+            <button className='text-gray-500 rounded-full bg-gray-100 hover:bg-gray-200 px-2 focus:outline-none ml-auto' onClick={() => clearRecentSearches()}>Clear</button>
           </div>
         </div>
       </div>
