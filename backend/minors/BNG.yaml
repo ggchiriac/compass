@@ -63,7 +63,7 @@ req_list:
   - BNG 451
   - EEB 325
   - EEB 330
-  - ELE 452
+  - ECE 452
   - ENE 318
   - MAE 344
   - MAE 416
@@ -104,7 +104,7 @@ req_list:
   - MOL 423
   - NEU 202
   - NEU 422
-  - WWS 354
+  - SPI 354
 - name: Ethical Aspects
   max_counted: 1
   min_needed: 1

@@ -21,11 +21,11 @@ req_list:
   max_counted: 1
   min_needed: 2
   explanation: Students must complete two AAS core survey courses. 
-  These courses serve as an introduction to the methods and 
-  areas of interdisciplinary study in the field. 
-  They are the cornerstone of the AAS minor, and thus there 
-  are no replacements for or exemptions from this 
-  requirement.
+    These courses serve as an introduction to the methods and 
+    areas of interdisciplinary study in the field. 
+    They are the cornerstone of the AAS minor, and thus there 
+    are no replacements for or exemptions from this 
+    requirement.
   double_counting_allowed: false
   max_common_with_major: 1 
   pdfs_allowed: 1
@@ -69,16 +69,16 @@ req_list:
   max_counted: 1
   min_needed: 3
   explanation: Students must take three additional courses in AAS, cross-listed 
-  by AAS, or from our approved cognates list (which may be accessed on the 
-  department’s website). At least one of these courses must be situated 
-  in the Global Race and Ethnicity (GRE) subfield.
+    by AAS, or from our approved cognates list (which may be accessed on the 
+    department’s website). At least one of these courses must be situated 
+    in the Global Race and Ethnicity (GRE) subfield.
   max_common_with_major: 1
   req_list:
   - name: AAS courses and cognates
     max_counted: 3
     min_needed: 1
     explanation: Courses in AAS, cross-listed by AAS, 
-    or from the department's approved cognates list
+      or from the department's approved cognates list
     double_counting_allowed: false
     pdfs_allowed: 1
     course_list:
@@ -529,24 +529,24 @@ req_list:
     - VIS 234
     - AAS 234
   - name: Restrictions
-  max_counted: 1
-  min_needed: 1
-  explanation: |-
-    <i>Editor's Note: Only one PDF can be counted towards the minor.</i><br><br>
+    max_counted: 1
+    min_needed: 1
+    explanation: |-
+      <i>Editor's Note: Only one PDF can be counted towards the minor.</i><br><br>
 
-    Students may count one course taken for their major toward the minor if the course 
-    is cross-listed with AAS or has been approved as a cognate by the AAS Director of 
-    Undergraduate Studies before the course is taken. The PDF option counts toward the minor
-    if the course is primary-listed with AAS, cross-listed with AAS, or has been approved as 
-    a creative or practice-based cognate by the AAS Director of Undergraduate Studies before
-    the course is taken. Only one PDF course may count toward the minor. 
-    Students must receive passing grades in all five courses in order 
-    to complete the program of study for the minor.
+      Students may count one course taken for their major toward the minor if the course 
+      is cross-listed with AAS or has been approved as a cognate by the AAS Director of 
+      Undergraduate Studies before the course is taken. The PDF option counts toward the minor
+      if the course is primary-listed with AAS, cross-listed with AAS, or has been approved as 
+      a creative or practice-based cognate by the AAS Director of Undergraduate Studies before
+      the course is taken. Only one PDF course may count toward the minor. 
+      Students must receive passing grades in all five courses in order 
+      to complete the program of study for the minor.
 
-    Students who have completed the program of study by graduation will compose a 
-    700-word essay describing how the AAS minor has informed their independent 
-    work in the major. The reflection may touch on the Junior Paper, the Senior Thesis, 
-    or both. The reflection essay will be due during reading period of the graduating
-    semester. The AAS Curriculum Committee, which is chaired by the Director of 
-    Undergraduate Studies, will review and assess the essays, thereby approving 
-    the completion of the program of study.
+      Students who have completed the program of study by graduation will compose a 
+      700-word essay describing how the AAS minor has informed their independent 
+      work in the major. The reflection may touch on the Junior Paper, the Senior Thesis, 
+      or both. The reflection essay will be due during reading period of the graduating
+      semester. The AAS Curriculum Committee, which is chaired by the Director of 
+      Undergraduate Studies, will review and assess the essays, thereby approving 
+      the completion of the program of study.
