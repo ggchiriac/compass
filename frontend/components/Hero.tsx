@@ -1,16 +1,16 @@
-import { MouseEvent } from 'react';
+// import { MouseEvent } from 'react';
 
-import useAuthStore from '@/store/authSlice';
+// import useAuthStore from '@/store/authSlice';
 
 export default function Hero() {
-  const { login } = useAuthStore((state) => ({
-    login: state.login,
-  }));
-  const handleButtonClick = (e: MouseEvent<HTMLAnchorElement>) => {
-    // TODO: Change this to a proper route guard instead of onclick event
-    e.preventDefault();
-    login();
-  };
+  // const { login } = useAuthStore((state) => ({
+  //   login: state.login,
+  // }));
+  // const handleButtonClick = (e: MouseEvent<HTMLAnchorElement>) => {
+  //   // TODO: Change this to a proper route guard instead of onclick event
+  //   e.preventDefault();
+  //   login();
+  // };
 
   return (
     <div>
