@@ -33,17 +33,20 @@ export default function Hero() {
               <h1 className='text-4xl font-bold tracking-tight sm:text-6xl'>
                 welcome to hoagie<span className='text-slate-300'>plan</span>.
               </h1>
-              <p className='mt-6 text-lg leading-8'>
+              {/* <p className='mt-6 text-lg leading-8'>
                 Explore courses, read reviews, and manage your four-year course schedule.
+              </p> */}
+              <p className='mt-6 text-lg leading-8'>
+                HoagiePlan is currently under maintenance. Please come back tomorrow!
               </p>
               <div className='mt-10 flex items-center justify-center gap-x-6'>
-                <a
+                {/* <a
                   href='/dashboard/'
                   className='rounded-md bg-indigo-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-400 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-400'
                   onClick={handleButtonClick}
                 >
                   Get started
-                </a>
+                </a> */}
                 {/* <a
                   href='/about/'
                   className='text-sm font-semibold leading-6 text-white'

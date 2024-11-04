@@ -328,9 +328,10 @@ def push_certificates(certificates_path):
 # TODO: This should create or update so we don't have duplicates in the database, also with atomicity too
 if __name__ == '__main__':
     with transaction.atomic():
-        push_degrees(Path('../degrees').resolve())
-        push_majors(Path('../majors').resolve())
-        push_certificates(Path('../certificates').resolve())
-        push_minors(Path('../minors').resolve())
+        push_minor('../minors/ARA.yaml')
+        # push_degrees(Path('../degrees').resolve())
+        # push_majors(Path('../majors').resolve())
+        # push_certificates(Path('../certificates').resolve())
+        # push_minors(Path('../minors').resolve())
         # Push Undeclared major into database
-        Major.objects.create(**UNDECLARED)
+        # Major.objects.create(**UNDECLARED)
