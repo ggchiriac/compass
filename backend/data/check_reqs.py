@@ -438,7 +438,6 @@ def mark_dist(req, courses):
                 continue
 
             course_dist = course_dist.split(' or ')
-            dist_req = req['dist_req']
             ok = 0
 
             for area in course_dist:
