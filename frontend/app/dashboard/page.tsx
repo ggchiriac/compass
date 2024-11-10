@@ -1,18 +1,21 @@
 'use client';
 
-import { useEffect, useState, FC } from 'react';
+import { useEffect, FC } from 'react';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import SkeletonApp from '@/components/SkeletonApp';
 import { useModalStore } from '@/store/modalSlice';
 import { Canvas } from '@/app/dashboard/Canvas';
+import { mapUserProfileToProfile } from '@/utils/profileMapper';
 
 const Dashboard: FC = () => {
-  const { user, error, isLoading } = useUser();
+  const { user, isLoading } = useUser();
   
   useEffect(() => {
     useModalStore.setState({ currentPage: 'dashboard' });
   });
+
+  const profile = mapUserProfileToProfile(user);
 
   return (
     <>
@@ -32,7 +35,7 @@ const Dashboard: FC = () => {
         </div>
         <main className='flex flex-grow bg-[#FAFAFA] shadow-xl z-10 rounded pt-0.5vh pb-0.5vh pl-0.5vw pr-0.5vw'>
           {!isLoading && user && user.nickname !== '' ? (
-            <Canvas user={user} columns={2} />
+            <Canvas user={profile} columns={2} />
           ) : (
             <div>
               <SkeletonApp />

@@ -190,11 +190,12 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       classYear: classYear,
     };
 
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_profile/`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/profile/update`, {
       method: 'POST',
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-NetId': profile.netId,
       },
       body: JSON.stringify(profile),
     }).then((response) => {

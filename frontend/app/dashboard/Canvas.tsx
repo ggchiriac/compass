@@ -35,8 +35,9 @@ import { Course, Profile } from '@/types';
 
 import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearchItem.module.css';
 import Search from '@/components/Search';
-import { TabbedMenu } from '@/components/TabbedMenu';
+import TabbedMenu from '@/components/TabbedMenu/TabbedMenu';
 import useSearchStore from '@/store/searchSlice';
+import { fetchCsrfToken } from '@/utils/csrf';
 
 import { Item, Container, ContainerProps } from '../../components';
 
@@ -106,6 +107,18 @@ function simpleHash(str: string) {
     sum += (i + 1) * str.charCodeAt(i);
   }
   return sum % 11;
+}
+
+let csrfToken: string;
+
+if (typeof window === 'undefined') {
+  // Server-side or during pre-rendering/build time
+  csrfToken = '';
+} else {
+  // Client-side
+  (async () => {
+    csrfToken = await fetchCsrfToken();
+  })();
 }
 
 
@@ -204,7 +217,7 @@ type Props = {
 
 export const PLACEHOLDER_ID = 'placeholder';
 export const SEARCH_RESULTS_ID = 'Search Results';
-const defaultClassYear = new Date().getFullYear();
+const defaultClassYear = new Date().getFullYear() + 1;
 
 export function Canvas({
   user,
@@ -318,18 +331,26 @@ export function Canvas({
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/fetch_courses/`, {
         method: 'GET',
         credentials: 'include',
+        headers: {
+          'X-NetId': user.netId
+        }
       });
       const data = await response.json();
+      console.log("DATA FROM fetchCourses()")
+      console.log(data)
       return data;
     } catch (error) {
-      return null; // Handle error appropriately
+      return null; // TODO: Handle error appropriately
     }
   };
 
-  const categorizeRequirements = () => {
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/categorize_requirements/`, {
+  const updateRequirements = () => {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_requirements/`, {
       method: 'GET',
       credentials: 'include',
+      headers: {
+        'X-NetId': user.netId
+      }
     })
       .then((response) => response.json())
       .then((data) => {
@@ -346,7 +367,7 @@ export function Canvas({
         }));
       }
     });
-    categorizeRequirements();
+    updateRequirements();
   }, [classYear]);
 
   const staticSearchResults = useSearchStore((state) => state.searchResults);
@@ -554,13 +575,15 @@ export function Canvas({
                 credentials: 'include',
                 headers: {
                   'Content-Type': 'application/json',
+                  'X-NetId': user.netId,
+                  'X-CSRFToken': csrfToken,
                 },
                 body: JSON.stringify({
                   crosslistings: active.id.toString().split('|')[1],
                   semesterId: overContainerId,
                 }),
               }).then((response) => response.json());
-              categorizeRequirements();
+              updateRequirements();
             }
           }
 
@@ -704,7 +727,9 @@ export function Canvas({
             >
               <TabbedMenu
                 tabsData={academicPlan}
-                categorizeRequirements={categorizeRequirements}
+                user={user}
+                csrfToken={csrfToken}
+                updateRequirements={updateRequirements}
               />
             </div>
           </div>
@@ -790,6 +815,8 @@ export function Canvas({
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken,
+        'X-NetId': user.netId
       },
       body: JSON.stringify({
         crosslistings: value.toString().split('|')[1],
@@ -797,7 +824,7 @@ export function Canvas({
       }),
     }).then((response) => {
       response.json();
-      categorizeRequirements();
+      updateRequirements();
     });
   }
 }

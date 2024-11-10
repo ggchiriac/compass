@@ -1,17 +1,17 @@
-from re import IGNORECASE, sub, split, compile
+import time
+from re import IGNORECASE, compile, split, sub
+
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
-import time
+
+from hoagieplan.logger import logger
 from hoagieplan.models import (
-    CustomUser,
     Course,
 )
 from hoagieplan.serializers import (
     CourseSerializer,
 )
-from hoagieplan.logger import logger
-
 
 DEPT_NUM_SUFFIX_REGEX = compile(r"^[a-zA-Z]{3}\d{3}[a-zA-Z]$", IGNORECASE)
 DEPT_NUM_REGEX = compile(r"^[a-zA-Z]{3}\d{1,4}$", IGNORECASE)
@@ -135,30 +135,4 @@ def search_courses(request):
         return JsonResponse({"courses": []})
     except Exception as e:
         logger.error(f"An error occurred while searching for courses: {e}")
-        return JsonResponse({"error": "Internal Server Error"}, status=500)
-
-
-@require_GET
-def get_user_courses(request):
-    """Retrieve user's courses for frontend."""
-    if request.method != "GET":
-        return JsonResponse({"error": "Method not allowed"}, status=405)
-
-    net_id = request.session.get("net_id")
-    if not net_id:
-        return JsonResponse({})
-
-    try:
-        user_inst = CustomUser.objects.get(net_id=net_id)
-        user_course_dict = {}
-
-        for semester in range(1, 9):
-            user_courses = Course.objects.filter(usercourses__user=user_inst, usercourses__semester=semester)
-            serialized_courses = CourseSerializer(user_courses, many=True)
-            user_course_dict[semester] = serialized_courses.data
-
-        return JsonResponse(user_course_dict)
-
-    except Exception as e:
-        logger.error(f"An error occurred while retrieving courses: {e}")
         return JsonResponse({"error": "Internal Server Error"}, status=500)

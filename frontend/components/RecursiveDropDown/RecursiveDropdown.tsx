@@ -17,6 +17,7 @@ import useSearchStore from '@/store/searchSlice';
 
 import LoadingComponent from '../LoadingComponent';
 import SettingsModal from '../Modal';
+import { Profile } from '@/types';
 
 import styles from '../InfoComponent/InfoComponent.module.css';
 
@@ -26,8 +27,9 @@ interface Dictionary {
 
 interface DropdownProps {
   data: Dictionary;
+  user: Profile;
   csrfToken: string;
-  categorizeRequirements: any;
+  updateRequirements: any;
 }
 
 interface SatisfactionStatusProps {
@@ -101,7 +103,7 @@ const SatisfactionStatus: FC<SatisfactionStatusProps> = ({
 };
 
 // Dropdown component with refined styling
-const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }) => {
+const Dropdown: FC<DropdownProps> = ({ data, user, csrfToken, updateRequirements }) => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [markedSatisfied, setMarkedSatisfied] = useState<boolean>(false);
   const [explanation, setExplanation] = useState<{ [key: number]: any } | null>(null);
@@ -135,6 +137,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-NetId': user.netId,
       },
     })
       .then((response) => response.json())
@@ -188,13 +191,14 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-NetId': user.netId,
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({ reqId: explanation ? explanation[0] : null, markedSatisfied: 'true' }),
     }).then((response) => response.json());
 
     setMarkedSatisfied(true);
-    categorizeRequirements();
+    updateRequirements();
   };
 
   const handleUnmarkSatisfied = () => {
@@ -206,6 +210,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-NetId': user.netId,
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({
@@ -215,7 +220,7 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
     }).then((response) => response.json());
 
     setMarkedSatisfied(false);
-    categorizeRequirements();
+    updateRequirements();
   };
 
   useEffect(() => {
@@ -368,12 +373,13 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
       credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'X-NetId': user.netId,
         'X-CSRFToken': csrfToken,
       },
       body: JSON.stringify({ crosslistings: crosslistings, reqId: reqId }),
     }).then((response) => response.json());
 
-    categorizeRequirements();
+    updateRequirements();
   };
 
   const renderContent = (data: Dictionary) => {
@@ -505,20 +511,23 @@ const Dropdown: FC<DropdownProps> = ({ data, csrfToken, categorizeRequirements }
 // Recursive dropdown component
 interface RecursiveDropdownProps {
   dictionary: Dictionary;
+  user: Profile;
   csrfToken: string;
-  categorizeRequirements: any;
+  updateRequirements: any;
 }
 
 const RecursiveDropdown: FC<RecursiveDropdownProps> = ({
   dictionary,
+  user,
   csrfToken,
-  categorizeRequirements,
+  updateRequirements,
 }) => {
   return (
     <Dropdown
       data={dictionary}
+      user={user}
       csrfToken={csrfToken}
-      categorizeRequirements={categorizeRequirements}
+      updateRequirements={updateRequirements}
     />
   );
 };

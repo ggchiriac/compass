@@ -1,15 +1,18 @@
 import json
 from datetime import datetime
 from re import search
+
+from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
-from django.db import transaction
-from django.core.exceptions import ValidationError
-from hoagieplan.models import CustomUser, Certificate, Major, Minor
+
 from data.configs.configs import Configs
 from data.req_lib import ReqLib
 from hoagieplan.api.errors.errors import UserProfileNotFoundError
 from hoagieplan.logger import logger
+from hoagieplan.models import Certificate, Course, CustomUser, Major, Minor
+from hoagieplan.serializers import CourseSerializer
 
 UNDECLARED = {"code": "Undeclared", "name": "Undeclared"}
 VALID_CLASS_YEAR_RANGE = range(2023, 2031)
@@ -86,9 +89,32 @@ def fetch_user_info(net_id):
 
 
 @require_GET
+def get_user_courses(request):
+    """Retrieve user's courses for frontend."""
+    net_id = request.headers.get("X-NetId")
+    if not net_id:
+        return JsonResponse({})
+
+    try:
+        user_inst = CustomUser.objects.get(net_id=net_id)
+        user_course_dict = {}
+
+        for semester in range(1, 9):
+            user_courses = Course.objects.filter(usercourses__user=user_inst, usercourses__semester=semester)
+            serialized_courses = CourseSerializer(user_courses, many=True)
+            user_course_dict[semester] = serialized_courses.data
+
+        return JsonResponse(user_course_dict)
+
+    except Exception as e:
+        logger.error(f"An error occurred while retrieving courses: {e}")
+        return JsonResponse({"error": "Internal Server Error"}, status=500)
+
+
+@require_GET
 def profile(request):
     """Get user profile information."""
-    net_id = request.session.get("net_id")
+    net_id = request.headers.get("X-NetId")
     if not net_id:
         return JsonResponse({"error": "Not authenticated"}, status=401)
 

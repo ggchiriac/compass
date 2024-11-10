@@ -26,8 +26,9 @@ This software is provided "as-is", without warranty of any kind.
 import json
 from urllib.request import urlopen
 
-from authlib.oauth2.rfc7523 import JWTBearerTokenValidator
 from authlib.jose.rfc7517.jwk import JsonWebKey
+from authlib.oauth2.rfc7523 import JWTBearerTokenValidator
+
 
 class Auth0JWTBearerTokenValidator(JWTBearerTokenValidator):
     """Validate Auth0 JWT tokens using Authlib's JWTBearerTokenValidator.
@@ -35,29 +36,28 @@ class Auth0JWTBearerTokenValidator(JWTBearerTokenValidator):
     Fetch the public key set from the Auth0 domain and validate tokens
     against the specified audience.
     """
-    
+
     def __init__(self, domain, audience):
         """Initialize the validator with Auth0's public keys and configure claims.
 
         Args:
+        ----
             domain (str): The Auth0 domain, e.g., 'your-domain.auth0.com'.
             audience (str): The expected audience for the JWT.
 
         """
         # Construct the issuer URL for the domain
         issuer = f"https://{domain}/"
-        
+
         # Fetch the public key set from the domain's .well-known endpoint
         json_url = urlopen(f"{issuer}.well-known/jwks.json")
-        
+
         # Parse and import the public key set from the fetched JSON
-        public_key = JsonWebKey.import_key_set(
-            json.loads(json_url.read())
-        )
+        public_key = JsonWebKey.import_key_set(json.loads(json_url.read()))
 
         # Initialize the parent class with the imported public keys
         super(Auth0JWTBearerTokenValidator, self).__init__(public_key)
-        
+
         # Define claims validation options: ensure the presence and correctness
         # of the 'exp' (expiration), 'aud' (audience), and 'iss' (issuer) claims
         self.claims_options = {

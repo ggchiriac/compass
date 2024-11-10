@@ -1,10 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
+
 from hoagieplan.models import (
     Course,
-    Department,
     CourseComments,
     CourseEvaluations,
+    Department,
 )
 
 

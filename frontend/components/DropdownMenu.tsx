@@ -55,7 +55,7 @@ const DropdownMenu: FC = () => {
     const fetchProfile = async () => {
       const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND}/profile`, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-NetId': userProfile.netId },
         credentials: 'include',
       });
       const data = await response.json();

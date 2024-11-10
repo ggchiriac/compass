@@ -23,33 +23,33 @@ limitations under the License.
 
 from django.contrib import admin
 from django.urls import path
-from hoagieplan.api.auth import cas
-from hoagieplan.api.profile import info
-from hoagieplan.api import details
-from hoagieplan.api import search
-from hoagieplan.api.dashboard import requirements
+
+from hoagieplan.api import details, search
+from hoagieplan.api.auth import cas, csrf
 from hoagieplan.api.calendar import configuration
+from hoagieplan.api.dashboard import requirements
+from hoagieplan.api.profile import info
 
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
     # CAS Authentication
     path("cas/", cas.dispatch, name="cas"),
+    # CSRF Token for approving POST requests
+    path("csrf/", csrf.csrf_token_view, name="csrf"),
     # Profile
     path("profile/", info.profile, name="profile"),
-    path("update_profile/", info.update_profile, name="update_profile"),
-    path("profile/", info.profile, name="profile"),
-    path("profile/update_profile/", info.update_profile, name="update_profile"),
+    path("profile/update/", info.update_profile, name="update_profile"),
     path("profile/class-year/", info.update_class_year, name="update_class_year"),
     path("course/details/", details.course_details, name="course_details"),
     path("course/comments/", details.course_comments_view, name="course_comments"),
     # Canvas
     path("search/", search.search_courses, name="search"),
-    path("fetch_courses/", search.get_user_courses, name="fetch_courses"),
+    path("fetch_courses/", info.get_user_courses, name="fetch_courses"),
     path("update_courses/", requirements.update_courses, name="update_courses"),
     path("manually_settle/", requirements.manually_settle, name="manually_settle"),
     path("mark_satisfied/", requirements.mark_satisfied, name="mark_satisfied"),
-    path("categorize_requirements/", requirements.categorize_requirements, name="categorize_requirements"),
+    path("update_requirements/", requirements.update_requirements, name="update_requirements"),
     # path("update_user/", info.update_user, name="update_user"),
     path("requirement_info/", requirements.requirement_info, name="requirement_info"),
     # Calendar

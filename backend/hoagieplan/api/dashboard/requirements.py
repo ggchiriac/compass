@@ -1,61 +1,36 @@
+import collections
+import copy
 import json
 import logging
-import copy
-from hoagieplan.api.profile.info import fetch_user_info
-from hoagieplan.api.dashboard.utils import cumulative_time
-from django.db.models import Q
-from django.http import JsonResponse
-from django.db.models import Prefetch
-import collections
-from hoagieplan.serializers import (
-    CourseSerializer,
-)
 
+from django.db.models import Prefetch, Q
+from django.http import JsonResponse
+
+from hoagieplan.api.dashboard.utils import cumulative_time
+from hoagieplan.api.profile.info import fetch_user_info
 from hoagieplan.models import (
-    CustomUser,
-    Major,
-    Minor,
     Certificate,
     Course,
-    UserCourses,
-    Requirement,
+    CustomUser,
     Degree,
+    Major,
+    Minor,
+    Requirement,
+    UserCourses,
+)
+from hoagieplan.serializers import (
+    CourseSerializer,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s")
 logger = logging.getLogger(__name__)
 
 
-# Have a custom check_requirements recursive function for minors. Can
-# return a huge dict that says how close to completion each minor is
-
-# courses = [[{"inst" : something, "semester_number" : 1},
-# {"id" : 72967, "semester_number" : 1}, ...], [], [], [], [], [], [], []]
-# other fields: possible_reqs, reqs_satisfied, reqs_double_counted,
-# num_settleable
-
-# req is supposed to be the yaml data. Need a req dict to keep:
-# req instance
-# satisfied: whether the req is satisfied or not
-# settled: courses that were settled to this req (course ids)
-# unsettled: courses that were not settled to this req (course ids)
-# req_list
-
-# Is it better to keep reqs on the server (i.e. variable in this file)
-# or is it better to have a UserRequirements table?
-
-# Need a function that gets user id and creates courses matrix with
-# everything that _init_courses has
-
-# Django model instances are cached so this should be at least as
-# efficient as TigerPath code
-
-
 def manually_settle(request):
     data = json.loads(request.body)
     crosslistings = data.get("crosslistings")
     req_id = int(data.get("reqId"))
-    net_id = request.session["net_id"]
+    net_id = request.headers.get("X-NetId")
     user_inst = CustomUser.objects.get(net_id=net_id)
     course_inst = (
         Course.objects.select_related("department").filter(crosslistings__iexact=crosslistings).order_by("-guid")[0]
@@ -79,7 +54,7 @@ def mark_satisfied(request):
     data = json.loads(request.body)
     req_id = int(data.get("reqId"))
     marked_satisfied = data.get("markedSatisfied")
-    net_id = request.session["net_id"]
+    net_id = request.headers.get("X-NetId")
 
     user_inst = CustomUser.objects.get(net_id=net_id)
     req_inst = Requirement.objects.get(id=req_id)
@@ -289,11 +264,9 @@ def prefetch_req_inst(table, code):
 
 @cumulative_time
 def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
-    """
-    Assigns only settled courses and those that can only satify one requirement,
+    """Assigns only settled courses and those that can only satify one requirement,
     and updates the appropriate counts.
     """
-
     old_deficit = req["min_needed"] - req["count"]
     if req["max_counted"]:
         old_available = req["max_counted"] - req["count"]
@@ -338,9 +311,7 @@ def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
 
 @cumulative_time
 def mark_possible_reqs(req, courses):
-    """
-    Finds all the requirements that each course can satisfy.
-    """
+    """Finds all the requirements that each course can satisfy."""
     if "req_list" in req:
         for sub_req in req["req_list"]:
             mark_possible_reqs(sub_req, courses)
@@ -415,8 +386,7 @@ def mark_courses(req, courses):
 
 @cumulative_time
 def mark_all(req, courses):
-    """
-    Finds and marks all courses in 'courses' that satisfy a requirement where
+    """Finds and marks all courses in 'courses' that satisfy a requirement where
     double counting is allowed.
     """
     num_marked = 0
@@ -430,8 +400,7 @@ def mark_all(req, courses):
 
 @cumulative_time
 def mark_settled(req, courses):
-    """
-    Finds and marks all courses in 'courses' that have been settled to
+    """Finds and marks all courses in 'courses' that have been settled to
     this requirement.
     """
     num_marked = 0
@@ -455,8 +424,7 @@ def mark_settled(req, courses):
 
 @cumulative_time
 def check_degree_progress(req, courses):
-    """
-    Checks whether the correct number of courses have been completed by the
+    """Checks whether the correct number of courses have been completed by the
     end of semester number 'by_semester' (1-8)
     """
     by_semester = req["completed_by_semester"]
@@ -470,8 +438,7 @@ def check_degree_progress(req, courses):
 
 @cumulative_time
 def add_course_lists_to_req(req, courses):
-    """
-    Add course lists for each requirement that either
+    """Add course lists for each requirement that either
     (a) has no subrequirements, or
     (b) has hidden subrequirements
     """
@@ -502,9 +469,7 @@ def add_course_lists_to_req(req, courses):
 
 @cumulative_time
 def format_req_output(req, courses, manually_satisfied_reqs):
-    """
-    Enforce the type and order of fields in the req output
-    """
+    """Enforce the type and order of fields in the req output"""
     output = collections.OrderedDict()
     if req["table"] != "Requirement" and req["code"]:
         output["code"] = req["code"]
@@ -562,8 +527,7 @@ def format_req_output(req, courses, manually_satisfied_reqs):
 
 @cumulative_time
 def check_requirements(user_inst, table, code, courses):
-    """
-    Returns information about the requirements satisfied by the courses
+    """Returns information about the requirements satisfied by the courses
     given in course_ids.
 
     :param table: the table containing the root of the requirement tree
@@ -575,7 +539,6 @@ def check_requirements(user_inst, table, code, courses):
     :returns: A simplified json with info about how much of each requirement is satisfied
     :rtype: (bool, dict, dict)
     """
-
     req = cached_init_req(user_inst, table, code)
     manually_satisfied_reqs = list(user_inst.requirements.values_list("id", flat=True))
     courses = _init_courses(courses)
@@ -682,8 +645,9 @@ def transform_data(data):
     return transformed_data
 
 
-def categorize_requirements(request):
-    user_info = fetch_user_info(request.session["net_id"])
+def update_requirements(request):
+    net_id = request.headers.get("X-NetId")
+    user_info = fetch_user_info(net_id)
 
     this_major = user_info["major"]["code"]
     these_minors = [minor["code"] for minor in user_info["minors"]]
@@ -712,8 +676,6 @@ def categorize_requirements(request):
             else:
                 print("  " * (indent + 1) + str(value))
 
-    # pretty_print(formatted_dict, 2)
-
     return JsonResponse(formatted_dict)
 
 
@@ -722,6 +684,7 @@ def categorize_requirements(request):
 
 def requirement_info(request):
     req_id = request.GET.get("reqId", "")
+    net_id = request.headers.get("X-NetId")
     explanation = ""
     completed_by_semester = 8
     dist_req = []
@@ -732,7 +695,7 @@ def requirement_info(request):
 
     try:
         req_inst = Requirement.objects.get(id=req_id)
-        user_inst = CustomUser.objects.get(net_id=request.session["net_id"])
+        user_inst = CustomUser.objects.get(net_id=net_id)
 
         explanation = req_inst.explanation
         completed_by_semester = req_inst.completed_by_semester
@@ -828,7 +791,7 @@ def update_courses(request):
         data = json.loads(request.body)
         crosslistings = data.get("crosslistings")  # might have to adjust this, print
         container = data.get("semesterId")
-        net_id = request.session["net_id"]
+        net_id = request.headers.get("X-NetId")
         user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
         course_inst = (

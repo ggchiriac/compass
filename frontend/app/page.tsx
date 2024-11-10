@@ -38,7 +38,7 @@ export default function Index() {
   else if (user) {
     Profile = (
       <Pane>
-        <Link href='/feature1'>
+        <Link href='/dashboard'>
           <Button
             height={56}
             width={majorScale(35)}
@@ -46,7 +46,7 @@ export default function Index() {
             marginBottom={20}
             iconBefore={CalendarIcon}
           >
-            Call to Action
+            Go to Dashboard
           </Button>
         </Link>
         <br />

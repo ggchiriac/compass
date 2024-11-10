@@ -16,6 +16,7 @@ import { ReactNode } from 'react';
 import type { Metadata } from 'next';
 
 import { getSession } from '@auth0/nextjs-auth0';
+import { cookies } from 'next/headers'
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Inter } from 'next/font/google';
 import { Analytics } from '@vercel/analytics/react';
@@ -25,7 +26,6 @@ import Layout from '@/lib/hoagie-ui/Layout';
 import Theme from '@/lib/hoagie-ui/Theme';
 import '@/lib/hoagie-ui/Theme/theme.css';
 import Nav from '@/lib/hoagie-ui/Nav';
-import { useUserStore } from '@/store/userSlice';
 
 
 const inter = Inter({ subsets: ['latin'] });
@@ -36,6 +36,17 @@ export const metadata: Metadata = {
   manifest: 'manifest.json',
 };
 
+async function fetchSession() {
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get('appSession');
+  if (!sessionCookie) {
+    return null;
+  }
+
+  const session = await getSession();
+  return session;
+}
+
 /**
  * Content Component
  * Fetches user data (real or mock) and renders the main layout.
@@ -44,7 +55,7 @@ export const metadata: Metadata = {
  * @returns JSX Element representing the content area.
  */
 async function Content({ children }: { children: ReactNode }): Promise<JSX.Element> {
-  const session = await getSession();
+  const session = await fetchSession();
   const user = session?.user;
 
   const tabs = [
@@ -71,14 +82,15 @@ async function Content({ children }: { children: ReactNode }): Promise<JSX.Eleme
  * @param children - The child components to render within the layout.
  * @returns JSX Element representing the root HTML structure.
  */
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: ReactNode;
 }>) {
+  const session = await fetchSession();
   return (
     <html lang='en'>
-      <UserProvider>
+      <UserProvider user={session?.user}>
         <body className={`${inter.className} antialiased`}>
           <Content>{children}</Content>
           <Analytics />

@@ -4,13 +4,16 @@ import LoadingComponent from '../LoadingComponent';
 import { RecursiveDropdown } from '../RecursiveDropDown';
 
 import styles from './TabbedMenu.module.css';
+import { Profile } from '@/types'
 
 interface TabbedMenuProps {
   tabsData: { [key: string]: object };
-  categorizeRequirements: any;
+  user: Profile;
+  csrfToken: string;
+  updateRequirements: any;
 }
 
-const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, categorizeRequirements }) => {
+const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, user, csrfToken, updateRequirements }) => {
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   useEffect(() => {
@@ -58,8 +61,9 @@ const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, categorizeRequirements }) =
             <RecursiveDropdown
               key={activeTab}
               dictionary={tabsData[activeTab]}
+              user={user}
               csrfToken={csrfToken}
-              categorizeRequirements={categorizeRequirements}
+              updateRequirements={updateRequirements}
             />
           )
         )}

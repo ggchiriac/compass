@@ -21,8 +21,18 @@ export type MajorMinorType = {
 };
 
 export type Profile = {
-  name: string, // First and last name
-  nickname: string, // NetID
+  firstName: string;
+  lastName: string;
+  classYear: number;
+  major: MajorMinorType;
+  minors?: MajorMinorType[];
+  certificates?: MajorMinorType[];
+  netId: string;
+  universityId: string;
+  email: string;
+  department: string;
+  timeFormat24h: boolean;
+  themeDarkMode: boolean;
 };
 
 export type ProfileProps = {
