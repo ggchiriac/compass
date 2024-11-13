@@ -64,7 +64,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
         {event.section.class_section}
       </div>
       <div className='event-department'>
-        {event.section.enrollment} {event.section.capacity}
+        {event.course.department_code} {event.section.enrollment} {event.section.capacity}
       </div>
       {/* Button */}
     </div>
