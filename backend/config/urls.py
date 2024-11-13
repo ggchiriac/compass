@@ -39,6 +39,7 @@ urlpatterns = [
     path("csrf/", csrf.csrf_token_view, name="csrf"),
     # Profile
     path("profile/", info.profile, name="profile"),
+    path("profile/create_from_auth0/", info.create_from_auth0, name="create_from_auth0"),
     path("profile/update/", info.update_profile, name="update_profile"),
     path("profile/class-year/", info.update_class_year, name="update_class_year"),
     path("course/details/", details.course_details, name="course_details"),
@@ -50,7 +51,6 @@ urlpatterns = [
     path("manually_settle/", requirements.manually_settle, name="manually_settle"),
     path("mark_satisfied/", requirements.mark_satisfied, name="mark_satisfied"),
     path("update_requirements/", requirements.update_requirements, name="update_requirements"),
-    # path("update_user/", info.update_user, name="update_user"),
     path("requirement_info/", requirements.requirement_info, name="requirement_info"),
     # Calendar
     path(

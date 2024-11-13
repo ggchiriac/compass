@@ -1,14 +1,10 @@
 import json
 from datetime import datetime
-from re import search
 
-from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
-from data.configs.configs import Configs
-from data.req_lib import ReqLib
 from hoagieplan.api.errors.errors import UserProfileNotFoundError
 from hoagieplan.logger import logger
 from hoagieplan.models import Certificate, Course, CustomUser, Major, Minor
@@ -18,8 +14,16 @@ UNDECLARED = {"code": "Undeclared", "name": "Undeclared"}
 VALID_CLASS_YEAR_RANGE = range(2023, 2031)
 
 
-def get_user_or_create(net_id):
-    """Get or create a user with basic information."""
+@require_POST
+def create_from_auth0(request):
+    """Create database user entry using Auth0 information. If user already exists, just fetches existing data."""
+    user = json.loads(request.body)
+    net_id = user.get("netId")
+    first_name = user.get("firstName")
+    last_name = user.get("lastName")
+    email = user.get("email")
+    print(user)
+
     try:
         user_inst, created = CustomUser.objects.get_or_create(
             net_id=net_id,
@@ -31,27 +35,18 @@ def get_user_or_create(net_id):
                 "class_year": datetime.now().year + 1,
             },
         )
-        return user_inst
+        if created:
+            user_inst.first_name = first_name
+            user_inst.last_name = last_name
+            user_inst.email = email
+            user_inst.save()
+
+        print(format_user_data(user_inst))
+        return JsonResponse(format_user_data(user_inst))
+
     except Exception as e:
-        logger.error(f"Failed to create or retrieve user {net_id}: {e}")
-        raise ValidationError(f"Database error for user {net_id}")
-
-
-def update_user_from_profile(user_inst, profile):
-    """Update user information from profile data."""
-    if not any([user_inst.email, user_inst.first_name, user_inst.last_name, user_inst.class_year]):
-        # Extract class year
-        if class_year_match := search(r"Class of (\d{4})", profile["dn"]):
-            user_inst.class_year = int(class_year_match.group(1))
-
-        # Extract name
-        full_name = profile["displayname"].split(" ")
-        user_inst.first_name = full_name[0]
-        user_inst.last_name = " ".join(full_name[1:])
-
-        # Update email
-        user_inst.email = profile.get("mail", user_inst.email)
-        user_inst.save()
+        logger.error(f"Error processing profile data for {net_id}: {e}")
+        raise UserProfileNotFoundError("Failed to create user profile") from e
 
 
 def format_user_data(user_inst):
@@ -69,18 +64,18 @@ def format_user_data(user_inst):
 
 
 def fetch_user_info(net_id):
-    """Fetch and format complete user information."""
-    configs = Configs()
-    req_lib = ReqLib()
-
-    user_inst = get_user_or_create(net_id)
-
+    """Fetch database user information."""
     try:
-        # Only fetch external profile if needed
-        if not all([user_inst.email, user_inst.first_name, user_inst.last_name, user_inst.class_year]):
-            student_profile = req_lib.getJSON(f"{configs.USERS_FULL}?uid={net_id}")
-            update_user_from_profile(user_inst, student_profile[0])
-
+        user_inst, _ = CustomUser.objects.get_or_create(
+            net_id=net_id,
+            defaults={
+                "role": "student",
+                "email": "",
+                "first_name": "",
+                "last_name": "",
+                "class_year": datetime.now().year + 1,
+            },
+        )
         return format_user_data(user_inst)
 
     except Exception as e:
@@ -92,6 +87,7 @@ def fetch_user_info(net_id):
 def get_user_courses(request):
     """Retrieve user's courses for frontend."""
     net_id = request.headers.get("X-NetId")
+    print(f"NETID: {net_id}")
     if not net_id:
         return JsonResponse({})
 
@@ -131,7 +127,7 @@ def profile(request):
 @require_POST
 def update_profile(request):
     """Update user profile information."""
-    net_id = request.session.get("net_id")
+    net_id = request.headers.get("X-NetId")
     if not net_id:
         return JsonResponse({"error": "Not authenticated"}, status=401)
 
@@ -181,7 +177,7 @@ def update_profile(request):
 @require_POST
 def update_class_year(request):
     """Update user's class year."""
-    net_id = request.session.get("net_id")
+    net_id = request.headers.get("X-NetId")
     if not net_id:
         return JsonResponse({"error": "Not authenticated"}, status=401)
 

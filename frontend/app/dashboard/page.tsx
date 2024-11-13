@@ -1,21 +1,32 @@
 'use client';
 
-import { useEffect, FC } from 'react';
+import { useEffect, useState, FC } from 'react';
 
 import { useUser } from '@auth0/nextjs-auth0/client';
 import SkeletonApp from '@/components/SkeletonApp';
 import { useModalStore } from '@/store/modalSlice';
 import { Canvas } from '@/app/dashboard/Canvas';
 import { mapUserProfileToProfile } from '@/utils/profileMapper';
+import { Profile } from '@/types'
 
 const Dashboard: FC = () => {
   const { user, isLoading } = useUser();
+  const [profile, setProfile] = useState<Profile | null>(null);
   
   useEffect(() => {
     useModalStore.setState({ currentPage: 'dashboard' });
   });
 
-  const profile = mapUserProfileToProfile(user);
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const resolvedProfile = await mapUserProfileToProfile(user);
+        setProfile(resolvedProfile);
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
 
   return (
     <>
