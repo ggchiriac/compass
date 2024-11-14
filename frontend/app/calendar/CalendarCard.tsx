@@ -63,8 +63,8 @@ const CalendarCard: FC<CalendarCardProps> = ({
       <div className='text-xs event-department'>
         {event.section.class_section}
       </div>
-      <div className='event-department'>
-        {event.course.department_code} {event.section.enrollment} {event.section.capacity}
+      <div className='text xs event-department'>
+        {event.section.enrollment} {event.section.id}
       </div>
       {/* Button */}
     </div>
