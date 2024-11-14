@@ -80,7 +80,7 @@ const containerGridHeight = '87vh';
 const searchGridHeight = '85vh';
 
 // Widths are relative to viewport width.
-// Search width is 24vw, inherited from Container.module.scss
+// Search container width is 24vw, inherited from Container.module.scss
 const semesterWidth = '22.5vw';
 const requirementsWidth = '26vw';
 const courseWidth = '10.5vw';

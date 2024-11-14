@@ -66,7 +66,7 @@ async function Content({ children }: { children: ReactNode }): Promise<JSX.Eleme
   ];
 
   return (
-    <Theme palette='yellow'>
+    <Theme palette='purple'>
       <Layout>
         <Nav name='plan' tabs={tabs} user={user} />
         {children}

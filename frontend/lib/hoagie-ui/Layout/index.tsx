@@ -20,7 +20,7 @@ import Footer from '@/lib/hoagie-ui/Footer';
 function Layout({ children }: { children: ReactNode }) {
   const theme = useTheme();
   return (
-    <Pane display="flex" flexDirection="column" minHeight="100vh" background={theme.colors.blue100}>
+    <Pane display="flex" flexDirection="column" minHeight="100vh" background={theme.colors.blue50}>
       <Pane flex="1">{children}</Pane>
       <Pane>
         <Footer />
