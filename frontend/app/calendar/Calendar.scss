@@ -112,7 +112,10 @@ $box-shadow-hover:
   &:hover {
     transform: translateY(-4px);
     @include box-shadow($box-shadow-hover);
-
+    
+    .card-enrollment {
+      opacity: 1;
+    }
     &::before {
       opacity: 1;
     }
@@ -137,9 +140,11 @@ $box-shadow-hover:
   .card-header {
     display: flex;
     align-items: center;
-    margin-bottom: 12px;
   }
-
+  .card-container {
+    display: flex;
+    flex-direction: column;
+  }
   .course-code,
   .course-title,
   .time,
@@ -158,6 +163,11 @@ $box-shadow-hover:
     align-items: flex-start;
   }
 
+  .card-enrollment {
+    opacity: 0;
+    transition: opacity 0.2s ease-out
+  }
+  
   .event-details {
     display: flex;
     flex-direction: column;

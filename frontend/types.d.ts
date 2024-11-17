@@ -140,6 +140,7 @@ export type CalendarEvent = {
   color?: string;
   textColor?: string;
 
+
   // Defined fields
   isActive: boolean;
 };
