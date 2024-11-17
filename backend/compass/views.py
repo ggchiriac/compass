@@ -1003,6 +1003,8 @@ class FetchCalendarClasses(APIView):
             print(f"Course ID: {section_data['course']['course_id']}")
             print(f"Course Title: {section_data['course']['title']}")
             print(f"Instructor: {section_data['instructor']['name']}")
+            print(f"Capacity: {section_data['capacity']}")
+            print(f"Enrollment: {section_data['enrollment']}")
             for meeting in section_data['class_meetings']:
                 print(f"  Meeting ID: {meeting['id']}")
                 print(f"  Days: {meeting['days']}")
@@ -1030,7 +1032,6 @@ class FetchCalendarClasses(APIView):
         class_meetings_data = [
             self.serialize_class_meeting(meeting) for meeting in getattr(section, 'unique_class_meetings', [])
         ]
-
         section_data = {
             'id': section.id,
             'class_section': section.class_section,
@@ -1043,6 +1044,8 @@ class FetchCalendarClasses(APIView):
                 'name': str(section.instructor),
             },
             'class_meetings': class_meetings_data,
+            'enrollment': section.enrollment,
+            'capacity': section.capacity,
         }
         return section_data
 
