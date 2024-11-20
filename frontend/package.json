@@ -26,6 +26,7 @@
     "clsx": "^2.1.1",
     "daisyui": "^4.12.14",
     "date-fns": "^3.6.0",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.0.4",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
