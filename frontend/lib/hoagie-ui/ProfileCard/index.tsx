@@ -13,11 +13,17 @@
 import { majorScale, Button, Heading, Card, Avatar, useTheme, Text } from 'evergreen-ui';
 import { UserProfile } from '@auth0/nextjs-auth0/client';
 
+interface ProfileCardProps {
+  user: UserProfile;
+  showSettingsButton?: boolean;
+  onSettingsClick?: () => void;
+}
+
 /**
  * ProfileCard is a profile card meant for display of user information
  *  throughout different Hoagie applications.
  */
-function ProfileCard({ user }: { user: UserProfile }) {
+function ProfileCard({ user, showSettingsButton = false, onSettingsClick }: ProfileCardProps) {
   const theme = useTheme();
   const name = user?.name;
   const email = user?.email || (user?.sub?.includes('@') ? user.sub.split('|').pop() : 'N/A');
@@ -40,6 +46,11 @@ function ProfileCard({ user }: { user: UserProfile }) {
       <Text color='muted' size={300} marginTop={2}>
         {email}
       </Text>
+      {showSettingsButton && (
+        <Button marginTop={16} onClick={onSettingsClick}>
+          Settings
+        </Button>
+      )}
       <a href='/api/auth/logout'>
         <Button marginTop={16}>Log Out</Button>
       </a>

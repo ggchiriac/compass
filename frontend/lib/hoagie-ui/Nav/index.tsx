@@ -49,13 +49,26 @@ export type Nav = {
 
   // A flag to show the "beta" development disclaimer on the hoagie app logo.
   beta?: boolean;
+
+  // Optional props to allow ProfileCard to have a Settings button
+  showSettingsButton?: boolean;
+  onSettingsClick?: () => void;
 };
 
 /**
  * Nav is a navbar meant for internal navigations throughout
  * different Hoagie applications.
  */
-function Nav({ name, LogoComponent, HeaderComponent, tabs = [], user, beta = false }: Nav) {
+function Nav({ 
+  name, 
+  LogoComponent, 
+  HeaderComponent, 
+  tabs = [], 
+  user, 
+  beta = false, 
+  showSettingsButton = false,
+  onSettingsClick,
+}: Nav) {
   const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
@@ -131,7 +144,13 @@ function Nav({ name, LogoComponent, HeaderComponent, tabs = [], user, beta = fal
               ))}
             </TabNavigation>
             {user && (
-              <Popover content={<ProfileCard user={user} />} position={Position.BOTTOM}>
+              <Popover 
+              content={
+              <ProfileCard 
+              user={user} 
+              showSettingsButton={showSettingsButton}
+              onSettingsClick={onSettingsClick}/>} 
+              position={Position.BOTTOM}>
                 <Avatar
                   name={username}
                   style={{
