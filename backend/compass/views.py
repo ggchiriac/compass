@@ -1036,6 +1036,8 @@ class FetchCalendarClasses(APIView):
             'id': section.id,
             'class_section': section.class_section,
             'class_type': section.class_type,
+            'enrollment': section.enrollment,
+            'capacity': section.capacity,
             'course': {
                 'course_id': section.course.course_id,
                 'title': section.course.title,
@@ -1044,8 +1046,6 @@ class FetchCalendarClasses(APIView):
                 'name': str(section.instructor),
             },
             'class_meetings': class_meetings_data,
-            'enrollment': section.enrollment,
-            'capacity': section.capacity,
         }
         return section_data
 
