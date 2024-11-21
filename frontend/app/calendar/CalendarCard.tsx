@@ -28,7 +28,8 @@ const CalendarCard: FC<CalendarCardProps> = ({
   const getGradientStyle = (dept: string) => {
     return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
   };
-  console.log(event.section);
+  console.log('Full section:', event.section);
+  console.log('Full section:', event.section.enrollment);
   return (
     <div
       className={`calendar-card ${event.textColor}`}
@@ -65,7 +66,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
           {event.section.class_section}
         </div>
         <div className='text-xs event-department card-enrollment'>
-          {event.section.capacity} {event.section.id}
+          {event.section.enrollment} / {event.section.capacity}
         </div>
       </div>
 

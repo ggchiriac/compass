@@ -153,6 +153,11 @@ $box-shadow-hover:
     @include ellipsis;
   }
 
+  .subsection-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
   .course-title {
     color: $primary-color;
     flex-grow: 1;
