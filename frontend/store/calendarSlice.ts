@@ -105,7 +105,21 @@ const useCalendarStore = create<CalendarStore>()(
           const sections = await response.json();
           // console.log('Fetched sections:', sections.length);
 
-          const exceptions = ['Lecture', 'Seminar'];
+          const uniqueSections = new Set(sections.map((section) => section.class_section));
+
+          const uniqueCount = uniqueSections.size;
+
+          const exceptions = ['Seminar', 'Lecture'];
+
+          const lectureSections = sections.filter(
+            (section) => section.class_type === 'Lecture' && /^L0\d+/.test(section.class_section)
+          );
+
+          const uniqueLectureNumbers = new Set(
+            lectureSections.map((section) => section.class_section.match(/^L0(\d+)/)?.[1])
+          );
+
+          console.log(uniqueLectureNumbers);
 
           const calendarEvents: CalendarEvent[] = sections.flatMap((section: Section) =>
             section.class_meetings.flatMap((classMeeting: ClassMeeting) => {
@@ -120,7 +134,9 @@ const useCalendarStore = create<CalendarStore>()(
                 startRowIndex: calculateGridRow(classMeeting.start_time),
                 endRowIndex: calculateGridRow(classMeeting.end_time),
                 isActive: true,
-                needsChoice: !exceptions.includes(section.class_type),
+                needsChoice:
+                  (!exceptions.includes(section.class_type) && uniqueCount > 1) ||
+                  (uniqueLectureNumbers.size > 1 && section.class_type === 'Lecture'),
                 isChosen: false,
               }));
             })
@@ -156,7 +172,13 @@ const useCalendarStore = create<CalendarStore>()(
         set((state) => {
           const term = clickedSection.course.guid.substring(0, 4);
           const selectedCourses = state.selectedCourses[term] || [];
-          const typeExceptions = ['Lecture', 'Seminar'];
+          const typeExceptions = ['Seminar'];
+
+          const sectionsPerGroupping = selectedCourses.filter(
+            (section) =>
+              section.course.guid === clickedSection.course.guid &&
+              section.section.id === clickedSection.section.id
+          ).length;
 
           // Determine if this is a special exception
           const isException =
@@ -170,12 +192,6 @@ const useCalendarStore = create<CalendarStore>()(
           if (isException) {
             return { selectedCourses: state.selectedCourses };
           }
-
-          const sectionsPerGroupping = selectedCourses.filter(
-            (section) =>
-              section.course.guid === clickedSection.course.guid &&
-              section.section.id === clickedSection.section.id
-          ).length;
 
           const isActiveSingle =
             selectedCourses.filter(
