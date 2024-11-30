@@ -1,8 +1,8 @@
-import { FC, memo } from 'react';
+import { FC, memo } from "react";
 
-import { CalendarEvent } from '@/types';
+import { CalendarEvent } from "@/types";
 
-import CalendarCard from './CalendarCard';
+import CalendarCard from "./CalendarCard";
 // import CalendarTime from './CalendarTime';
 
 interface CalendarGridProps {
@@ -15,14 +15,14 @@ interface CalendarGridProps {
 
 const formatHour = (hour: number): string => {
   const formattedHour: number = hour % 12 || 12;
-  const period: string = hour < 12 ? 'AM' : 'PM';
+  const period: string = hour < 12 ? "AM" : "PM";
   return `${formattedHour}:00 ${period}`;
 };
 
 const calendarColors = {
-  gridBorder: '#e0e0e0',
-  dayLabelBg: '#f5f5f5',
-  timeLabelText: '#757575',
+  gridBorder: "#e0e0e0",
+  dayLabelBg: "#f5f5f5",
+  timeLabelText: "#757575",
 };
 
 const CalendarGrid: FC<CalendarGridProps> = memo(
@@ -34,10 +34,13 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
     const headerRows = 2; // Rows taken up by the header
 
     return (
-      <div className='grid calendar-container' style={{ gridTemplateColumns, gridTemplateRows }}>
+      <div
+        className="grid calendar-container"
+        style={{ gridTemplateColumns, gridTemplateRows }}
+      >
         {/* Filled-in top left cell */}
         <div
-          className='bg-gray-100'
+          className="bg-gray-100"
           style={{
             gridColumn: 1,
             gridRow: 1,
@@ -45,7 +48,7 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
             borderRight: `1px solid ${calendarColors.gridBorder}`,
             borderTop: `1px solid ${calendarColors.gridBorder}`,
             borderLeft: `1px solid ${calendarColors.gridBorder}`,
-            borderTopLeftRadius: '10px',
+            borderTopLeftRadius: "10px",
           }}
         ></div>
 
@@ -54,17 +57,17 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
         {days.map((day, index) => (
           <div
             key={`day-label-${index}`}
-            className='text-center font-medium border-b border-r border-t'
+            className="text-center font-medium border-b border-r border-t"
             style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
               gridColumn: index + 2,
               gridRow: 1,
               backgroundColor: calendarColors.dayLabelBg,
               borderColor: calendarColors.gridBorder,
               borderTop: `1px solid ${calendarColors.gridBorder}`,
-              borderTopRightRadius: index === days.length - 1 ? '10px' : '0',
+              borderTopRightRadius: index === days.length - 1 ? "10px" : "0",
             }}
           >
             {day}
@@ -75,16 +78,20 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
         {Array.from({ length: endHour - startHour + 1 }, (_, rowIndex) => (
           <div
             key={`time-${rowIndex}`}
-            className='calendar-time bg-white border-l border-r flex items-center justify-end pr-2'
+            className="calendar-time bg-white border-l border-r flex items-center justify-end pr-2"
             style={{
-              fontSize: '0.75rem',
+              fontSize: "0.75rem",
               gridRow: `${rowIndex * 6 + headerRows} / span 6`,
-              gridColumn: '1',
+              gridColumn: "1",
               borderColor: calendarColors.gridBorder,
               borderBottom: `1px solid ${calendarColors.gridBorder}`,
-              borderTop: rowIndex === 0 ? `1px solid ${calendarColors.gridBorder}` : 'none',
+              borderTop:
+                rowIndex === 0
+                  ? `1px solid ${calendarColors.gridBorder}`
+                  : "none",
               color: calendarColors.timeLabelText,
-              borderBottomLeftRadius: rowIndex === endHour - startHour ? '10px' : '0',
+              borderBottomLeftRadius:
+                rowIndex === endHour - startHour ? "10px" : "0",
             }}
           >
             {formatHour(rowIndex + startHour)}
@@ -95,13 +102,14 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
         {Array.from({ length: totalRows }, (_, rowIndex) => (
           <div
             key={`grid-row-${rowIndex}`}
-            className='border-b'
+            className="border-b"
             style={{
               gridRow: `${rowIndex + headerRows}`,
-              gridColumn: '2 / -1',
+              gridColumn: "2 / -1",
               borderColor: calendarColors.gridBorder,
-              visibility: (rowIndex + 1) % 6 !== 0 ? 'hidden' : 'visible',
-              borderBottomRightRadius: rowIndex === totalRows - 1 ? '10px' : '0',
+              visibility: (rowIndex + 1) % 6 !== 0 ? "hidden" : "visible",
+              borderBottomRightRadius:
+                rowIndex === totalRows - 1 ? "10px" : "0",
             }}
           />
         ))}
@@ -110,9 +118,9 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
         {[...Array(days.length + 1)].map((_, colIndex) => (
           <div
             key={`grid-col-${colIndex}`}
-            className='border-r'
+            className="border-r"
             style={{
-              gridRow: '2 / -1',
+              gridRow: "2 / -1",
               gridColumn: colIndex + 1,
               borderColor: calendarColors.gridBorder,
             }}
@@ -135,8 +143,8 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
         {/* <CalendarTime startHour={startHour} endHour={endHour} /> */}
       </div>
     );
-  }
+  },
 );
 
-CalendarGrid.displayName = 'CalendarGrid';
+CalendarGrid.displayName = "CalendarGrid";
 export default CalendarGrid;

@@ -10,11 +10,11 @@
  * and/or sell copies of the software. This software is provided "as-is", without warranty of any kind.
  */
 
-'use client';
+"use client";
 
-import { ComponentType } from 'react';
+import { ComponentType } from "react";
 
-import { UserProfile } from '@auth0/nextjs-auth0/client';
+import { UserProfile } from "@auth0/nextjs-auth0/client";
 import {
   majorScale,
   Pane,
@@ -25,11 +25,11 @@ import {
   TabNavigation,
   Tab,
   useTheme,
-} from 'evergreen-ui';
-import Link from 'next/link';
-import { useRouter, usePathname } from 'next/navigation';
+} from "evergreen-ui";
+import Link from "next/link";
+import { useRouter, usePathname } from "next/navigation";
 
-import ProfileCard from '@/lib/hoagie-ui/ProfileCard';
+import ProfileCard from "@/lib/hoagie-ui/ProfileCard";
 
 export type Nav = {
   // The name of the app for generating the `hoagie{name}` title.
@@ -59,13 +59,13 @@ export type Nav = {
  * Nav is a navbar meant for internal navigations throughout
  * different Hoagie applications.
  */
-function Nav({ 
-  name, 
-  LogoComponent, 
-  HeaderComponent, 
-  tabs = [], 
-  user, 
-  beta = false, 
+function Nav({
+  name,
+  LogoComponent,
+  HeaderComponent,
+  tabs = [],
+  user,
+  beta = false,
   showSettingsButton = false,
   onSettingsClick,
 }: Nav) {
@@ -79,49 +79,53 @@ function Nav({
       {HeaderComponent ? (
         <HeaderComponent />
       ) : (
-        <Pane width='100%' height={20} background={theme.colors.blue500} />
+        <Pane width="100%" height={20} background={theme.colors.blue500} />
       )}
       <Pane
-        display='flex'
-        justifyContent='center'
-        width='100%'
+        display="flex"
+        justifyContent="center"
+        width="100%"
         height={majorScale(9)}
-        background='white'
+        background="white"
       >
         <Pane
-          display='flex'
-          alignItems='center'
-          justifyContent='space-between'
-          width='100%'
-          height='100%'
+          display="flex"
+          alignItems="center"
+          justifyContent="space-between"
+          width="100%"
+          height="100%"
           maxWidth={1200}
           paddingX={majorScale(5)}
           fontSize={25}
         >
-          <Link href='/'>
-            <Pane cursor='pointer' position='relative'>
+          <Link href="/">
+            <Pane cursor="pointer" position="relative">
               {LogoComponent ? (
                 <LogoComponent />
               ) : (
                 <Pane>
                   <Text
-                    is='h2'
-                    display='inline-block'
-                    className='hoagie logo'
+                    is="h2"
+                    display="inline-block"
+                    className="hoagie logo"
                     color={theme.colors.gray900}
                   >
                     hoagie
                   </Text>
                   <Text
-                    is='h2'
-                    display='inline-block'
-                    className='hoagie logo'
+                    is="h2"
+                    display="inline-block"
+                    className="hoagie logo"
                     color={theme.colors.blue500}
                   >
                     {name}
                   </Text>
                   {beta && (
-                    <Text className='hoagie beta' position='absolute' color={theme.colors.gray900}>
+                    <Text
+                      className="hoagie beta"
+                      position="absolute"
+                      color={theme.colors.gray900}
+                    >
                       (BETA)
                     </Text>
                   )}
@@ -129,14 +133,14 @@ function Nav({
               )}
             </Pane>
           </Link>
-          <Pane display='flex' alignItems='center'>
+          <Pane display="flex" alignItems="center">
             <TabNavigation>
               {tabs.map((tab) => (
                 <Tab
                   key={tab.title}
                   id={tab.title}
                   isSelected={pathname === tab.href}
-                  appearance='primary'
+                  appearance="primary"
                   onSelect={() => router.push(tab.href)}
                 >
                   {tab.title}
@@ -144,17 +148,20 @@ function Nav({
               ))}
             </TabNavigation>
             {user && (
-              <Popover 
-              content={
-              <ProfileCard 
-              user={user} 
-              showSettingsButton={showSettingsButton}
-              onSettingsClick={onSettingsClick}/>} 
-              position={Position.BOTTOM}>
+              <Popover
+                content={
+                  <ProfileCard
+                    user={user}
+                    showSettingsButton={showSettingsButton}
+                    onSettingsClick={onSettingsClick}
+                  />
+                }
+                position={Position.BOTTOM}
+              >
                 <Avatar
                   name={username}
                   style={{
-                    cursor: 'pointer',
+                    cursor: "pointer",
                     border: `2px solid ${theme.colors.blueTint}`,
                   }}
                   backgroundColor={theme.colors.blue100}

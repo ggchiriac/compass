@@ -1,9 +1,9 @@
-import { FC, CSSProperties } from 'react';
+import { FC, CSSProperties } from "react";
 
-import { CalendarEvent } from '@/types';
+import { CalendarEvent } from "@/types";
 
-import './Calendar.css';
-import { departmentColors } from '@/utils/departmentColors';
+import "./Calendar.css";
+import { departmentColors } from "@/utils/departmentColors";
 
 interface CalendarCardProps {
   event: CalendarEvent;
@@ -26,7 +26,9 @@ const CalendarCard: FC<CalendarCardProps> = ({
   dept,
 }) => {
   const getGradientStyle = (dept: string) => {
-    return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
+    return (
+      departmentColors[dept] || "linear-gradient(135deg, #3498db, #2980b9)"
+    ); // Default color
   };
 
   return (
@@ -38,7 +40,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
         gridColumn: `${event.startColumnIndex + 1} / span 1`,
         width: `calc(100% * ${width})`,
         marginLeft: `calc(100% * ${offsetLeft})`,
-        overflow: 'hidden',
+        overflow: "hidden",
       }}
       onClick={onSectionClick}
     >
@@ -56,11 +58,13 @@ const CalendarCard: FC<CalendarCardProps> = ({
           </div>
         ))}
       </div> */}
-      <div className='event-department'>
+      <div className="event-department">
         {event.course.department_code} {event.course.catalog_number}
       </div>
       {/* TODO: Add start time, end time, building name, room number*/}
-      <div className='text-xs event-department'>{event.section.class_section}</div>
+      <div className="text-xs event-department">
+        {event.section.class_section}
+      </div>
       {/* Button */}
     </div>
   );

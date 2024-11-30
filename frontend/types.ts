@@ -1,5 +1,5 @@
 // TODO: Check all of these with Cmd + Shift + F and delete any unused ones
-import { CSSProperties, ReactNode } from 'react';
+import { CSSProperties, ReactNode } from "react";
 
 export type AuthState = {
   user?: Profile;
@@ -102,7 +102,11 @@ export type DroppableProps = {
 export type DndState = {
   semesters: Semester[];
   addCourseToSemester: (course: Course, semesterId: string) => void;
-  moveCourseWithinSemester: (courseID: string, oldIndex: number, newIndex: number) => void;
+  moveCourseWithinSemester: (
+    courseID: string,
+    oldIndex: number,
+    newIndex: number,
+  ) => void;
 };
 
 export type SearchResults = {

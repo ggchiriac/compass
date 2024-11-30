@@ -1,6 +1,6 @@
 /**
  * @overview Theme component for the Hoagie Plan app.
- * 
+ *
  * Copyright © 2021-2024 Hoagie Club and affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -10,11 +10,11 @@
  * and/or sell copies of the software. This software is provided "as-is", without warranty of any kind.
  */
 
-'use client';
+"use client";
 
-import { ThemeProvider } from 'evergreen-ui';
-import { ReactNode } from 'react';
-import { hoagiePurple, hoagieOrange, hoagieUI } from './themes';
+import { ThemeProvider } from "evergreen-ui";
+import { ReactNode } from "react";
+import { hoagiePurple, hoagieOrange, hoagieUI } from "./themes";
 
 type ThemeProps = {
   // Options: "purple", "blue", "orange")
@@ -26,15 +26,15 @@ type ThemeProps = {
 
 /**
  * Returns a Hoagie theme based on the provided palette.
- * 
+ *
  * @returns {ThemeProvider} A Hoagie-paletted theme provider component.
  */
-function Theme({ palette = 'purple', children }: ThemeProps) {
+function Theme({ palette = "purple", children }: ThemeProps) {
   const colorTheme = (() => {
     switch (palette) {
-      case 'purple':
+      case "purple":
         return hoagiePurple;
-      case 'orange':
+      case "orange":
         return hoagieOrange;
       default:
         return hoagieUI;

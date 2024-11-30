@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useEffect, useState, FC } from 'react';
+import { useEffect, useState, FC } from "react";
 
-import { useUser } from '@auth0/nextjs-auth0/client';
-import SkeletonApp from '@/components/SkeletonApp';
-import { useModalStore } from '@/store/modalSlice';
-import { Canvas } from '@/app/dashboard/Canvas';
-import { mapUserProfileToProfile } from '@/utils/profileMapper';
-import { Profile } from '@/types'
+import { useUser } from "@auth0/nextjs-auth0/client";
+import SkeletonApp from "@/components/SkeletonApp";
+import { useModalStore } from "@/store/modalSlice";
+import { Canvas } from "@/app/dashboard/Canvas";
+import { mapUserProfileToProfile } from "@/utils/profileMapper";
+import { Profile } from "@/types";
 
 const Dashboard: FC = () => {
   const { user, isLoading } = useUser();
   const [profile, setProfile] = useState<Profile | null>(null);
-  
+
   useEffect(() => {
-    useModalStore.setState({ currentPage: 'dashboard' });
+    useModalStore.setState({ currentPage: "dashboard" });
   });
 
   useEffect(() => {
@@ -30,15 +30,15 @@ const Dashboard: FC = () => {
 
   return (
     <>
-        <main className='flex flex-grow z-10 rounded pt-0.5vh pb-0.5vh pl-0.5vw pr-0.5vw'>
-          {!isLoading && profile && profile.email !== '' ? (
-            <Canvas user={profile} columns={2} />
-          ) : (
-            <div>
-              <SkeletonApp />
-            </div> // FIXME: We can replace this with a proper loading component or message
-          )}
-        </main>
+      <main className="flex flex-grow z-10 rounded pt-0.5vh pb-0.5vh pl-0.5vw pr-0.5vw">
+        {!isLoading && profile && profile.email !== "" ? (
+          <Canvas user={profile} columns={2} />
+        ) : (
+          <div>
+            <SkeletonApp />
+          </div> // FIXME: We can replace this with a proper loading component or message
+        )}
+      </main>
     </>
   );
 };

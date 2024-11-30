@@ -1,22 +1,29 @@
-'use client';
+"use client";
 
-import { useEffect, useState, FC, useMemo } from 'react';
+import { useEffect, useState, FC, useMemo } from "react";
 
-import { Pane, Tablist, Tab, IconButton, ChevronLeftIcon, ChevronRightIcon } from 'evergreen-ui';
+import {
+  Pane,
+  Tablist,
+  Tab,
+  IconButton,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+} from "evergreen-ui";
 
-import BackgroundGradient from '@/components/BackgroundGradient';
-import Footer from '@/components/Footer';
-import Navbar from '@/components/Navbar';
-import SkeletonApp from '@/components/SkeletonApp';
-import tabStyles from '@/components/TabbedMenu/TabbedMenu.module.css';
-import useAuthStore from '@/store/authSlice';
-import useFilterStore from '@/store/filterSlice';
-import UserState from '@/store/userSlice';
+import BackgroundGradient from "@/components/BackgroundGradient";
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import SkeletonApp from "@/components/SkeletonApp";
+import tabStyles from "@/components/TabbedMenu/TabbedMenu.module.css";
+import useAuthStore from "@/store/authSlice";
+import useFilterStore from "@/store/filterSlice";
+import UserState from "@/store/userSlice";
 
-import './Calendar.css';
-import Calendar from './Calendar';
-import CalendarSearch from './CalendarSearch';
-import SelectedCourses from './SelectedCourses';
+import "./Calendar.css";
+import Calendar from "./Calendar";
+import CalendarSearch from "./CalendarSearch";
+import SelectedCourses from "./SelectedCourses";
 
 const CalendarUI: FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -53,14 +60,14 @@ const CalendarUI: FC = () => {
   return (
     <>
       <Navbar />
-      <div className='flex flex-col min-h-screen pt-24'>
+      <div className="flex flex-col min-h-screen pt-24">
         <BackgroundGradient />
-        <div className='flex flex-col bg-[#FAFAFA] shadow-xl z-10 rounded overflow-hidden'>
-          <div className='flex justify-center p-4'>
-            <Pane display='flex' justifyContent='center' alignItems='center'>
+        <div className="flex flex-col bg-[#FAFAFA] shadow-xl z-10 rounded overflow-hidden">
+          <div className="flex justify-center p-4">
+            <Pane display="flex" justifyContent="center" alignItems="center">
               <IconButton
                 icon={ChevronLeftIcon}
-                appearance='minimal'
+                appearance="minimal"
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage === 1}
                 marginRight={8}
@@ -83,34 +90,35 @@ const CalendarUI: FC = () => {
 
               <IconButton
                 icon={ChevronRightIcon}
-                appearance='minimal'
+                appearance="minimal"
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
                 marginLeft={8}
-                size='medium'
+                size="medium"
               />
             </Pane>
           </div>
 
-          <main className='flex flex-grow'>
-            <div className='flex w-full h-full'>
+          <main className="flex flex-grow">
+            <div className="flex w-full h-full">
               <div>
                 <CalendarSearch />
                 <SelectedCourses />
               </div>
 
-              <div className='flex-grow p-4'>
-                {!isLoading && userProfile && userProfile.netId !== '' ? (
+              <div className="flex-grow p-4">
+                {!isLoading && userProfile && userProfile.netId !== "" ? (
                   <Calendar />
                 ) : (
                   <SkeletonApp />
                 )}
               </div>
             </div>
-            <div className={tabStyles.tabContainer} style={{ width: '20%' }}>
+            <div className={tabStyles.tabContainer} style={{ width: "20%" }}>
               <div className={tabStyles.tabContent}>
-                <div className='text-sm font-medium text-gray-500'>
-                  <strong>More calendar features</strong> will be available soon. Stay tuned!
+                <div className="text-sm font-medium text-gray-500">
+                  <strong>More calendar features</strong> will be available
+                  soon. Stay tuned!
                 </div>
               </div>
             </div>

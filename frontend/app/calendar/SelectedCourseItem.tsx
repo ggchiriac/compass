@@ -1,18 +1,18 @@
 // SelectedCourseItem.tsx
-import { FC, CSSProperties } from 'react';
+import { FC, CSSProperties } from "react";
 
-import { CalendarEvent } from '@/types';
+import { CalendarEvent } from "@/types";
 
-import styles from '@/components/Item/Item.module.css';
-import useCalendarStore from '@/store/calendarSlice';
-import { departmentColors } from '@/utils/departmentColors';
+import styles from "@/components/Item/Item.module.css";
+import useCalendarStore from "@/store/calendarSlice";
+import { departmentColors } from "@/utils/departmentColors";
 
 interface SelectedCourseItemProps {
   event: CalendarEvent;
 }
 
 const getGradientStyle = (dept: string) => {
-  return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)';
+  return departmentColors[dept] || "linear-gradient(135deg, #3498db, #2980b9)";
 };
 
 const SelectedCourseItem: FC<SelectedCourseItemProps> = ({ event }) => {
@@ -23,10 +23,12 @@ const SelectedCourseItem: FC<SelectedCourseItemProps> = ({ event }) => {
   };
 
   const relevantMeeting = event.section.class_meetings.find((meeting) =>
-    meeting.days.includes(event.section.class_type)
+    meeting.days.includes(event.section.class_type),
   );
 
-  const buildingName = relevantMeeting ? relevantMeeting.building_name : 'Unknown Building';
+  const buildingName = relevantMeeting
+    ? relevantMeeting.building_name
+    : "Unknown Building";
 
   return (
     <div className={styles.Wrapper}>
@@ -34,8 +36,8 @@ const SelectedCourseItem: FC<SelectedCourseItemProps> = ({ event }) => {
         className={`${styles.Item} ${styles.color} ${styles.ItemClickable}`}
         style={
           {
-            '--color_primary': event.color,
-            '--color_secondary': event.textColor,
+            "--color_primary": event.color,
+            "--color_secondary": event.textColor,
             background: getGradientStyle(event.course.department_code),
           } as CSSProperties
         }

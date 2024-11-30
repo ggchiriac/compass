@@ -1,10 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode } from "react";
 
-import { useDroppable, UniqueIdentifier } from '@dnd-kit/core';
-import classNames from 'classnames';
+import { useDroppable, UniqueIdentifier } from "@dnd-kit/core";
+import classNames from "classnames";
 
-import { droppable } from './droppable-svg';
-import styles from './Droppable.module.css';
+import { droppable } from "./droppable-svg";
+import styles from "./Droppable.module.css";
 
 export type DroppableProps = {
   children: ReactNode;
@@ -24,9 +24,9 @@ export function Droppable({ children, id, dragging }: DroppableProps) {
         styles.Droppable,
         isOver && styles.over,
         dragging && styles.dragging,
-        children && styles.dropped
+        children && styles.dropped,
       )}
-      aria-label='Droppable region'
+      aria-label="Droppable region"
     >
       {children}
       {droppable}

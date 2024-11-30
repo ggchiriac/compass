@@ -1,6 +1,6 @@
 /**
  * @overview Tab component for the Hoagie Plan app.
- * 
+ *
  * Copyright © 2021-2024 Hoagie Club and affiliates.
  *
  * This source code is licensed under the MIT license found in the
@@ -10,7 +10,7 @@
  * and/or sell copies of the software. This software is provided "as-is", without warranty of any kind.
  */
 
-import { defaultTheme } from 'evergreen-ui';
+import { defaultTheme } from "evergreen-ui";
 
 const Tab = {
   ...defaultTheme.components.Tab,
@@ -18,7 +18,7 @@ const Tab = {
     ...defaultTheme.components.Tab.appearances,
     navbar: {
       ...defaultTheme.components.Tab.appearances.primary,
-      fontSize: '14px',
+      fontSize: "14px",
     },
   },
 };

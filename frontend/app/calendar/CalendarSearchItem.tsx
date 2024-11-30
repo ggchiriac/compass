@@ -1,8 +1,8 @@
 // CalendarSearchItem.jsx
-import useCalendarStore from '@/store/calendarSlice';
-import { termsInverse } from '@/utils/terms';
+import useCalendarStore from "@/store/calendarSlice";
+import { termsInverse } from "@/utils/terms";
 
-import styles from './CalendarSearchItem.module.css';
+import styles from "./CalendarSearchItem.module.css";
 
 const CalendarSearchItem = ({ course }) => {
   const addCourse = useCalendarStore((state) => state.addCourse);
