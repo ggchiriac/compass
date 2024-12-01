@@ -41,7 +41,7 @@ export type ProfileProps = {
   onSave: (updatedProfile: Profile) => void;
 };
 
-export type SettingsModalProps = {
+export type ModalProps = {
   children?: ReactNode;
   setShowPopup?: (show: boolean) => void; // TODO: Should this be optional or required?
   setTermFilter?: (term: string) => void;

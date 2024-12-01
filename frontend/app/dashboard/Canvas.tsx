@@ -86,7 +86,7 @@ const requirementsWidth = "26vw";
 const courseWidth = "10.5vw";
 const extendedCourseWidth = "22.0vw";
 
-const staticRectSortingStrategy = (_ref: any) => {
+const staticRectSortingStrategy = () => {
   return {
     x: 0,
     y: 0,

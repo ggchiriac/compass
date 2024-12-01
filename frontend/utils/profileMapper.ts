@@ -17,10 +17,7 @@ async function fetchCustomUser(
   email: string,
 ): Promise<Profile | null> {
   try {
-    // Add body to this request and make it a POST request
-    // In body, put first name, last name, netId, email
     const csrfToken = await fetchCsrfToken();
-    console.log("CSRF Token:", csrfToken);
 
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND}/profile/create_from_auth0/`,

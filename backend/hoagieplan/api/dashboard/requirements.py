@@ -469,7 +469,7 @@ def add_course_lists_to_req(req, courses):
 
 @cumulative_time
 def format_req_output(req, courses, manually_satisfied_reqs):
-    """Enforce the type and order of fields in the req output"""
+    """Enforce the type and order of fields in the req output."""
     output = collections.OrderedDict()
     if req["table"] != "Requirement" and req["code"]:
         output["code"] = req["code"]

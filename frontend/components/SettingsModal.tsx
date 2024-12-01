@@ -1,22 +1,30 @@
-import { FC } from "react";
+import { useState } from "react";
+import SettingsModal from "./Modal";
+import UserSettings from "./UserSettings";
+import useUserSlice from "../store/userSlice";
 
-import { createPortal } from "react-dom";
+/**
+ * Opens the settings modal and manages its state.
+ *
+ * @returns An object containing a function to open the modal and the modal itself.
+ */
+export function useSettingsModal() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userProfile] = useUserSlice((state) => [state.profile]);
 
-import { SettingsModalProps } from "@/types";
+  const openSettingsModal = () => setIsModalOpen(true);
 
-const SettingsModal: FC<SettingsModalProps> = ({ children }) => {
-  return createPortal(
-    <>
-      {/* TODO: Would be nice but likely not before deadline: Need an equivalent fade out animation when 'Close' is pressed */}
-      <div className="modal-backdrop fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 z-50"></div>
-      <div className="modal-entrance fixed inset-0 flex justify-center items-center z-50">
-        <div className="p-5 rounded-lg max-w-md w-1/2 shadow-xl">
-          {children}
-        </div>
-      </div>
-    </>,
-    document.body,
-  );
-};
+  const settingsModal = isModalOpen ? (
+    <SettingsModal>
+      <UserSettings
+        profile={userProfile}
+        onClose={() => setIsModalOpen(false)}
+        onSave={() => {
+          window.location.reload(); // Refresh page on save
+        }}
+      />
+    </SettingsModal>
+  ) : null;
 
-export default SettingsModal;
+  return { openSettingsModal, settingsModal };
+}

@@ -14,18 +14,16 @@ import "./globals.css";
 
 import { ReactNode } from "react";
 import type { Metadata } from "next";
-
-import { getSession } from "@auth0/nextjs-auth0";
-import { cookies } from "next/headers";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 
-import Layout from "@/lib/hoagie-ui/Layout";
-import Theme from "@/lib/hoagie-ui/Theme";
+import { getSession } from "@auth0/nextjs-auth0";
+import { UserProvider } from "@auth0/nextjs-auth0/client";
+import { cookies } from "next/headers";
+import { Inter } from "next/font/google";
+
+import Content from "@/app/content";
 import "@/lib/hoagie-ui/Theme/theme.css";
-import Nav from "@/lib/hoagie-ui/Nav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -47,39 +45,7 @@ async function fetchSession() {
 }
 
 /**
- * Content Component
- * Fetches user data (real or mock) and renders the main layout.
- *
- * @param children - The child components to render within the layout.
- * @returns JSX Element representing the content area.
- */
-async function Content({
-  children,
-}: {
-  children: ReactNode;
-}): Promise<JSX.Element> {
-  const session = await fetchSession();
-  const user = session?.user;
-
-  const tabs = [
-    { title: "About", href: "/about" },
-    { title: "Dashboard", href: "/dashboard" },
-    { title: "Calendar", href: "/calendar" },
-    { title: "Contact Us", href: "/contact" },
-  ];
-
-  return (
-    <Theme palette="purple">
-      <Layout>
-        <Nav name="plan" tabs={tabs} user={user} />
-        {children}
-      </Layout>
-    </Theme>
-  );
-}
-
-/**
- * RootLayout Component
+ * RootLayout server side
  * Wraps the entire application with necessary providers and layouts.
  *
  * @param children - The child components to render within the layout.
@@ -87,19 +53,20 @@ async function Content({
  */
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: ReactNode;
-}>) {
+}) {
   const session = await fetchSession();
+
   return (
     <html lang="en">
-      <UserProvider user={session?.user}>
-        <body className={`${inter.className} antialiased`}>
-          <Content>{children}</Content>
-          <Analytics />
-          <SpeedInsights />
-        </body>
-      </UserProvider>
+      <body className={`${inter.className} antialiased`}>
+        <UserProvider user={session?.user}>
+          <Content user={session?.user}>{children}</Content>
+        </UserProvider>
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

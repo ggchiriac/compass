@@ -15,6 +15,8 @@ import { MajorMinorType, ProfileProps } from "@/types";
 
 import useUserSlice from "@/store/userSlice";
 
+import { fetchCsrfToken } from "@/utils/csrf";
+
 function generateClassYears() {
   const currentYear = new Date().getFullYear();
   const classYears = [
@@ -184,8 +186,20 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   // const [timeFormat24h, setTimeFormat24h] = useState<boolean>(profile.timeFormat24h);
   // const [themeDarkMode, setThemeDarkMode] = useState<boolean>(profile.themeDarkMode);
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false);
+  let csrfToken: string;
+
+  if (typeof window === "undefined") {
+    // Server-side or during pre-rendering/build time
+    csrfToken = "";
+  } else {
+    // Client-side
+    (async () => {
+      csrfToken = await fetchCsrfToken();
+    })();
+  }
 
   const handleMinorsChange = (_, newMinors: MajorMinorType[]) => {
+    console.log("CSRF:", csrfToken);
     const uniqueMinors = Array.from(
       new Set(newMinors.map((minor) => minor.code)),
     ).map((code) => newMinors.find((minor) => minor.code === code));
@@ -225,12 +239,13 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
       classYear: classYear,
     };
 
-    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/profile/update`, {
+    fetch(`${process.env.NEXT_PUBLIC_BACKEND}/profile/update/`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
         "X-NetId": profile.netId,
+        "X-CSRFToken": csrfToken,
       },
       body: JSON.stringify(profile),
     }).then((response) => {
@@ -248,6 +263,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
     minors,
     certificates,
     classYear,
+    csrfToken,
     onSave,
   ]);
 

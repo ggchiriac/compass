@@ -42,7 +42,7 @@ export type Nav = {
   HeaderComponent?: ComponentType;
 
   // A list of tab objects for the navbar, each with `title` and `href` fields.
-  tabs?: Array<any>;
+  tabs?: Array<{ title: string; href: string }>;
 
   // Authenticated user data.
   user?: UserProfile;

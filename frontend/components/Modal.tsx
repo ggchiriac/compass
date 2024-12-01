@@ -2,9 +2,9 @@ import { FC } from "react";
 
 import { createPortal } from "react-dom";
 
-import { SettingsModalProps } from "@/types";
+import { ModalProps } from "@/types";
 
-const Modal: FC<SettingsModalProps> = ({ children }) => {
+const Modal: FC<ModalProps> = ({ children }) => {
   return createPortal(
     <>
       <div className="modal-backdrop fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 z-50"></div>
@@ -18,7 +18,7 @@ const Modal: FC<SettingsModalProps> = ({ children }) => {
   );
 };
 
-export const FilterModal: FC<SettingsModalProps> = ({ children }) => {
+export const FilterModal: FC<ModalProps> = ({ children }) => {
   return createPortal(
     <>
       <div className="modal-backdrop fixed inset-0 backdrop-blur-sm bg-black bg-opacity-30 z-50"></div>
@@ -32,7 +32,7 @@ export const FilterModal: FC<SettingsModalProps> = ({ children }) => {
   );
 };
 
-export const TutorialModal: FC<SettingsModalProps> = ({ children }) => {
+export const TutorialModal: FC<ModalProps> = ({ children }) => {
   return createPortal(
     <>
       {/* TODO: Need an equivalent fade out animation when 'Close' is pressed */}
