@@ -185,7 +185,7 @@ const dropAnimation: DropAnimation = {
 type Items = Record<UniqueIdentifier, UniqueIdentifier[]>;
 
 type Props = {
-  user: Profile;
+  profile: Profile;
   adjustScale?: boolean;
   columns?: number;
 
@@ -221,7 +221,7 @@ export const SEARCH_RESULTS_ID = "Search Results";
 const defaultClassYear = new Date().getFullYear() + 1;
 
 export function Canvas({
-  user,
+  profile,
   adjustScale = false,
   columns = 2,
   handle = true,
@@ -248,7 +248,7 @@ export function Canvas({
     width: semesterWidth,
   };
 
-  const classYear = user.classYear ?? defaultClassYear;
+  const classYear = profile.classYear ?? defaultClassYear;
 
   const generateSemesters = (classYear: number): Items => {
     const semesters: Items = {};
@@ -298,7 +298,6 @@ export function Canvas({
   const [academicPlan, setAcademicPlan] =
     useState<Dictionary>(initialRequirements);
 
-  // Assuming 'user' is of type User
   // TODO: Make this dynamic later
   const userMajorCode = "COS-BSE";
   const userMinors = [];
@@ -336,7 +335,7 @@ export function Canvas({
           method: "GET",
           credentials: "include",
           headers: {
-            "X-NetId": user.netId,
+            "X-NetId": profile.netId,
           },
         },
       );
@@ -354,7 +353,7 @@ export function Canvas({
       method: "GET",
       credentials: "include",
       headers: {
-        "X-NetId": user.netId,
+        "X-NetId": profile.netId,
       },
     })
       .then((response) => response.json())
@@ -594,7 +593,7 @@ export function Canvas({
                 credentials: "include",
                 headers: {
                   "Content-Type": "application/json",
-                  "X-NetId": user.netId,
+                  "X-NetId": profile.netId,
                   "X-CSRFToken": csrfToken,
                 },
                 body: JSON.stringify({
@@ -748,7 +747,7 @@ export function Canvas({
             >
               <TabbedMenu
                 tabsData={academicPlan}
-                user={user}
+                user={profile}
                 csrfToken={csrfToken}
                 updateRequirements={updateRequirements}
               />
@@ -847,7 +846,7 @@ export function Canvas({
       headers: {
         "Content-Type": "application/json",
         "X-CSRFToken": csrfToken,
-        "X-NetId": user.netId,
+        "X-NetId": profile.netId,
       },
       body: JSON.stringify({
         crosslistings: value.toString().split("|")[1],

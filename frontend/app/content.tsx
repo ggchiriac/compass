@@ -7,6 +7,7 @@ import Layout from "@/lib/hoagie-ui/Layout";
 import Theme from "@/lib/hoagie-ui/Theme";
 import Nav from "@/lib/hoagie-ui/Nav";
 import { UserProfile } from "@auth0/nextjs-auth0/client";
+import { useFetchUserProfile } from "@/store/userSlice";
 
 /**
  * Content Component
@@ -22,6 +23,7 @@ export default function Content({
   children: ReactNode;
   user: UserProfile;
 }) {
+  useFetchUserProfile(user);
   const { openSettingsModal, settingsModal } = useSettingsModal();
 
   const tabs = [

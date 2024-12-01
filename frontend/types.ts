@@ -1,5 +1,6 @@
 // TODO: Check all of these with Cmd + Shift + F and delete any unused ones
 import { CSSProperties, ReactNode } from "react";
+import { UserProfile } from "@auth0/nextjs-auth0/client";
 
 export type AuthState = {
   user?: Profile;
@@ -13,6 +14,7 @@ export type AuthState = {
 export type UserState = {
   profile: Profile;
   updateProfile: (updates: Partial<Profile>) => void;
+  fetchAndUpdateProfile: (userProfile: UserProfile | null) => void;
 };
 
 export type MajorMinorType = {

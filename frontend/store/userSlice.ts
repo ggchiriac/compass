@@ -1,28 +1,92 @@
 import { useEffect } from "react";
 import { create } from "zustand";
-import { UserState, Claims, Profile } from "@/types";
+import { UserProfile } from "@auth0/nextjs-auth0/client";
+import { fetchCsrfToken } from "@/utils/csrf";
+import { Profile, MajorMinorType, UserState } from "@/types";
 
-// Function to extract profile information from Auth0 user session
-function getProfileFromUser(user: Claims): Profile {
-  const [firstName, lastName] = user.name.split(" ");
+// Fetch user profile from the backend
+async function fetchCustomUser(
+  netId: string,
+  firstName: string,
+  lastName: string,
+  email: string,
+): Promise<Profile | null> {
+  try {
+    const csrfToken = await fetchCsrfToken();
+
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_BACKEND}/profile/create_from_auth0/`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": csrfToken,
+        },
+        body: JSON.stringify({
+          netId,
+          firstName,
+          lastName,
+          email,
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        console.error("User not authenticated.");
+        return null;
+      }
+      if (response.status === 404) {
+        console.error("User profile not found.");
+        return null;
+      }
+      throw new Error(`Error fetching CustomUser: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return data as Profile;
+  } catch (error) {
+    console.error("Error fetching CustomUser:", error);
+    return null;
+  }
+}
+
+// Utility function: Map Auth0 user profile to app's Profile type
+async function mapUserProfileToProfile(
+  userProfile: UserProfile | null,
+): Promise<Profile> {
+  if (!userProfile) {
+    throw new Error("UserProfile is null or undefined.");
+  }
+
+  const [firstName, lastName] = (userProfile.name || "").split(" ");
+  const netId = userProfile.nickname || "";
+  const email = userProfile.sub?.split("|")[2] || "";
+
+  const defaultMajor: MajorMinorType = {
+    code: "Undeclared",
+    name: "Undeclared",
+  };
+
+  const user = await fetchCustomUser(netId, firstName, lastName, email);
 
   return {
-    firstName,
-    lastName,
-    netId: user.nickname, // Assuming `nickname` is the NetID
-    email: user.sub.split("|").pop() || "", // Extract email from `sub` (after the last pipe symbol)
-    department: "COS", // Placeholder, adjust as needed
-    timeFormat24h: false, // Assuming default 12-hour format
-    themeDarkMode: false, // Assuming default light mode
-    major: undefined,
-    minors: [],
-    certificates: [],
-    classYear: undefined,
-    universityId: "",
+    firstName: user?.firstName || firstName,
+    lastName: user?.lastName || lastName,
+    classYear: user?.classYear || new Date().getFullYear() + 1,
+    major: user?.major || defaultMajor,
+    minors: user?.minors || [],
+    certificates: user?.certificates || [],
+    netId: user?.netId || netId,
+    universityId: user?.universityId || "",
+    email: user?.email || email,
+    department: user?.department || "Undeclared",
+    timeFormat24h: user?.timeFormat24h || false,
+    themeDarkMode: user?.themeDarkMode || false,
   };
 }
 
-// Create Zustand store
 const useUserSlice = create<UserState>((set) => ({
   profile: {
     firstName: "",
@@ -40,18 +104,26 @@ const useUserSlice = create<UserState>((set) => ({
   },
   updateProfile: (updates: Partial<Profile>) =>
     set((state) => ({ profile: { ...state.profile, ...updates } })),
+  fetchAndUpdateProfile: async (userProfile: UserProfile) => {
+    try {
+      const profile = await mapUserProfileToProfile(userProfile);
+      set(() => ({ profile }));
+    } catch (error) {
+      console.error("Failed to fetch and update user profile:", error);
+    }
+  },
 }));
 
-// Custom hook to fetch user profile and update Zustand store
-export const useFetchUserProfile = (user: Claims | null) => {
-  const updateStore = useUserSlice((state) => state.updateProfile);
+export const useFetchUserProfile = (userProfile: UserProfile) => {
+  const fetchAndUpdateProfile = useUserSlice(
+    (state) => state.fetchAndUpdateProfile,
+  );
 
   useEffect(() => {
-    if (user) {
-      const profile = getProfileFromUser(user);
-      updateStore(profile); // Update the store with the user profile
+    if (userProfile) {
+      fetchAndUpdateProfile(userProfile);
     }
-  }, [user, updateStore]);
+  }, [userProfile, fetchAndUpdateProfile]);
 };
 
 export default useUserSlice;

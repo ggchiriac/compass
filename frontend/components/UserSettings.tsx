@@ -170,7 +170,7 @@ const certificateOptions = [
 ];
 
 const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
-  const { updateProfile } = useUserSlice((state) => state);
+  const updateProfile = useUserSlice((state) => state.updateProfile);
   const [firstName, setFirstName] = useState<string>(profile.firstName);
   const [lastName, setLastName] = useState<string>(profile.lastName);
   const [classYear, setClassYear] = useState(

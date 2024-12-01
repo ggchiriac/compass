@@ -10,7 +10,7 @@ import useUserSlice from "../store/userSlice";
  */
 export function useSettingsModal() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userProfile] = useUserSlice((state) => [state.profile]);
+  const userProfile = useUserSlice((state) => state.profile);
 
   const openSettingsModal = () => setIsModalOpen(true);
 
