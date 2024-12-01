@@ -21,6 +21,7 @@ import {
   Heading,
   Spinner,
   CalendarIcon,
+  GridViewIcon,
   ArrowLeftIcon,
   Button,
   useTheme,
@@ -44,9 +45,21 @@ export default function Index() {
             width={majorScale(35)}
             backgroundColor={theme.colors.blue100}
             marginBottom={20}
+            iconBefore={GridViewIcon}
+          >
+            Plan your four-year path
+          </Button>
+        </Link>
+        <br />
+        <Link href="/calendar">
+          <Button
+            height={56}
+            width={majorScale(35)}
+            backgroundColor={theme.colors.blue100}
+            marginBottom={20}
             iconBefore={CalendarIcon}
           >
-            Go to Dashboard
+            Plan your weekly classes
           </Button>
         </Link>
         <br />

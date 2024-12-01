@@ -12,9 +12,6 @@ import UserState from "@/store/userSlice";
 import useAuthStore from "../store/authSlice";
 import useMobileMenuStore from "../store/mobileMenuSlice";
 
-import CalendarTutorial from "./CalendarTutorial/CalendarTutorial";
-import DashboardTutorial from "./DashboardTutorial/DashboardTutorial";
-
 import DropdownMenu from "./DropdownMenu";
 import { Login } from "./Login";
 

@@ -12,8 +12,6 @@ import {
 } from "evergreen-ui";
 
 import BackgroundGradient from "@/components/BackgroundGradient";
-import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
 import SkeletonApp from "@/components/SkeletonApp";
 import tabStyles from "@/components/TabbedMenu/TabbedMenu.module.css";
 import useAuthStore from "@/store/authSlice";
@@ -59,74 +57,66 @@ const CalendarUI: FC = () => {
 
   return (
     <>
-      <Navbar />
-      <div className="flex flex-col min-h-screen pt-24">
-        <BackgroundGradient />
-        <div className="flex flex-col bg-[#FAFAFA] shadow-xl z-10 rounded overflow-hidden">
-          <div className="flex justify-center p-4">
-            <Pane display="flex" justifyContent="center" alignItems="center">
-              <IconButton
-                icon={ChevronLeftIcon}
-                appearance="minimal"
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
+      <div className="flex justify-center p-4">
+        <Pane display="flex" justifyContent="center" alignItems="center">
+          <IconButton
+            icon={ChevronLeftIcon}
+            appearance="minimal"
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            marginRight={8}
+          />
+
+          <Tablist>
+            {displayedSemesters.map((semester) => (
+              <Tab
+                key={semester}
+                isSelected={termFilter === terms[semester]}
+                onSelect={() => setTermFilter(terms[semester])}
                 marginRight={8}
-              />
+                paddingX={12}
+                paddingY={8}
+              >
+                {semester}
+              </Tab>
+            ))}
+          </Tablist>
 
-              <Tablist>
-                {displayedSemesters.map((semester) => (
-                  <Tab
-                    key={semester}
-                    isSelected={termFilter === terms[semester]}
-                    onSelect={() => setTermFilter(terms[semester])}
-                    marginRight={8}
-                    paddingX={12}
-                    paddingY={8}
-                  >
-                    {semester}
-                  </Tab>
-                ))}
-              </Tablist>
-
-              <IconButton
-                icon={ChevronRightIcon}
-                appearance="minimal"
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                marginLeft={8}
-                size="medium"
-              />
-            </Pane>
-          </div>
-
-          <main className="flex flex-grow">
-            <div className="flex w-full h-full">
-              <div>
-                <CalendarSearch />
-                <SelectedCourses />
-              </div>
-
-              <div className="flex-grow p-4">
-                {!isLoading && userProfile && userProfile.netId !== "" ? (
-                  <Calendar />
-                ) : (
-                  <SkeletonApp />
-                )}
-              </div>
-            </div>
-            <div className={tabStyles.tabContainer} style={{ width: "20%" }}>
-              <div className={tabStyles.tabContent}>
-                <div className="text-sm font-medium text-gray-500">
-                  <strong>More calendar features</strong> will be available
-                  soon. Stay tuned!
-                </div>
-              </div>
-            </div>
-          </main>
-        </div>
+          <IconButton
+            icon={ChevronRightIcon}
+            appearance="minimal"
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            marginLeft={8}
+            size="medium"
+          />
+        </Pane>
       </div>
 
-      <Footer />
+      <main className="flex flex-grow">
+        <div className="flex w-full h-full">
+          <div>
+            <CalendarSearch />
+            <SelectedCourses />
+          </div>
+
+          <div className="flex-grow p-4">
+            {!isLoading && userProfile && userProfile.netId !== "" ? (
+              <Calendar />
+            ) : (
+              <SkeletonApp />
+            )}
+          </div>
+        </div>
+        <div className={tabStyles.tabContainer} style={{ width: "20%" }}>
+          <div className={tabStyles.tabContent}>
+            <div className="text-sm font-medium text-gray-500">
+              <strong>More calendar features</strong> will be available soon.
+              Stay tuned!
+            </div>
+          </div>
+        </div>
+      </main>
     </>
   );
 };

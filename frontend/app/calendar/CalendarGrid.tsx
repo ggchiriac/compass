@@ -40,7 +40,6 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
       >
         {/* Filled-in top left cell */}
         <div
-          className="bg-gray-100"
           style={{
             gridColumn: 1,
             gridRow: 1,
