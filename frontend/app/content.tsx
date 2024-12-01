@@ -34,7 +34,7 @@ export default function Content({
   ];
 
   return (
-    <Theme palette="purple">
+    <Theme palette="yellow">
       <Layout>
         <Nav
           name="plan"

@@ -79,7 +79,7 @@ function Nav({
       {HeaderComponent ? (
         <HeaderComponent />
       ) : (
-        <Pane width="100%" height={20} background={theme.colors.blue500} />
+        <Pane width="100%" height={20} background={theme.colors.yellow400} />
       )}
       <Pane
         display="flex"
@@ -116,7 +116,7 @@ function Nav({
                     is="h2"
                     display="inline-block"
                     className="hoagie logo"
-                    color={theme.colors.blue500}
+                    color={theme.colors.yellow400}
                   >
                     {name}
                   </Text>
@@ -140,7 +140,7 @@ function Nav({
                   key={tab.title}
                   id={tab.title}
                   isSelected={pathname === tab.href}
-                  appearance="primary"
+                  appearance="navbar"
                   onSelect={() => router.push(tab.href)}
                 >
                   {tab.title}
@@ -160,11 +160,8 @@ function Nav({
               >
                 <Avatar
                   name={username}
-                  style={{
-                    cursor: "pointer",
-                    border: `2px solid ${theme.colors.blueTint}`,
-                  }}
-                  backgroundColor={theme.colors.blue100}
+                  style={{ cursor: "pointer" }}
+                  backgroundColor={theme.colors.yellow100}
                   size={40}
                   marginLeft={majorScale(4)}
                 />

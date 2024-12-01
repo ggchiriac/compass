@@ -1,5 +1,4 @@
-"""
-WSGI config for hoagieplan.
+"""WSGI config for hoagieplan.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 

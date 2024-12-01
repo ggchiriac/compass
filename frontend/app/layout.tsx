@@ -35,6 +35,8 @@ export const metadata: Metadata = {
 
 async function fetchSession() {
   const cookieStore = cookies();
+
+  // TODO: I think this is handled in middleware.ts and should be removed -windsor
   const sessionCookie = cookieStore.get("appSession");
   if (!sessionCookie) {
     return null;

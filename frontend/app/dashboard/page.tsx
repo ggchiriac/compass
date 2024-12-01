@@ -12,7 +12,7 @@ const Dashboard: FC = () => {
 
   useEffect(() => {
     useModalStore.setState({ currentPage: "dashboard" });
-  });
+  }, []);
 
   return (
     <>

@@ -17,30 +17,32 @@ from hoagieplan.serializers import (
 )
 
 class FetchCalendarClasses(APIView):
-    """
-    A function to retrieve unique class meetings based on the provided term and course ID.
+    """A function to retrieve unique class meetings based on the provided term and course ID.
 
-    Parameters:
+    Parameters
+    ----------
         request: The request object.
         term: The term to search for.
         course_id: The course ID to search for.
 
-    Returns:
+    Returns
+    -------
         Response: A response object with the unique class meetings serialized.
+
     """
 
     def get(self, request, term, course_id):
         sections = self.get_unique_class_meetings(term, course_id)
-        print('term', term)
+        print("term", term)
         if not sections:
-            return Response({'error': 'No sections found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"error": "No sections found"}, status=status.HTTP_404_NOT_FOUND)
 
         sections_data = [self.serialize_section(section) for section in sections]
 
         # Group sections by instructor
         sections_by_instructor = {}
         for section_data in sections_data:
-            instructor_name = section_data['instructor']['name']
+            instructor_name = section_data["instructor"]["name"]
             if instructor_name not in sections_by_instructor:
                 sections_by_instructor[instructor_name] = []
             sections_by_instructor[instructor_name].append(section_data)
@@ -56,7 +58,7 @@ class FetchCalendarClasses(APIView):
             print(f"Course ID: {section_data['course']['course_id']}")
             print(f"Course Title: {section_data['course']['title']}")
             print(f"Instructor: {section_data['instructor']['name']}")
-            for meeting in section_data['class_meetings']:
+            for meeting in section_data["class_meetings"]:
                 print(f"  Meeting ID: {meeting['id']}")
                 print(f"  Days: {meeting['days']}")
                 print(f"  Start Time: {meeting['start_time']}")
@@ -70,50 +72,50 @@ class FetchCalendarClasses(APIView):
         print(term)
         sections = Section.objects.filter(term__term_code=term, course__course_id=course_id)
 
-        unique_sections = sections.select_related('course', 'instructor').prefetch_related(
+        unique_sections = sections.select_related("course", "instructor").prefetch_related(
             Prefetch(
-                'classmeeting_set',
-                queryset=ClassMeeting.objects.order_by('id'),
-                to_attr='unique_class_meetings',
+                "classmeeting_set",
+                queryset=ClassMeeting.objects.order_by("id"),
+                to_attr="unique_class_meetings",
             )
         )
         return unique_sections
 
     def serialize_section(self, section):
         class_meetings_data = [
-            self.serialize_class_meeting(meeting) for meeting in getattr(section, 'unique_class_meetings', [])
+            self.serialize_class_meeting(meeting) for meeting in getattr(section, "unique_class_meetings", [])
         ]
 
         section_data = {
-            'id': section.id,
-            'class_section': section.class_section,
-            'class_type': section.class_type,
-            'course': {
-                'course_id': section.course.course_id,
-                'title': section.course.title,
+            "id": section.id,
+            "class_section": section.class_section,
+            "class_type": section.class_type,
+            "course": {
+                "course_id": section.course.course_id,
+                "title": section.course.title,
             },
-            'instructor': {
-                'name': str(section.instructor),
+            "instructor": {
+                "name": str(section.instructor),
             },
-            'class_meetings': class_meetings_data,
+            "class_meetings": class_meetings_data,
         }
         return section_data
 
     def serialize_class_meeting(self, meeting):
         class_meeting_data = {
-            'id': meeting.id,
-            'days': meeting.days,
-            'start_time': meeting.start_time.strftime('%H:%M'),
-            'end_time': meeting.end_time.strftime('%H:%M'),
-            'building_name': meeting.building_name,
-            'room': meeting.room,
+            "id": meeting.id,
+            "days": meeting.days,
+            "start_time": meeting.start_time.strftime("%H:%M"),
+            "end_time": meeting.end_time.strftime("%H:%M"),
+            "building_name": meeting.building_name,
+            "room": meeting.room,
         }
         return class_meeting_data
 
 
 class CalendarConfigurationsView(APIView):
     def get(self, request):
-        term_code = request.query_params.get('term_code')
+        term_code = request.query_params.get("term_code")
         user = request.user
 
         if term_code:
@@ -128,21 +130,21 @@ class CalendarConfigurationsView(APIView):
 
     def post(self, request):
         user = request.user
-        name = request.data.get('name', 'Default Schedule')
+        name = request.data.get("name", "Default Schedule")
 
         try:
             calendar_config, created = CalendarConfiguration.objects.get_or_create(
-                user=user, name=name, defaults={'user': user, 'name': name}
+                user=user, name=name, defaults={"user": user, "name": name}
             )
             serializer = CalendarConfigurationSerializer(calendar_config)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except IntegrityError:
             return Response(
-                {'detail': 'Calendar configuration with this name already exists.'},
+                {"detail": "Calendar configuration with this name already exists."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class CalendarConfigurationView(APIView):
@@ -157,29 +159,29 @@ class CalendarConfigurationView(APIView):
             return Response(serializer.data)
         except CalendarConfiguration.DoesNotExist:
             return Response(
-                {'detail': 'Calendar configuration not found.'},
+                {"detail": "Calendar configuration not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
         except Exception as e:
-            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def post(self, request):
         user = request.user
-        name = request.data.get('name', 'Default Schedule')
+        name = request.data.get("name", "Default Schedule")
 
         try:
             calendar_config, _ = CalendarConfiguration.objects.get_or_create(
-                user=user, name=name, defaults={'user': user, 'name': name}
+                user=user, name=name, defaults={"user": user, "name": name}
             )
             serializer = CalendarConfigurationSerializer(calendar_config)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except IntegrityError:
             return Response(
-                {'detail': 'Calendar configuration with this name already exists.'},
+                {"detail": "Calendar configuration with this name already exists."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
         except Exception as e:
-            return Response({'detail': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class SemesterConfigurationView(APIView):
@@ -200,7 +202,7 @@ class SemesterConfigurationView(APIView):
             return Response(serializer.data)
         else:
             return Response(
-                {'detail': 'Semester configuration not found.'},
+                {"detail": "Semester configuration not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -215,7 +217,7 @@ class SemesterConfigurationView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(
-                {'detail': 'Semester configuration not found.'},
+                {"detail": "Semester configuration not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -226,7 +228,7 @@ class SemesterConfigurationView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:
             return Response(
-                {'detail': 'Semester configuration not found.'},
+                {"detail": "Semester configuration not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )
 
@@ -254,6 +256,6 @@ class ScheduleSelectionView(APIView):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(
-                {'detail': 'Schedule selection not found.'},
+                {"detail": "Schedule selection not found."},
                 status=status.HTTP_404_NOT_FOUND,
             )

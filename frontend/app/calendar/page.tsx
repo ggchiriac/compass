@@ -11,12 +11,12 @@ import {
   ChevronRightIcon,
 } from "evergreen-ui";
 
-import BackgroundGradient from "@/components/BackgroundGradient";
 import SkeletonApp from "@/components/SkeletonApp";
 import tabStyles from "@/components/TabbedMenu/TabbedMenu.module.css";
 import useAuthStore from "@/store/authSlice";
 import useFilterStore from "@/store/filterSlice";
 import UserState from "@/store/userSlice";
+import { terms } from "@/utils/terms";
 
 import "./Calendar.css";
 import Calendar from "./Calendar";
@@ -28,7 +28,7 @@ const CalendarUI: FC = () => {
   const [currentPage, setCurrentPage] = useState(2);
   const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
-  const { terms, termFilter, setTermFilter } = useFilterStore((state) => state);
+  const { termFilter, setTermFilter } = useFilterStore((state) => state);
   const semesterList = useMemo(() => Object.keys(terms).reverse(), [terms]);
   const semestersPerPage = 5;
   const totalPages = Math.ceil(semesterList.length / semestersPerPage);

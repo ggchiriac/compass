@@ -120,7 +120,7 @@ const Calendar: FC = () => {
 
   useEffect(() => {
     useModalStore.getState().setCurrentPage("calendar");
-  });
+  }, []);
 
   return (
     <div>

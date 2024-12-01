@@ -14,10 +14,10 @@
 
 import { ThemeProvider } from "evergreen-ui";
 import { ReactNode } from "react";
-import { hoagiePurple, hoagieOrange, hoagieUI } from "./themes";
+import { hoagieYellow, hoagieUI } from "./themes";
 
 type ThemeProps = {
-  // Options: "purple", "blue", "orange")
+  // Options: "yellow"
   palette?: string;
 
   // React children (child components)
@@ -29,13 +29,11 @@ type ThemeProps = {
  *
  * @returns {ThemeProvider} A Hoagie-paletted theme provider component.
  */
-function Theme({ palette = "purple", children }: ThemeProps) {
+function Theme({ palette = "yellow", children }: ThemeProps) {
   const colorTheme = (() => {
     switch (palette) {
-      case "purple":
-        return hoagiePurple;
-      case "orange":
-        return hoagieOrange;
+      case "yellow":
+        return hoagieYellow;
       default:
         return hoagieUI;
     }

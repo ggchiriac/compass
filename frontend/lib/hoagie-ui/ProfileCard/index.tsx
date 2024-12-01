@@ -53,7 +53,7 @@ function ProfileCard({
       flexDirection="column"
       alignItems="center"
     >
-      <Avatar name={name} backgroundColor={theme.colors.blue100} size={40} />
+      <Avatar name={name} backgroundColor={theme.colors.yellow100} size={40} />
       <Heading size={500} marginTop={majorScale(1)}>
         {name}
       </Heading>

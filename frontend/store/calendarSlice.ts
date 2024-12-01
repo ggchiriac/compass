@@ -84,11 +84,11 @@ const useCalendarStore = create<CalendarStore>()(
         const term = course.guid.substring(0, 4);
         const selectedCourses = get().getSelectedCourses(term);
 
-        console.log("Attempting to add course:", course);
+        // console.log('Attempting to add course:', course);
         if (
           selectedCourses.some((event) => event.course.guid === course.guid)
         ) {
-          console.log("Course already added:", course);
+          // console.log('Course already added:', course);
           // TODO: Return a snackbar/toast or something nice if the course is already added
           return;
         }
@@ -97,9 +97,7 @@ const useCalendarStore = create<CalendarStore>()(
         try {
           const term = course.guid.substring(0, 4);
           const course_id = course.guid.substring(4);
-          console.log(
-            `Fetching course details from backend for ${term}-${course_id}`,
-          );
+          // console.log(`Fetching course details from backend for ${term}-${course_id}`);
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_BACKEND}/fetch_calendar_classes/${term}/${course_id}`,
           );
@@ -108,7 +106,27 @@ const useCalendarStore = create<CalendarStore>()(
           }
 
           const sections = await response.json();
-          console.log("Fetched sections:", sections.length);
+          // console.log('Fetched sections:', sections.length);
+
+          const uniqueSections = new Set(
+            sections.map((section) => section.class_section),
+          );
+
+          const uniqueCount = uniqueSections.size;
+
+          const exceptions = ["Seminar", "Lecture"];
+
+          const lectureSections = sections.filter(
+            (section) =>
+              section.class_type === "Lecture" &&
+              /^L0\d+/.test(section.class_section),
+          );
+
+          const uniqueLectureNumbers = new Set(
+            lectureSections.map(
+              (section) => section.class_section.match(/^L0(\d+)/)?.[1],
+            ),
+          );
 
           const calendarEvents: CalendarEvent[] = sections.flatMap(
             (section: Section) =>
@@ -126,11 +144,17 @@ const useCalendarStore = create<CalendarStore>()(
                   startRowIndex: calculateGridRow(classMeeting.start_time),
                   endRowIndex: calculateGridRow(classMeeting.end_time),
                   isActive: true,
+                  needsChoice:
+                    (!exceptions.includes(section.class_type) &&
+                      uniqueCount > 1) ||
+                    (uniqueLectureNumbers.size > 1 &&
+                      section.class_type === "Lecture"),
+                  isChosen: false,
                 }));
               }),
           );
 
-          console.log("Prepared calendar events to add:", calendarEvents);
+          // console.log('Prepared calendar events to add:', calendarEvents);
           // set((state) => ({
           //   selectedCourses: [...state.selectedCourses, ...calendarEvents],
           //   loading: false,
@@ -142,13 +166,17 @@ const useCalendarStore = create<CalendarStore>()(
             },
             loading: false,
           }));
-          console.log("Course added successfully:", course.guid);
-          console.log(
-            "Initial sections' active states:",
-            calendarEvents.map((s) => s.isActive),
-          );
+          // console.log('Course added successfully:', course.guid);
+          // console.log(
+          //   "Initial sections' active states:",
+          //   calendarEvents.map((s) => s.isActive)
+          // );
+          // console.log(
+          //   'Initial sections needing choice:',
+          //   calendarEvents.map((s) => s.needsChoice)
+          // );
         } catch (error) {
-          console.error("Error adding course:", error);
+          // console.error('Error adding course:', error);
           set({
             error: "Failed to add course. Please try again.",
             loading: false,
@@ -159,11 +187,17 @@ const useCalendarStore = create<CalendarStore>()(
         set((state) => {
           const term = clickedSection.course.guid.substring(0, 4);
           const selectedCourses = state.selectedCourses[term] || [];
-          const exceptions = ["Lecture", "Seminar"];
+          const typeExceptions = ["Seminar"];
+
+          const sectionsPerGroupping = selectedCourses.filter(
+            (section) =>
+              section.course.guid === clickedSection.course.guid &&
+              section.section.id === clickedSection.section.id,
+          ).length;
 
           // Determine if this is a special exception
           const isException =
-            exceptions.includes(clickedSection.section.class_type) &&
+            typeExceptions.includes(clickedSection.section.class_type) &&
             !(
               clickedSection.section.class_type === "Seminar" &&
               clickedSection.course.title.includes("Independent Work")
@@ -181,22 +215,34 @@ const useCalendarStore = create<CalendarStore>()(
                 section.isActive &&
                 section.section.class_type ===
                   clickedSection.section.class_type,
-            ).length === 1;
+            ).length <= sectionsPerGroupping;
 
           const updatedSections = selectedCourses.map((section) => {
-            if (section.course.guid !== clickedSection.course.guid) {
-              return section;
+            if (
+              section.section.id === clickedSection.section.id &&
+              section.course.guid === clickedSection.course.guid
+            ) {
+              return {
+                ...section,
+                isChosen: !section.isChosen,
+              };
+            } else if (section.course.guid !== clickedSection.course.guid) {
+              return { ...section };
             }
 
             if (isActiveSingle && clickedSection.isActive) {
               return section.section.class_type ===
                 clickedSection.section.class_type
-                ? { ...section, isActive: true }
+                ? { ...section, isActive: true, isChosen: false }
                 : section;
             } else {
               return section.section.class_type ===
                 clickedSection.section.class_type
-                ? { ...section, isActive: section.key === clickedSection.key }
+                ? {
+                    ...section,
+                    isActive: section.key === clickedSection.key,
+                    isChosen: section.key === clickedSection.key,
+                  }
                 : section;
             }
           });

@@ -1,5 +1,4 @@
-"""
-Test suite for Hoagie Plan's backend.
+"""Test suite for Hoagie Plan's backend.
 
 Docs: https://docs.djangoproject.com/en/5.1/topics/testing/overview/
 """
@@ -24,7 +23,7 @@ init(autoreset=True)
 class Logger:
     @staticmethod
     def _log(color, style, msg):
-        sys.stdout.write(f'{style}{color}{msg}\n')
+        sys.stdout.write(f"{style}{color}{msg}\n")
         sys.stdout.flush()
 
     @staticmethod
@@ -45,7 +44,7 @@ class Logger:
 
     @staticmethod
     def header(msg):
-        Logger._log(Fore.CYAN, Style.BRIGHT, f'\n{msg}')
+        Logger._log(Fore.CYAN, Style.BRIGHT, f"\n{msg}")
 
 
 class Commands:
@@ -54,8 +53,8 @@ class Commands:
         return CustomUser.objects.create_user(
             username=username,
             email=email,
-            password='password',
-            role='student',
+            password="password",
+            role="student",
             net_id=username,
             first_name=first_name,
             last_name=last_name,
@@ -130,65 +129,65 @@ class BasicCalendarTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.commands = Commands()
-        cls.user1 = cls.commands.create_user('mn4560', 'mn4560@princeton.edu', 'Windsor', 'Nguyen', 2025)
-        cls.user2 = cls.commands.create_user('gc5512', 'gc5512@princeton.edu', 'George', 'Chiriac', 2025)
-        cls.term = cls.commands.create_term('1252', 'F2024', '2024-09-03', '2024-12-15')
-        cls.department = cls.commands.create_department('Computer Science')
+        cls.user1 = cls.commands.create_user("mn4560", "mn4560@princeton.edu", "Windsor", "Nguyen", 2025)
+        cls.user2 = cls.commands.create_user("gc5512", "gc5512@princeton.edu", "George", "Chiriac", 2025)
+        cls.term = cls.commands.create_term("1252", "F2024", "2024-09-03", "2024-12-15")
+        cls.department = cls.commands.create_department("Computer Science")
         cls.course = cls.commands.create_course(
             cls.department,
-            'COS-333-2024-fall',
-            'COS333',
-            '333',
-            'Advanced Programming Techniques',
-            'This course teaches advanced programming techniques.',
-            'https://www.cs.princeton.edu/courses/archive/fall24/cos333/',
+            "COS-333-2024-fall",
+            "COS333",
+            "333",
+            "Advanced Programming Techniques",
+            "This course teaches advanced programming techniques.",
+            "https://www.cs.princeton.edu/courses/archive/fall24/cos333/",
         )
-        cls.section = cls.commands.create_section(cls.course, 12345, 'Lecture', 'L01', cls.term, 100, 'Open', 0)
+        cls.section = cls.commands.create_section(cls.course, 12345, "Lecture", "L01", cls.term, 100, "Open", 0)
 
     def setUp(self):
-        Logger.success('SetUp completed: Test environment prepared.')
+        Logger.success("SetUp completed: Test environment prepared.")
 
     def test_create_edit_schedules(self):
-        Logger.header('Test: Create and Edit Schedules')
-        calendar_config1 = self.commands.create_calendar_config(self.user1, 'User1 Config', 0)
+        Logger.header("Test: Create and Edit Schedules")
+        calendar_config1 = self.commands.create_calendar_config(self.user1, "User1 Config", 0)
         semester_config1 = self.commands.create_semester_config(calendar_config1, self.term)
-        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, 'User1 Schedule')
-        Logger.warn(f'Created initial schedule: {schedule1.name}')
+        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, "User1 Schedule")
+        Logger.warn(f"Created initial schedule: {schedule1.name}")
 
-        schedule1.name = 'User1 Updated Schedule'
+        schedule1.name = "User1 Updated Schedule"
         schedule1.save()
-        Logger.warn(f'Updated schedule name to: {schedule1.name}')
+        Logger.warn(f"Updated schedule name to: {schedule1.name}")
 
         updated_schedule = ScheduleSelection.objects.get(id=schedule1.id)
-        Logger.warn(f'Retrieved updated schedule: {updated_schedule.name}')
-        self.assertEqual(updated_schedule.name, 'User1 Updated Schedule')
-        Logger.success('Test completed successfully')
+        Logger.warn(f"Retrieved updated schedule: {updated_schedule.name}")
+        self.assertEqual(updated_schedule.name, "User1 Updated Schedule")
+        Logger.success("Test completed successfully")
 
     def test_multiple_users_schedules(self):
-        Logger.header('Test: Multiple Users Create Schedules Without Conflict')
-        calendar_config1 = self.commands.create_calendar_config(self.user1, 'User1 Config', 0)
+        Logger.header("Test: Multiple Users Create Schedules Without Conflict")
+        calendar_config1 = self.commands.create_calendar_config(self.user1, "User1 Config", 0)
         semester_config1 = self.commands.create_semester_config(calendar_config1, self.term)
-        self.commands.create_schedule(semester_config1, self.section, 0, 'User1 Schedule')
-        Logger.warn('Created schedule for User 1')
+        self.commands.create_schedule(semester_config1, self.section, 0, "User1 Schedule")
+        Logger.warn("Created schedule for User 1")
 
-        calendar_config2 = self.commands.create_calendar_config(self.user2, 'User2 Config', 0)
+        calendar_config2 = self.commands.create_calendar_config(self.user2, "User2 Config", 0)
         semester_config2 = self.commands.create_semester_config(calendar_config2, self.term)
-        self.commands.create_schedule(semester_config2, self.section, 0, 'User2 Schedule')
-        Logger.warn('Created schedule for User 2')
+        self.commands.create_schedule(semester_config2, self.section, 0, "User2 Schedule")
+        Logger.warn("Created schedule for User 2")
 
         user1_schedules = ScheduleSelection.objects.filter(semester_configuration=semester_config1).count()
         user2_schedules = ScheduleSelection.objects.filter(semester_configuration=semester_config2).count()
-        Logger.warn(f'User 1 schedules: {user1_schedules}, User 2 schedules: {user2_schedules}')
+        Logger.warn(f"User 1 schedules: {user1_schedules}, User 2 schedules: {user2_schedules}")
         self.assertEqual(user1_schedules, 1)
         self.assertEqual(user2_schedules, 1)
-        Logger.success('Test completed successfully')
+        Logger.success("Test completed successfully")
 
     def test_edit_others_schedules(self):
         Logger.header("Test: Users Cannot Edit Each Other's Schedules")
-        calendar_config1 = self.commands.create_calendar_config(self.user1, 'User1 Config', 0)
+        calendar_config1 = self.commands.create_calendar_config(self.user1, "User1 Config", 0)
         semester_config1 = self.commands.create_semester_config(calendar_config1, self.term)
-        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, 'User1 Schedule')
-        Logger.warn(f'Created schedule for User 1: {schedule1.name}')
+        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, "User1 Schedule")
+        Logger.warn(f"Created schedule for User 1: {schedule1.name}")
 
         Logger.warn("Attempting to edit User 1's schedule as User 2...")
         try:
@@ -197,30 +196,30 @@ class BasicCalendarTests(TestCase):
             )
             self.fail("User 2 should not be able to access User 1's schedule")
         except ScheduleSelection.DoesNotExist:
-            Logger.success('Expected: ScheduleSelection.DoesNotExist')
-        Logger.success('Test completed successfully')
+            Logger.success("Expected: ScheduleSelection.DoesNotExist")
+        Logger.success("Test completed successfully")
 
     def test_delete_own_schedules(self):
-        Logger.header('Test: Users Can Delete Their Schedules')
-        calendar_config1 = self.commands.create_calendar_config(self.user1, 'User1 Config', 0)
+        Logger.header("Test: Users Can Delete Their Schedules")
+        calendar_config1 = self.commands.create_calendar_config(self.user1, "User1 Config", 0)
         semester_config1 = self.commands.create_semester_config(calendar_config1, self.term)
-        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, 'User1 Schedule')
-        Logger.warn(f'Created schedule for User 1: {schedule1.name}')
+        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, "User1 Schedule")
+        Logger.warn(f"Created schedule for User 1: {schedule1.name}")
 
         schedule1.delete()
         Logger.warn("Deleted User 1's schedule")
 
         remaining = ScheduleSelection.objects.filter(semester_configuration=semester_config1).count()
-        Logger.warn(f'Remaining schedules for User 1: {remaining}')
+        Logger.warn(f"Remaining schedules for User 1: {remaining}")
         self.assertEqual(remaining, 0)
-        Logger.success('Test completed successfully')
+        Logger.success("Test completed successfully")
 
     def test_delete_others_schedules(self):
-        Logger.header('Test: Users Cannot Delete Each Others Schedules')
-        calendar_config1 = self.commands.create_calendar_config(self.user1, 'User1 Config', 0)
+        Logger.header("Test: Users Cannot Delete Each Others Schedules")
+        calendar_config1 = self.commands.create_calendar_config(self.user1, "User1 Config", 0)
         semester_config1 = self.commands.create_semester_config(calendar_config1, self.term)
-        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, 'User1 Schedule')
-        Logger.warn(f'Created schedule for User 1: {schedule1.name}')
+        schedule1 = self.commands.create_schedule(semester_config1, self.section, 0, "User1 Schedule")
+        Logger.warn(f"Created schedule for User 1: {schedule1.name}")
 
         Logger.warn("Attempting to delete User 1's schedule as User 2...")
         try:
@@ -229,5 +228,5 @@ class BasicCalendarTests(TestCase):
             ).delete()
             self.fail("User 2 should not be able to delete User 1's schedule")
         except ScheduleSelection.DoesNotExist:
-            Logger.success('Expected: ScheduleSelection.DoesNotExist')
-        Logger.success('Test completed successfully')
+            Logger.success("Expected: ScheduleSelection.DoesNotExist")
+        Logger.success("Test completed successfully")

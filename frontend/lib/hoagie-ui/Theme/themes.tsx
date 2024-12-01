@@ -15,6 +15,7 @@ export const hoagieUI = mergeTheme(defaultTheme, {
     gray400: "#D2D2D2",
     gray300: "#EEEEEE",
     gray200: "#F1F1F1",
+    gray150: "#F4F4F4",
     gray100: "#F7F7F7",
     gray90: "#FBFBFB",
     gray75: "#FCFCFC",
@@ -116,9 +117,6 @@ export const hoagieUI = mergeTheme(defaultTheme, {
       success: "#52BD95",
       info: "#3366FF",
     },
-
-    // Additional custom color
-    "hoagie-orange": "#DE7548",
   },
   fills: {
     ...defaultTheme.fills,
@@ -231,64 +229,34 @@ export const hoagieUI = mergeTheme(defaultTheme, {
   },
 });
 
-export const hoagiePurple = mergeTheme(hoagieUI, {
-  title: "purple",
+export const hoagieYellow = mergeTheme(hoagieUI, {
+  title: "yellow",
   colors: {
     ...hoagieUI.colors,
-    purple900: "#190C30",
-    purple800: "#351E5C",
-    purple700: "#58427F",
-    purple600: "#6C47AE",
-    purple500: "#8F59EF",
-    purple400: "#A472FC",
-    purple300: "#BFA0F4",
-    purple200: "#D1BAF7",
-    purple100: "#E9DDFE",
-    purple50: "#F5F0FF",
-    purple25: "#F9F5FF",
-    selected: "#8F59EF",
-    tint1: "#FCFAFF",
-    tint2: "#FAF9FC",
+    yellow900: "#4A300B",
+    yellow800: "#66460D",
+    yellow700: "#835A1A",
+    yellow600: "#66460D",
+    yellow500: "#996A14",
+    yellow400: "#FFB020",
+    yellow300: "#FFD079",
+    yellow200: "#FFDFA6",
+    yellow100: "#FFEFD2",
+    yellow50: "#FFFAF1",
+    yellow25: "#FFFDF6",
+    chartYellow: "#FAC86B",
+    selected: "#FFD079",
+    tint1: "#FFF8E6",
+    tint2: "#FFFDF2",
     icon: {
-      selected: "#8F59EF",
+      selected: "#FFD079",
     },
     text: {
-      info: "#8F59EF",
+      info: "#FFD079",
     },
   },
   shadows: {
     ...hoagieUI.shadows,
-    focusRing: "0 0 0 2px #E9DDFE",
-  },
-});
-
-export const hoagieOrange = mergeTheme(hoagieUI, {
-  title: "orange",
-  colors: {
-    ...hoagieUI.colors,
-    orange900: "#301F0E",
-    orange800: "#593714",
-    orange700: "#7C4813",
-    orange600: "#BC5E00",
-    orange500: "#E77500",
-    orange400: "#FC8C1B",
-    orange300: "#FFB164",
-    orange200: "#FFCB97",
-    orange100: "#FFE3C6",
-    orange50: "#FEE9D2",
-    orange25: "#FFF5EA",
-    selected: "#E77500",
-    tint1: "#F8E9DA",
-    tint2: "#FCFAF9",
-    icon: {
-      selected: "#E77500",
-    },
-    text: {
-      info: "#E77500",
-    },
-  },
-  shadows: {
-    ...hoagieUI.shadows,
-    focusRing: "0 0 0 2px #FFE3C6",
+    focusRing: "0 0 0 2px #FFEFD2",
   },
 });
