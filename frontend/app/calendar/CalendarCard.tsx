@@ -28,14 +28,13 @@ const CalendarCard: FC<CalendarCardProps> = ({
   const getGradientStyle = (dept: string) => {
     return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
   };
-  console.log('Full section:', event.section);
-  console.log('Full section:', event.section.enrollment);
-  console.log('Full section:', event.section.capacity);
+
   return (
     <div
       className={`calendar-card ${event.textColor}`}
       style={{
         background: getGradientStyle(dept),
+        opacity: event.needsChoice && !event.isChosen ? 0.5 : 1,
         gridRow: `${startIndex} / ${endIndex}`,
         gridColumn: `${event.startColumnIndex + 1} / span 1`,
         width: `calc(100% * ${width})`,
@@ -58,23 +57,17 @@ const CalendarCard: FC<CalendarCardProps> = ({
           </div>
         ))}
       </div> */}
-      <div className="card-container">
-        <div className="">
-            {event.course.department_code} {event.course.catalog_number}
-        </div>
-        {/* TODO: Add start time, end time, building name, room number*/}
-        <div className="subsection-container">
-          <div className='text-xs event-department'>
-            {event.section.class_section}
-          </div>
-          <div className='text-xs event-department card-enrollment'>
-            {event.section.enrollment} / {event.section.capacity}
-          </div>
-        </div>
+      <div className='event-department'>
+        {event.course.department_code} {event.course.catalog_number}
       </div>
-
+      {/* TODO: Add start time, end time, building name, room number*/}
+      <div className='text-xs event-department'>{event.section.class_section}</div>
       {/* Button */}
+      <div className='text-xs event-department card-enrollment'>
+        {event.section.enrollment} / {event.section.capacity}
+      </div>
     </div>
+    
   );
 };
 
