@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from 'react';
+import { FC, useState, useEffect, useRef } from 'react';
 
 import { Button as JoyButton } from '@mui/joy';
 import classNames from 'classnames';
@@ -20,6 +20,8 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
   const [showPopup, setShowPopup] = useState<boolean>(false);
   const [courseDetails, setCourseDetails] = useState<{ [key: string]: any } | null>(null);
 
+  const modalRef = useRef(null);
+
   useEffect(() => {
     if (showPopup && value) {
       const url = new URL(`${process.env.BACKEND}/course_details/`);
@@ -39,6 +41,12 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
     }
   }, [showPopup, value]);
 
+  const handleOutsideClick = (event) => {
+    if (modalRef.current && !modalRef.current.contains(event.target)) {
+      handleCancel(event);
+    }
+  };
+
   const handleKeyDown = (event) => {
     if (event.key === 'Escape' || event.key === 'Enter') {
       handleCancel(event);
@@ -49,6 +57,7 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
     event.stopPropagation();
     setShowPopup(true);
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleOutsideClick);
   };
 
   const handleCancel = (event) => {
@@ -56,11 +65,22 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
     event.stopPropagation();
     setShowPopup(false);
     document.removeEventListener('keydown', handleKeyDown);
+    document.removeEventListener('mousedown', handleOutsideClick);
   };
 
   const modalContent = showPopup ? (
     <SettingsModal>
-      <div className={styles.modal} style={{ width: '85%', height: '75%', padding: '25px' }}>
+      <div
+        className={styles.modal}
+        style={{
+          width: '85%',
+          height: '75%',
+          padding: '25px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+        }}
+        ref={modalRef}
+      >
         {' '}
         {/* Ensure full width */}
         {courseDetails ? (
@@ -105,8 +125,15 @@ const InfoComponent: FC<InfoComponentProps> = ({ value }) => {
             </div>
           </div>
         ) : (
-          <LoadingComponent />
-          // <div>Loading...</div>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'center',
+              width: '100%',
+            }}
+          >
+            <LoadingComponent />
+          </div>
         )}
         <div style={{ display: 'flex', flexDirection: 'column', marginBottom: '15px' }}>
           <footer className='mt-auto text-right'>
