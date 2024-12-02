@@ -23,6 +23,7 @@ export default function Content({
   children: ReactNode;
   user: UserProfile;
 }) {
+  console.log(user);
   useFetchUserProfile(user);
   const { openSettingsModal, settingsModal } = useSettingsModal();
 

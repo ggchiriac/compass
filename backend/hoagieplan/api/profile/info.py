@@ -22,14 +22,13 @@ def create_from_auth0(request):
     first_name = user.get("firstName")
     last_name = user.get("lastName")
     email = user.get("email")
-    print(user)
 
     try:
         user_inst, created = CustomUser.objects.get_or_create(
-            net_id=net_id,
+            email=email,
             defaults={
                 "role": "student",
-                "email": "",
+                "net_id": "",
                 "first_name": "",
                 "last_name": "",
                 "class_year": datetime.now().year + 1,
@@ -38,10 +37,14 @@ def create_from_auth0(request):
         if created:
             user_inst.first_name = first_name
             user_inst.last_name = last_name
-            user_inst.email = email
+            user_inst.net_id = net_id
+            user_inst.save()
+        else:
+            email_prefix = email.split("@")[0]
+            user_inst.net_id = email_prefix
+            user_inst.username = email_prefix
             user_inst.save()
 
-        print(format_user_data(user_inst))
         return JsonResponse(format_user_data(user_inst))
 
     except Exception as e:
