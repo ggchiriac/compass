@@ -124,8 +124,7 @@ const Calendar: FC = () => {
 
   return (
     <div>
-      <div className="calendar-main">
-        <CalendarBody
+      <CalendarBody
           calendarRef={calendarElementRef}
           days={formattedDays.map((day) => day.name)}
           startHour={START_HOUR}
@@ -133,7 +132,6 @@ const Calendar: FC = () => {
           events={events}
           onEventClick={handleClick}
         />
-      </div>
     </div>
   );
 };

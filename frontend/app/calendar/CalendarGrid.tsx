@@ -3,7 +3,7 @@ import { FC, memo } from "react";
 import { CalendarEvent } from "@/types";
 
 import CalendarCard from "./CalendarCard";
-// import CalendarTime from './CalendarTime';
+import CalendarTime from './CalendarTime';
 
 interface CalendarGridProps {
   days: string[];
@@ -139,11 +139,11 @@ const CalendarGrid: FC<CalendarGridProps> = memo(
             dept={event.course.department_code}
           />
         ))}
-        {/* <CalendarTime startHour={startHour} endHour={endHour} /> */}
+        <CalendarTime startHour={startHour} endHour={endHour} />
       </div>
     );
   },
 );
 
-CalendarGrid.displayName = "CalendarGrid";
+CalendarGrid.displayName = "CalendarGrid" as const;
 export default CalendarGrid;

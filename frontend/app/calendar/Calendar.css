@@ -243,4 +243,5 @@
   overflow: auto;
   height: 100vh;
   background-color: #fff;
+  border-radius: 10px;
 }
