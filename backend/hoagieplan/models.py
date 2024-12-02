@@ -291,7 +291,7 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=100, null=True, blank=True)
     last_name = models.CharField(max_length=100, null=True, blank=True)
     class_year = models.IntegerField(null=True, blank=True)
-    seen_tutorial = models.BooleanField(default=False)
+    seen_tutorial = models.BooleanField(default=False, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
