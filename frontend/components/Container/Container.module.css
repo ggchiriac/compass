@@ -10,7 +10,7 @@
   margin-right: 0.5vw;
   border-radius: 8px;
   transition: background-color 350ms ease;
-  background-color: rgba(246, 246, 246, 1);
+  background-color: #fff;
   border: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 1em;
   width: 24vw;
@@ -88,7 +88,7 @@
   padding-right: 8px;
   align-items: center;
   justify-content: space-between;
-  background-color: #fff;
+  background-color: #f4f6fa;
   border-top-left-radius: 6px;
   border-top-right-radius: 6px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);

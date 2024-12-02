@@ -522,7 +522,8 @@ const Dropdown: FC<DropdownProps> = ({
           style={{
             margin: "0",
             boxShadow: "none",
-            borderBottom: "1px solid #e0e0e0",
+            borderTop: "1px solid #e0e0e0",
+            // borderBottom: "1px solid #e0e0e0",
           }}
           expanded={!expanded.has(key)}
           onChange={(event) => handleChange(event, key)} // TODO: disable propagation in modals
@@ -531,7 +532,7 @@ const Dropdown: FC<DropdownProps> = ({
             expandIcon={hasNestedItems && !hasItems ? <ExpandMoreIcon /> : null}
             aria-controls={`${key}-content`}
             id={`${key}-header`}
-            style={{ backgroundColor: "#f6f6f6" }} // subtle background color
+            style={{ backgroundColor: "#fff" }} // subtle background color
           >
             <div
               style={{

@@ -7,7 +7,7 @@
   margin: 1vh 0.5vw;
   border-radius: 8px;
   transition: background-color 350ms ease;
-  background-color: #f6f6f6;
+  background-color: #f4f6fa;
   border: 1px solid rgba(0, 0, 0, 0.05);
   font-size: 1em;
   width: 24vw;
@@ -141,7 +141,7 @@
 .search-results {
   flex: 1;
   overflow-y: auto;
-  background-color: #f6f6f6;
+  background-color: #f4f6fa;
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 6px;
 }

@@ -21,7 +21,7 @@ const formatHour = (hour: number): string => {
 
 const calendarColors = {
   gridBorder: "#e0e0e0",
-  dayLabelBg: "#f5f5f5",
+  dayLabelBg: "#f4f6fa",
   timeLabelText: "#757575",
 };
 
