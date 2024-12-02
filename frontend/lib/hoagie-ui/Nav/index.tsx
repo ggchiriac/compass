@@ -108,7 +108,7 @@ function Nav({
                     is="h2"
                     display="inline-block"
                     className="hoagie logo"
-                    color={theme.colors.gray900}
+                    color="gray900"
                   >
                     hoagie
                   </Text>
@@ -116,7 +116,7 @@ function Nav({
                     is="h2"
                     display="inline-block"
                     className="hoagie logo"
-                    color={theme.colors.yellow400}
+                    color="yellow400"
                   >
                     {name}
                   </Text>
@@ -124,7 +124,7 @@ function Nav({
                     <Text
                       className="hoagie beta"
                       position="absolute"
-                      color={theme.colors.gray900}
+                      color="gray900"
                     >
                       (BETA)
                     </Text>
@@ -138,6 +138,7 @@ function Nav({
               {tabs.map((tab) => (
                 <Tab
                   key={tab.title}
+                  is="a"
                   id={tab.title}
                   isSelected={pathname === tab.href}
                   appearance="navbar"

@@ -1,9 +1,7 @@
 "use client";
 
-import { SVGProps, useState, useEffect } from "react";
+import { SVGProps, useEffect } from "react";
 import Image from "next/image";
-import Navbar from "@/components/Navbar";
-import useAuthStore from "@/store/authSlice";
 import { useModalStore } from "@/store/modalSlice";
 
 const foundingTeam = [
@@ -129,32 +127,10 @@ const TeamMemberCard = ({ member, index }: { member: any; index: number }) => (
 );
 
 const About = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { checkAuthentication } = useAuthStore();
-
-  useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
-  }, [checkAuthentication]);
 
   useEffect(() => {
     useModalStore.setState({ currentPage: "about" });
   }, []);
-
-  if (isLoading) {
-    return (
-      <>
-        <div className="flex flex-col min-h-screen pt-10 rounded-xl">
-          <div className="relative isolate pt-14">
-            <div className="flex flex-col min-h-screen pt-24">
-              <div className="flex justify-center items-center">
-                <p>Loading...</p> {/* TODO: Add a Skeleton here */}
-              </div>
-            </div>
-          </div>
-        </div>
-      </>
-    );
-  }
 
   return (
     <>

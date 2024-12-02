@@ -3,6 +3,7 @@
 Docs: https://docs.djangoproject.com/en/5.1/topics/testing/overview/
 """
 
+# TODO: This file needs to be updated, e.g. we no longer have a net_id field for CustomUsers
 import sys
 from colorama import init, Fore, Style
 from django.test import TestCase

@@ -15,35 +15,32 @@ VALID_CLASS_YEAR_RANGE = range(2023, 2031)
 
 
 @require_POST
-def create_from_auth0(request):
-    """Create database user entry using Auth0 information. If user already exists, just fetches existing data."""
+def get_user(request):
+    """Create or fetch a user based on email prefix (NetID)."""
     user = json.loads(request.body)
-    net_id = user.get("netId")
+    email = user.get("email")
     first_name = user.get("firstName")
     last_name = user.get("lastName")
-    email = user.get("email")
+    net_id = email.split("@")[0]
 
     try:
+        # Get or create user based on the email prefix (NetID)
         user_inst, created = CustomUser.objects.get_or_create(
-            email=email,
+            username=net_id, # Let username be the user's NetID
             defaults={
+                "email": email,
+                "first_name": first_name,
+                "last_name": last_name,
                 "role": "student",
-                "net_id": "",
-                "first_name": "",
-                "last_name": "",
                 "class_year": datetime.now().year + 1,
             },
         )
+
+        # TODO: For debugging, remove once confirmed correct.
         if created:
-            user_inst.first_name = first_name
-            user_inst.last_name = last_name
-            user_inst.net_id = net_id
-            user_inst.save()
+            logger.info(f"New user created: {net_id}")
         else:
-            email_prefix = email.split("@")[0]
-            user_inst.net_id = email_prefix
-            user_inst.username = email_prefix
-            user_inst.save()
+            logger.info(f"Existing user fetched: {net_id}")
 
         return JsonResponse(format_user_data(user_inst))
 
@@ -51,11 +48,10 @@ def create_from_auth0(request):
         logger.error(f"Error processing profile data for {net_id}: {e}")
         raise UserProfileNotFoundError("Failed to create user profile") from e
 
-
 def format_user_data(user_inst):
     """Format user data for API response."""
     return {
-        "netId": user_inst.net_id,
+        "netId": user_inst.username,
         "email": user_inst.email,
         "firstName": user_inst.first_name,
         "lastName": user_inst.last_name,
@@ -70,7 +66,7 @@ def fetch_user_info(net_id):
     """Fetch database user information."""
     try:
         user_inst, _ = CustomUser.objects.get_or_create(
-            net_id=net_id,
+            username=net_id,
             defaults={
                 "role": "student",
                 "email": "",
@@ -90,12 +86,11 @@ def fetch_user_info(net_id):
 def get_user_courses(request):
     """Retrieve user's courses for frontend."""
     net_id = request.headers.get("X-NetId")
-    print(f"NETID: {net_id}")
     if not net_id:
         return JsonResponse({})
 
     try:
-        user_inst = CustomUser.objects.get(net_id=net_id)
+        user_inst = CustomUser.objects.get(username=net_id)
         user_course_dict = {}
 
         for semester in range(1, 9):
@@ -141,7 +136,7 @@ def update_profile(request):
 
     try:
         with transaction.atomic():
-            user_inst = CustomUser.objects.get(net_id=net_id)
+            user_inst = CustomUser.objects.get(username=net_id)
 
             # Update basic info
             user_inst.username = net_id
@@ -194,7 +189,7 @@ def update_class_year(request):
                 status=400,
             )
 
-        user_inst = CustomUser.objects.get(net_id=net_id)
+        user_inst = CustomUser.objects.get(username=net_id)
         user_inst.class_year = class_year
         user_inst.save()
 

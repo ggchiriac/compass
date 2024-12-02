@@ -11,6 +11,7 @@ import {
   ChevronRightIcon,
 } from "evergreen-ui";
 
+import { useUser } from '@auth0/nextjs-auth0/client';
 import SkeletonApp from "@/components/SkeletonApp";
 import tabStyles from "@/components/TabbedMenu/TabbedMenu.module.css";
 import useAuthStore from "@/store/authSlice";
@@ -24,18 +25,13 @@ import CalendarSearch from "./CalendarSearch";
 import SelectedCourses from "./SelectedCourses";
 
 const CalendarUI: FC = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { isLoading } = useUser();
   const [currentPage, setCurrentPage] = useState(2);
-  const { checkAuthentication } = useAuthStore((state) => state);
   const userProfile = UserState((state) => state.profile);
   const { termFilter, setTermFilter } = useFilterStore((state) => state);
   const semesterList = useMemo(() => Object.keys(terms).reverse(), [terms]);
   const semestersPerPage = 5;
   const totalPages = Math.ceil(semesterList.length / semestersPerPage);
-
-  useEffect(() => {
-    checkAuthentication().then(() => setIsLoading(false));
-  }, [checkAuthentication]);
 
   useEffect(() => {
     const currentSemester = Object.values(terms)[0];

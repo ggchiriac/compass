@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { ReactNode } from "react";
 import { useSettingsModal } from "@/components/SettingsModal";
@@ -31,7 +31,7 @@ export default function Content({
     { title: "About", href: "/about" },
     { title: "Dashboard", href: "/dashboard" },
     { title: "Calendar", href: "/calendar" },
-    { title: "Contact Us", href: "/contact" },
+    { title: "Contact", href: "/contact" },
   ];
 
   return (

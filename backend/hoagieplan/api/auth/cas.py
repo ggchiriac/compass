@@ -11,6 +11,8 @@ from hoagieplan.models import CustomUser, Major
 from django.contrib.auth import login, logout
 from hoagieplan.logger import logger
 
+# TODO: CAS is no longer used since we migrated to Auth0 :(
+# It was a great feat of engineering while it lasted! -windsor
 def strip_ticket(request: HttpRequest) -> str:
     """Strip the ticket parameter from the request URL.
 
@@ -83,7 +85,7 @@ def authenticate_user(request: HttpRequest) -> JsonResponse:
         return JsonResponse(response_data, status=401)
 
     # Fetch or create the user based on CAS info
-    user, new_user = CustomUser.objects.get_or_create(net_id=net_id, defaults={"role": "student"})
+    user, new_user = CustomUser.objects.get_or_create(username=net_id, defaults={"role": "student"})
 
     if new_user:
         # Initialize new user if necessary

@@ -42,7 +42,7 @@ urlpatterns = [
     path("tutorial/set-status/", tutorial.set_status, name="set_tutorial_status"),
     # Profile
     path("profile/", info.profile, name="profile"),
-    path("profile/create_from_auth0/", info.create_from_auth0, name="create_from_auth0"),
+    path("profile/get_user/", info.get_user, name="get_user"),
     path("profile/update/", info.update_profile, name="update_profile"),
     path("profile/class-year/", info.update_class_year, name="update_class_year"),
     path("course/details/", details.course_details, name="course_details"),

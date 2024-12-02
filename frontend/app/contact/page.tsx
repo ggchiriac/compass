@@ -1,15 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import useAuthStore from "@/store/authSlice";
 import { useModalStore } from "@/store/modalSlice";
 
 const Contact = () => {
-  const { checkAuthentication } = useAuthStore();
-
-  useEffect(() => {
-    checkAuthentication();
-  }, [checkAuthentication]);
 
   useEffect(() => {
     useModalStore.setState({ currentPage: "contact" });

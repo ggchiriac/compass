@@ -15,7 +15,7 @@ async function fetchCustomUser(
     const csrfToken = await fetchCsrfToken();
 
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND}/profile/create_from_auth0/`,
+      `${process.env.NEXT_PUBLIC_BACKEND}/profile/get_user/`,
       {
         method: "POST",
         credentials: "include",

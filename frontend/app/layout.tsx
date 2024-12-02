@@ -11,21 +11,17 @@
  */
 
 import "./globals.css";
+import "@/lib/hoagie-ui/Theme/theme.css";
 
 import { ReactNode } from "react";
 import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-
 import { getSession } from "@auth0/nextjs-auth0";
 import { UserProvider } from "@auth0/nextjs-auth0/client";
 import { cookies } from "next/headers";
-import { Inter } from "next/font/google";
 
 import Content from "@/app/content";
-import "@/lib/hoagie-ui/Theme/theme.css";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Plan by Hoagie",
@@ -36,7 +32,6 @@ export const metadata: Metadata = {
 async function fetchSession() {
   const cookieStore = cookies();
 
-  // TODO: I think this is handled in middleware.ts and should be removed -windsor
   const sessionCookie = cookieStore.get("appSession");
   if (!sessionCookie) {
     return null;
@@ -49,6 +44,7 @@ async function fetchSession() {
 /**
  * RootLayout server side
  * Wraps the entire application with necessary providers and layouts.
+ * Since Content maintains its own state, we need to pass it down as a client component prop.
  *
  * @param children - The child components to render within the layout.
  * @returns JSX Element representing the root HTML structure.
@@ -62,13 +58,13 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
-        <UserProvider user={session?.user}>
+      <UserProvider>
+        <body className="antialiased">
           <Content user={session?.user}>{children}</Content>
-        </UserProvider>
-        <Analytics />
-        <SpeedInsights />
-      </body>
+          <Analytics />
+          <SpeedInsights />
+        </body>
+      </UserProvider>
     </html>
   );
 }
