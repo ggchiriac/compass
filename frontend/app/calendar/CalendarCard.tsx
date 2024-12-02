@@ -30,6 +30,7 @@ const CalendarCard: FC<CalendarCardProps> = ({
   };
   console.log('Full section:', event.section);
   console.log('Full section:', event.section.enrollment);
+  console.log('Full section:', event.section.capacity);
   return (
     <div
       className={`calendar-card ${event.textColor}`}

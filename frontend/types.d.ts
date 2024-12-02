@@ -70,20 +70,9 @@ export type SearchStoreState = {
   setLoading: (loading: boolean) => void;
 };
 
-export type CourseProps = {
-  id: number;
-  course: Course;
-};
-
 export type Semester = {
   id: string;
   courses: Course[];
-};
-
-export type SemesterBinProps = {
-  children?: ReactNode;
-  semester: Semester;
-  className?: string;
 };
 
 export type DraggableProps = {
@@ -97,12 +86,6 @@ export type DroppableProps = {
   id: string;
   children: ReactNode;
   className?: string;
-};
-
-export type DndState = {
-  semesters: Semester[];
-  addCourseToSemester: (course: Course, semesterId: string) => void;
-  moveCourseWithinSemester: (courseID: string, oldIndex: number, newIndex: number) => void;
 };
 
 export type SearchResults = {
@@ -140,9 +123,10 @@ export type CalendarEvent = {
   color?: string;
   textColor?: string;
 
-
   // Defined fields
   isActive: boolean;
+  needsChoice: boolean;
+  isChosen: boolean;
 };
 
 // Note: types from the API, fields in snake_case.
