@@ -1,6 +1,6 @@
 import argparse
 import csv
-import logging
+import hoagieplan.logger import logger
 import os
 import sys
 import re
@@ -27,10 +27,6 @@ from hoagieplan.models import (
 
 
 # -------------------------------------------------------------------------------------#
-
-
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s")
-logger = logging.getLogger(__name__)
 
 CLASS_YEAR_ENROLLMENT_PATTERN = re.compile(r"Year (\d+): (\d+) students")
 
@@ -72,7 +68,7 @@ def _parse_time(time_str):
 
 
 def insert_departments(rows):
-    logging.info("Starting Department insertions and updates...")
+    logger.info("Starting Department insertions and updates...")
 
     # Create a set of unique departments from the input rows
     unique_departments = {(row["Subject Code"], row["Subject Name"]) for row in rows}
@@ -106,19 +102,19 @@ def insert_departments(rows):
             if departments_to_update:
                 Department.objects.bulk_update(departments_to_update, ["name"])
     except Exception as e:
-        logging.error(f"Error in inserting departments: {e}")
+        logger.error(f"Error in inserting departments: {e}")
 
-    logging.info(
+    logger.info(
         f"Inserted {len(departments_to_create)} new departments and updated {len(departments_to_update)} departments."
     )
-    logging.info("Department insertions and updates completed!")
+    logger.info("Department insertions and updates completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_academic_terms(rows):
-    logging.info("Starting AcademicTerm insertions and updates...")
+    logger.info("Starting AcademicTerm insertions and updates...")
 
     def parse_date(date_str):
         """Parse a date string into a date object, return None if empty."""
@@ -142,7 +138,7 @@ def insert_academic_terms(rows):
             )
 
             if created:
-                logging.info("Inserted 1 new academic term.")
+                logger.info("Inserted 1 new academic term.")
             else:
                 # Extract existing term details
                 existing_details = (term.suffix, term.start_date, term.end_date)
@@ -154,21 +150,21 @@ def insert_academic_terms(rows):
                         start_date=new_details[1],
                         end_date=new_details[2],
                     )
-                    logging.info("Updated 1 academic term.")
+                    logger.info("Updated 1 academic term.")
                 else:
-                    logging.info("No changes detected; no update performed.")
+                    logger.info("No changes detected; no update performed.")
 
     except Exception as e:
-        logging.error(f"Error in inserting/updating academic terms: {e}")
+        logger.error(f"Error in inserting/updating academic terms: {e}")
 
-    logging.info("AcademicTerm insertions and updates completed!")
+    logger.info("AcademicTerm insertions and updates completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_courses(rows):
-    logging.info("Starting Course insertions and updates...")
+    logger.info("Starting Course insertions and updates...")
 
     departments = {dept.code: dept for dept in Department.objects.all()}
     existing_courses = {course.guid: course for course in Course.objects.all()}
@@ -181,7 +177,7 @@ def insert_courses(rows):
         department = departments.get(dept_code)
 
         if not guid:
-            logging.warning(f"Course GUID not found on row {row_index + 1}")
+            logger.warning(f"Course GUID not found on row {row_index + 1}")
             continue
 
         crosslistings = row.get("Crosslistings")
@@ -250,19 +246,19 @@ def insert_courses(rows):
             if updated_courses:
                 Course.objects.bulk_update(updated_courses, update_fields)
     except Exception as e:
-        logging.error(f"Error in inserting/updating courses: {e}")
+        logger.error(f"Error in inserting/updating courses: {e}")
 
-    logging.info(
+    logger.info(
         f"Inserted {len(new_courses)} new courses, updated {len(updated_courses)} existing courses."
     )
-    logging.info("Course insertions and updates completed!")
+    logger.info("Course insertions and updates completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_instructors(rows):
-    logging.info("Starting instructor insertions and updates...")
+    logger.info("Starting instructor insertions and updates...")
 
     update_fields = ["first_name", "last_name", "full_name"]
     new_instructors = []
@@ -277,7 +273,7 @@ def insert_instructors(rows):
     for row in tqdm(rows, desc="Processing Instructors..."):
         instructor_emplid = row.get("Instructor EmplID", "").strip()
         if not instructor_emplid:
-            logging.warning("Skipping row with missing Instructor EmplID")
+            logger.warning("Skipping row with missing Instructor EmplID")
             continue
 
         first_name = row.get("Instructor First Name", "").strip()
@@ -320,18 +316,18 @@ def insert_instructors(rows):
                 Instructor.objects.bulk_update(updated_instructors, update_fields)
 
     except Exception as e:
-        logging.error(f"Error in processing instructors: {e}")
-    logging.info(
+        logger.error(f"Error in processing instructors: {e}")
+    logger.info(
         f"Created {len(new_instructors)} new instructors, updated {len(updated_instructors)} existing instructors."
     )
-    logging.info("Instructor processing completed!")
+    logger.info("Instructor processing completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_sections(rows):
-    logging.info("Starting Section insertions and updates...")
+    logger.info("Starting Section insertions and updates...")
     # Load caches for terms and courses
     term_cache = {term.term_code: term for term in AcademicTerm.objects.all()}
     course_cache = {course.guid: course for course in Course.objects.all()}
@@ -409,19 +405,19 @@ def insert_sections(rows):
             if updated_sections:
                 Section.objects.bulk_update(updated_sections, update_fields)
     except Exception as e:
-        logging.error(f"Error in section insertion and update process: {e}")
+        logger.error(f"Error in section insertion and update process: {e}")
 
-    logging.info(
+    logger.info(
         f"Inserted {len(new_sections)} new sections, updated {len(updated_sections)} sections."
     )
-    logging.info("Section processing completed!")
+    logger.info("Section processing completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_class_meetings(rows):
-    logging.info("Starting ClassMeeting insertions and updates...")
+    logger.info("Starting ClassMeeting insertions and updates...")
 
     section_cache = {
         (section.course.guid, section.class_number, section.instructor.emplid): section
@@ -458,14 +454,14 @@ def insert_class_meetings(rows):
         end_time = _parse_time(row.get("Meeting End Time", ""))
 
         if not start_time:
-            logging.error(
+            logger.error(
                 f"Invalid start_time format for Class {class_number} "
                 f"in Term {term_code} on row {row}."
             )
             continue
 
         if not end_time:
-            logging.error(
+            logger.error(
                 f"Invalid end_time for Class {class_number} "
                 f"in Term {term_code} on row {row}."
             )
@@ -537,19 +533,19 @@ def insert_class_meetings(rows):
             # we insert the same semester data twice in a row. Bug?
             ClassMeeting.objects.bulk_update(updated_meetings, update_fields)
     except Exception as e:
-        logging.error(f"Error in bulk operation: {e}")
+        logger.error(f"Error in bulk operation: {e}")
 
-    logging.info(
+    logger.info(
         f"Created {len(new_meetings)} new class meetings and updated {len(updated_meetings)} existing class meetings."
     )
-    logging.info("ClassMeeting insertions and updates completed!")
+    logger.info("ClassMeeting insertions and updates completed!")
 
 
 # -------------------------------------------------------------------------------------#
 
 
 def insert_class_year_enrollments(rows):
-    logging.info("Starting ClassYearEnrollment insertions and updates...")
+    logger.info("Starting ClassYearEnrollment insertions and updates...")
 
     # Initial cache of Section IDs to minimize database queries.
     section_cache = {
@@ -582,7 +578,7 @@ def insert_class_year_enrollments(rows):
                 try:
                     class_year = int(class_year) if class_year else None
                 except ValueError:
-                    logging.error(f"Invalid class year: {class_year}")
+                    logger.error(f"Invalid class year: {class_year}")
                     continue
 
                 enrollment_key = (section_id, class_year)
@@ -615,12 +611,12 @@ def insert_class_year_enrollments(rows):
                     ["enrl_seats"],
                 )
     except Exception as e:
-        logging.error(f"Error in bulk operation: {e}")
+        logger.error(f"Error in bulk operation: {e}")
 
-    logging.info(
+    logger.info(
         f"Created {len(new_enrollments)} new class year enrollments and updated {len(updated_enrollment_data)} existing ones."
     )
-    logging.info("ClassYearEnrollment insertions and updates completed!")
+    logger.info("ClassYearEnrollment insertions and updates completed!")
 
 
 # -------------------------------------------------------------------------------------#
@@ -694,7 +690,7 @@ def insert_course_data(semester):
                 insert_class_year_enrollments(formatted_rows)
 
     except Exception as e:
-        logging.error(f"Transaction failed: {e}")
+        logger.error(f"Transaction failed: {e}")
 
 
 # -------------------------------------------------------------------------------------#

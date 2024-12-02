@@ -18,6 +18,7 @@ sys.path.append(str(Path("../").resolve()))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
 django.setup()
 from hoagieplan.models import (
+    Certificate,
     Course,
     CustomUser,
     Degree,

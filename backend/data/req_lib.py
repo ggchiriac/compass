@@ -1,7 +1,7 @@
 from typing import Dict, Any
 import json
 import requests
-from .configs.configs import Configs
+from configs import Configs
 
 
 class ReqLib:

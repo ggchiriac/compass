@@ -1,69 +1,137 @@
-import collections
-import copy
+import os
+import sys
 import json
+import django
+import logging
+import collections
+import time
+import copy
+from pathlib import Path
+from django.db.models import Prefetch
 
-from django.db.models import Prefetch, Q
-from django.http import JsonResponse
-
-from hoagieplan.logger import logger
-from hoagieplan.api.dashboard.utils import cumulative_time
-from hoagieplan.api.profile.info import fetch_user_info
-from hoagieplan.models import (
-    Certificate,
+logging.basicConfig(level=logging.INFO)
+sys.path.append(str(Path("../").resolve()))
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings")
+django.setup()
+from compass.models import (
     Course,
-    CustomUser,
+    Department,
     Degree,
     Major,
     Minor,
-    Requirement,
+    Certificate,
+    CustomUser,
     UserCourses,
+    Requirement,
+    CourseComments,
+    CourseEvaluations,
 )
-from hoagieplan.serializers import CourseSerializer
+import constants
 
-def manually_settle(request):
-    data = json.loads(request.body)
-    crosslistings = data.get("crosslistings")
-    req_id = int(data.get("reqId"))
-    net_id = request.headers.get("X-NetId")
-    user_inst = CustomUser.objects.get(username=net_id)
-    course_inst = (
-        Course.objects.select_related("department").filter(crosslistings__iexact=crosslistings).order_by("-guid")[0]
-    )
 
-    user_course_inst = UserCourses.objects.get(user_id=user_inst.id, course=course_inst)
-    if user_course_inst.requirement_id is None:
-        user_course_inst.requirement_id = req_id
-        user_course_inst.save()
+# Have a custom check_requirements recursive function for minors. Can
+# return a huge dict that says how close to completion each minor is
 
-        return JsonResponse({"Manually settled": user_course_inst.id})
+# courses = [[{"inst" : something, "semester_number" : 1},
+# {"id" : 72967, "semester_number" : 1}, ...], [], [], [], [], [], [], []]
+# other fields: possible_reqs, reqs_satisfied, reqs_double_counted,
+# num_settleable
 
+# req is supposed to be the yaml data. Need a req dict to keep:
+# req instance
+# satisfied: whether the req is satisfied or not
+# settled: courses that were settled to this req (course ids)
+# unsettled: courses that were not settled to this req (course ids)
+# req_list
+
+# Is it better to keep reqs on the server (i.e. variable in this file)
+# or is it better to have a UserRequirements table?
+
+# Need a function that gets user id and creates courses matrix with
+# everything that _init_courses has
+
+# Django model instances are cached so this should be at least as
+# efficient as TigerPath code
+
+
+def cumulative_time(func):
+    def wrapper(*args, **kwargs):
+        if not hasattr(wrapper, "total_time"):
+            wrapper.total_time = 0
+        start_time = time.time()
+        result = func(*args, **kwargs)
+        end_time = time.time()
+        wrapper.total_time += end_time - start_time
+        return result
+
+    wrapper.total_time = 0
+    return wrapper
+
+
+def ensure_list(x):
+    if isinstance(x, list):
+        return x
+    elif isinstance(x, str):
+        return [x]
     else:
-        user_course_inst.requirement_id = None
-        user_course_inst.save()
-
-        return JsonResponse({"Unsettled": user_course_inst.id})
+        return []
 
 
-def mark_satisfied(request):
-    data = json.loads(request.body)
-    req_id = int(data.get("reqId"))
-    marked_satisfied = data.get("markedSatisfied")
-    net_id = request.headers.get("X-NetId")
+@cumulative_time
+def check_user(net_id, major, minors, certificates):
+    output = {}
 
-    user_inst = CustomUser.objects.get(username=net_id)
-    req_inst = Requirement.objects.get(id=req_id)
+    user_inst = CustomUser.objects.get(net_id=net_id)
+    user_courses = create_courses(user_inst)
 
-    if marked_satisfied == "true":
-        user_inst.requirements.add(req_inst)
-        action = "Marked satisfied"
-    elif marked_satisfied == "false":
-        if user_inst.requirements.filter(id=req_id).exists():
-            user_inst.requirements.remove(req_inst)
-            action = "Unmarked satisfied"
+    if major is not None:
+        major_code = major["code"]
+        degree_code = None
+
+        if major_code in constants.AB_MAJORS:
+            degree_code = "AB"
+        elif major_code in constants.BSE_MAJORS:
+            degree_code = "BSE"
+        if degree_code:
+            output[degree_code] = {}
+            formatted_req = check_requirements(user_inst, "Degree", degree_code, user_courses)
+            output[degree_code]["requirements"] = formatted_req
+
+        output[major_code] = {}
+        if major_code != "Undeclared":
+            formatted_req = check_requirements(user_inst, "Major", major_code, user_courses)
         else:
-            return JsonResponse({"error": "Requirement not found in user requirements."})
+            formatted_req = {"code": "Undeclared", "satisfied": True}
+        output[major_code]["requirements"] = formatted_req
 
-    return JsonResponse({"Manually satisfied": req_id, "action": action})
+    output["Minors"] = {}
+    for minor in minors:
+        minor = minor["code"]
+        output["Minors"][minor] = {}
+        formatted_req = check_requirements(user_inst, "Minor", minor, user_courses)
+        output["Minors"][minor]["requirements"] = formatted_req
+
+    output["Certificates"] = {}
+    for certificate in certificates:
+        certificate = certificate["code"]
+        output["Certificates"][certificate] = {}
+        formatted_req = check_requirements(user_inst, "Certificate", certificate, user_courses)
+        output["Certificates"][certificate]["requirements"] = formatted_req
+
+    # print(f"create_courses: {create_courses.total_time} seconds")
+    # print(f"check_requirements: {check_requirements.total_time} seconds")
+    # print(f"_init_courses: {_init_courses.total_time} seconds")
+    # print(f"_init_req: {_init_req.total_time} seconds")
+    # print(f"assign_settled_courses_to_reqs: {assign_settled_courses_to_reqs.total_time} seconds")
+    # print(f"mark_possible_reqs: {mark_possible_reqs.total_time} seconds")
+    # print(f"mark_dist: {mark_dist.total_time} seconds")
+    # print(f"mark_courses: {mark_courses.total_time} seconds")
+    # print(f"mark_all: {mark_all.total_time} seconds")
+    # print(f"mark_settled: {mark_settled.total_time} seconds")
+    # print(f"add_course_lists_to_req: {add_course_lists_to_req.total_time} seconds")
+    # print(f"format_req_output: {format_req_output.total_time} seconds")
+
+    return output
 
 
 @cumulative_time
@@ -86,13 +154,29 @@ def create_courses(user_inst):
     return courses
 
 
-def ensure_list(x):
-    if isinstance(x, list):
-        return x
-    elif isinstance(x, str):
-        return [x]
-    else:
-        return []
+@cumulative_time
+def check_requirements(user_inst, table, code, courses):
+    """Returns information about the requirements satisfied by the courses
+    given in course_ids.
+
+    :param table: the table containing the root of the requirement tree
+    :param id: primary key in table
+    :type req_file: string
+    :type courses: 2D array of dictionaries.
+    :returns: Whether the requirements are satisfied
+    :returns: The list of courses with info about the requirements they satisfy
+    :returns: A simplified json with info about how much of each requirement is satisfied
+    :rtype: (bool, dict, dict)
+    """
+    req = cached_init_req(user_inst, table, code)
+    manually_satisfied_reqs = list(user_inst.requirements.values_list("id", flat=True))
+    courses = _init_courses(courses)
+    mark_possible_reqs(req, courses)
+    assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs)
+    add_course_lists_to_req(req, courses)
+    # formatted_courses = format_courses_output(courses)
+    formatted_req = format_req_output(req, courses, manually_satisfied_reqs)
+    return formatted_req
 
 
 # These fields could be in the UserCourses table by default
@@ -305,7 +389,8 @@ def assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs):
 
 @cumulative_time
 def mark_possible_reqs(req, courses):
-    """Finds all the requirements that each course can satisfy."""
+    """Finds all the requirements that each course can satisfy.
+    """
     if "req_list" in req:
         for sub_req in req["req_list"]:
             mark_possible_reqs(sub_req, courses)
@@ -331,7 +416,6 @@ def mark_dist(req, courses):
                 continue
 
             course_dist = course_dist.split(" or ")
-            dist_req = req["dist_req"]
             ok = 0
 
             for area in course_dist:
@@ -463,7 +547,8 @@ def add_course_lists_to_req(req, courses):
 
 @cumulative_time
 def format_req_output(req, courses, manually_satisfied_reqs):
-    """Enforce the type and order of fields in the req output."""
+    """Enforce the type and order of fields in the req output
+    """
     output = collections.OrderedDict()
     if req["table"] != "Requirement" and req["code"]:
         output["code"] = req["code"]
@@ -519,302 +604,107 @@ def format_req_output(req, courses, manually_satisfied_reqs):
     return output
 
 
-@cumulative_time
-def check_requirements(user_inst, table, code, courses):
-    """Returns information about the requirements satisfied by the courses
-    given in course_ids.
-
-    :param table: the table containing the root of the requirement tree
-    :param id: primary key in table
-    :type req_file: string
-    :type courses: 2D array of dictionaries.
-    :returns: Whether the requirements are satisfied
-    :returns: The list of courses with info about the requirements they satisfy
-    :returns: A simplified json with info about how much of each requirement is satisfied
-    :rtype: (bool, dict, dict)
-    """
-    req = cached_init_req(user_inst, table, code)
-    manually_satisfied_reqs = list(user_inst.requirements.values_list("id", flat=True))
-    courses = _init_courses(courses)
-    mark_possible_reqs(req, courses)
-    assign_settled_courses_to_reqs(req, courses, manually_satisfied_reqs)
-    add_course_lists_to_req(req, courses)
-    # formatted_courses = format_courses_output(courses)
-    formatted_req = format_req_output(req, courses, manually_satisfied_reqs)
-    return formatted_req
+# ---------------------------- FETCH COURSE COMMENTS ----------------------------------#
 
 
-@cumulative_time
-def check_user(net_id, major, minors, certificates):
-    output = {}
-
-    user_inst = CustomUser.objects.get(username=net_id)
-    user_courses = create_courses(user_inst)
-
-    if major is not None:
-        major_code = major["code"]
-        major_obj = Major.objects.get(code=major_code)
-
-        # Check for degree
-        degrees = major_obj.degree.all()
-        for degree in degrees:
-            output[degree.code] = {}
-            formatted_req = check_requirements(user_inst, "Degree", degree.code, user_courses)
-            output[degree.code]["requirements"] = formatted_req
-
-        # Check for major
-        output[major_code] = {}
-        if major_code != "Undeclared":
-            formatted_req = check_requirements(user_inst, "Major", major_code, user_courses)
-        else:
-            formatted_req = {"code": "Undeclared", "satisfied": True}
-        output[major_code]["requirements"] = formatted_req
-
-    # Check for minors
-    output["Minors"] = {}
-    for minor in minors:
-        minor_code = minor["code"]
-        output["Minors"][minor_code] = {}
-        formatted_req = check_requirements(user_inst, "Minor", minor_code, user_courses)
-        output["Minors"][minor_code]["requirements"] = formatted_req
-
-    # Check for certificates
-    output["Certificates"] = {}
-    for certificate in certificates:
-        certificate_code = certificate["code"]
-        output["Certificates"][certificate_code] = {}
-        formatted_req = check_requirements(user_inst, "Certificate", certificate_code, user_courses)
-        output["Certificates"][certificate_code]["requirements"] = formatted_req
-
-    # print(f"create_courses: {create_courses.total_time} seconds")
-    # print(f"check_requirements: {check_requirements.total_time} seconds")
-    # print(f"_init_courses: {_init_courses.total_time} seconds")
-    # print(f"_init_req: {_init_req.total_time} seconds")
-    # print(f"assign_settled_courses_to_reqs: {assign_settled_courses_to_reqs.total_time} seconds")
-    # print(f"mark_possible_reqs: {mark_possible_reqs.total_time} seconds")
-    # print(f"mark_dist: {mark_dist.total_time} seconds")
-    # print(f"mark_courses: {mark_courses.total_time} seconds")
-    # print(f"mark_all: {mark_all.total_time} seconds")
-    # print(f"mark_settled: {mark_settled.total_time} seconds")
-    # print(f"add_course_lists_to_req: {add_course_lists_to_req.total_time} seconds")
-    # print(f"format_req_output: {format_req_output.total_time} seconds")
-
-    return output
-
-
-def transform_requirements(requirements):
-    # Base case: If there's no 'subrequirements', return the requirements as is
-    if "subrequirements" not in requirements:
-        return requirements
-
-    # Recursively transform each subrequirement
-    transformed = {}
-    for key, subreq in requirements["subrequirements"].items():
-        transformed[key] = transform_requirements(subreq)
-
-    # After transformation, remove 'subrequirements' key
-    requirements.pop("subrequirements")
-
-    # Merge the 'satisfied' status and the transformed subrequirements
-    # print(f"requirements: {requirements}, transformed: {transformed}\n")
-    return {**requirements, **transformed}
-
-
-def transform_data(data):
-    transformed_data = {}
-
-    # Go through each major/minor and transform accordingly
-    for _, value in data.items():
-        if "requirements" in value:
-            # Extract 'code' and 'satisfied' from 'requirements'
-            code = value["requirements"].pop("code")
-            satisfied = value["requirements"].pop("satisfied")
-
-            # Transform the rest of the requirements
-            transformed_reqs = transform_requirements(value["requirements"])
-
-            # Combine 'satisfied' status and transformed requirements
-            transformed_data[code] = {"satisfied": satisfied, **transformed_reqs}
-
-    return transformed_data
-
-
-def update_requirements(request):
-    net_id = request.headers.get("X-NetId")
-    user_info = fetch_user_info(net_id)
-
-    this_major = user_info["major"]["code"]
-    these_minors = [minor["code"] for minor in user_info["minors"]]
-    these_certificates = [certificate["code"] for certificate in user_info["certificates"]]
-
-    req_dict = check_user(user_info["netId"], user_info["major"], user_info["minors"], user_info["certificates"])
-
-    # Rewrite req_dict so that it is stratified by requirements being met
-    formatted_dict = {}
-    if "AB" in req_dict:
-        formatted_dict["AB"] = req_dict["AB"]
-    elif "BSE" in req_dict:
-        formatted_dict["BSE"] = req_dict["BSE"]
-    formatted_dict[this_major] = req_dict[this_major]
-    for minor in these_minors:
-        formatted_dict[minor] = req_dict["Minors"][minor]
-    for certificate in these_certificates:
-        formatted_dict[certificate] = req_dict["Certificates"][certificate]
-    formatted_dict = transform_data(formatted_dict)
-
-    def pretty_print(data, indent=0):
-        for key, value in data.items():
-            print("  " * indent + str(key))
-            if isinstance(value, dict):
-                pretty_print(value, indent + 1)
-            else:
-                print("  " * (indent + 1) + str(value))
-
-    return JsonResponse(formatted_dict)
-
-
-# ---------------------------- FETCH REQUIREMENT INFO -----------------------------------#
-
-
-def requirement_info(request):
-    req_id = request.GET.get("reqId", "")
-    net_id = request.headers.get("X-NetId")
-    explanation = ""
-    completed_by_semester = 8
-    dist_req = []
-    sorted_dept_list = []
-    sorted_course_list = []
-    sorted_dept_sample_list = []
-    marked_satisfied = False
-
+# dept is the department code (string) and num is the catalog number (int)
+# returns dictionary containing relevant info
+def get_course_comments(dept, num):
+    dept = str(dept)
+    num = str(num)
     try:
-        req_inst = Requirement.objects.get(id=req_id)
-        user_inst = CustomUser.objects.get(username=net_id)
+        dept_code = Department.objects.filter(code=dept).first().id
+        try:
+            this_course_id = Course.objects.filter(department__id=dept_code, catalog_number=num).first().guid
+            this_course_id = this_course_id[4:]
+            try:
+                comments = list(CourseComments.objects.filter(course_guid__endswith=this_course_id))
+                li = []
+                for commentobj in comments:
+                    if 2 <= len(commentobj.comment) <= 2000:
+                        li.append(commentobj.comment)
+                li = list(dict.fromkeys(li))
+                cleaned_li = []
+                for element in li:
+                    element = element.replace('\\"', '"')
+                    element = element.replace("it?s", "it's")
+                    element = element.replace("?s", "'s")
+                    element = element.replace("?r", "'r")
+                    if element[0] == "[" and element[len(element) - 1] == "]":
+                        element = element[1 : len(element) - 1]
 
-        explanation = req_inst.explanation
-        completed_by_semester = req_inst.completed_by_semester
-        if req_inst.dist_req:
-            dist_req = ensure_list(json.loads(req_inst.dist_req))
-            query = Q()
-            for distribution in dist_req:
-                query |= Q(distribution_area_short__icontains=distribution)
-            course_list = (
-                Course.objects.select_related("department")
-                .filter(query)
-                .order_by("course_id", "-guid")
-                .distinct("course_id")
-            )
-        else:
-            excluded_course_ids = req_inst.excluded_course_list.values_list("course_id", flat=True).distinct()
-            course_list = (
-                req_inst.course_list.exclude(course_id__in=excluded_course_ids)
-                .order_by("course_id", "-guid")
-                .distinct("course_id")
-            )
+                    cleaned_li.append(element)
 
-        if course_list:
-            serialized_course_list = CourseSerializer(course_list, many=True)
-            sorted_course_list = sorted(serialized_course_list.data, key=lambda course: course["crosslistings"])
+                dictresult = {}
+                dictresult["reviews"] = cleaned_li
 
-        if req_inst.dept_list:
-            sorted_dept_list = sorted(json.loads(req_inst.dept_list))
+                try:
+                    quality_of_course = (
+                        CourseEvaluations.objects.filter(course_guid__endswith=this_course_id)
+                        .first()
+                        .quality_of_course
+                    )
+                    dictresult["rating"] = quality_of_course
 
-            query = Q()
+                except CourseEvaluations.DoesNotExist:
+                    return dictresult
 
-            for dept in sorted_dept_list:
-                # Fetch the IDs of 5 courses for the current department
-                dept_course_ids = (
-                    Course.objects.select_related("department")
-                    .filter(department__code=dept)
-                    .values_list("id", flat=True)[:5]
-                )
+                return dictresult
 
-                query |= Q(id__in=list(dept_course_ids))
-
-            dept_sample_list = (
-                Course.objects.select_related("department")
-                .filter(query)
-                .order_by("course_id", "-guid")
-                .distinct("course_id")
-            )
-            if dept_sample_list:
-                serialized_dept_sample_list = CourseSerializer(dept_sample_list, many=True)
-                sorted_dept_sample_list = sorted(
-                    serialized_dept_sample_list.data,
-                    key=lambda course: course["crosslistings"],
-                )
-
-        marked_satisfied = user_inst.requirements.filter(id=req_id).exists()
-
-    except Requirement.DoesNotExist:
-        pass
-
-    # mapping:
-    # 3 -> 0
-    # 0 -> 1
-    # 1 -> 2
-    # 7 -> 3
-    # 5 -> 4
-    # 2 -> 5
-    # 6 -> 6
-    # 4 -> 7
-
-    info = {}
-    info[0] = req_id
-    info[1] = explanation
-    info[2] = completed_by_semester
-    info[3] = dist_req
-    info[4] = sorted_dept_list
-    info[5] = sorted_course_list
-    info[6] = sorted_dept_sample_list
-    info[7] = marked_satisfied
-    return JsonResponse(info)
+            except CourseComments.DoesNotExist:
+                return None
+        except Course.DoesNotExist:
+            return None
+    except Department.DoesNotExist:
+        return None
 
 
-def parse_semester(semester_id, class_year):
-    season = semester_id.split(" ")[0]
-    year = int(semester_id.split(" ")[1])
-    is_Fall = 1 if (season == "Fall") else 0
-    semester_num = 8 - ((class_year - year) * 2 - is_Fall)
-
-    return semester_num
+# ---------------------------- FETCH COURSE DETAILS -----------------------------------#
 
 
-def update_courses(request):
+# dept is the department code (string) and num is the catalog number (int)
+# returns dictionary containing relevant info
+def get_course_info(crosslistings):
     try:
-        data = json.loads(request.body)
-        crosslistings = data.get("crosslistings")  # might have to adjust this, print
-        container = data.get("semesterId")
-        net_id = request.headers.get("X-NetId")
-        user_inst = CustomUser.objects.get(username=net_id)
-        class_year = user_inst.class_year
-        course_inst = (
+        course = (
             Course.objects.select_related("department")
-            .filter(crosslistings__iexact=crosslistings)
+            .filter(crosslistings__icontains=crosslistings)
             .order_by("-guid")[0]
         )
+        # if course.course_id:
+        # instructor = "None"
+        # try:
+        #    instructor = Section.objects.filter(course_id=13248).first()
+        # except Section.DoesNotExist:
+        #    instructor = "Information Unavailable"
+        # get relevant info and put it in a dictionary
+        course_dict = {}
+        if course.title:
+            course_dict["Title"] = course.title
+        if course.description:
+            course_dict["Description"] = course.description
+        if course.distribution_area_short:
+            course_dict["Distribution Area"] = course.distribution_area_short
+        # if instructor:
+        #    course_dict["Professor"] = instructor
+        if course.reading_list:
+            clean_reading_list = course.reading_list
+            clean_reading_list = clean_reading_list.replace("//", ", by ")
+            clean_reading_list = clean_reading_list.replace(";", "; ")
+            course_dict["Reading List"] = clean_reading_list
+        if course.reading_writing_assignment:
+            course_dict["Reading / Writing Assignments"] = course.reading_writing_assignment
+        if course.grading_basis:
+            course_dict["Grading Basis"] = course.grading_basis
+        return course_dict
 
-        if container == "Search Results":
-            user_course = UserCourses.objects.get(user=user_inst, course=course_inst)
-            user_course.delete()
-            message = f"User course deleted: {crosslistings}, {net_id}"
+    except Course.DoesNotExist:
+        return None
 
-        else:
-            semester = parse_semester(container, class_year)
 
-            user_course, created = UserCourses.objects.update_or_create(
-                user=user_inst, course=course_inst, defaults={"semester": semester}
-            )
-            if created:
-                message = f"User course added: {semester}, {crosslistings}, {net_id}"
-            else:
-                message = f"User course updated: {semester}, {crosslistings}, {net_id}"
+def main():
+    pass
 
-        return JsonResponse({"status": "success", "message": message})
 
-    except Exception as e:
-        # Log the detailed error internally
-        logger.error(f"An internal error occurred: {e}", exc_info=True)
-
-        # Return a generic error message to the user
-        return JsonResponse({"status": "error", "message": "An internal error has occurred!"})
+if __name__ == "__main__":
+    main()

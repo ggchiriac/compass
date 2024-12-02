@@ -56,6 +56,7 @@ class ColorFormatter(logging.Formatter):
 
         Returns:
             str: The formatted log message with colors applied.
+
         """
         # Apply color based on the log level
         level_color = self.LOG_COLORS.get(record.levelno, Fore.WHITE)

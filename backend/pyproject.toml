@@ -3,15 +3,18 @@
 # ===============================
 [project]
 name = "hoagie-plan"
-version = "1.9.1"
+version = "2.0.0"
 description = "Dependency manager for the Hoagie Plan repository."
 license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12"
 
-# Authors of the project
 authors = [
-    { name = "Hoagie Club" },
+    { name = "Hoagie Club", email = "hoagie@princeton.edu" },
+]
+
+maintainers = [
+    { name = "Hoagie Club", email = "hoagie@princeton.edu" },
 ]
 
 # Project dependencies
@@ -26,7 +29,7 @@ dependencies = [
     "django-cors-headers>=4.5.0",
     "colorama>=0.4.6",
     "psycopg2>=2.9.10",
-    "postgres>=4.0",
+    "tqdm>=4.67.1",
 ]
 
 # ===============================
