@@ -76,6 +76,7 @@ export const hoagieUI = mergeTheme(defaultTheme, {
     yellow300: "#FFD079",
     yellow200: "#FFDFA6",
     yellow100: "#FFEFD2",
+    yellow50: "#FFFAF1",
 
     realBlue300: "#85A3FF",
 

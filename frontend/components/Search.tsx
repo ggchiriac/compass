@@ -407,7 +407,7 @@ const Search: FC = () => {
           <div className="text-sm font-medium text-gray-500">
             Recent searches:
           </div>
-          <div className="flex overflow-x-auto py-2 space-x-2 flex-basis:100px">
+          <div className="flex overflow-x-auto py-2 px-1 space-x-2 flex-basis:100px">
             {recentSearches.map((search, index) => (
               <button
                 key={index}
@@ -418,9 +418,9 @@ const Search: FC = () => {
               </button>
             ))}
           </div>
-          <div className="overflow-x-auto py-2 space-x-2">
+          <div className="overflow-x-auto py-1 px-1 space-x-1">
             <button
-              className="text-gray-500 rounded-full bg-gray-100 hover:bg-gray-200 px-2 focus:outline-none ml-auto"
+              className="bg-red-100 hover:bg-red-200 text-red-800 font-medium py-0.5 px-2 rounded-full text-xs focus:outline-none focus:ring-2 focus:ring-red-300 focus:border-red-300"
               onClick={() => clearRecentSearches()}
             >
               Clear
