@@ -585,6 +585,7 @@ export function Canvas({
 
           if (overContainerId) {
             if (activeContainerId !== overContainerId) {
+              csrfToken = await fetchCsrfToken();
               fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_courses/`, {
                 method: "POST",
                 credentials: "include",
@@ -597,8 +598,10 @@ export function Canvas({
                   crosslistings: active.id.toString().split("|")[1],
                   semesterId: overContainerId,
                 }),
-              }).then((response) => response.json());
-              updateRequirements();
+              }).then((response) => {
+                response.json();
+                updateRequirements();
+              });
             }
           }
 
