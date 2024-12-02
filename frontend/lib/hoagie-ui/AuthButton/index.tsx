@@ -38,17 +38,17 @@ function AuthButton({ variant = "login", href = "" }: AuthButtonProps) {
   const isLogout = variant === "logout";
   const defHref = isLogout ? "/api/auth/logout" : "/api/auth/login";
   return (
-    <a href={href === '' ? defHref : href}>
+    <a href={href === "" ? defHref : href}>
       <Button
         height={56}
         width={majorScale(35)}
         background={theme.colors.yellow100}
-        appearance={isLogout ? 'default' : 'primary'}
+        appearance={isLogout ? "default" : "primary"}
       >
         {logo}
-        <Pane display='flex'>
-          {isLogout ? 'Logout from' : 'Login using'}
-          <Pane marginLeft={minorScale(1)} className='hoagie'>
+        <Pane display="flex">
+          {isLogout ? "Logout from" : "Login using"}
+          <Pane marginLeft={minorScale(1)} className="hoagie">
             hoagie<b>profile</b>
           </Pane>
         </Pane>

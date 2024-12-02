@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useModalStore } from "@/store/modalSlice";
 
 const Contact = () => {
-
   useEffect(() => {
     useModalStore.setState({ currentPage: "contact" });
   }, []);

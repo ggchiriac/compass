@@ -127,7 +127,6 @@ const TeamMemberCard = ({ member, index }: { member: any; index: number }) => (
 );
 
 const About = () => {
-
   useEffect(() => {
     useModalStore.setState({ currentPage: "about" });
   }, []);
@@ -140,7 +139,7 @@ const About = () => {
           <div className="py-12 sm:py-16 lg:pb-20">
             <div className="mx-auto max-w-7xl px-6 lg:px-8">
               {/* Header */}
-              <div className="text-center text-[var(--system-text-color)]">
+              <div className="text-center text-black">
                 <h1 className="text-4xl font-bold sm:text-5xl mb-4">
                   Meet the Team
                 </h1>
@@ -152,10 +151,10 @@ const About = () => {
 
               {/* Founding Team Section */}
               <div className="mt-16">
-                <h2 className="text-3xl font-bold text-center text-[var(--system-text-color)] mb-4">
+                <h2 className="text-3xl font-bold text-center text-black mb-4">
                   Founding Team
                 </h2>
-                <p className="text-center text-lg mb-8 text-[var(--system-text-color)]">
+                <p className="text-center text-lg mb-8 text-black">
                   HoagiePlan started as Compass, a COS 333 project. Windsor and
                   George subsequently <br />
                   worked on Compass as a joint Independent Work project.
@@ -173,13 +172,13 @@ const About = () => {
 
               {/* Team Leads Section */}
               <div className="mt-16">
-                <h2 className="text-3xl font-bold text-center text-[var(--system-text-color)] mb-4">
+                <h2 className="text-3xl font-bold text-center text-black mb-4">
                   Team Leads
                 </h2>
-                <p className="text-center text-lg mb-8 text-[var(--system-text-color)]">
+                <p className="text-center text-lg mb-8 text-black">
                   Development for HoagiePlan continued as part of Hoagie. Issac
                   and Gabriel are <br />
-                  managing HoagiePlan's current developers.
+                  managing HoagiePlan&apos;s current developers.
                 </p>
                 <div className="flex flex-wrap justify-center gap-6">
                   {teamLeads.map((member, index) => (
@@ -194,15 +193,15 @@ const About = () => {
 
               {/* Contributors Section */}
               <div className="mt-16">
-                <h2 className="text-3xl font-bold text-center text-[var(--system-text-color)] mb-4">
+                <h2 className="text-3xl font-bold text-center text-black mb-4">
                   Contributors
                 </h2>
-                <p className="text-center text-lg mb-8 text-[var(--system-text-color)]">
+                <p className="text-center text-lg mb-8 text-black">
                   HoagiePlan would not exist without our talented team of
                   Developers.
                 </p>
                 <ul
-                  className="list-disc text-lg text-[var(--system-text-color)] max-w-2xl mx-auto space-y-4"
+                  className="list-disc text-lg text-black max-w-2xl mx-auto space-y-4"
                   // Optionally adjust padding
                 >
                   {contributors.map((contributor) => (

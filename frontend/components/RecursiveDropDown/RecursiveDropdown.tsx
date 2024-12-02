@@ -29,7 +29,7 @@ interface DropdownProps {
   data: Dictionary;
   user: Profile;
   csrfToken: string;
-  updateRequirements: any;
+  updateRequirements: () => void;
 }
 
 interface SatisfactionStatusProps {
@@ -579,7 +579,7 @@ interface RecursiveDropdownProps {
   dictionary: Dictionary;
   user: Profile;
   csrfToken: string;
-  updateRequirements: any;
+  updateRequirements: () => void;
 }
 
 const RecursiveDropdown: FC<RecursiveDropdownProps> = ({

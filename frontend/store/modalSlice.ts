@@ -10,11 +10,14 @@ interface ModalStore {
   setHasSeenTutorial: (seen: boolean) => void;
 }
 
-const getLocalStorageValue = (key: string, defaultValue: any) => {
+const getLocalStorageValue = <ValueType>(
+  key: string,
+  defaultValue: ValueType,
+): ValueType => {
   if (typeof window === "undefined") return defaultValue;
   try {
     const value = localStorage.getItem(key);
-    return value ? JSON.parse(value) : defaultValue;
+    return value ? (JSON.parse(value) as ValueType) : defaultValue;
   } catch {
     return defaultValue;
   }

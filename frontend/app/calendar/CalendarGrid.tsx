@@ -3,7 +3,7 @@ import { FC, memo } from "react";
 import { CalendarEvent } from "@/types";
 
 import CalendarCard from "./CalendarCard";
-import CalendarTime from './CalendarTime';
+import CalendarTime from "./CalendarTime";
 
 interface CalendarGridProps {
   days: string[];

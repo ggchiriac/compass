@@ -125,13 +125,13 @@ const Calendar: FC = () => {
   return (
     <div>
       <CalendarBody
-          calendarRef={calendarElementRef}
-          days={formattedDays.map((day) => day.name)}
-          startHour={START_HOUR}
-          endHour={END_HOUR}
-          events={events}
-          onEventClick={handleClick}
-        />
+        calendarRef={calendarElementRef}
+        days={formattedDays.map((day) => day.name)}
+        startHour={START_HOUR}
+        endHour={END_HOUR}
+        events={events}
+        onEventClick={handleClick}
+      />
     </div>
   );
 };

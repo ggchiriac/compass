@@ -59,8 +59,7 @@ UNDECLARED = {"code": "Undeclared", "name": "Undeclared"}
 
 
 class UserProfileNotFoundError(Exception):
-    """Exception raised when the user profile is not found or cannot be updated from an external source.
-    """
+    """Exception raised when the user profile is not found or cannot be updated from an external source."""
 
     def __init__(self, message: str, user_id: str = None):
         super().__init__(message)
@@ -72,8 +71,7 @@ class UserProfileNotFoundError(Exception):
 
 
 class UserProfileUpdateError(Exception):
-    """Exception raised for errors that occur when attempting to update the user profile in the database.
-    """
+    """Exception raised for errors that occur when attempting to update the user profile in the database."""
 
     def __init__(self, message: str, user_id: str = None, errors: dict = None):
         super().__init__(message)
@@ -89,8 +87,7 @@ class UserProfileUpdateError(Exception):
 
 
 class CASAuthenticationException(Exception):
-    """Exception raised when there is a failure in the CAS authentication process.
-    """
+    """Exception raised when there is a failure in the CAS authentication process."""
 
     def __init__(self, message: str, details: str = None):
         super().__init__(message)
@@ -259,23 +256,25 @@ def update_profile(request):
 class CASAuthBackend:
     """CAS authentication backend.
 
-    Attributes:
+    Attributes
+    ----------
         cas_url (str): The CAS server URL.
 
     """
 
     def __init__(self):
-        """Initializes the class instance with the CAS URL from the settings.
-        """
+        """Initializes the class instance with the CAS URL from the settings."""
         self.cas_url = settings.CAS_SERVER_URL
 
     def _strip_ticket(self, request):
         """Strips ticket parameter from the URL.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
 
         Returns:
+        -------
             str: The URL with the ticket parameter stripped.
 
         """
@@ -286,10 +285,12 @@ class CASAuthBackend:
         """Validates the CAS ticket.
 
         Args:
+        ----
             ticket (str): CAS ticket string.
             service_url (str): Service URL string.
 
         Returns:
+        -------
             str: The authenticated username if successful, None otherwise.
 
         """
@@ -321,9 +322,11 @@ class CASAuthBackend:
         """Authenticates the user using CAS.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
 
         Returns:
+        -------
             tuple: (user, None) if successful, (None, None) otherwise.
 
         """
@@ -349,18 +352,19 @@ class CASAuthBackend:
 
 
 class CAS(APIView):
-    """Handles single-sign-on CAS authentication with token-based authentication.
-    """
+    """Handles single-sign-on CAS authentication with token-based authentication."""
 
     def get(self, request):
         """Handles GET requests to the CAS endpoint.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
             *args: Additional positional arguments.
             **kwargs: Additional keyword arguments.
 
         Returns:
+        -------
             JsonResponse or HttpResponse: The appropriate response based on the action parameter.
 
         """
@@ -378,9 +382,11 @@ class CAS(APIView):
         """Authenticates a user based on the request object provided.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
 
         Returns:
+        -------
             JsonResponse: A JSON response indicating if the user is authenticated along with user information.
 
         """
@@ -400,9 +406,11 @@ class CAS(APIView):
         authenticates the user, and redirects accordingly.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
 
         Returns:
+        -------
             HttpResponse: Redirects to the dashboard if the user is authenticated,
                 redirects to the dashboard after successful authentication,
                 redirects to the CAS login URL if authentication fails,
@@ -441,9 +449,11 @@ class CAS(APIView):
         """Logs out the user by flushing the session and redirecting to the CAS logout URL.
 
         Args:
+        ----
             request (HttpRequest): The incoming request object.
 
         Returns:
+        -------
             HttpResponse: Redirects to the CAS logout URL.
 
         """
@@ -484,8 +494,7 @@ def make_sort_key(dept):
 
 
 class SearchCourses(APIView):
-    """Handles search queries for courses.
-    """
+    """Handles search queries for courses."""
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get("course", None)
@@ -573,7 +582,7 @@ class SearchCourses(APIView):
                     if courses:
                         serialized_courses = CourseSerializer(courses, many=True)
                         sorted_data = sorted(serialized_courses.data, key=make_sort_key(dept))
-                        print(f"Search time: {time.time() - init_time}")
+                        # print(f"Search time: {time.time() - init_time}")
                         return JsonResponse({"courses": sorted_data})
                     return JsonResponse({"courses": []})
             except Exception as e:
@@ -584,8 +593,7 @@ class SearchCourses(APIView):
 
 
 class GetUserCourses(APIView):
-    """Retrieves user's courses for frontend
-    """
+    """Retrieves user's courses for frontend"""
 
     def get(self, request, *args, **kwargs):
         net_id = request.session["net_id"]
@@ -973,7 +981,6 @@ class FetchCalendarClasses(APIView):
 
     def get(self, request, term, course_id):
         sections = self.get_unique_class_meetings(term, course_id)
-        print("term", term)
         if not sections:
             return Response({"error": "No sections found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -991,27 +998,26 @@ class FetchCalendarClasses(APIView):
         selected_instructor = next(iter(sections_by_instructor.keys()))
         selected_sections_data = sections_by_instructor[selected_instructor]
 
-        for section_data in selected_sections_data:
-            print(f"ID: {section_data['id']}")
-            print(f"Class Section: {section_data['class_section']}")
-            print(f"Class Type: {section_data['class_type']}")
-            print(f"Course ID: {section_data['course']['course_id']}")
-            print(f"Course Title: {section_data['course']['title']}")
-            print(f"Instructor: {section_data['instructor']['name']}")
-            print(f"Capacity: {section_data['capacity']}")
-            print(f"Enrollment: {section_data['enrollment']}")
-            for meeting in section_data["class_meetings"]:
-                print(f"  Meeting ID: {meeting['id']}")
-                print(f"  Days: {meeting['days']}")
-                print(f"  Start Time: {meeting['start_time']}")
-                print(f"  End Time: {meeting['end_time']}")
-                print(f"  Building Name: {meeting['building_name']}")
-                print(f"  Room: {meeting['room']}")
+        # for section_data in selected_sections_data:
+        #     print(f"ID: {section_data['id']}")
+        #     print(f"Class Section: {section_data['class_section']}")
+        #     print(f"Class Type: {section_data['class_type']}")
+        #     print(f"Course ID: {section_data['course']['course_id']}")
+        #     print(f"Course Title: {section_data['course']['title']}")
+        #     print(f"Instructor: {section_data['instructor']['name']}")
+        #     print(f"Capacity: {section_data['capacity']}")
+        #     print(f"Enrollment: {section_data['enrollment']}")
+        #     for meeting in section_data["class_meetings"]:
+        #         print(f"  Meeting ID: {meeting['id']}")
+        #         print(f"  Days: {meeting['days']}")
+        #         print(f"  Start Time: {meeting['start_time']}")
+        #         print(f"  End Time: {meeting['end_time']}")
+        #         print(f"  Building Name: {meeting['building_name']}")
+        #         print(f"  Room: {meeting['room']}")
 
         return Response(selected_sections_data, status=status.HTTP_200_OK)
 
     def get_unique_class_meetings(self, term, course_id):
-        print(term)
         sections = Section.objects.filter(term__term_code=term, course__course_id=course_id)
 
         unique_sections = sections.select_related("course", "instructor").prefetch_related(

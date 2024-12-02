@@ -175,8 +175,7 @@ const useCalendarStore = create<CalendarStore>()(
           //   'Initial sections needing choice:',
           //   calendarEvents.map((s) => s.needsChoice)
           // );
-        } catch (error) {
-          // console.error('Error adding course:', error);
+        } catch {
           set({
             error: "Failed to add course. Please try again.",
             loading: false,

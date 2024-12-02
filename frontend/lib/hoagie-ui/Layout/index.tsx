@@ -10,16 +10,21 @@
  * and/or sell copies of the software. This software is provided "as-is", without warranty of any kind.
  */
 
-'use client';
+"use client";
 
-import { Pane } from 'evergreen-ui';
-import { ReactNode } from 'react';
-import { useTheme } from 'evergreen-ui';
+import { Pane } from "evergreen-ui";
+import { ReactNode } from "react";
+import { useTheme } from "evergreen-ui";
 
 function Layout({ children }: { children: ReactNode }) {
   const theme = useTheme();
   return (
-    <Pane display='flex' flexDirection='column' minHeight='100vh' background={theme.colors.yellow100}>
+    <Pane
+      display="flex"
+      flexDirection="column"
+      minHeight="100vh"
+      background={theme.colors.yellow100}
+    >
       {children}
     </Pane>
   );

@@ -11,10 +11,9 @@ import {
   ChevronRightIcon,
 } from "evergreen-ui";
 
-import { useUser } from '@auth0/nextjs-auth0/client';
+import { useUser } from "@auth0/nextjs-auth0/client";
 import SkeletonApp from "@/components/SkeletonApp";
 import tabStyles from "@/components/TabbedMenu/TabbedMenu.module.css";
-import useAuthStore from "@/store/authSlice";
 import useFilterStore from "@/store/filterSlice";
 import UserState from "@/store/userSlice";
 import { terms } from "@/utils/terms";
@@ -29,14 +28,14 @@ const CalendarUI: FC = () => {
   const [currentPage, setCurrentPage] = useState(2);
   const userProfile = UserState((state) => state.profile);
   const { termFilter, setTermFilter } = useFilterStore((state) => state);
-  const semesterList = useMemo(() => Object.keys(terms).reverse(), [terms]);
+  const semesterList = useMemo(() => Object.keys(terms).reverse(), []);
   const semestersPerPage = 5;
   const totalPages = Math.ceil(semesterList.length / semestersPerPage);
 
   useEffect(() => {
     const currentSemester = Object.values(terms)[0];
     setTermFilter(currentSemester);
-  }, []);
+  }, [setTermFilter]);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {

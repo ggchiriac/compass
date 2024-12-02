@@ -20,6 +20,7 @@ import {
   Text,
 } from "evergreen-ui";
 import { UserProfile } from "@auth0/nextjs-auth0/client";
+import Link from "next/link";
 
 interface ProfileCardProps {
   user: UserProfile;
@@ -65,9 +66,9 @@ function ProfileCard({
           Settings
         </Button>
       )}
-      <a href="/api/auth/logout">
+      <Link href="/api/auth/logout">
         <Button marginTop={16}>Log Out</Button>
-      </a>
+      </Link>
     </Card>
   );
 }
