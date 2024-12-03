@@ -1,18 +1,24 @@
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC } from "react";
 
-import LoadingComponent from '../LoadingComponent';
-import { RecursiveDropdown } from '../RecursiveDropDown';
+import LoadingComponent from "../LoadingComponent";
+import { RecursiveDropdown } from "../RecursiveDropDown";
 
-import styles from './TabbedMenu.module.scss';
+import styles from "./TabbedMenu.module.css";
+import { Profile } from "@/types";
 
 interface TabbedMenuProps {
   tabsData: { [key: string]: object };
+  profile: Profile;
   csrfToken: string;
-  checkRequirements: any;
+  updateRequirements: any;
 }
 
-const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirements }) => {
-  // console.log(tabsData);
+const TabbedMenu: FC<TabbedMenuProps> = ({
+  tabsData,
+  profile,
+  csrfToken,
+  updateRequirements,
+}) => {
   const [activeTab, setActiveTab] = useState<string | null>(null);
 
   useEffect(() => {
@@ -37,7 +43,7 @@ const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirement
         {Object.keys(tabsData).map((tabKey) => (
           <li
             key={tabKey}
-            className={tabKey === activeTab ? styles.active : ''}
+            className={tabKey === activeTab ? styles.active : ""}
             onClick={() => handleTabClick(tabKey)}
             // style={{
             //   fontWeight: tabsData[tabKey]['satisfied'] ? '500' : 'normal',
@@ -49,8 +55,8 @@ const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirement
         ))}
       </ul>
       <div className={styles.tabContent}>
-        {activeTab === 'Undeclared' ? (
-          <div className='text-sm font-medium text-gray-500'>
+        {activeTab === "Undeclared" ? (
+          <div className="text-sm font-medium text-gray-500">
             To choose your major and minor(s), select
             <strong> Account Settings </strong>
             within your profile in the top right-hand corner.
@@ -60,8 +66,9 @@ const TabbedMenu: FC<TabbedMenuProps> = ({ tabsData, csrfToken, checkRequirement
             <RecursiveDropdown
               key={activeTab}
               dictionary={tabsData[activeTab]}
+              profile={profile}
               csrfToken={csrfToken}
-              checkRequirements={checkRequirements}
+              updateRequirements={updateRequirements}
             />
           )
         )}

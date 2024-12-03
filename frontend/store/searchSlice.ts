@@ -1,6 +1,6 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
-import { SearchStoreState } from '../types';
+import { SearchStoreState } from "../types";
 
 const useSearchStore = create<SearchStoreState>((set) => ({
   searchResults: [],
@@ -8,18 +8,18 @@ const useSearchStore = create<SearchStoreState>((set) => ({
   error: null,
   loading: false,
   setSearchResults: (results) => set({ searchResults: results }),
-  clearRecentSearches: () => set({recentSearches: []}),
+  clearRecentSearches: () => set({ recentSearches: [] }),
   addRecentSearch: (query) => {
     let trimmedQuery = query.trim();
     if (trimmedQuery.length === 0) {
       return;
     }
-    trimmedQuery = trimmedQuery.length > 120 ? trimmedQuery.slice(0, 120) : trimmedQuery;
+    trimmedQuery =
+      trimmedQuery.length > 120 ? trimmedQuery.slice(0, 120) : trimmedQuery;
     set((state) => {
-      const updatedRecentSearches = [...new Set([trimmedQuery, ...state.recentSearches])].slice(
-        0,
-        5
-      );
+      const updatedRecentSearches = [
+        ...new Set([trimmedQuery, ...state.recentSearches]),
+      ].slice(0, 5);
       return { recentSearches: updatedRecentSearches };
     });
   },

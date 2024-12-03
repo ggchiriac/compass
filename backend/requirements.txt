@@ -82,7 +82,7 @@ typing-extensions==4.12.2
     # via hoagieplan-backend (pyproject.toml)
 tzdata==2024.1
     # via hoagieplan-backend (pyproject.toml)
-ujson==5.10.0
+orjson==3.10.12
     # via hoagieplan-backend (pyproject.toml)
 urllib3==2.2.2
     # via hoagieplan-backend (pyproject.toml)

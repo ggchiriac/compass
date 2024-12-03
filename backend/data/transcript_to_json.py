@@ -1,4 +1,3 @@
-from pypdf import PdfReader
 import pdfplumber
 
 def transcript_to_json(pdf_path):

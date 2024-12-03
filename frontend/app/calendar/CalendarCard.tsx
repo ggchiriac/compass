@@ -1,9 +1,7 @@
-import { FC, CSSProperties } from 'react';
-
-import { CalendarEvent } from '@/types';
-
-import './Calendar.scss';
-import { departmentColors } from '@/utils/departmentColors';
+import { FC, CSSProperties } from "react";
+import { CalendarEvent } from "@/types";
+import "./Calendar.css";
+import { departmentColors } from "@/utils/departmentColors";
 
 interface CalendarCardProps {
   event: CalendarEvent;
@@ -25,49 +23,54 @@ const CalendarCard: FC<CalendarCardProps> = ({
   endIndex,
   dept,
 }) => {
-  const getGradientStyle = (dept: string) => {
-    return departmentColors[dept] || 'linear-gradient(135deg, #3498db, #2980b9)'; // Default color
-  };
+  function getGradientStyle(dept: string, needsChoice: boolean, isChosen: boolean): string {
+    const baseGradient =
+      departmentColors[dept] || "linear-gradient(135deg, #3498db, #2980b9)";
+
+    if (!needsChoice || isChosen) {
+      return baseGradient;
+    }
+
+    return `
+      ${baseGradient},
+      repeating-linear-gradient(
+        45deg,
+        rgba(255, 255, 255, 0.1) 0px,
+        rgba(255, 255, 255, 0.1) 8px,
+        rgba(0, 0, 0, 0.05) 8px,
+        rgba(0, 0, 0, 0.05) 16px
+      )
+    `;
+  }
 
   return (
     <div
       className={`calendar-card ${event.textColor}`}
       style={{
-        background: getGradientStyle(dept),
+        background: getGradientStyle(dept, event.needsChoice, event.isChosen),
         opacity: event.needsChoice && !event.isChosen ? 0.5 : 1,
         gridRow: `${startIndex} / ${endIndex}`,
         gridColumn: `${event.startColumnIndex + 1} / span 1`,
         width: `calc(100% * ${width})`,
         marginLeft: `calc(100% * ${offsetLeft})`,
-        overflow: 'hidden',
+        overflow: "hidden",
+        position: "relative",
       }}
       onClick={onSectionClick}
     >
-      {/* <div className='card-header'></div>
-      <div className='card-body'>
-        {relevantMeetings.map((classMeeting, index) => (
-          <div key={index} className='event-details'>
-            <div className='event-department'>
-              <span className='department-code'>{event.course.department_code}</span>
-              <span className='catalog-number'>{event.course.catalog_number}</span>
-            </div>
-            <div className='event-location'>
-              <span className='building-name'>{classMeeting.building_name}</span>
-            </div>
-          </div>
-        ))}
-      </div> */}
-      <div className='event-department'>
-        {event.course.department_code} {event.course.catalog_number}
+      <div className="event-department">
+        {event.course.department_code} {event.course.catalog_number} - {event.section.class_section}
       </div>
-      {/* TODO: Add start time, end time, building name, room number*/}
-      <div className='text-xs event-department'>{event.section.class_section}</div>
-      {/* Button */}
-      <div className='text-xs event-department card-enrollment'>
-        {event.section.enrollment} / {event.section.capacity}
+      
+      <div className="text-sm text-white/80 mt-1">
+        {event.startTime} – {event.endTime}
+      </div>
+      
+      <div className="flex justify-between items-center text-sm text-white/80 mt-1">
+        <span>{event.section.class_meetings[0].building_name}</span>
+        <span>{event.section.enrollment} / {event.section.capacity}</span>
       </div>
     </div>
-    
   );
 };
 
