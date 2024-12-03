@@ -28,8 +28,8 @@ const allowedOrigins = [
   'http://localhost:8000', // Local Django development
   process.env.HOAGIE, // Frontend URL
   process.env.BACKEND, // Backend URL
-  process.env.HOAGIE?.replace('https://', 'http://'), // HTTP variants
-  process.env.BACKEND?.replace('https://', 'http://'),
+  process.env.HOAGIE.replace('https://', 'http://'), // HTTP variants
+  process.env.BACKEND.replace('https://', 'http://'),
 ].filter(Boolean); // Remove any undefined values
 
 export function middleware(req: NextRequest) {

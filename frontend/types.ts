@@ -41,7 +41,7 @@ export type Profile = {
   firstName: string;
   lastName: string;
   classYear: number;
-  major: MajorMinorType;
+  major: MajorMinorType | string;
   minors?: MajorMinorType[];
   certificates?: MajorMinorType[];
   netId: string;

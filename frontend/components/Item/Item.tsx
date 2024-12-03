@@ -80,11 +80,11 @@ export const Item = memo(
           style={
             {
               ...wrapperStyle,
-              transition: [transition, wrapperStyle?.transition].filter(Boolean).join(', '),
+              transition: [transition, wrapperStyle.transition].filter(Boolean).join(', '),
               '--translate-x': transform ? `${Math.round(transform.x)}px` : undefined,
               '--translate-y': transform ? `${Math.round(transform.y)}px` : undefined,
-              '--scale-x': transform?.scaleX ? `${transform.scaleX}` : undefined,
-              '--scale-y': transform?.scaleY ? `${transform.scaleY}` : undefined,
+              '--scale-x': transform.scaleX ? `${transform.scaleX}` : undefined,
+              '--scale-y': transform.scaleY ? `${transform.scaleY}` : undefined,
               '--index': index,
               '--color_primary': color_primary,
               '--color_secondary': color_secondary,

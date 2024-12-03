@@ -98,28 +98,30 @@
 
 // TODO: Type-safe auth fix 3
 
-import "./globals.css";
-import "@/lib/hoagie-ui/Theme/theme.css";
+import './globals.css';
+import '@/lib/hoagie-ui/Theme/theme.css';
 
-import { ReactNode } from "react";
-import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react";
-import { getSession } from "@auth0/nextjs-auth0";
-import { UserProvider } from "@auth0/nextjs-auth0/client";
-import { cookies } from "next/headers";
+import type { ReactNode } from 'react';
 
-import Content from "@/app/content";
+import { getSession } from '@auth0/nextjs-auth0';
+import { UserProvider } from '@auth0/nextjs-auth0/client';
+import { Analytics } from '@vercel/analytics/react';
+import { cookies } from 'next/headers';
+
+import Content from '@/app/content';
+
+import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Plan by Hoagie",
-  description: "Princeton, All In One",
-  manifest: "manifest.json",
+  title: 'Plan by Hoagie',
+  description: 'Princeton, All In One',
+  manifest: 'manifest.json',
 };
 
 async function fetchSession() {
   const cookieStore = cookies();
 
-  const sessionCookie = cookieStore.get("appSession");
+  const sessionCookie = cookieStore.get('appSession');
   if (!sessionCookie) {
     return null;
   }
@@ -136,18 +138,14 @@ async function fetchSession() {
  * @param children - The child components to render within the layout.
  * @returns JSX Element representing the root HTML structure.
  */
-export default async function RootLayout({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
   const session = await fetchSession();
 
   return (
-    <html lang="en" className="bg-hoagieplan-dark-yellow">
+    <html lang='en' className='bg-hoagieplan-dark-yellow'>
       <UserProvider>
-        <body className="antialiased">
-          <Content user={session?.user}>{children}</Content>
+        <body className='antialiased'>
+          <Content user={session.user}>{children}</Content>
           <Analytics />
         </body>
       </UserProvider>

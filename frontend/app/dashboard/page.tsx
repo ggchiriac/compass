@@ -10,7 +10,6 @@ import useUserSlice from '@/store/userSlice';
 
 const Dashboard: FC = () => {
   const profile = useUserSlice((state) => state.profile);
-console.log(profile)
   useEffect(() => {
     useModalStore.setState({ currentPage: 'dashboard' });
   }, []);
@@ -19,7 +18,7 @@ console.log(profile)
     <>
       <main className='z-10 flex flex-grow rounded pb-0.5vh pl-0.5vw pr-0.5vw pt-0.5vh'>
         {profile && profile.netId !== '' ? (
-          <Canvas profile={profile} columns={1} />
+          <Canvas profile={profile} columns={2} />
         ) : (
           <div>
             <SkeletonApp />
