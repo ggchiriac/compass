@@ -1,28 +1,15 @@
-import withPWA from 'next-pwa';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import withPWA from "next-pwa";
 
 const nextConfig = {
+  eslint: {
+    ignoreDuringBuilds: false,
+  },
+  typescript: {
+    ignoreBuildErrors: false,
+  },
   reactStrictMode: true,
-  sassOptions: {
-    includePaths: [path.join(__dirname, 'styles')],
-  },
-  env: {
-    PUCOMPASS: process.env.PUCOMPASS,
-    BACKEND: process.env.BACKEND,
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.BACKEND}/:path*`,
-      },
-    ];
-  },
   ...withPWA({
-    dest: 'public',
+    dest: "public",
     register: true,
     skipWaiting: true,
   }),
