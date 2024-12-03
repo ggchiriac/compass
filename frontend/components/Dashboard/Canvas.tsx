@@ -1,7 +1,7 @@
 /*
-* This is the beginning of the refactoring of this abomination of a file.
-* - windsor
-*/
+ * This is the beginning of the refactoring of this abomination of a file.
+ * - windsor
+ */
 
 "use client";
 

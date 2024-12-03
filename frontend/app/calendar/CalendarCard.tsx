@@ -23,7 +23,11 @@ const CalendarCard: FC<CalendarCardProps> = ({
   endIndex,
   dept,
 }) => {
-  function getGradientStyle(dept: string, needsChoice: boolean, isChosen: boolean): string {
+  function getGradientStyle(
+    dept: string,
+    needsChoice: boolean,
+    isChosen: boolean,
+  ): string {
     const baseGradient =
       departmentColors[dept] || "linear-gradient(135deg, #3498db, #2980b9)";
 
@@ -59,16 +63,19 @@ const CalendarCard: FC<CalendarCardProps> = ({
       onClick={onSectionClick}
     >
       <div className="event-department">
-        {event.course.department_code} {event.course.catalog_number} - {event.section.class_section}
+        {event.course.department_code} {event.course.catalog_number} -{" "}
+        {event.section.class_section}
       </div>
-      
+
       <div className="text-sm text-white/80 mt-1">
         {event.startTime} – {event.endTime}
       </div>
-      
+
       <div className="flex justify-between items-center text-sm text-white/80 mt-1">
         <span>{event.section.class_meetings[0].building_name}</span>
-        <span>{event.section.enrollment} / {event.section.capacity}</span>
+        <span>
+          {event.section.enrollment} / {event.section.capacity}
+        </span>
       </div>
     </div>
   );
