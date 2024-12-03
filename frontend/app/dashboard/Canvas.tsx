@@ -1,93 +1,90 @@
-'use client';
+"use client";
 
-import type { CSSProperties } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { CSSProperties, useCallback, useEffect, useRef, useState } from "react";
 
 import {
   closestCenter,
   pointerWithin,
   rectIntersection,
+  CollisionDetection,
   DndContext,
   DragOverlay,
+  DropAnimation,
   getFirstCollision,
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
+  Modifiers,
+  UniqueIdentifier,
   useSensors,
   useSensor,
   MeasuringStrategy,
-  defaultDropAnimationSideEffects,
-} from '@dnd-kit/core';
-import { SortableContext, useSortable, defaultAnimateLayoutChanges } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import { createPortal } from 'react-dom';
-
-import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearchItem.module.css';
-import Search from '@/components/Search';
-import TabbedMenu from '@/components/TabbedMenu/TabbedMenu';
-import useSearchStore from '@/store/searchSlice';
-import type { CertificateType, Course, MajorMinorType, Profile } from '@/types';
-import { fetchCsrfToken } from '@/utils/csrf';
-
-import { Item, Container } from '../../components';
-
-import { coordinateGetter as multipleContainersCoordinateGetter } from './multipleContainersKeyboardCoordinates';
-
-import type { ContainerProps } from '../../components';
-import type {
-  CollisionDetection,
-  DropAnimation,
-  Modifiers,
-  UniqueIdentifier,
   KeyboardCoordinateGetter,
-} from '@dnd-kit/core';
-import type { AnimateLayoutChanges } from '@dnd-kit/sortable';
+  defaultDropAnimationSideEffects,
+} from "@dnd-kit/core";
+import {
+  AnimateLayoutChanges,
+  SortableContext,
+  useSortable,
+  defaultAnimateLayoutChanges,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { createPortal } from "react-dom";
+
+import { Course, Profile } from "@/types";
+
+import dashboardItemStyles from "@/components/DashboardSearchItem/DashboardSearchItem.module.css";
+import Search from "@/components/Search";
+import TabbedMenu from "@/components/TabbedMenu/TabbedMenu";
+import useSearchStore from "@/store/searchSlice";
+import { fetchCsrfToken } from "@/utils/csrf";
+
+import { Item, Container, ContainerProps } from "../../components";
+
+import { coordinateGetter as multipleContainersCoordinateGetter } from "./multipleContainersKeyboardCoordinates";
 
 const PRIMARY_COLOR_LIST: string[] = [
-  '#ff7895',
-  '#e38a62',
-  '#cdaf7b',
-  '#94bb77',
-  '#e2c25e',
-  '#ead196',
-  '#e7bc7d',
-  '#d0b895',
-  '#72b4c9',
-  '#2cdbca',
-  '#a8cadc',
-  '#c5bab6',
-  '#bf91bd',
+  "#ff7895",
+  "#e38a62",
+  "#cdaf7b",
+  "#94bb77",
+  "#e2c25e",
+  "#ead196",
+  "#e7bc7d",
+  "#d0b895",
+  "#72b4c9",
+  "#2cdbca",
+  "#a8cadc",
+  "#c5bab6",
+  "#bf91bd",
 ];
 
 const SECONDARY_COLOR_LIST: string[] = [
-  '#ff91a9',
-  '#e9a88a',
-  '#d7bf95',
-  '#afcb9a',
-  '#e9d186',
-  '#f5db9d',
-  '#f0d2a8',
-  '#dcc9af',
-  '#96c7d6',
-  '#2ee8d6',
-  '#a8d3dc',
-  '#cac1be',
-  '#c398c1',
+  "#ff91a9",
+  "#e9a88a",
+  "#d7bf95",
+  "#afcb9a",
+  "#e9d186",
+  "#f5db9d",
+  "#f0d2a8",
+  "#dcc9af",
+  "#96c7d6",
+  "#2ee8d6",
+  "#a8d3dc",
+  "#cac1be",
+  "#c398c1",
 ];
 
-const DEFAULT_PRIMARY_COLOR = '#c5bab6'; // Fallback for primary colors
-const DEFAULT_SECONDARY_COLOR = '#cac1be'; // Fallback for secondary colors
-
 // Heights are relative to viewport height
-const containerGridHeight = '87vh';
-const searchGridHeight = '85vh';
+const containerGridHeight = "87vh";
+const searchGridHeight = "85vh";
 
 // Widths are relative to viewport width.
 // Search container width is 24vw, inherited from Container.module.css
-const semesterWidth = '22.5vw';
-const requirementsWidth = '26vw';
-const courseWidth = '10.5vw';
-const extendedCourseWidth = '22.0vw';
+const semesterWidth = "22.5vw";
+const requirementsWidth = "26vw";
+const courseWidth = "10.5vw";
+const extendedCourseWidth = "22.0vw";
 
 const staticRectSortingStrategy = () => {
   return {
@@ -98,24 +95,25 @@ const staticRectSortingStrategy = () => {
   };
 };
 
-const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
+const transitionAnimation = "width 0.2s ease-in-out, left 0.2s ease-in-out";
 
-function simpleHash(str: string): number {
-  // djb2 hash
-  let hash = 5381;
-
-  for (let i = 0; i < str.length; i++) {
-    hash = hash * 33 + str.charCodeAt(i);
+function simpleHash(str: string) {
+  if (str.length !== 3) {
+    return 0;
   }
 
-  return Math.abs(hash);
+  let sum = 0;
+  for (let i = 0; i < str.length; i++) {
+    sum += (i + 1) * str.charCodeAt(i);
+  }
+  return sum % 11;
 }
 
 let csrfToken: string;
 
-if (typeof window === 'undefined') {
+if (typeof window === "undefined") {
   // Server-side or during pre-rendering/build time
-  csrfToken = '';
+  csrfToken = "";
 } else {
   // Client-side
   (async () => {
@@ -140,16 +138,17 @@ function DroppableContainer({
   items: UniqueIdentifier[];
   style?: CSSProperties;
 }) {
-  const { active, isDragging, over, setNodeRef, transition, transform } = useSortable({
-    id,
-    data: {
-      type: 'container',
-      children: items,
-    },
-    animateLayoutChanges,
-  });
+  const { active, isDragging, over, setNodeRef, transition, transform } =
+    useSortable({
+      id,
+      data: {
+        type: "container",
+        children: items,
+      },
+      animateLayoutChanges,
+    });
   const isOverContainer = over
-    ? (id === over.id && (active?.data.current?.type ?? 'container') !== 'container') ||
+    ? (id === over.id && active?.data.current?.type !== "container") ||
       items.includes(over.id)
     : false;
 
@@ -176,7 +175,7 @@ const dropAnimation: DropAnimation = {
   sideEffects: defaultDropAnimationSideEffects({
     styles: {
       active: {
-        opacity: '0.5',
+        opacity: "0.5",
       },
     },
   }),
@@ -216,8 +215,8 @@ type Props = {
   vertical?: boolean;
 };
 
-export const PLACEHOLDER_ID = 'placeholder';
-export const SEARCH_RESULTS_ID = 'Search Results';
+export const PLACEHOLDER_ID = "placeholder";
+export const SEARCH_RESULTS_ID = "Search Results";
 const defaultClassYear = new Date().getFullYear() + 1;
 
 export function Canvas({
@@ -236,10 +235,10 @@ export function Canvas({
     width: courseWidth,
   });
   const searchWrapperStyle = () => ({
-    width: '100%',
-    overflow: 'hidden', // Ensure overflow is hidden
-    whiteSpace: 'nowrap', // Keep the text on a single line
-    textOverflow: 'ellipsis', // Add ellipsis to text overflow
+    width: "100%",
+    overflow: "hidden", // Ensure overflow is hidden
+    whiteSpace: "nowrap", // Keep the text on a single line
+    textOverflow: "ellipsis", // Add ellipsis to text overflow
   });
 
   // The width of the semester bins
@@ -264,23 +263,20 @@ export function Canvas({
   const updateSemesters = (
     prevItems: Items,
     classYear: number,
-    userCourses: { [key: number]: Course[] }
+    userCourses: { [key: number]: Course[] },
   ): Items => {
     const startYear = classYear - 4;
     let semester = 1;
-
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = (userCourses[semester] ?? []).map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+      prevItems[`Fall ${year}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`,
       );
       semester += 1;
-
-      prevItems[`Spring ${year + 1}`] = (userCourses[semester] ?? []).map(
-        (course) => `${course.course_id}|${course.crosslistings}`
+      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
+        (course) => `${course.course_id}|${course.crosslistings}`,
       );
       semester += 1;
     }
-
     return prevItems;
   };
 
@@ -291,34 +287,33 @@ export function Canvas({
   }));
 
   type Dictionary = {
-    // TODO: Address this typing eventually.
-
-    [key: string]: any;
+    [key: string]: any; // TODO: Aim to replace 'any' with more specific types.
   };
 
   // Initialize a more structured dictionary if possible
   const initialRequirements: Dictionary = {};
 
   // State for academic requirements
-  const [academicPlan, setAcademicPlan] = useState<Dictionary>(initialRequirements);
+  const [academicPlan, setAcademicPlan] =
+    useState<Dictionary>(initialRequirements);
 
   // TODO: Make this dynamic later
-  const userMajorCode = 'COS-BSE';
-  const userMinors: MajorMinorType[] = [];
-  const userCertificates: CertificateType[] = [];
+  const userMajorCode = "COS-BSE";
+  const userMinors = [];
+  const userCertificates = [];
 
   // Structure to hold degree requirements
-  const degreeRequirements: Dictionary = { General: '' };
+  const degreeRequirements: Dictionary = { General: "" };
 
   // Add major to degree requirements if it's a string
-  if (userMajorCode && typeof userMajorCode === 'string') {
+  if (userMajorCode && typeof userMajorCode === "string") {
     degreeRequirements[userMajorCode] = academicPlan[userMajorCode] ?? {};
   }
 
   // Iterate over minors and add them to degree requirements if their code is a string
   userMinors.forEach((minor) => {
     const minorCode = minor.code;
-    if (minorCode && typeof minorCode === 'string') {
+    if (minorCode && typeof minorCode === "string") {
       degreeRequirements[minorCode] = academicPlan[minorCode] ?? {};
     }
   });
@@ -326,20 +321,23 @@ export function Canvas({
   // Iterate over certificates and add them to degree requirements if their code is a string
   userCertificates.forEach((certificate) => {
     const certificateCode = certificate.code;
-    if (certificateCode && typeof certificateCode === 'string') {
+    if (certificateCode && typeof certificateCode === "string") {
       degreeRequirements[certificateCode] = academicPlan[certificateCode] ?? {};
     }
   });
 
   const fetchCourses = useCallback(async () => {
     try {
-      const response = await fetch(`${process.env.BACKEND}/fetch_courses/`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-          'X-NetId': profile.netId,
+      const response = await fetch(
+        `${process.env.BACKEND}/fetch_courses/`,
+        {
+          method: "GET",
+          credentials: "include",
+          headers: {
+            "X-NetId": profile.netId,
+          },
         },
-      });
+      );
       const data = await response.json();
       return data;
     } catch {
@@ -349,10 +347,10 @@ export function Canvas({
 
   const updateRequirements = useCallback(() => {
     fetch(`${process.env.BACKEND}/update_requirements/`, {
-      method: 'GET',
-      credentials: 'include',
+      method: "GET",
+      credentials: "include",
       headers: {
-        'X-NetId': profile.netId,
+        "X-NetId": profile.netId,
       },
     })
       .then((response) => response.json())
@@ -385,7 +383,7 @@ export function Canvas({
       const userCurrentCourses: Set<string> = new Set<string>();
       Object.keys(prevItems).forEach((key) => {
         if (key !== SEARCH_RESULTS_ID) {
-          const courses = prevItems[key] ?? [];
+          const courses = prevItems[key];
           courses.forEach((course) => {
             userCurrentCourses.add(course.toString());
           });
@@ -396,7 +394,10 @@ export function Canvas({
         ...prevItems,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+            (course) =>
+              !userCurrentCourses.has(
+                `${course.course_id}|${course.crosslistings}`,
+              ),
           )
           .map((course) => `${course.course_id}|${course.crosslistings}`),
       };
@@ -406,12 +407,14 @@ export function Canvas({
   const initialContainers = [SEARCH_RESULTS_ID, ...Object.keys(semesters)];
   const containers = initialContainers;
   const [activeId, setActiveId] = useState<UniqueIdentifier | null>(null);
-  const [activeContainerId, setActiveContainerId] = useState<UniqueIdentifier | null>(null);
+  const [activeContainerId, setActiveContainerId] =
+    useState<UniqueIdentifier | null>(null);
   const lastOverId = useRef<UniqueIdentifier | null>(null);
   const recentlyMovedToNewContainer = useRef(false);
   // isSortingContainer is legacy code, since we are not using sortable containers
   const isSortingContainer = false;
-  const [overContainerId, setOverContainerId] = useState<UniqueIdentifier | null>(null);
+  const [overContainerId, setOverContainerId] =
+    useState<UniqueIdentifier | null>(null);
 
   /**
    * Custom collision detection strategy optimized for multiple containers
@@ -430,7 +433,7 @@ export function Canvas({
           ? // If there are droppables intersecting with the pointer, return those
             pointerIntersections
           : rectIntersection(args);
-      let overId = getFirstCollision(intersections, 'id');
+      let overId = getFirstCollision(intersections, "id");
 
       if (overId !== null) {
         if (overId in items) {
@@ -442,7 +445,9 @@ export function Canvas({
             overId = closestCenter({
               ...args,
               droppableContainers: args.droppableContainers.filter(
-                (container) => container.id !== overId && containerItems.includes(container.id)
+                (container) =>
+                  container.id !== overId &&
+                  containerItems.includes(container.id),
               ),
             })[0]?.id;
           }
@@ -463,7 +468,7 @@ export function Canvas({
       // If no droppable is matched, return the last match
       return lastOverId.current ? [{ id: lastOverId.current }] : [];
     },
-    [activeId, items]
+    [activeId, items],
   );
   const [clonedItems, setClonedItems] = useState<Items | null>(null);
   const sensors = useSensors(
@@ -471,7 +476,7 @@ export function Canvas({
     useSensor(TouchSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter,
-    })
+    }),
   );
   const findContainer = (id?: UniqueIdentifier) => {
     if (id === null || id === undefined) {
@@ -509,7 +514,9 @@ export function Canvas({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', placeItems: 'center' }}>
+    <div
+      style={{ display: "flex", flexDirection: "row", placeItems: "center" }}
+    >
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetectionStrategy}
@@ -527,7 +534,7 @@ export function Canvas({
           setClonedItems(items);
         }}
         onDragOver={({ active, over }) => {
-          const overId = over.id;
+          const overId = over?.id;
           if (overId === null || overId === undefined || active.id in items) {
             return;
           }
@@ -548,8 +555,13 @@ export function Canvas({
 
               return {
                 ...items,
-                [activeContainer]: items[activeContainer].filter((item) => item !== active.id),
-                [overContainer]: [...items[overContainer], items[activeContainer][activeIndex]],
+                [activeContainer]: items[activeContainer].filter(
+                  (item) => item !== active.id,
+                ),
+                [overContainer]: [
+                  ...items[overContainer],
+                  items[activeContainer][activeIndex],
+                ],
               };
             });
           }
@@ -561,7 +573,7 @@ export function Canvas({
             return;
           }
 
-          const overId = over.id;
+          const overId = over?.id;
 
           if (overId === null || overId === undefined) {
             setActiveId(null);
@@ -575,15 +587,15 @@ export function Canvas({
             if (activeContainerId !== overContainerId) {
               csrfToken = await fetchCsrfToken();
               fetch(`${process.env.BACKEND}/update_courses/`, {
-                method: 'POST',
-                credentials: 'include',
+                method: "POST",
+                credentials: "include",
                 headers: {
-                  'Content-Type': 'application/json',
-                  'X-NetId': profile.netId,
-                  'X-CSRFToken': csrfToken,
+                  "Content-Type": "application/json",
+                  "X-NetId": profile.netId,
+                  "X-CSRFToken": csrfToken,
                 },
                 body: JSON.stringify({
-                  crosslistings: active.id.toString().split('|')[1],
+                  crosslistings: active.id.toString().split("|")[1],
                   semesterId: overContainerId,
                 }),
               }).then((response) => {
@@ -601,13 +613,13 @@ export function Canvas({
         onDragCancel={onDragCancel}
       >
         <SortableContext items={[...containers, PLACEHOLDER_ID]}>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div style={{ display: "flex", flexDirection: "row" }}>
             {/* Left Section for Search Results */}
             {containers.includes(SEARCH_RESULTS_ID) && (
               <div
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
+                  display: "flex",
+                  flexDirection: "column",
                   height: containerGridHeight,
                 }}
               >
@@ -632,7 +644,9 @@ export function Canvas({
                       return (
                         <div className={dashboardItemStyles.card} key={index}>
                           <div className={dashboardItemStyles.content}>
-                            <div className={dashboardItemStyles.title}>{course.title}</div>
+                            <div className={dashboardItemStyles.title}>
+                              {course.title}
+                            </div>
                             {items[SEARCH_RESULTS_ID].includes(courseId) ? (
                               <SortableItem
                                 disabled={isSortingContainer}
@@ -649,7 +663,7 @@ export function Canvas({
                               <SortableItem
                                 disabled={true}
                                 key={index}
-                                id={courseId + '|disabled'}
+                                id={courseId + "|disabled"}
                                 index={index}
                                 handle={handle}
                                 style={getItemStyles}
@@ -671,19 +685,19 @@ export function Canvas({
             <div
               style={{
                 flexGrow: 1,
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gridTemplateRows: '1fr 1fr 1fr 1fr',
+                display: "grid",
+                gridTemplateColumns: "1fr 1fr",
+                gridTemplateRows: "1fr 1fr 1fr 1fr",
               }}
             >
               {containers
-                .filter((id) => id !== 'Search Results')
+                .filter((id) => id !== "Search Results")
                 .map((containerId) => (
                   <div
                     key={containerId}
                     style={{
-                      display: 'flex',
-                      flexDirection: 'column',
+                      display: "flex",
+                      flexDirection: "column",
                       height: `calc(${containerGridHeight} / 4)`,
                     }}
                   >
@@ -692,30 +706,31 @@ export function Canvas({
                       id={containerId}
                       label={minimal ? undefined : `${containerId}`}
                       columns={columns}
-                      items={items[containerId]}
+                      items={items[containerId] || []}
                       scrollable={scrollable}
                       style={semesterStyle}
                       unstyled={minimal}
                       height={`calc(${containerGridHeight} / 4)`}
                     >
                       <SortableContext
-                        items={items[containerId]}
+                        items={items[containerId] || []}
                         strategy={staticRectSortingStrategy}
                       >
-                        {items[containerId].map((course, index) => (
-                          <SortableItem
-                            disabled={isSortingContainer}
-                            key={index}
-                            id={course}
-                            index={index}
-                            handle={handle}
-                            style={getItemStyles}
-                            wrapperStyle={wrapperStyle}
-                            onRemove={() => handleRemove(course, containerId)}
-                            containerId={containerId}
-                            getIndex={getIndex}
-                          />
-                        ))}
+                        {items[containerId] &&
+                          items[containerId].map((course, index) => (
+                            <SortableItem
+                              disabled={isSortingContainer}
+                              key={index}
+                              id={course}
+                              index={index}
+                              handle={handle}
+                              style={getItemStyles}
+                              wrapperStyle={wrapperStyle}
+                              onRemove={() => handleRemove(course, containerId)}
+                              containerId={containerId}
+                              getIndex={getIndex}
+                            />
+                          ))}
                       </SortableContext>
                     </DroppableContainer>
                   </div>
@@ -725,8 +740,8 @@ export function Canvas({
             {/* Right section for requirements */}
             <div
               style={{
-                display: 'flex',
-                flexDirection: 'column',
+                display: "flex",
+                flexDirection: "column",
                 height: containerGridHeight,
                 width: requirementsWidth,
               }}
@@ -745,7 +760,7 @@ export function Canvas({
           <DragOverlay adjustScale={adjustScale} dropAnimation={dropAnimation}>
             {activeId ? renderSortableItemDragOverlay(activeId) : null}
           </DragOverlay>,
-          document.body
+          document.body,
         )}
       </DndContext>
     </div>
@@ -754,13 +769,15 @@ export function Canvas({
   function renderSortableItemDragOverlay(id: UniqueIdentifier) {
     // Determine the current overlay width based on overContainerId
     const currentOverlayWidth =
-      activeContainerId === SEARCH_RESULTS_ID && overContainerId === SEARCH_RESULTS_ID
+      activeContainerId === SEARCH_RESULTS_ID &&
+      overContainerId === SEARCH_RESULTS_ID
         ? extendedCourseWidth
         : courseWidth;
     const currentOverlayLeft =
-      activeContainerId === SEARCH_RESULTS_ID && overContainerId !== SEARCH_RESULTS_ID
+      activeContainerId === SEARCH_RESULTS_ID &&
+      overContainerId !== SEARCH_RESULTS_ID
         ? `calc(${extendedCourseWidth} - ${courseWidth})`
-        : '0vw';
+        : "0vw";
 
     // Modify the wrapperStyle function or directly adjust the style here to use the determined width
     const dynamicWrapperStyle = {
@@ -791,7 +808,10 @@ export function Canvas({
     );
   }
 
-  function handleRemove(value: UniqueIdentifier, containerId: UniqueIdentifier) {
+  function handleRemove(
+    value: UniqueIdentifier,
+    containerId: UniqueIdentifier,
+  ) {
     setItems((items) => {
       const userCurrentCourses: Set<string> = new Set<string>();
       Object.keys(items).forEach((key) => {
@@ -808,25 +828,30 @@ export function Canvas({
         ...items,
         [SEARCH_RESULTS_ID]: searchResults
           .filter(
-            (course) => !userCurrentCourses.has(`${course.course_id}|${course.crosslistings}`)
+            (course) =>
+              !userCurrentCourses.has(
+                `${course.course_id}|${course.crosslistings}`,
+              ),
           )
           .map((course) => `${course.course_id}|${course.crosslistings}`),
-        [containerId]: items[containerId].filter((course) => course !== value.toString()),
+        [containerId]: items[containerId].filter(
+          (course) => course !== value.toString(),
+        ),
       };
       return updatedCourses;
     });
 
     fetch(`${process.env.BACKEND}/update_courses/`, {
-      method: 'POST',
-      credentials: 'include',
+      method: "POST",
+      credentials: "include",
       headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': csrfToken,
-        'X-NetId': profile.netId,
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+        "X-NetId": profile.netId,
       },
       body: JSON.stringify({
-        crosslistings: value.toString().split('|')[1],
-        semesterId: 'Search Results',
+        crosslistings: value.toString().split("|")[1],
+        semesterId: "Search Results",
       }),
     }).then((response) => {
       response.json();
@@ -835,18 +860,14 @@ export function Canvas({
   }
 }
 
-function getPrimaryColor(id: UniqueIdentifier): string {
-  const parts = String(id).split('|');
-  const key = parts[1]?.slice(0, 3) ?? '';
-  const hash = simpleHash(key) % PRIMARY_COLOR_LIST.length;
-  return PRIMARY_COLOR_LIST[hash] || DEFAULT_PRIMARY_COLOR;
+function getPrimaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split("|")[1].slice(0, 3));
+  return PRIMARY_COLOR_LIST[hash];
 }
 
-function getSecondaryColor(id: UniqueIdentifier): string {
-  const parts = String(id).split('|');
-  const key = parts[1]?.slice(0, 3) ?? '';
-  const hash = simpleHash(key) % SECONDARY_COLOR_LIST.length;
-  return SECONDARY_COLOR_LIST[hash] || DEFAULT_SECONDARY_COLOR;
+function getSecondaryColor(id: UniqueIdentifier) {
+  const hash = simpleHash(String(id).split("|")[1].slice(0, 3));
+  return SECONDARY_COLOR_LIST[hash];
 }
 
 type SortableItemProps = {

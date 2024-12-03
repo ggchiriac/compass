@@ -12,7 +12,7 @@ from hoagieplan.serializers import CourseSerializer
 
 
 UNDECLARED = {"code": "Undeclared", "name": "Undeclared"}
-VALID_CLASS_YEAR_RANGE = range(2023, 2038)
+VALID_CLASS_YEAR_RANGE = range(2023, 2031)
 
 
 @require_POST
@@ -36,12 +36,6 @@ def get_user(request):
                 "class_year": datetime.now().year + 1,
             },
         )
-
-        # TODO: For debugging, remove once confirmed correct.
-        if created:
-            logger.info(f"New user created: {net_id}")
-        else:
-            logger.info(f"Existing user fetched: {net_id}")
 
         return JsonResponse(format_user_data(user_inst))
 

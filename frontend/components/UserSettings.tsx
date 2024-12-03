@@ -307,6 +307,7 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
     <div>
       <div className='grid grid-cols-2 gap-6'>
         <div>
+          {/* TODO: Names are now fixed due to Auth0 migration. Either see if we can change Auth0 data directly or deprecate this. */}
           <FormLabel>First name</FormLabel>
           <Input
             placeholder='First name'
@@ -520,4 +521,5 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
     </div>
   );
 };
+
 export default UserSettings;
