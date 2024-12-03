@@ -69,13 +69,13 @@ export const Item = memo(
       }, [dragOverlay]);
 
       // Safely extract transform properties with defaults
-      const translateX = transform?.x != null ? `${Math.round(transform.x)}px` : undefined;
-      const translateY = transform?.y != null ? `${Math.round(transform.y)}px` : undefined;
-      const scaleX = transform?.scaleX != null ? `${transform.scaleX}` : undefined;
-      const scaleY = transform?.scaleY != null ? `${transform.scaleY}` : undefined;
+      const translateX = transform.x != null ? `${Math.round(transform.x)}px` : undefined;
+      const translateY = transform.y != null ? `${Math.round(transform.y)}px` : undefined;
+      const scaleX = transform.scaleX != null ? `${transform.scaleX}` : undefined;
+      const scaleY = transform.scaleY != null ? `${transform.scaleY}` : undefined;
 
       // Safely convert value to string for InfoComponent
-      const stringValue = typeof value === 'string' ? value : value?.toString() ?? '';
+      const stringValue = typeof value === 'string' ? value : (value.toString() ?? '');
       const infoValue = stringValue.split('|')[1] ?? '';
 
       return (
@@ -89,7 +89,7 @@ export const Item = memo(
           style={
             {
               ...wrapperStyle,
-              transition: [transition, wrapperStyle?.transition].filter(Boolean).join(', '),
+              transition: [transition, wrapperStyle.transition].filter(Boolean).join(', '),
               '--translate-x': translateX,
               '--translate-y': translateY,
               '--scale-x': scaleX,
@@ -112,7 +112,7 @@ export const Item = memo(
               color_secondary && styles.color_secondary
             )}
             style={style}
-            data-cypress="draggable-item"
+            data-cypress='draggable-item'
             {...(!handle && !disabled ? listeners : undefined)}
             {...props}
             tabIndex={disabled ? -1 : !handle ? 0 : undefined}

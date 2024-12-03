@@ -32,7 +32,7 @@ import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Plan by Hoagie',
-  description: 'Princeton, All In One',
+  description: 'Princeton, All In One.',
   manifest: 'manifest.json',
 };
 
@@ -69,7 +69,6 @@ async function Content({ children }: { children: ReactNode }): Promise<JSX.Eleme
         <Nav name='plan' tabs={tabs} />
         {children}
         <Toaster />
-        <Footer />
       </Layout>
     </Theme>
   );
