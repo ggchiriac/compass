@@ -67,13 +67,16 @@ const CalendarCard: FC<CalendarCardProps> = ({
       }}
       onClick={onSectionClick}
     >
-      <div className="event-department">
-        {event.course.department_code} {event.course.catalog_number} -{" "}
-        {event.section.class_section}
-      </div>
+      {/* Wrapper for header unit */}
+      <div className="event-header-unit flex flex-col items-start">
+        <div className="event-department">
+          {event.course.department_code} {event.course.catalog_number} -{" "}
+          {event.section.class_section}
+        </div>
 
-      <div className="text-sm text-white/80 mt-1">
-        {event.startTime} – {event.endTime}
+        <div className="text-sm text-white/80 mt-1">
+          {event.startTime} – {event.endTime}
+        </div>
       </div>
 
       <div className="flex items-center text-sm text-white/80 mt-1 capacity-container">
