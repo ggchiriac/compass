@@ -103,7 +103,7 @@ function Nav({
           height="100%"
           maxWidth={1200}
           paddingX={majorScale(5)}
-          fontSize={25}
+          fontSize={18}
         >
           <Link href="/">
             <Pane cursor="pointer" position="relative">
