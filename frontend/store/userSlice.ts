@@ -1,3 +1,5 @@
+'use client';
+
 import { useEffect } from 'react';
 
 import { create } from 'zustand';
@@ -5,7 +7,7 @@ import { create } from 'zustand';
 import type { Profile, MajorMinorType, UserState } from '@/types';
 import { fetchCsrfToken } from '@/utils/csrf';
 
-import type { UserProfile } from '@auth0/nextjs-auth0/client';
+import { type UserProfile } from '@auth0/nextjs-auth0/client';
 
 // Fetch user profile from the backend
 async function fetchCustomUser(
@@ -58,9 +60,9 @@ async function mapUserProfileToProfile(userProfile: UserProfile | null): Promise
     throw new Error('UserProfile is null or undefined.');
   }
 
-  const [firstName, lastName] = (userProfile.name || '').split(' ');
+  const [firstName = '', lastName = ''] = (userProfile.name || '').split(' ');
   const netId = userProfile.nickname || '';
-  const email = userProfile.sub.split('|')[2] || '';
+  const email = userProfile.sub?.split('|')[2] || '';
 
   const defaultMajor: MajorMinorType = {
     code: 'Undeclared',
@@ -70,18 +72,18 @@ async function mapUserProfileToProfile(userProfile: UserProfile | null): Promise
   const user = await fetchCustomUser(netId, firstName, lastName, email);
 
   return {
-    firstName: user.firstName || firstName,
-    lastName: user.lastName || lastName,
-    classYear: user.classYear || new Date().getFullYear() + 1,
-    major: user.major || defaultMajor,
-    minors: user.minors || [],
-    certificates: user.certificates || [],
-    netId: user.netId || netId,
-    universityId: user.universityId || '',
-    email: user.email || email,
-    department: user.department || 'Undeclared',
-    timeFormat24h: user.timeFormat24h || false,
-    themeDarkMode: user.themeDarkMode || false,
+    firstName: user?.firstName || firstName,
+    lastName: user?.lastName || lastName,
+    classYear: user?.classYear || new Date().getFullYear() + 1,
+    major: user?.major || defaultMajor,
+    minors: user?.minors || [],
+    certificates: user?.certificates || [],
+    netId: user?.netId || netId,
+    universityId: user?.universityId || '',
+    email: user?.email || email,
+    department: user?.department || 'Undeclared',
+    timeFormat24h: user?.timeFormat24h || false,
+    themeDarkMode: user?.themeDarkMode || false,
   };
 }
 
@@ -103,6 +105,11 @@ const useUserSlice = create<UserState>((set) => ({
   updateProfile: (updates: Partial<Profile>) =>
     set((state) => ({ profile: { ...state.profile, ...updates } })),
   fetchAndUpdateProfile: async (userProfile: UserProfile) => {
+    if (!userProfile) {
+      console.warn('fetchAndUpdateProfile called with undefined userProfile.');
+      return;
+    }
+
     try {
       const profile = await mapUserProfileToProfile(userProfile);
       set(() => ({ profile }));
@@ -112,7 +119,7 @@ const useUserSlice = create<UserState>((set) => ({
   },
 }));
 
-export const useFetchUserProfile = (userProfile: UserProfile) => {
+export const useFetchUserProfile = (userProfile: UserProfile | undefined) => {
   const fetchAndUpdateProfile = useUserSlice((state) => state.fetchAndUpdateProfile);
 
   useEffect(() => {

@@ -12,8 +12,7 @@
 
 'use client';
 
-import type { ComponentType } from 'react';
-
+import { type ComponentType } from 'react';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import {
   majorScale,
@@ -28,13 +27,13 @@ import {
 } from 'evergreen-ui';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import { useUser } from '@auth0/nextjs-auth0/client';
 
 import { useTutorialModal } from '@/components/Tutorial/Tutorial';
 import ProfileCard from '@/lib/hoagie-ui/ProfileCard';
+import { useFetchUserProfile } from '@/store/userSlice';
 
-import type { UserProfile } from '@auth0/nextjs-auth0/client';
-
-export type Nav = {
+export type NavProps = {
   // The name of the app for generating the `hoagie{name}` title.
   name: string;
 
@@ -46,9 +45,6 @@ export type Nav = {
 
   // A list of tab objects for the navbar, each with `title` and `href` fields.
   tabs?: Array<{ title: string; href: string }>;
-
-  // Authenticated user data.
-  user?: UserProfile;
 
   // A flag to show the "beta" development disclaimer on the hoagie app logo.
   beta?: boolean;
@@ -67,21 +63,24 @@ function Nav({
   LogoComponent,
   HeaderComponent,
   tabs = [],
-  user,
   beta = false,
   showSettingsButton = false,
   onSettingsClick,
-}: Nav) {
+}: NavProps) {
+  const { user, error, isLoading } = useUser();
   const theme = useTheme();
   const router = useRouter();
   const pathname = usePathname();
-  const username = user.name;
   const { openTutorialModal, tutorialModal } = useTutorialModal();
+
+  useFetchUserProfile(user);
+
   const tutorialType = pathname.includes('/dashboard')
     ? 'dashboard'
     : pathname.includes('/calendar')
-      ? 'calendar'
-      : 'dashboard';
+    ? 'calendar'
+    : 'dashboard';
+
   return (
     <Pane elevation={1}>
       {HeaderComponent ? (
@@ -167,7 +166,7 @@ function Nav({
                 position={Position.BOTTOM}
               >
                 <Avatar
-                  name={username}
+                  name={user.name}
                   style={{ cursor: 'pointer' }}
                   backgroundColor={theme.colors.yellow100}
                   size={40}

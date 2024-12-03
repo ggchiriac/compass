@@ -30,11 +30,11 @@ function generateClassYears() {
   return classYears;
 }
 
-// Should probably id these corresponding to the ids in the database
+// TODO: Should probably id these corresponding to the ids in the database
 const undeclared = { code: 'Undeclared', name: 'Undeclared' };
 const defaultClassYear = new Date().getFullYear();
 
-// Should probably id these corresponding to the ids in the database
+// TODO: Should probably id these corresponding to the ids in the database, may be used in other files
 const majorOptions = [
   { code: 'AAS', name: 'African American Studies' },
   { code: 'ANT', name: 'Anthropology' },
