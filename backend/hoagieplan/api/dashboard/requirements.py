@@ -26,7 +26,7 @@ def manually_settle(request):
     crosslistings = data.get("crosslistings")
     req_id = int(data.get("reqId"))
     net_id = request.headers.get("X-NetId")
-    user_inst = CustomUser.objects.get(username=net_id)
+    user_inst = CustomUser.objects.get(net_id=net_id)
     course_inst = (
         Course.objects.select_related("department")
         .filter(crosslistings__iexact=crosslistings, usercourses__user=user_inst)
@@ -58,7 +58,7 @@ def mark_satisfied(request):
     marked_satisfied = data.get("markedSatisfied")
     net_id = request.headers.get("X-NetId")
 
-    user_inst = CustomUser.objects.get(username=net_id)
+    user_inst = CustomUser.objects.get(net_id=net_id)
     req_inst = Requirement.objects.get(id=req_id)
 
     if marked_satisfied == "true":
@@ -560,7 +560,7 @@ def check_requirements(user_inst, table, code, courses):
 def check_user(net_id, major, minors, certificates):
     output = {}
 
-    user_inst = CustomUser.objects.get(username=net_id)
+    user_inst = CustomUser.objects.get(net_id=net_id)
     user_courses = create_courses(user_inst)
 
     if major is not None:
@@ -701,7 +701,7 @@ def requirement_info(request):
 
     try:
         req_inst = Requirement.objects.get(id=req_id)
-        user_inst = CustomUser.objects.get(username=net_id)
+        user_inst = CustomUser.objects.get(net_id=net_id)
 
         explanation = req_inst.explanation
         completed_by_semester = req_inst.completed_by_semester
@@ -798,7 +798,7 @@ def update_courses(request):
         crosslistings = data.get("crosslistings")  # might have to adjust this, print
         container = data.get("semesterId")
         net_id = request.headers.get("X-NetId")
-        user_inst = CustomUser.objects.get(username=net_id)
+        user_inst = CustomUser.objects.get(net_id=net_id)
         class_year = user_inst.class_year
 
         course_inst = (

@@ -1,4 +1,4 @@
-import type { CSSProperties, ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { memo, forwardRef, useEffect } from 'react';
 
 import classNames from 'classnames';
@@ -28,7 +28,7 @@ export type Props = {
   style?: CSSProperties;
   transition?: string | null;
   wrapperStyle?: CSSProperties;
-  value: ReactNode; // Text or JSX
+  value: ReactNode; // Note: This should be the text that appears on the course card
   onRemove?(): void;
 };
 
@@ -38,19 +38,20 @@ export const Item = memo(
       {
         color_primary,
         color_secondary,
-        dragOverlay = false,
-        dragging = false,
-        disabled = false,
-        fadeIn = false,
-        handle = false,
+        dragOverlay,
+        dragging,
+        disabled,
+        fadeIn,
+        handle,
         handleProps,
-        index = 0,
+        // TODO: need?: height,
+        index,
         listeners,
         onRemove,
-        sorting = false,
+        sorting,
         style,
         transition,
-        transform = null,
+        transform,
         value,
         wrapperStyle,
         ...props
@@ -68,16 +69,6 @@ export const Item = memo(
         };
       }, [dragOverlay]);
 
-      // Safely extract transform properties with defaults
-      const translateX = transform.x != null ? `${Math.round(transform.x)}px` : undefined;
-      const translateY = transform.y != null ? `${Math.round(transform.y)}px` : undefined;
-      const scaleX = transform.scaleX != null ? `${transform.scaleX}` : undefined;
-      const scaleY = transform.scaleY != null ? `${transform.scaleY}` : undefined;
-
-      // Safely convert value to string for InfoComponent
-      const stringValue = typeof value === 'string' ? value : (value.toString() ?? '');
-      const infoValue = stringValue.split('|')[1] ?? '';
-
       return (
         <li
           className={classNames(
@@ -90,10 +81,10 @@ export const Item = memo(
             {
               ...wrapperStyle,
               transition: [transition, wrapperStyle.transition].filter(Boolean).join(', '),
-              '--translate-x': translateX,
-              '--translate-y': translateY,
-              '--scale-x': scaleX,
-              '--scale-y': scaleY,
+              '--translate-x': transform?.x != null ? `${Math.round(transform.x)}px` : undefined,
+              '--translate-y': transform?.y != null ? `${Math.round(transform.y)}px` : undefined,
+              '--scale-x': transform?.scaleX != null ? `${transform.scaleX}` : undefined,
+              '--scale-y': transform?.scaleY != null ? `${transform.scaleY}` : undefined,
               '--index': index,
               '--color_primary': color_primary,
               '--color_secondary': color_secondary,
@@ -119,7 +110,11 @@ export const Item = memo(
           >
             {/* Text Container for InfoComponent */}
             <div className={styles.TextContainer}>
-              {!disabled ? <InfoComponent value={infoValue} /> : infoValue}
+              {!disabled ? (
+                <InfoComponent value={value.toString().split('|')[1] ?? ''} />
+              ) : (
+                (value.toString().split('|')[1] ?? '')
+              )}
             </div>
 
             {!disabled && handle ? (
