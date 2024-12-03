@@ -28,7 +28,7 @@ export type Props = {
   style?: CSSProperties;
   transition?: string | null;
   wrapperStyle?: CSSProperties;
-  value: ReactNode; // Note: This should be the text that appears on the course card
+  value: ReactNode; // Text or JSX
   onRemove?(): void;
 };
 
@@ -38,20 +38,19 @@ export const Item = memo(
       {
         color_primary,
         color_secondary,
-        dragOverlay,
-        dragging,
-        disabled,
-        fadeIn,
-        handle,
+        dragOverlay = false,
+        dragging = false,
+        disabled = false,
+        fadeIn = false,
+        handle = false,
         handleProps,
-        // TODO: need?: height,
-        index,
+        index = 0,
         listeners,
         onRemove,
-        sorting,
+        sorting = false,
         style,
         transition,
-        transform,
+        transform = null,
         value,
         wrapperStyle,
         ...props
@@ -69,6 +68,16 @@ export const Item = memo(
         };
       }, [dragOverlay]);
 
+      // Safely extract transform properties with defaults
+      const translateX = transform?.x != null ? `${Math.round(transform.x)}px` : undefined;
+      const translateY = transform?.y != null ? `${Math.round(transform.y)}px` : undefined;
+      const scaleX = transform?.scaleX != null ? `${transform.scaleX}` : undefined;
+      const scaleY = transform?.scaleY != null ? `${transform.scaleY}` : undefined;
+
+      // Safely convert value to string for InfoComponent
+      const stringValue = typeof value === 'string' ? value : value?.toString() ?? '';
+      const infoValue = stringValue.split('|')[1] ?? '';
+
       return (
         <li
           className={classNames(
@@ -80,11 +89,11 @@ export const Item = memo(
           style={
             {
               ...wrapperStyle,
-              transition: [transition, wrapperStyle.transition].filter(Boolean).join(', '),
-              '--translate-x': transform.x != null ? `${Math.round(transform.x)}px` : undefined,
-              '--translate-y': transform.y != null ? `${Math.round(transform.y)}px` : undefined,
-              '--scale-x': transform.scaleX != null ? `${transform.scaleX}` : undefined,
-              '--scale-y': transform.scaleY != null ? `${transform.scaleY}` : undefined,
+              transition: [transition, wrapperStyle?.transition].filter(Boolean).join(', '),
+              '--translate-x': translateX,
+              '--translate-y': translateY,
+              '--scale-x': scaleX,
+              '--scale-y': scaleY,
               '--index': index,
               '--color_primary': color_primary,
               '--color_secondary': color_secondary,
@@ -103,18 +112,14 @@ export const Item = memo(
               color_secondary && styles.color_secondary
             )}
             style={style}
-            data-cypress='draggable-item'
+            data-cypress="draggable-item"
             {...(!handle && !disabled ? listeners : undefined)}
             {...props}
             tabIndex={disabled ? -1 : !handle ? 0 : undefined}
           >
             {/* Text Container for InfoComponent */}
             <div className={styles.TextContainer}>
-              {!disabled ? (
-                <InfoComponent value={value.toString().split('|')[1] ?? ''} />
-              ) : (
-                (value.toString().split('|')[1] ?? '')
-              )}
+              {!disabled ? <InfoComponent value={infoValue} /> : infoValue}
             </div>
 
             {!disabled && handle ? (
