@@ -118,11 +118,7 @@ const Search: FC = () => {
       setLoading(true);
       try {
         const queryString = buildQuery(searchQuery, filter);
-
-        const response = await fetch(
-          `${process.env.BACKEND}/search/?${queryString}`,
-        );
-
+        const response = await fetch(`${process.env.BACKEND}/search/?${queryString}`);
         if (response.ok) {
           const data: { courses: Course[] } = await response.json();
           setSearchResults(data.courses);

@@ -33,8 +33,6 @@ from hoagieplan.api.profile import info
 urlpatterns = [
     # Admin
     path("admin/", admin.site.urls),
-    # CAS Authentication
-    path("cas/", cas.dispatch, name="cas"),
     # CSRF Token for approving POST requests
     path("csrf/", csrf.csrf_token_view, name="csrf"),
     # Tutorial

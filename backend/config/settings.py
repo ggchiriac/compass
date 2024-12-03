@@ -72,19 +72,22 @@ AUTHENTICATION_BACKENDS = ("django.contrib.auth.backends.ModelBackend",)
 
 HOMEPAGE = os.getenv("HOAGIEPLAN")
 DASHBOARD = urljoin(os.getenv("HOAGIEPLAN"), "dashboard")
-CAS_SERVER_URL = urljoin(os.getenv("CAS_URL"), "cas/")
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = ["X-NetId", "Content-Type", "X-CSRFToken"]
+CORS_ALLOW_HEADERS = [
+    "X-NetId", 
+    "Content-Type", 
+    "X-CSRFToken", 
+    "Authorization",
+]
 
 CORS_ALLOWED_ORIGINS = [
-    os.getenv("BACKEND"),
-    os.getenv("HOAGIEPLAN"),  # TODO: might be useless
+    os.getenv("HOAGIEPLAN"),
 ]
+
 CSRF_TRUSTED_ORIGINS = [
     os.getenv("HOAGIEPLAN"),
-    os.getenv("BACKEND"),
 ]
 
 LOGGING = {

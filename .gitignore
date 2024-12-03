@@ -34,9 +34,6 @@ db.sqlite3
 .vscode/
 .zed/
 
-# CAS folder
-backend/cas/
-
 # Virtual environment
 env/
 .venv/
