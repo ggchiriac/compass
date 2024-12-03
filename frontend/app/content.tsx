@@ -17,8 +17,11 @@ import type { UserProfile } from '@auth0/nextjs-auth0/client';
  * @param children - The child components to render within the layout.
  * @returns JSX Element representing the content area.
  */
-export default function Content({ children, user }: { children: ReactNode; user: UserProfile }) {
-  useFetchUserProfile(user);
+export default function Content({ children, user }: { children: ReactNode; user: UserProfile | null }) {
+  if (user) {
+    useFetchUserProfile(user);
+  }
+
   const { openSettingsModal, settingsModal } = useSettingsModal();
 
   const tabs = [

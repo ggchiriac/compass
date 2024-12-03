@@ -35,6 +35,8 @@ export type MajorMinorType = {
   name: string;
 };
 
+export type CertificateType = MajorMinorType & {};
+
 export type Profile = {
   firstName: string;
   lastName: string;

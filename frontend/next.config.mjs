@@ -8,7 +8,7 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 
 const nextConfig = {
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: false,
   },
   typescript: {
     ignoreBuildErrors: true,
@@ -27,7 +27,7 @@ const nextConfig = {
       useSwcCss: true,
       treeShaking: true,
       memoryLimit: 1024 * 1024 * 512, // 512 MB memory limit
-    }
+    },
   },
   ...withPWA({
     dest: 'public',

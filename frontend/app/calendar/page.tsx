@@ -34,7 +34,8 @@ const CalendarUI: FC = () => {
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      const selectedSemester = semesterList[semesterList.length - ((page - 1) * semestersPerPage + 1)];
+      const selectedSemester =
+        semesterList[semesterList.length - ((page - 1) * semestersPerPage + 1)];
       if (selectedSemester && terms[selectedSemester]) {
         setTermFilter(terms[selectedSemester]);
       }
@@ -62,11 +63,7 @@ const CalendarUI: FC = () => {
               <Tab
                 key={semester}
                 isSelected={termFilter === terms[semester]}
-                onSelect={() => {
-                  if (terms[semester]) {
-                    setTermFilter(terms[semester]);
-                  }
-                }}
+                onSelect={() => setTermFilter(terms[semester] ?? '')}
                 marginRight={8}
                 paddingX={12}
                 paddingY={8}

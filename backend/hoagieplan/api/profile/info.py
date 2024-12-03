@@ -10,8 +10,9 @@ from hoagieplan.logger import logger
 from hoagieplan.models import Certificate, Course, CustomUser, Major, Minor
 from hoagieplan.serializers import CourseSerializer
 
+
 UNDECLARED = {"code": "Undeclared", "name": "Undeclared"}
-VALID_CLASS_YEAR_RANGE = range(2023, 2031)
+VALID_CLASS_YEAR_RANGE = range(2023, 2038)
 
 
 @require_POST

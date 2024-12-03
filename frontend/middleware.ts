@@ -16,6 +16,7 @@
  */
 
 import { NextResponse } from 'next/server';
+
 import type { NextRequest } from 'next/server';
 
 // Protected routes requiring authentication
@@ -23,61 +24,57 @@ const protectedRoutes = ['/dashboard', '/calendar'];
 
 // Allowed origins for CORS
 const allowedOrigins = [
-  'http://localhost:3000',                              // Local development
-  'http://localhost:8000',                              // Local Django development
-  process.env.HOAGIE,                                   // Frontend URL
-  process.env.BACKEND,                                  // Backend URL
-  process.env.HOAGIE?.replace('https://', 'http://'),   // HTTP variants
-  process.env.BACKEND?.replace('https://', 'http://')
+  'http://localhost:3000', // Local development
+  'http://localhost:8000', // Local Django development
+  process.env.HOAGIE, // Frontend URL
+  process.env.BACKEND, // Backend URL
+  process.env.HOAGIE?.replace('https://', 'http://'), // HTTP variants
+  process.env.BACKEND?.replace('https://', 'http://'),
 ].filter(Boolean); // Remove any undefined values
 
 export function middleware(req: NextRequest) {
-    const { pathname } = req.nextUrl;
-    
-    // Handle CORS for API routes
-    if (pathname.startsWith('/api')) {
-        const origin = req.headers.get("origin");
-        const res = NextResponse.next();
+  const { pathname } = req.nextUrl;
 
-        // Set CORS headers for allowed origins
-        if (origin && allowedOrigins.includes(origin)) {
-            res.headers.set('Access-Control-Allow-Origin', origin);
-        }
+  // Handle CORS for API routes
+  if (pathname.startsWith('/api')) {
+    const origin = req.headers.get('origin');
+    const res = NextResponse.next();
 
-        res.headers.set('Access-Control-Allow-Credentials', 'true');
-        res.headers.set('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT,OPTIONS');
-        res.headers.set(
-            'Access-Control-Allow-Headers',
-            'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
-        );
-
-        // Handle preflight OPTIONS request
-        if (req.method === 'OPTIONS') {
-            return new NextResponse(null, { status: 200, headers: res.headers });
-        }
-
-        return res;
+    // Set CORS headers for allowed origins
+    if (origin && allowedOrigins.includes(origin)) {
+      res.headers.set('Access-Control-Allow-Origin', origin);
     }
 
-    // Handle protected routes authentication
-    if (protectedRoutes.some((route) => pathname.startsWith(route))) {
-        const token = req.cookies.get('appSession');
+    res.headers.set('Access-Control-Allow-Credentials', 'true');
+    res.headers.set('Access-Control-Allow-Methods', 'GET,DELETE,PATCH,POST,PUT,OPTIONS');
+    res.headers.set(
+      'Access-Control-Allow-Headers',
+      'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+    );
 
-        if (!token) {
-            const loginUrl = new URL('/api/auth/login', req.url);
-            loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname);
-            return NextResponse.redirect(loginUrl);
-        }
+    // Handle preflight OPTIONS request
+    if (req.method === 'OPTIONS') {
+      return new NextResponse(null, { status: 200, headers: res.headers });
     }
 
-    return NextResponse.next();
+    return res;
+  }
+
+  // Handle protected routes authentication
+  if (protectedRoutes.some((route) => pathname.startsWith(route))) {
+    const token = req.cookies.get('appSession');
+
+    if (!token) {
+      const loginUrl = new URL('/api/auth/login', req.url);
+      loginUrl.searchParams.set('callbackUrl', req.nextUrl.pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  return NextResponse.next();
 }
 
 // Update matcher to include both API and protected routes
 export const config = {
-    matcher: [
-        '/api/:path*',
-        '/dashboard/:path*', 
-        '/calendar/:path*'
-    ],
+  matcher: ['/api/:path*', '/dashboard/:path*', '/calendar/:path*'],
 };

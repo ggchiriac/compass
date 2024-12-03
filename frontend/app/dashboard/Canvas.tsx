@@ -26,7 +26,7 @@ import dashboardItemStyles from '@/components/DashboardSearchItem/DashboardSearc
 import Search from '@/components/Search';
 import TabbedMenu from '@/components/TabbedMenu/TabbedMenu';
 import useSearchStore from '@/store/searchSlice';
-import type { Course, Profile } from '@/types';
+import type { CertificateType, Course, MajorMinorType, Profile } from '@/types';
 import { fetchCsrfToken } from '@/utils/csrf';
 
 import { Item, Container } from '../../components';
@@ -75,6 +75,9 @@ const SECONDARY_COLOR_LIST: string[] = [
   '#c398c1',
 ];
 
+const DEFAULT_PRIMARY_COLOR = '#c5bab6'; // Fallback for primary colors
+const DEFAULT_SECONDARY_COLOR = '#cac1be'; // Fallback for secondary colors
+
 // Heights are relative to viewport height
 const containerGridHeight = '87vh';
 const searchGridHeight = '85vh';
@@ -97,16 +100,15 @@ const staticRectSortingStrategy = () => {
 
 const transitionAnimation = 'width 0.2s ease-in-out, left 0.2s ease-in-out';
 
-function simpleHash(str: string) {
-  if (str.length !== 3) {
-    return 0;
+function simpleHash(str: string): number {
+  // djb2 hash
+  let hash = 5381;
+
+  for (let i = 0; i < str.length; i++) {
+    hash = hash * 33 + str.charCodeAt(i);
   }
 
-  let sum = 0;
-  for (let i = 0; i < str.length; i++) {
-    sum += (i + 1) * str.charCodeAt(i);
-  }
-  return sum % 11;
+  return Math.abs(hash);
 }
 
 let csrfToken: string;
@@ -147,7 +149,8 @@ function DroppableContainer({
     animateLayoutChanges,
   });
   const isOverContainer = over
-    ? (id === over.id && active.data.current.type !== 'container') || items.includes(over.id)
+    ? (id === over.id && (active?.data.current?.type ?? 'container') !== 'container') ||
+      items.includes(over.id)
     : false;
 
   return (
@@ -265,16 +268,19 @@ export function Canvas({
   ): Items => {
     const startYear = classYear - 4;
     let semester = 1;
+
     for (let year = startYear; year < classYear; ++year) {
-      prevItems[`Fall ${year}`] = userCourses[semester].map(
+      prevItems[`Fall ${year}`] = (userCourses[semester] ?? []).map(
         (course) => `${course.course_id}|${course.crosslistings}`
       );
       semester += 1;
-      prevItems[`Spring ${year + 1}`] = userCourses[semester].map(
+
+      prevItems[`Spring ${year + 1}`] = (userCourses[semester] ?? []).map(
         (course) => `${course.course_id}|${course.crosslistings}`
       );
       semester += 1;
     }
+
     return prevItems;
   };
 
@@ -298,8 +304,8 @@ export function Canvas({
 
   // TODO: Make this dynamic later
   const userMajorCode = 'COS-BSE';
-  const userMinors = [];
-  const userCertificates = [];
+  const userMinors: MajorMinorType[] = [];
+  const userCertificates: CertificateType[] = [];
 
   // Structure to hold degree requirements
   const degreeRequirements: Dictionary = { General: '' };
@@ -379,7 +385,7 @@ export function Canvas({
       const userCurrentCourses: Set<string> = new Set<string>();
       Object.keys(prevItems).forEach((key) => {
         if (key !== SEARCH_RESULTS_ID) {
-          const courses = prevItems[key];
+          const courses = prevItems[key] ?? [];
           courses.forEach((course) => {
             userCurrentCourses.add(course.toString());
           });
@@ -829,14 +835,18 @@ export function Canvas({
   }
 }
 
-function getPrimaryColor(id: UniqueIdentifier) {
-  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
-  return PRIMARY_COLOR_LIST[hash];
+function getPrimaryColor(id: UniqueIdentifier): string {
+  const parts = String(id).split('|');
+  const key = parts[1]?.slice(0, 3) ?? '';
+  const hash = simpleHash(key) % PRIMARY_COLOR_LIST.length;
+  return PRIMARY_COLOR_LIST[hash] || DEFAULT_PRIMARY_COLOR;
 }
 
-function getSecondaryColor(id: UniqueIdentifier) {
-  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
-  return SECONDARY_COLOR_LIST[hash];
+function getSecondaryColor(id: UniqueIdentifier): string {
+  const parts = String(id).split('|');
+  const key = parts[1]?.slice(0, 3) ?? '';
+  const hash = simpleHash(key) % SECONDARY_COLOR_LIST.length;
+  return SECONDARY_COLOR_LIST[hash] || DEFAULT_SECONDARY_COLOR;
 }
 
 type SortableItemProps = {

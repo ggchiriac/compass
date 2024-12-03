@@ -18,7 +18,6 @@ import type { ReactNode } from 'react';
 import { getSession } from '@auth0/nextjs-auth0';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import { cookies } from 'next/headers';
 
 import Content from '@/app/content';
@@ -58,9 +57,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang='en' className='bg-hoagieplan-dark-yellow'>
       <UserProvider>
         <body className='antialiased'>
-          <Content user={session.user}>{children}</Content>
+          <Content user={session?.user ?? null}>{children}</Content>
           <Analytics />
-          <SpeedInsights />
         </body>
       </UserProvider>
     </html>
