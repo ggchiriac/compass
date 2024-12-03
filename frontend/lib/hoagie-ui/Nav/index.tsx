@@ -164,8 +164,8 @@ function Nav({
               onClick={() => openTutorialModal(tutorialType)}
             >
               <HelpOutlineIcon
-                fontSize="large"
-                style={{ color: theme.colors.yellow400 }}
+                fontSize="medium"
+                style={{ color: theme.colors.blue500 }}
                 titleAccess="Open Tutorial"
               />
             </Pane>

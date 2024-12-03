@@ -135,7 +135,7 @@ const Search: FC = () => {
             `Server returned ${response.status}: ${response.statusText}`,
           );
         }
-      } catch (error) {
+      } catch {
         setError("There was an error fetching courses.");
       } finally {
         setLoading(false);

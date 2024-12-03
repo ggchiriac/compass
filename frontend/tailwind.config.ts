@@ -1,5 +1,7 @@
+import tailwindcssForms from "@tailwindcss/forms";
 import type { Config } from "tailwindcss";
 
+// TODO: Update colors here, see if they need to be integrated anywhere.
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -21,16 +23,16 @@ const config: Config = {
       },
       colors: {
         // Darker Day Theme
-        "day-primary": "#B26400", // Darkened Princeton Orange
-        "day-secondary": "#333333", // Softened Black
-        "day-accent": "#093E70", // Darkened Princeton Blue
-        "day-text": "#D9D9D9", // Light Gray for text
+        "day-primary": "#FFF",
+        "day-secondary": "#FFF",
+        "day-accent": "#FFF",
+        "day-text": "#FFF",
 
         // Night Theme
-        "night-primary": "#121212", // Near Black
-        "night-secondary": "#1E1E1E", // Dark Gray
-        "night-accent": "#324A5E", // Soft Blue
-        "night-text": "#E0E0E0", // Soft White for text
+        "night-primary": "#FFF",
+        "night-secondary": "#FFF",
+        "night-accent": "#FFF",
+        "night-text": "#FFF",
       },
       textColor: {
         "hoagieplan-blue": "#0F1E2F",
@@ -38,17 +40,12 @@ const config: Config = {
         "hoagieplan-black": "#2C2C2C",
         "hoagieplan-purple": "#663399",
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
       backgroundColor: {
         "dnd-gray": "rgba(0, 0, 0, 0.05)", // Background "on hover" color dnd uses
       },
     },
   },
-  plugins: [require("evergreen-ui"), require("@tailwindcss/forms")],
+  plugins: [tailwindcssForms],
 };
 
 export default config;

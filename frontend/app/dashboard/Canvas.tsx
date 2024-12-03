@@ -170,7 +170,6 @@ function DroppableContainer({
   );
 }
 
-// THIS IS WHERE YOU EDIT THE DND DROP ANIMATION
 const dropAnimation: DropAnimation = {
   duration: 200,
   sideEffects: defaultDropAnimationSideEffects({
@@ -327,7 +326,7 @@ export function Canvas({
     }
   });
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND}/fetch_courses/`,
@@ -340,15 +339,13 @@ export function Canvas({
         },
       );
       const data = await response.json();
-      console.log("DATA FROM fetchCourses()");
-      console.log(data);
       return data;
-    } catch (error) {
+    } catch {
       return null; // TODO: Handle error appropriately
     }
-  };
+  }, [profile.netId]);
 
-  const updateRequirements = () => {
+  const updateRequirements = useCallback(() => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_requirements/`, {
       method: "GET",
       credentials: "include",
@@ -360,7 +357,7 @@ export function Canvas({
       .then((data) => {
         setAcademicPlan(data);
       });
-  };
+  }, [profile.netId]);
 
   // Fetch user courses and check requirements on initial render
   useEffect(() => {
@@ -372,7 +369,7 @@ export function Canvas({
       }
     });
     updateRequirements();
-  }, [classYear]);
+  }, [classYear, fetchCourses, updateRequirements]);
 
   const staticSearchResults = useSearchStore((state) => state.searchResults);
   const [searchResults, setSearchResults] = useState(staticSearchResults);
@@ -588,6 +585,7 @@ export function Canvas({
 
           if (overContainerId) {
             if (activeContainerId !== overContainerId) {
+              csrfToken = await fetchCsrfToken();
               fetch(`${process.env.NEXT_PUBLIC_BACKEND}/update_courses/`, {
                 method: "POST",
                 credentials: "include",
@@ -600,8 +598,10 @@ export function Canvas({
                   crosslistings: active.id.toString().split("|")[1],
                   semesterId: overContainerId,
                 }),
-              }).then((response) => response.json());
-              updateRequirements();
+              }).then((response) => {
+                response.json();
+                updateRequirements();
+              });
             }
           }
 

@@ -224,7 +224,6 @@ const UserSettings: FC<ProfileProps> = ({ profile, onClose, onSave }) => {
   }
 
   const handleMinorsChange = (_, newMinors: MajorMinorType[]) => {
-    console.log("CSRF:", csrfToken);
     const uniqueMinors = Array.from(
       new Set(newMinors.map((minor) => minor.code)),
     ).map((code) => newMinors.find((minor) => minor.code === code));

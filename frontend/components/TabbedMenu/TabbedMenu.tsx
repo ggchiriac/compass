@@ -10,7 +10,7 @@ interface TabbedMenuProps {
   tabsData: { [key: string]: object };
   profile: Profile;
   csrfToken: string;
-  updateRequirements: any;
+  updateRequirements: () => void;
 }
 
 const TabbedMenu: FC<TabbedMenuProps> = ({

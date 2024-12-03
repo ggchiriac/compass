@@ -1,4 +1,4 @@
-import withPWA from 'next-pwa';
+import withPWA from "next-pwa";
 
 const nextConfig = {
   eslint: {
@@ -9,7 +9,7 @@ const nextConfig = {
   },
   reactStrictMode: true,
   ...withPWA({
-    dest: 'public',
+    dest: "public",
     register: true,
     skipWaiting: true,
   }),
