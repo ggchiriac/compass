@@ -1,13 +1,17 @@
-import { CSSProperties, forwardRef, ReactNode } from 'react';
+import { CSSProperties, forwardRef, ReactNode } from "react";
 
-import type { DraggableSyntheticListeners } from '@dnd-kit/core';
-import type { Transform } from '@dnd-kit/utilities';
-import classNames from 'classnames';
+import type { DraggableSyntheticListeners } from "@dnd-kit/core";
+import type { Transform } from "@dnd-kit/utilities";
+import classNames from "classnames";
 
-import { Handle } from '@/components/Item/components/Handle';
+import { Handle } from "@/components/Item/components/Handle";
 
-import { draggable, draggableHorizontal, draggableVertical } from './draggable-svg';
-import styles from './Draggable.module.scss';
+import {
+  draggable,
+  draggableHorizontal,
+  draggableVertical,
+} from "./draggable-svg";
+import styles from "./Draggable.module.css";
 
 export enum Axis {
   All,
@@ -28,54 +32,56 @@ type DraggableProps = {
   children?: ReactNode;
 };
 
-export const Draggable = forwardRef<HTMLButtonElement, DraggableProps>(function Draggable(
-  {
-    axis,
-    dragOverlay,
-    dragging,
-    handle,
-    label,
-    listeners,
-    transform,
-    style,
-    buttonStyle,
-    ...props
-  },
-  ref
-) {
-  return (
-    <div
-      className={classNames(
-        styles.Draggable,
-        dragOverlay && styles.dragOverlay,
-        dragging && styles.dragging,
-        handle && styles.handle
-      )}
-      style={
-        {
-          ...style,
-          '--translate-x': `${transform?.x ?? 0}px`,
-          '--translate-y': `${transform?.y ?? 0}px`,
-        } as CSSProperties
-      }
-    >
-      <button
-        {...props}
-        aria-label='Draggable'
-        data-cypress='draggable-item'
-        {...(handle ? {} : listeners)}
-        tabIndex={handle ? -1 : undefined}
-        ref={ref}
-        style={buttonStyle}
+export const Draggable = forwardRef<HTMLButtonElement, DraggableProps>(
+  function Draggable(
+    {
+      axis,
+      dragOverlay,
+      dragging,
+      handle,
+      label,
+      listeners,
+      transform,
+      style,
+      buttonStyle,
+      ...props
+    },
+    ref,
+  ) {
+    return (
+      <div
+        className={classNames(
+          styles.Draggable,
+          dragOverlay && styles.dragOverlay,
+          dragging && styles.dragging,
+          handle && styles.handle,
+        )}
+        style={
+          {
+            ...style,
+            "--translate-x": `${transform?.x ?? 0}px`,
+            "--translate-y": `${transform?.y ?? 0}px`,
+          } as CSSProperties
+        }
       >
-        {axis === Axis.Vertical
-          ? draggableVertical
-          : axis === Axis.Horizontal
-            ? draggableHorizontal
-            : draggable}
-        {handle ? <Handle {...(handle ? listeners : {})} /> : null}
-      </button>
-      {label ? <label>{label}</label> : null}
-    </div>
-  );
-});
+        <button
+          {...props}
+          aria-label="Draggable"
+          data-cypress="draggable-item"
+          {...(handle ? {} : listeners)}
+          tabIndex={handle ? -1 : undefined}
+          ref={ref}
+          style={buttonStyle}
+        >
+          {axis === Axis.Vertical
+            ? draggableVertical
+            : axis === Axis.Horizontal
+              ? draggableHorizontal
+              : draggable}
+          {handle ? <Handle {...(handle ? listeners : {})} /> : null}
+        </button>
+        {label ? <label>{label}</label> : null}
+      </div>
+    );
+  },
+);

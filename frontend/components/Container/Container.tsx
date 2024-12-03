@@ -1,8 +1,15 @@
-import { CSSProperties, forwardRef, HTMLAttributes, ReactNode, Ref, RefCallback } from 'react';
+import {
+  CSSProperties,
+  forwardRef,
+  HTMLAttributes,
+  ReactNode,
+  Ref,
+  RefCallback,
+} from "react";
 
-import classNames from 'classnames';
+import classNames from "classnames";
 
-import styles from './Container.module.scss';
+import styles from "./Container.module.css";
 
 export type ContainerProps = {
   children: ReactNode;
@@ -21,7 +28,10 @@ export type ContainerProps = {
   onRemove?(): void;
 };
 
-export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, ContainerProps>(
+export const Container = forwardRef<
+  HTMLDivElement | HTMLButtonElement,
+  ContainerProps
+>(
   (
     {
       children,
@@ -40,11 +50,13 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
       height,
       ...props
     }: ContainerProps,
-    ref: Ref<HTMLDivElement | HTMLButtonElement>
+    ref: Ref<HTMLDivElement | HTMLButtonElement>,
   ) => {
-    const Component = onClick ? 'button' : 'div';
-    const setRef: RefCallback<HTMLDivElement | HTMLButtonElement> = (instance) => {
-      if (typeof ref === 'function') {
+    const Component = onClick ? "button" : "div";
+    const setRef: RefCallback<HTMLDivElement | HTMLButtonElement> = (
+      instance,
+    ) => {
+      if (typeof ref === "function") {
         ref(instance);
       }
     };
@@ -56,7 +68,7 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
         style={
           {
             ...style,
-            '--columns': columns,
+            "--columns": columns,
             height: height,
           } as CSSProperties
         }
@@ -67,7 +79,7 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
           hover && styles.hover,
           placeholder && styles.placeholder,
           scrollable && styles.scrollable,
-          shadow && styles.shadow
+          shadow && styles.shadow,
         )}
         onClick={onClick}
         tabIndex={onClick ? 0 : undefined}
@@ -76,7 +88,7 @@ export const Container = forwardRef<HTMLDivElement | HTMLButtonElement, Containe
         {placeholder ? children : <ul>{children}</ul>}
       </Component>
     );
-  }
+  },
 );
 
-Container.displayName = 'Container';
+Container.displayName = "Container";
