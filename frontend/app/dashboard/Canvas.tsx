@@ -28,6 +28,8 @@ import TabbedMenu from '@/components/TabbedMenu/TabbedMenu';
 import useSearchStore from '@/store/searchSlice';
 import type { Course, Profile } from '@/types';
 import { fetchCsrfToken } from '@/utils/csrf';
+import { departmentColors } from '@/utils/departmentColors';
+import { getDepartmentGradient } from '@/utils/departmentColors';
 
 import { coordinateGetter as multipleContainersCoordinateGetter } from './multipleContainersKeyboardCoordinates';
 
@@ -39,38 +41,6 @@ import type {
   KeyboardCoordinateGetter,
 } from '@dnd-kit/core';
 import type { AnimateLayoutChanges } from '@dnd-kit/sortable';
-
-const PRIMARY_COLOR_LIST: string[] = [
-  '#ff7895',
-  '#e38a62',
-  '#cdaf7b',
-  '#94bb77',
-  '#e2c25e',
-  '#ead196',
-  '#e7bc7d',
-  '#d0b895',
-  '#72b4c9',
-  '#2cdbca',
-  '#a8cadc',
-  '#c5bab6',
-  '#bf91bd',
-];
-
-const SECONDARY_COLOR_LIST: string[] = [
-  '#ff91a9',
-  '#e9a88a',
-  '#d7bf95',
-  '#afcb9a',
-  '#e9d186',
-  '#f5db9d',
-  '#f0d2a8',
-  '#dcc9af',
-  '#96c7d6',
-  '#2ee8d6',
-  '#a8d3dc',
-  '#cac1be',
-  '#c398c1',
-];
 
 // Heights are relative to viewport height
 const containerGridHeight = '87vh';
@@ -826,13 +796,15 @@ export function Canvas({
 }
 
 function getPrimaryColor(id: UniqueIdentifier) {
-  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
-  return PRIMARY_COLOR_LIST[hash];
+  const dept = String(id).split('|')[1].slice(0, 3).toUpperCase();
+  const gradient = getDepartmentGradient(dept, 90);
+  return gradient.match(/#[0-9a-fA-F]{6}/)?.[0] ?? '#000000'; // Extract the first color
 }
 
 function getSecondaryColor(id: UniqueIdentifier) {
-  const hash = simpleHash(String(id).split('|')[1].slice(0, 3));
-  return SECONDARY_COLOR_LIST[hash];
+  const dept = String(id).split('|')[1].slice(0, 3).toUpperCase();
+  const gradient = getDepartmentGradient(dept, 90);
+  return gradient.match(/#[0-9a-fA-F]{6}/g)?.[1] ?? '#FFFFFF'; // Extract the second color
 }
 
 type SortableItemProps = {
